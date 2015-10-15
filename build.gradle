@@ -1,0 +1,35 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+}
+
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'maven'
+
+group = 'com.secureauth.api'
+
+version = '0.9.0'
+jar {
+    baseName = 'saRestApi'
+}
+
+repositories {
+    mavenCentral()
+}
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+dependencies {
+    compile('com.sun.jersey:jersey-client:1.19')
+    compile('com.sun.jersey:jersey-json:1.19')
+    compile('commons-codec:commons-codec:1.10')
+    
+    compile fileTree(dir: 'lib', include: '*.jar')
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '2.7'
+}
