@@ -26,8 +26,6 @@ dependencies {
     compile('com.sun.jersey:jersey-client:1.19')
     compile('com.sun.jersey:jersey-json:1.19')
     compile('commons-codec:commons-codec:1.10')
-    
-    compile fileTree(dir: 'lib', include: '*.jar')
 }
 
 task wrapper(type: Wrapper) {
