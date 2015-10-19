@@ -17,7 +17,7 @@ Requires ant to build the package
 Building:
 --------
 1. Fork the Repo to local machine
-2. Run gradle build jar
+2. Run gradle jar
 
 Add the saLib folder to your classpath for use with any of your projects
 
