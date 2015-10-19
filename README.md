@@ -34,8 +34,8 @@ String applianceHost = "example.domain.com";
 String appliancePort = "443";
 boolean applianceSSL = true;
 String realm = "secureauth2";
-String applicationID = "2c30646d6ec64d6bae351c0728cf594d";
-String applicationKey = "6f03fdc29ff4dc17b95067bba0b68009d269193f77663d8a0a63c6a07079d626";
+String applicationID = ".........";
+String applicationKey = ".........";
 
  /*
  This will create the instance of the SAAccess which is able to execute REST calls.
