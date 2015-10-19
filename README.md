@@ -11,8 +11,8 @@ The SDK version 0.9.0. is written to support SecureAuth Appliance 8.1 and newer.
 
 Requirements:
 ------------
-Requires Java 1.6 or Newer
-Requires ant to build the package
+Requires Java 1.7 or Newer
+Requires gradle to build the package
 
 Building:
 --------
