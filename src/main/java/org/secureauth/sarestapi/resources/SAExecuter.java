@@ -5,6 +5,7 @@ import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.client.config.DefaultClientConfig;
 import com.sun.jersey.client.urlconnection.HTTPSProperties;
+
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.SerializationConfig;
 import org.secureauth.sarestapi.data.*;
@@ -14,8 +15,11 @@ import javax.net.ssl.*;
 import javax.ws.rs.core.MediaType;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Unmarshaller;
+
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.net.URI;
+import java.net.URL;
 import java.security.SecureRandom;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
@@ -73,7 +77,7 @@ public class SAExecuter {
             ctx = SSLContext.getInstance("TLS");
             ctx.init(null, certs, new SecureRandom());
         }catch(java.security.GeneralSecurityException ex){
-            logger.log(Level.SEVERE,new StringBuilder().append("Exception occurred while attempting to setup SSL security. ").toString());
+            logger.log(Level.SEVERE,new StringBuilder().append("Exception occurred while attempting to setup SSL security. ").toString(), ex);
         }
 
         //logger.log(Level.SEVERE,"Setting url connection!");
@@ -88,7 +92,7 @@ public class SAExecuter {
 
 
         }catch(Exception e){
-            logger.log(Level.SEVERE,new StringBuilder().append("Exception occurred while attempting to associating our SSL cert to the session.").toString());
+            logger.log(Level.SEVERE,new StringBuilder().append("Exception occurred while attempting to associating our SSL cert to the session.").toString(), e);
         }
 
         try{
@@ -134,7 +138,7 @@ public class SAExecuter {
 
         }catch(Exception e){
             logger.log(Level.SEVERE,new StringBuilder().append("Exception getting User Factors: \nQuery:\n\t")
-                    .append(query).append("\nError:").append(e.getMessage()).append(".\nResponse code is ").append(response.getStatus()).toString());
+                    .append(query).append("\nError:").append(e.getMessage()).append(".\nResponse code is ").append(response).toString(), e);
         }
         return factorsResponse;
 
@@ -172,7 +176,7 @@ public class SAExecuter {
 
         }catch(Exception e){
             logger.log(Level.SEVERE,new StringBuilder().append("Exception Validating User: \nQuery:\n\t")
-                    .append(query).append("\nError: \n\t").append(responseStr).append(".\nResponse code is ").append(response.getStatus()).toString());
+                    .append(query).append("\nError: \n\t").append(responseStr).append(".\nResponse code is ").append(response).toString(), e);
         }
         return responseObject;
 
@@ -206,7 +210,7 @@ public class SAExecuter {
 
         }catch(Exception e){
             logger.log(Level.SEVERE,new StringBuilder().append("Exception Validating User Password: \nQuery:\n\t")
-                    .append(query).append("\nError:").append(e.getMessage()).append(".\nResponse code is ").append(response.getStatus()).toString());
+                    .append(query).append("\nError:").append(e.getMessage()).append(".\nResponse code is ").append(response).toString(), e);
         }
         return responseObject;
 
@@ -239,7 +243,7 @@ public class SAExecuter {
 
         }catch(Exception e){
             logger.log(Level.SEVERE,new StringBuilder().append("Exception Validating KBA: \nQuery:\n\t")
-                    .append(query).append("\nError:").append(e.getMessage()).append(".\nResponse code is ").append(response.getStatus()).toString());
+                    .append(query).append("\nError:").append(e.getMessage()).append(".\nResponse code is ").append(response).toString(), e);
         }
         return responseObject;
 
@@ -273,7 +277,7 @@ public class SAExecuter {
 
         }catch(Exception e){
             logger.log(Level.SEVERE,new StringBuilder().append("Exception Validating OATH: \nQuery:\n\t")
-                    .append(query).append("\nError:").append(e.getMessage()).append(".\nResponse code is ").append(response.getStatus()).toString());
+                    .append(query).append("\nError:").append(e.getMessage()).append(".\nResponse code is ").append(response).toString(), e);
         }
         return responseObject;
 
@@ -307,7 +311,7 @@ public class SAExecuter {
 
         }catch(Exception e){
             logger.log(Level.SEVERE,new StringBuilder().append("Exception Delivering OTP by Phone: \nQuery:\n\t")
-                    .append(query).append("\nError:").append(e.getMessage()).append(".\nResponse code is ").append(response.getStatus()).toString());
+                    .append(query).append("\nError:").append(e.getMessage()).append(".\nResponse code is ").append(response).toString(), e);
         }
         return responseObject;
 
@@ -341,7 +345,7 @@ public class SAExecuter {
 
         }catch(Exception e){
             logger.log(Level.SEVERE,new StringBuilder().append("Exception Delivering OTP by SMS: \nQuery:\n\t")
-                    .append(query).append("\nError:").append(e.getMessage()).append(".\nResponse code is ").append(response.getStatus()).toString());
+                    .append(query).append("\nError:").append(e.getMessage()).append(".\nResponse code is ").append(response).toString(), e);
         }
         return responseObject;
 
@@ -375,7 +379,7 @@ public class SAExecuter {
 
         }catch(Exception e){
             logger.log(Level.SEVERE,new StringBuilder().append("Exception Delivering OTP by Email: \nQuery:\n\t")
-                    .append(query).append("\nError:").append(e.getMessage()).append(".\nResponse code is ").append(response.getStatus()).toString());
+                    .append(query).append("\nError:").append(e.getMessage()).append(".\nResponse code is ").append(response).toString(), e);
         }
         return responseObject;
 
@@ -409,7 +413,7 @@ public class SAExecuter {
 
         }catch(Exception e){
             logger.log(Level.SEVERE,new StringBuilder().append("Exception Delivering OTP by Push: \nQuery:\n\t")
-                    .append(query).append("\nError:").append(e.getMessage()).append(".\nResponse code is ").append(response.getStatus()).toString());
+                    .append(query).append("\nError:").append(e.getMessage()).append(".\nResponse code is ").append(response).toString(), e);
         }
         return responseObject;
 
@@ -443,7 +447,7 @@ public class SAExecuter {
 
         }catch(Exception e){
             logger.log(Level.SEVERE,new StringBuilder().append("Exception Delivering OTP by HelpDesk: \nQuery:\n\t")
-                    .append(query).append("\nError:").append(e.getMessage()).append(".\nResponse code is ").append(response.getStatus()).toString());
+                    .append(query).append("\nError:").append(e.getMessage()).append(".\nResponse code is ").append(response).toString(), e);
         }
         return responseObject;
 
@@ -479,7 +483,7 @@ public class SAExecuter {
 
         }catch(Exception e){
             logger.log(Level.SEVERE,new StringBuilder().append("Exception Running IP Evaluation: \nQuery:\n\t")
-                    .append(query).append("\nError:").append(e.getMessage()).append(".\nResponse code is ").append(response.getStatus()).toString());
+                    .append(query).append("\nError:").append(e.getMessage()).append(".\nResponse code is ").append(response).toString(), e);
         }
         return ipEval;
 

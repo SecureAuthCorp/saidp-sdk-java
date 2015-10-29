@@ -65,7 +65,7 @@ public class RestApiHeader {
         try {
             base64Sha = new String(Base64.encodeBase64(HMACUtil.encode(saAuth.getApplicationKey(), stringBuilder.toString())));
         }catch(Exception e){
-            logger.log(Level.SEVERE,new StringBuilder().append("Exception occurred while generating Authorization Header\n").append(e.getMessage()).append("\n").toString());
+            logger.log(Level.SEVERE,new StringBuilder().append("Exception occurred while generating Authorization Header\n").append(e.getMessage()).append("\n").toString(), e);
         }
 
         String appId = saAuth.getApplicationID() + ":" + base64Sha;
@@ -73,7 +73,7 @@ public class RestApiHeader {
         try {
             authHeader = "Basic " + Base64.encodeBase64String(appId.getBytes("UTF-8"));
         }catch(UnsupportedEncodingException uee){
-            logger.log(Level.SEVERE, new StringBuilder().append("Exception Encoding\n").append(uee.getMessage()).append("\n").toString());
+            logger.log(Level.SEVERE, new StringBuilder().append("Exception Encoding\n").append(uee.getMessage()).append("\n").toString(), uee);
         }
 
         return authHeader;
@@ -97,7 +97,7 @@ public class RestApiHeader {
         try {
             base64Sha = new String(Base64.encodeBase64(HMACUtil.encode(saAuth.getApplicationKey(), stringBuilder.toString())));
         }catch(Exception e){
-            logger.log(Level.SEVERE,new StringBuilder().append("Exception occurred while generating Authorization Header\n").append(e.getMessage()).append("\n").toString());
+            logger.log(Level.SEVERE,new StringBuilder().append("Exception occurred while generating Authorization Header\n").append(e.getMessage()).append("\n").toString(), e);
         }
 
         String appId = saAuth.getApplicationID() + ":" + base64Sha;
@@ -105,7 +105,7 @@ public class RestApiHeader {
         try {
             authHeader = "Basic " + Base64.encodeBase64String(appId.getBytes("UTF-8"));
         }catch(UnsupportedEncodingException uee){
-            logger.log(Level.SEVERE, new StringBuilder().append("Exception Encoding\n").append(uee.getMessage()).append("\n").toString());
+            logger.log(Level.SEVERE, new StringBuilder().append("Exception Encoding\n").append(uee.getMessage()).append("\n").toString(), uee);
         }
 
         return authHeader;
@@ -126,7 +126,7 @@ public class RestApiHeader {
         try {
             base64Sha = new String(Base64.encodeBase64(HMACUtil.encode(saAuth.getApplicationKey(), stringBuilder.toString())));
         }catch(Exception e){
-            logger.log(Level.SEVERE,new StringBuilder().append("Exception occurred while generating Authorization Header\n").append(e.getMessage()).append("\n").toString());
+            logger.log(Level.SEVERE,new StringBuilder().append("Exception occurred while generating Authorization Header\n").append(e.getMessage()).append("\n").toString(), e);
         }
 
         String appId = saAuth.getApplicationID() + ":" + base64Sha;
@@ -134,7 +134,7 @@ public class RestApiHeader {
         try {
             authHeader = "Basic " + Base64.encodeBase64String(appId.getBytes("UTF-8"));
         }catch(UnsupportedEncodingException uee){
-            logger.log(Level.SEVERE, new StringBuilder().append("Exception Encoding\n").append(uee.getMessage()).append("\n").toString());
+            logger.log(Level.SEVERE, new StringBuilder().append("Exception Encoding\n").append(uee.getMessage()).append("\n").toString(), uee);
         }
 
         return authHeader;
