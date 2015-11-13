@@ -2,15 +2,10 @@ package org.secureauth.restapi.examples;
 
 
 import java.net.MalformedURLException;
-import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
 
 import org.secureauth.sarestapi.SAAccess;
-import org.secureauth.sarestapi.data.Factors;
 import org.secureauth.sarestapi.data.FactorsResponse;
-import org.secureauth.sarestapi.data.IPEval;
-import org.secureauth.sarestapi.data.ResponseObject;
 
 
 /**
@@ -39,17 +34,15 @@ import org.secureauth.sarestapi.data.ResponseObject;
 public class GetFactorsForUser {
 
     //Define our User Variables
-    private static String user = "Test User";
-    private static String password = "test";
-    private static String otp = "";
+    private static String user = "lding";
 
     //Required for connectivity to Appliance
-    private static String applianceHost = "user-identity.com";
+    private static String applianceHost = "qaportal2.gosecureauth.com";
     private static String appliancePort = "443";
     private static boolean applianceSSL = true;
-    private static String realm = "secureauth998";
-    private static String applicationID = "66ecde134bf343a99c0e8586328bb346";
-    private static String applicationKey = "3983de13b7c5cf39bc952c7599243507c4f0f8784817e7861892b7f5b141f530";
+    private static String realm = "secureauth11";
+    private static String applicationID = "5e0f658a77484a0aa799bafd0f04c28c";
+    private static String applicationKey = "5a264feaa95a348d8fa64bf038d8add50638bdc807f0940e817e1045c518d57d";
 
 
     public static void main(String[] args) throws MalformedURLException, URISyntaxException{
@@ -59,9 +52,8 @@ public class GetFactorsForUser {
 
         System.out.println("Start Test++++++++++++++++++");
         //Grab all available Factors for a user
-//        FactorsResponse factorsResponse = getFactors(saAccess, user);
+        getFactors(saAccess, user);
         
-        System.out.println(new StringBuilder().append("...").append((String)null));
         System.out.println("End Test++++++++++++++++++++");
 
     }
