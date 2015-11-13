@@ -1,19 +1,27 @@
 package org.secureauth.sarestapi;
 
-import org.secureauth.sarestapi.data.*;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Locale;
+import java.util.TimeZone;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import org.secureauth.sarestapi.data.AuthRequest;
+import org.secureauth.sarestapi.data.FactorsResponse;
+import org.secureauth.sarestapi.data.IPEval;
+import org.secureauth.sarestapi.data.IPEvalRequest;
+import org.secureauth.sarestapi.data.PushAcceptDetails;
+import org.secureauth.sarestapi.data.PushAcceptStatus;
+import org.secureauth.sarestapi.data.PushToAcceptRequest;
+import org.secureauth.sarestapi.data.ResponseObject;
+import org.secureauth.sarestapi.data.SAAuth;
+import org.secureauth.sarestapi.data.SABaseURL;
 import org.secureauth.sarestapi.queries.AuthQuery;
 import org.secureauth.sarestapi.queries.FactorsQuery;
 import org.secureauth.sarestapi.queries.IPEvalQuery;
 import org.secureauth.sarestapi.resources.SAExecuter;
 import org.secureauth.sarestapi.util.RestApiHeader;
-
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Locale;
-import java.util.TimeZone;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * @author rrowcliffe@secureauth.com
@@ -110,7 +118,7 @@ import java.util.logging.Logger;
 
 
         try{
-            return saExecuter.executeGetFactorsByUser(header,saBaseURL.getApplianceURL() + FactorsQuery.queryFactors(saAuth.getRealm(),userid),ts);
+            return saExecuter.executeGetRequest(header,saBaseURL.getApplianceURL() + FactorsQuery.queryFactors(saAuth.getRealm(),userid),ts, FactorsResponse.class);
 
         }catch (Exception e){
         logger.log(Level.SEVERE,new StringBuilder().append("Exception occurred executing REST query::\n").append(e.getMessage()).append("\n").toString(), e);
@@ -118,6 +126,54 @@ import java.util.logging.Logger;
         return null;
     }
 
+    /**
+     * <p>
+     *     Send push to accept request asynchronously 
+     * </p>
+     * @param userid the user id of the identity
+     * @param endUserIP the IP of requesting client
+     * @return {@link org.secureauth.sarestapi.data.FactorsResponse}
+     */
+    public ResponseObject sendPushToAcceptReq(String userid, String factor_id, String endUserIP, String clientCompany, String clientDescription){
+        String ts = getServerTime();
+        RestApiHeader restApiHeader = new RestApiHeader();
+        PushToAcceptRequest req = new PushToAcceptRequest();
+        req.setUser_id(userid);
+        req.setType("push_accept");
+        req.setFactor_id(factor_id);
+        PushAcceptDetails pad = new PushAcceptDetails();
+        pad.setEnduser_ip(endUserIP);
+        if (clientCompany != null) {
+        	pad.setCompany_name(clientCompany);
+        }
+        if (clientDescription != null) {
+        	pad.setApplication_description(clientDescription);
+        }
+        req.setPush_accept_details(pad);
+        String header = restApiHeader.getAuthorizationHeader(saAuth,"POST", AuthQuery.queryAuth(saAuth.getRealm()), req,ts);
+
+        try{
+            return saExecuter.executePushRequest(header,saBaseURL.getApplianceURL() + AuthQuery.queryAuth(saAuth.getRealm()), req,ts);
+        }catch (Exception e){
+            logger.log(Level.SEVERE,new StringBuilder().append("Exception occurred executing REST query::\n").append(e.getMessage()).append("\n").toString(), e);
+        }
+        return null;
+    }
+    
+    public PushAcceptStatus queryPushAcceptStatus(String refId){
+        String ts = getServerTime();
+        RestApiHeader restApiHeader = new RestApiHeader();
+        String getUri = AuthQuery.queryAuth(saAuth.getRealm()) + "/" + refId;
+        String header = restApiHeader.getAuthorizationHeader(saAuth,"GET", getUri,ts);
+
+        try{
+            return saExecuter.executeGetRequest(header,saBaseURL.getApplianceURL() + getUri,ts, PushAcceptStatus.class);
+        }catch (Exception e){
+            logger.log(Level.SEVERE,new StringBuilder().append("Exception occurred executing REST query::\n").append(e.getMessage()).append("\n").toString(), e);
+        }
+        return null;
+    }
+    
     public static String encode(String input) {
         StringBuilder resultStr = new StringBuilder();
         for (char ch : input.toCharArray()) {
@@ -353,7 +409,7 @@ import java.util.logging.Logger;
         String header = restApiHeader.getAuthorizationHeader(saAuth,"POST", AuthQuery.queryAuth(saAuth.getRealm()), authRequest,ts);
 
         try{
-            return saExecuter.executeOTPByPush(header,saBaseURL.getApplianceURL() + AuthQuery.queryAuth(saAuth.getRealm()), authRequest,ts);
+            return saExecuter.executePushRequest(header,saBaseURL.getApplianceURL() + AuthQuery.queryAuth(saAuth.getRealm()), authRequest,ts);
         }catch (Exception e){
             logger.log(Level.SEVERE,new StringBuilder().append("Exception occurred executing REST query::\n").append(e.getMessage()).append("\n").toString(), e);
         }

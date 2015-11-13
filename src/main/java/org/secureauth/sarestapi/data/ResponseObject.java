@@ -31,6 +31,7 @@ public class ResponseObject {
     private String status;
     private String message;
     private String user_id;
+    private String reference_id;
     private int otp;
 
     public String getStatus() {
@@ -65,6 +66,13 @@ public class ResponseObject {
         this.otp = otp;
     }
 
+	public String getReference_id() {
+		return reference_id;
+	}
+
+	public void setReference_id(String reference_id) {
+		this.reference_id = reference_id;
+	}
 
     @Override
     public String toString(){
@@ -74,10 +82,12 @@ public class ResponseObject {
         if(user_id != null) {
             stringBuilder.append("\n\t").append("User_ID:").append(user_id);
         }
+        if(reference_id != null) {
+            stringBuilder.append("\n\t").append("reference_id:").append(reference_id);
+        }
         if(otp > 0) {
             stringBuilder.append("\n\t").append("OTP:").append(otp);
         }
         return stringBuilder.toString();
     }
-
 }

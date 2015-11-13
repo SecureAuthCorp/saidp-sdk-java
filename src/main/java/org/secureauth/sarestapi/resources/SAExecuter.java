@@ -110,7 +110,7 @@ public class SAExecuter {
     }
 
     //Get Factors for the user requested
-    public FactorsResponse executeGetFactorsByUser(String auth, String query,String ts)throws Exception {
+    public <T> T executeGetRequest(String auth, String query,String ts,  Class<T> valueType)throws Exception {
         if(client == null) {
             createConnection();
         }
@@ -118,7 +118,7 @@ public class SAExecuter {
         WebResource service = null;
         ClientResponse response = null;
         String factors=null;
-        FactorsResponse factorsResponse =null;
+        T factorsResponse =null;
         try{
 
             service = client.resource(query);
@@ -130,11 +130,11 @@ public class SAExecuter {
             factors= response.getEntity(String.class);
 
             //System.out.println(factors);
-            JAXBContext context = JAXBContext.newInstance(FactorsResponse.class);
+            JAXBContext context = JAXBContext.newInstance(valueType);
             Unmarshaller un = context.createUnmarshaller();
+
             InputStream inStream = new ByteArrayInputStream(factors.getBytes());
-            //factorsResponse = (FactorsResponse) un.unmarshal(inStream);
-            factorsResponse = new ObjectMapper().readValue(inStream, FactorsResponse.class);
+            factorsResponse = new ObjectMapper().readValue(inStream, valueType);
 
         }catch(Exception e){
             logger.log(Level.SEVERE,new StringBuilder().append("Exception getting User Factors: \nQuery:\n\t")
@@ -386,7 +386,7 @@ public class SAExecuter {
     }
 
     //Validate User Token by Push Notification
-    public ResponseObject executeOTPByPush(String auth,String query, AuthRequest authRequest,String ts)throws Exception{
+    public ResponseObject executePushRequest(String auth,String query, AuthRequest authRequest,String ts)throws Exception{
 
         if(client == null) {
             createConnection();
