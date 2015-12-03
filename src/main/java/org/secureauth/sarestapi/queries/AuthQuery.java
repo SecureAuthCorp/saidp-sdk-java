@@ -33,4 +33,10 @@ public class AuthQuery {
         stringBuilder.append(realm).append(s.APPLIANCE_AUTH);
         return stringBuilder.toString();
     }
+    
+    public static String queryAAuth(String realm){
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append(realm).append(s.APPLIANCE_AAUTH);
+        return stringBuilder.toString();
+    }
 }

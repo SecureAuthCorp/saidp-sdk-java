@@ -385,8 +385,8 @@ public class SAExecuter {
 
     }
 
-    //Validate User Token by Push Notification
-    public ResponseObject executePushRequest(String auth,String query, AuthRequest authRequest,String ts)throws Exception{
+     // post request
+    public <T> T executePostRequest(String auth,String query, AuthRequest authRequest,String ts, Class<T> valueType)throws Exception{
 
         if(client == null) {
             createConnection();
@@ -395,7 +395,7 @@ public class SAExecuter {
         WebResource service = null;
         ClientResponse response = null;
         String responseStr=null;
-        ResponseObject responseObject =null;
+        T responseObject =null;
         try{
 
             service = client.resource(query);
@@ -405,10 +405,10 @@ public class SAExecuter {
                     header("X-SA-Date", ts).
                     post(ClientResponse.class, JSONUtil.getJSONStringFromObject(authRequest));
             responseStr= response.getEntity(String.class);
-            JAXBContext context = JAXBContext.newInstance(ResponseObject.class);
+            JAXBContext context = JAXBContext.newInstance(valueType);
             Unmarshaller un = context.createUnmarshaller();
             InputStream inStream = new ByteArrayInputStream(responseStr.getBytes());
-            responseObject = new ObjectMapper().readValue(inStream,ResponseObject.class);
+            responseObject = new ObjectMapper().readValue(inStream,valueType);
 
 
         }catch(Exception e){

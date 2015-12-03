@@ -40,9 +40,9 @@ public class GetFactorsForUser {
     private static String applianceHost = "qaportal2.gosecureauth.com";
     private static String appliancePort = "443";
     private static boolean applianceSSL = true;
-    private static String realm = "secureauth11";
-    private static String applicationID = "5e0f658a77484a0aa799bafd0f04c28c";
-    private static String applicationKey = "5a264feaa95a348d8fa64bf038d8add50638bdc807f0940e817e1045c518d57d";
+	private static String realm = "secureauth33";
+	private static String applicationID = "7635d6e3be694291b08c7243bb9e2db5";
+	private static String applicationKey = "2714b243644a50565fc6b318f2b50463c6d1da066dd83dd71f093b923decd025";
 
 
     public static void main(String[] args) throws MalformedURLException, URISyntaxException{

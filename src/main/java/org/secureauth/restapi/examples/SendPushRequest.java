@@ -6,6 +6,8 @@ import java.net.URISyntaxException;
 import org.secureauth.sarestapi.SAAccess;
 import org.secureauth.sarestapi.data.Factors;
 import org.secureauth.sarestapi.data.FactorsResponse;
+import org.secureauth.sarestapi.data.PushAcceptStatus;
+import org.secureauth.sarestapi.data.ResponseObject;
 
 public class SendPushRequest {
 
@@ -16,9 +18,9 @@ public class SendPushRequest {
 	private static String applianceHost = "qaportal2.gosecureauth.com";
 	private static String appliancePort = "443";
 	private static boolean applianceSSL = true;
-	private static String realm = "secureauth33";
-	private static String applicationID = "7635d6e3be694291b08c7243bb9e2db5";
-	private static String applicationKey = "2714b243644a50565fc6b318f2b50463c6d1da066dd83dd71f093b923decd025";
+	private static String realm = "secureauth11";
+	private static String applicationID = "5e0f658a77484a0aa799bafd0f04c28c";
+	private static String applicationKey = "5a264feaa95a348d8fa64bf038d8add50638bdc807f0940e817e1045c518d57d";
 
 	public static void main(String[] args) throws MalformedURLException,
 			URISyntaxException, InterruptedException {
@@ -35,14 +37,19 @@ public class SendPushRequest {
                 for (String capability : factor.getCapabilities()) {
                     //Test
                     if (capability.equalsIgnoreCase("push_accept")) {
-                        String refId = saAccess.sendPushToAcceptReq(user, factor.getId(), "12.1.1.1", null, null).getReference_id();
-                        Thread.sleep(500);
-                        System.out.println(saAccess.queryPushAcceptStatus(refId));
-                        break;
+                    	ResponseObject ro = saAccess.sendPushToAcceptReq(user, factor.getId(), "192.168.2.192", null, null);
+                    	System.out.println(ro);
+                        String refId = ro.getReference_id();
+                        PushAcceptStatus status;
+                        do {
+	                        Thread.sleep(2000);
+	                        status = saAccess.queryPushAcceptStatus(refId);
+	                        System.out.println(status);
+                        } while("PENDING".equals(status.getMessage()));
+                        //break;
                     }
                 }
             }
-
         }
 
 		System.out.println("End Test++++++++++++++++++++");
