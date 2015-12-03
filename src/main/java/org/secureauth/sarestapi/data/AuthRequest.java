@@ -27,7 +27,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 @JsonSerialize(include=JsonSerialize.Inclusion.NON_NULL)
 public class AuthRequest {
 
-    private String user_id;
+    String user_id;
     private String type;
     private String token;
     private String factor_id;

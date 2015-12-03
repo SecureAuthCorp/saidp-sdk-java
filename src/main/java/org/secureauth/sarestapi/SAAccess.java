@@ -7,6 +7,8 @@ import java.util.TimeZone;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.secureauth.sarestapi.data.AdaptiveAuthRequest;
+import org.secureauth.sarestapi.data.AdaptiveAuthResponse;
 import org.secureauth.sarestapi.data.AuthRequest;
 import org.secureauth.sarestapi.data.FactorsResponse;
 import org.secureauth.sarestapi.data.IPEval;
@@ -153,7 +155,29 @@ import org.secureauth.sarestapi.util.RestApiHeader;
         String header = restApiHeader.getAuthorizationHeader(saAuth,"POST", AuthQuery.queryAuth(saAuth.getRealm()), req,ts);
 
         try{
-            return saExecuter.executePushRequest(header,saBaseURL.getApplianceURL() + AuthQuery.queryAuth(saAuth.getRealm()), req,ts);
+            return saExecuter.executePostRequest(header,saBaseURL.getApplianceURL() + AuthQuery.queryAuth(saAuth.getRealm()), req,ts, ResponseObject.class);
+        }catch (Exception e){
+            logger.log(Level.SEVERE,new StringBuilder().append("Exception occurred executing REST query::\n").append(e.getMessage()).append("\n").toString(), e);
+        }
+        return null;
+    }
+    
+    /**
+     * <p>
+     *     Perform adaptive auth query
+     * </p>
+     * @param userid the user id of the identity
+     * @param endUserIP the IP of requesting client
+     * @return {@link org.secureauth.sarestapi.data.FactorsResponse}
+     */
+    public AdaptiveAuthResponse adaptiveAuthQuery(String userid, String endUserIP){
+        String ts = getServerTime();
+        RestApiHeader restApiHeader = new RestApiHeader();
+        AdaptiveAuthRequest req = new AdaptiveAuthRequest(userid, endUserIP);
+        String header = restApiHeader.getAuthorizationHeader(saAuth,"POST", AuthQuery.queryAAuth(saAuth.getRealm()), req,ts);
+
+        try{
+            return saExecuter.executePostRequest(header,saBaseURL.getApplianceURL() + AuthQuery.queryAAuth(saAuth.getRealm()), req, ts, AdaptiveAuthResponse.class);
         }catch (Exception e){
             logger.log(Level.SEVERE,new StringBuilder().append("Exception occurred executing REST query::\n").append(e.getMessage()).append("\n").toString(), e);
         }
@@ -409,7 +433,7 @@ import org.secureauth.sarestapi.util.RestApiHeader;
         String header = restApiHeader.getAuthorizationHeader(saAuth,"POST", AuthQuery.queryAuth(saAuth.getRealm()), authRequest,ts);
 
         try{
-            return saExecuter.executePushRequest(header,saBaseURL.getApplianceURL() + AuthQuery.queryAuth(saAuth.getRealm()), authRequest,ts);
+            return saExecuter.executePostRequest(header,saBaseURL.getApplianceURL() + AuthQuery.queryAuth(saAuth.getRealm()), authRequest,ts, ResponseObject.class);
         }catch (Exception e){
             logger.log(Level.SEVERE,new StringBuilder().append("Exception occurred executing REST query::\n").append(e.getMessage()).append("\n").toString(), e);
         }
