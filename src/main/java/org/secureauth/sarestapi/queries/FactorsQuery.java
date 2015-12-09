@@ -1,6 +1,5 @@
 package org.secureauth.sarestapi.queries;
 
-import java.util.logging.Logger;
 import org.secureauth.sarestapi.resources.s;
 
 /**
@@ -23,9 +22,6 @@ import org.secureauth.sarestapi.resources.s;
  * </p>
  */
 public class FactorsQuery {
-
-    private static Logger logger=Logger.getLogger(FactorsQuery.class.getName());
-
 
     public static String queryFactors(String realm, String userName){
         StringBuilder stringBuilder = new StringBuilder();

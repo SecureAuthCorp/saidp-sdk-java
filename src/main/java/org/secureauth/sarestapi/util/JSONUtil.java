@@ -8,7 +8,6 @@ import org.secureauth.sarestapi.data.AuthRequest;
 import org.secureauth.sarestapi.data.IPEvalRequest;
 
 import java.io.IOException;
-import java.util.logging.Logger;
 
 /**
  * @author rrowcliffe@secureauth.com
@@ -30,8 +29,6 @@ import java.util.logging.Logger;
  * </p>
  */
 public class JSONUtil {
-    private static Logger logger=Logger.getLogger(JSONUtil.class.getName());
-
     public JSONUtil (){}
 
     public static String getJSONStringFromObject(AuthRequest authRequest){

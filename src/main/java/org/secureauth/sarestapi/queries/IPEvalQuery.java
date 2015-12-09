@@ -2,8 +2,6 @@ package org.secureauth.sarestapi.queries;
 
 import org.secureauth.sarestapi.resources.s;
 
-import java.util.logging.Logger;
-
 /**
  * @author rrowcliffe@secureauth.com
  *
@@ -24,8 +22,6 @@ import java.util.logging.Logger;
  * </p>
  */
 public class IPEvalQuery {
-
-    private static Logger logger=Logger.getLogger(IPEvalQuery.class.getName());
 
 
     public static String queryIPEval(String realm){
