@@ -26,6 +26,7 @@ dependencies {
     compile('com.sun.jersey:jersey-client:1.19')
     compile('com.sun.jersey:jersey-json:1.19')
     compile('commons-codec:commons-codec:1.10')
+    compile('org.slf4j:slf4j-api:1.7.13')
 }
 
 task wrapper(type: Wrapper) {

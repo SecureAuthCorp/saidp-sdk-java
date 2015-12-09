@@ -1,30 +1,35 @@
 package org.secureauth.sarestapi.resources;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.security.SecureRandom;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
+
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSession;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
+import javax.ws.rs.core.MediaType;
+import javax.xml.bind.JAXBContext;
+
+import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.map.SerializationConfig;
+import org.secureauth.sarestapi.data.AuthRequest;
+import org.secureauth.sarestapi.data.IPEval;
+import org.secureauth.sarestapi.data.IPEvalRequest;
+import org.secureauth.sarestapi.data.ResponseObject;
+import org.secureauth.sarestapi.util.JSONUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.client.config.DefaultClientConfig;
 import com.sun.jersey.client.urlconnection.HTTPSProperties;
-
-import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.jackson.map.SerializationConfig;
-import org.secureauth.sarestapi.data.*;
-import org.secureauth.sarestapi.util.JSONUtil;
-
-import javax.net.ssl.*;
-import javax.ws.rs.core.MediaType;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.Unmarshaller;
-
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-import java.net.URI;
-import java.net.URL;
-import java.security.SecureRandom;
-import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * @author rrowcliffe@secureauth.com
@@ -49,8 +54,8 @@ public class SAExecuter {
 
     private com.sun.jersey.api.client.config.ClientConfig config = null;
     private com.sun.jersey.api.client.Client client=null;
-    private static Logger logger=Logger.getLogger(SAExecuter.class.getName());
-
+    private static Logger logger=LoggerFactory.getLogger(SAExecuter.class);
+    
     //Set up our Connection
     private void createConnection() throws Exception{
 
@@ -77,10 +82,10 @@ public class SAExecuter {
             ctx = SSLContext.getInstance("TLS");
             ctx.init(null, certs, new SecureRandom());
         }catch(java.security.GeneralSecurityException ex){
-            logger.log(Level.SEVERE,new StringBuilder().append("Exception occurred while attempting to setup SSL security. ").toString(), ex);
+            logger.error(new StringBuilder().append("Exception occurred while attempting to setup SSL security. ").toString(), ex);
         }
 
-        //logger.log(Level.SEVERE,"Setting url connection!");
+        //logger.error("Setting url connection!");
         HttpsURLConnection.setDefaultSSLSocketFactory(ctx.getSocketFactory());
 
         try{
@@ -92,7 +97,7 @@ public class SAExecuter {
 
 
         }catch(Exception e){
-            logger.log(Level.SEVERE,new StringBuilder().append("Exception occurred while attempting to associating our SSL cert to the session.").toString(), e);
+            logger.error(new StringBuilder().append("Exception occurred while attempting to associating our SSL cert to the session.").toString(), e);
         }
 
         try{
@@ -131,13 +136,13 @@ public class SAExecuter {
 
             //System.out.println(factors);
             JAXBContext context = JAXBContext.newInstance(valueType);
-            Unmarshaller un = context.createUnmarshaller();
+            context.createUnmarshaller();
 
             InputStream inStream = new ByteArrayInputStream(factors.getBytes());
             factorsResponse = new ObjectMapper().readValue(inStream, valueType);
 
         }catch(Exception e){
-            logger.log(Level.SEVERE,new StringBuilder().append("Exception getting User Factors: \nQuery:\n\t")
+            logger.error(new StringBuilder().append("Exception getting User Factors: \nQuery:\n\t")
                     .append(query).append("\nError:").append(e.getMessage()).append(".\nResponse code is ").append(response).toString(), e);
         }
         return factorsResponse;
@@ -168,14 +173,14 @@ public class SAExecuter {
             responseStr = response.getEntity(String.class);
 
             JAXBContext context = JAXBContext.newInstance(ResponseObject.class);
-            Unmarshaller un = context.createUnmarshaller();
+            context.createUnmarshaller();
             InputStream inStream = new ByteArrayInputStream(responseStr.getBytes());
 
             responseObject = new ObjectMapper().readValue(inStream,ResponseObject.class);
 
 
         }catch(Exception e){
-            logger.log(Level.SEVERE,new StringBuilder().append("Exception Validating User: \nQuery:\n\t")
+            logger.error(new StringBuilder().append("Exception Validating User: \nQuery:\n\t")
                     .append(query).append("\nError: \n\t").append(responseStr).append(".\nResponse code is ").append(response).toString(), e);
         }
         return responseObject;
@@ -203,13 +208,13 @@ public class SAExecuter {
                     post(ClientResponse.class, JSONUtil.getJSONStringFromObject(authRequest));
             responseStr=response.getEntity(String.class);
             JAXBContext context = JAXBContext.newInstance(ResponseObject.class);
-            Unmarshaller un = context.createUnmarshaller();
+            context.createUnmarshaller();
             InputStream inStream = new ByteArrayInputStream(responseStr.getBytes());
             responseObject = new ObjectMapper().readValue(inStream,ResponseObject.class);
 
 
         }catch(Exception e){
-            logger.log(Level.SEVERE,new StringBuilder().append("Exception Validating User Password: \nQuery:\n\t")
+            logger.error(new StringBuilder().append("Exception Validating User Password: \nQuery:\n\t")
                     .append(query).append("\nError:").append(e.getMessage()).append(".\nResponse code is ").append(response).toString(), e);
         }
         return responseObject;
@@ -237,12 +242,12 @@ public class SAExecuter {
                     post(ClientResponse.class, JSONUtil.getJSONStringFromObject(authRequest));
             responseStr= response.getEntity(String.class);
             JAXBContext context = JAXBContext.newInstance(ResponseObject.class);
-            Unmarshaller un = context.createUnmarshaller();
+            context.createUnmarshaller();
             InputStream inStream = new ByteArrayInputStream(responseStr.getBytes());
             responseObject = new ObjectMapper().readValue(inStream,ResponseObject.class);
 
         }catch(Exception e){
-            logger.log(Level.SEVERE,new StringBuilder().append("Exception Validating KBA: \nQuery:\n\t")
+            logger.error(new StringBuilder().append("Exception Validating KBA: \nQuery:\n\t")
                     .append(query).append("\nError:").append(e.getMessage()).append(".\nResponse code is ").append(response).toString(), e);
         }
         return responseObject;
@@ -270,13 +275,13 @@ public class SAExecuter {
                     post(ClientResponse.class, JSONUtil.getJSONStringFromObject(authRequest));
             responseStr= response.getEntity(String.class);
             JAXBContext context = JAXBContext.newInstance(ResponseObject.class);
-            Unmarshaller un = context.createUnmarshaller();
+            context.createUnmarshaller();
             InputStream inStream = new ByteArrayInputStream(responseStr.getBytes());
             responseObject = new ObjectMapper().readValue(inStream,ResponseObject.class);
 
 
         }catch(Exception e){
-            logger.log(Level.SEVERE,new StringBuilder().append("Exception Validating OATH: \nQuery:\n\t")
+            logger.error(new StringBuilder().append("Exception Validating OATH: \nQuery:\n\t")
                     .append(query).append("\nError:").append(e.getMessage()).append(".\nResponse code is ").append(response).toString(), e);
         }
         return responseObject;
@@ -304,13 +309,13 @@ public class SAExecuter {
                     post(ClientResponse.class, JSONUtil.getJSONStringFromObject(authRequest));
             responseStr= response.getEntity(String.class);
             JAXBContext context = JAXBContext.newInstance(ResponseObject.class);
-            Unmarshaller un = context.createUnmarshaller();
+            context.createUnmarshaller();
             InputStream inStream = new ByteArrayInputStream(responseStr.getBytes());
             responseObject = new ObjectMapper().readValue(inStream,ResponseObject.class);
 
 
         }catch(Exception e){
-            logger.log(Level.SEVERE,new StringBuilder().append("Exception Delivering OTP by Phone: \nQuery:\n\t")
+            logger.error(new StringBuilder().append("Exception Delivering OTP by Phone: \nQuery:\n\t")
                     .append(query).append("\nError:").append(e.getMessage()).append(".\nResponse code is ").append(response).toString(), e);
         }
         return responseObject;
@@ -338,13 +343,13 @@ public class SAExecuter {
                     post(ClientResponse.class, JSONUtil.getJSONStringFromObject(authRequest));
             responseStr= response.getEntity(String.class);
             JAXBContext context = JAXBContext.newInstance(ResponseObject.class);
-            Unmarshaller un = context.createUnmarshaller();
+            context.createUnmarshaller();
             InputStream inStream = new ByteArrayInputStream(responseStr.getBytes());
             responseObject = new ObjectMapper().readValue(inStream,ResponseObject.class);
 
 
         }catch(Exception e){
-            logger.log(Level.SEVERE,new StringBuilder().append("Exception Delivering OTP by SMS: \nQuery:\n\t")
+            logger.error(new StringBuilder().append("Exception Delivering OTP by SMS: \nQuery:\n\t")
                     .append(query).append("\nError:").append(e.getMessage()).append(".\nResponse code is ").append(response).toString(), e);
         }
         return responseObject;
@@ -372,13 +377,13 @@ public class SAExecuter {
                     post(ClientResponse.class, JSONUtil.getJSONStringFromObject(authRequest));
             responseStr= response.getEntity(String.class);
             JAXBContext context = JAXBContext.newInstance(ResponseObject.class);
-            Unmarshaller un = context.createUnmarshaller();
+            context.createUnmarshaller();
             InputStream inStream = new ByteArrayInputStream(responseStr.getBytes());
             responseObject = new ObjectMapper().readValue(inStream,ResponseObject.class);
 
 
         }catch(Exception e){
-            logger.log(Level.SEVERE,new StringBuilder().append("Exception Delivering OTP by Email: \nQuery:\n\t")
+            logger.error(new StringBuilder().append("Exception Delivering OTP by Email: \nQuery:\n\t")
                     .append(query).append("\nError:").append(e.getMessage()).append(".\nResponse code is ").append(response).toString(), e);
         }
         return responseObject;
@@ -406,13 +411,13 @@ public class SAExecuter {
                     post(ClientResponse.class, JSONUtil.getJSONStringFromObject(authRequest));
             responseStr= response.getEntity(String.class);
             JAXBContext context = JAXBContext.newInstance(valueType);
-            Unmarshaller un = context.createUnmarshaller();
+            context.createUnmarshaller();
             InputStream inStream = new ByteArrayInputStream(responseStr.getBytes());
             responseObject = new ObjectMapper().readValue(inStream,valueType);
 
 
         }catch(Exception e){
-            logger.log(Level.SEVERE,new StringBuilder().append("Exception Delivering OTP by Push: \nQuery:\n\t")
+            logger.error(new StringBuilder().append("Exception Delivering OTP by Push: \nQuery:\n\t")
                     .append(query).append("\nError:").append(e.getMessage()).append(".\nResponse code is ").append(response).toString(), e);
         }
         return responseObject;
@@ -440,13 +445,13 @@ public class SAExecuter {
                     post(ClientResponse.class, JSONUtil.getJSONStringFromObject(authRequest));
             responseStr= response.getEntity(String.class);
             JAXBContext context = JAXBContext.newInstance(ResponseObject.class);
-            Unmarshaller un = context.createUnmarshaller();
+            context.createUnmarshaller();
             InputStream inStream = new ByteArrayInputStream(responseStr.getBytes());
             responseObject = new ObjectMapper().readValue(inStream,ResponseObject.class);
 
 
         }catch(Exception e){
-            logger.log(Level.SEVERE,new StringBuilder().append("Exception Delivering OTP by HelpDesk: \nQuery:\n\t")
+            logger.error(new StringBuilder().append("Exception Delivering OTP by HelpDesk: \nQuery:\n\t")
                     .append(query).append("\nError:").append(e.getMessage()).append(".\nResponse code is ").append(response).toString(), e);
         }
         return responseObject;
@@ -474,7 +479,7 @@ public class SAExecuter {
                     post(ClientResponse.class, JSONUtil.getJSONStringFromObject(ipEvalRequest));
             responseStr= response.getEntity(String.class);
             JAXBContext context = JAXBContext.newInstance(ResponseObject.class);
-            Unmarshaller un = context.createUnmarshaller();
+            context.createUnmarshaller();
             InputStream inStream = new ByteArrayInputStream(responseStr.getBytes());
             ObjectMapper objectMapper = new ObjectMapper();
             objectMapper.configure(SerializationConfig.Feature.AUTO_DETECT_FIELDS, true);
@@ -482,7 +487,7 @@ public class SAExecuter {
 
 
         }catch(Exception e){
-            logger.log(Level.SEVERE,new StringBuilder().append("Exception Running IP Evaluation: \nQuery:\n\t")
+            logger.error(new StringBuilder().append("Exception Running IP Evaluation: \nQuery:\n\t")
                     .append(query).append("\nError:").append(e.getMessage()).append(".\nResponse code is ").append(response).toString(), e);
         }
         return ipEval;
