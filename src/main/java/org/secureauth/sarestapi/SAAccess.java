@@ -5,22 +5,10 @@ import java.util.Calendar;
 import java.util.Locale;
 import java.util.TimeZone;
 
-import org.secureauth.sarestapi.data.AdaptiveAuthRequest;
-import org.secureauth.sarestapi.data.AdaptiveAuthResponse;
-import org.secureauth.sarestapi.data.AuthRequest;
-import org.secureauth.sarestapi.data.FactorsResponse;
-import org.secureauth.sarestapi.data.IPEval;
-import org.secureauth.sarestapi.data.IPEvalRequest;
-import org.secureauth.sarestapi.data.PushAcceptDetails;
-import org.secureauth.sarestapi.data.PushAcceptStatus;
-import org.secureauth.sarestapi.data.PushToAcceptRequest;
-import org.secureauth.sarestapi.data.ResponseObject;
-import org.secureauth.sarestapi.data.SAAuth;
-import org.secureauth.sarestapi.data.SABaseURL;
-import org.secureauth.sarestapi.queries.AuthQuery;
-import org.secureauth.sarestapi.queries.FactorsQuery;
-import org.secureauth.sarestapi.queries.IPEvalQuery;
+import org.secureauth.sarestapi.data.*;
+import org.secureauth.sarestapi.queries.*;
 import org.secureauth.sarestapi.resources.SAExecuter;
+import org.secureauth.sarestapi.util.JSONUtil;
 import org.secureauth.sarestapi.util.RestApiHeader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,22 +18,6 @@ import org.slf4j.LoggerFactory;
  * <p>
  *     SAAccess is a class that allows access to the SecureAuth REST API. The intention is to provide an easy method to access
  *     the Secureauth Authentication Rest Services.
- * </p>
- *
- * <p>
- * Copyright 2015 SecureAuth Corporation
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
  * </p>
  */
 
@@ -466,7 +438,127 @@ import org.slf4j.LoggerFactory;
         return null;
     }
 
+    /**
+     * <p>
+     *     Returns response to Access History Post Rest API
+     * </p>
+     * @param userid The User ID that you want to validate from
+     * @param ip_address The IP Address of the user to be stored in the Datastore for use when evaluating Geo-Velocity
+     * @return {@link org.secureauth.sarestapi.data.AccessHistoryRequest}
+     *
+     */
+    public ResponseObject accessHistory(String userid, String ip_address){
+        String ts = getServerTime();
+        RestApiHeader restApiHeader =new RestApiHeader();
+        AccessHistoryRequest accessHistoryRequest =new AccessHistoryRequest();
+        accessHistoryRequest.setIp_address(ip_address);
+        accessHistoryRequest.setUser_id(userid);
 
+        String header = restApiHeader.getAuthorizationHeader(saAuth,"POST", AccessHistoryQuery.queryAccessHistory(saAuth.getRealm()), accessHistoryRequest, ts);
+
+        try{
+
+            return saExecuter.executeAccessHistory(header,saBaseURL.getApplianceURL() + AccessHistoryQuery.queryAccessHistory(saAuth.getRealm()),accessHistoryRequest,ts);
+
+        }catch (Exception e){
+            logger.error(new StringBuilder().append("Exception occurred executing REST query::\n").append(e.getMessage()).append("\n").toString(), e);
+        }
+
+        return null;
+    }
+
+    /**
+     * <p>
+     *     Confirm the DFP data from Client using the Rest API
+     * </p>
+     * @param userid The User ID that you want to validate from
+     * @param fingerprint_id The ID of the finger print to check against the data store
+     * @return {@link org.secureauth.sarestapi.data.DFPConfirmResponse}
+     *
+     */
+    public DFPConfirmResponse DFPConfirm(String userid, String fingerprint_id){
+        String ts = getServerTime();
+        RestApiHeader restApiHeader =new RestApiHeader();
+        DFPConfirmRequest dfpConfirmRequest =new DFPConfirmRequest();
+        dfpConfirmRequest.setUser_id(userid);
+        dfpConfirmRequest.setFingerprint_id(fingerprint_id);
+
+
+        String header = restApiHeader.getAuthorizationHeader(saAuth,"POST", DFPQuery.queryDFPConfirm(saAuth.getRealm()), dfpConfirmRequest, ts);
+
+        try{
+
+            return saExecuter.executeDFPConfirm(header,saBaseURL.getApplianceURL() + DFPQuery.queryDFPConfirm(saAuth.getRealm()), dfpConfirmRequest, ts);
+
+        }catch (Exception e){
+            logger.error(new StringBuilder().append("Exception occurred executing REST query::\n").append(e.getMessage()).append("\n").toString(), e);
+        }
+
+        return null;
+    }
+
+    /**
+     * <p>
+     *     Validate the DFP data from Client using the Rest API
+     * </p>
+     * @param userid The User ID that you want to validate from
+     * @param host_address The ID of the finger print to check against the data store
+     * @param jsonString The JSON String provided by the Java Script
+     * @param accept  Accept Value provided by the application to buidl the Digital Finger Print
+     * @param accept_charset The accept Charset supplied by the client from the application server
+     * @param accept_encoding The accept Encoding supplied by the client from the application server
+     * @param accept_language The accepted language by the client supplied by the application server
+     * @return {@link org.secureauth.sarestapi.data.DFPValidateResponse}
+     *
+     */
+    public DFPValidateResponse DFPValidateNewFingerprint(String userid, String host_address, String jsonString, String accept, String accept_charset, String accept_encoding, String accept_language){
+        String ts = getServerTime();
+        RestApiHeader restApiHeader =new RestApiHeader();
+        DFPValidateRequest dfpValidateRequest =new DFPValidateRequest();
+        dfpValidateRequest.setUser_id(userid);
+        dfpValidateRequest.setHost_address(host_address);
+        DFP dfp = JSONUtil.getObjectFromJSONString(jsonString);
+        dfp.setAccept(accept);
+        dfp.setAccept_charset(accept_charset);
+        dfp.setAccept_language(accept_language);
+        dfp.setAccept_encoding(accept_encoding);
+        dfpValidateRequest.setFingerprint(dfp);
+
+
+
+        String header = restApiHeader.getAuthorizationHeader(saAuth,"POST", DFPQuery.queryDFPValidate(saAuth.getRealm()), dfpValidateRequest, ts);
+
+        try{
+
+            return saExecuter.executeDFPValidate(header,saBaseURL.getApplianceURL() + DFPQuery.queryDFPValidate(saAuth.getRealm()), dfpValidateRequest, ts);
+
+        }catch (Exception e){
+            logger.error(new StringBuilder().append("Exception occurred executing REST query::\n").append(e.getMessage()).append("\n").toString(), e);
+        }
+
+        return null;
+    }
+
+    /**
+     * <p>
+     *     Returns the url for the JavaScript Source for DFP
+     * </p>
+     * @return {@link org.secureauth.sarestapi.data.JSObjectResponse}
+     */
+    public JSObjectResponse javaScriptSrc(){
+        String ts = getServerTime();
+        RestApiHeader restApiHeader = new RestApiHeader();
+        String header = restApiHeader.getAuthorizationHeader(saAuth,"GET",DFPQuery.queryDFPjs(saAuth.getRealm()),ts);
+
+
+        try{
+            return saExecuter.executeGetJSObject(header,saBaseURL.getApplianceURL() + DFPQuery.queryDFPjs(saAuth.getRealm()),ts, JSObjectResponse.class);
+
+        }catch (Exception e){
+            logger.error(new StringBuilder().append("Exception occurred executing REST query::\n").append(e.getMessage()).append("\n").toString(), e);
+        }
+        return null;
+    }
 
     String getServerTime() {
         Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));

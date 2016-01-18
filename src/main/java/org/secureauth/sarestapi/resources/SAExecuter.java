@@ -17,10 +17,7 @@ import javax.xml.bind.JAXBContext;
 
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.SerializationConfig;
-import org.secureauth.sarestapi.data.AuthRequest;
-import org.secureauth.sarestapi.data.IPEval;
-import org.secureauth.sarestapi.data.IPEvalRequest;
-import org.secureauth.sarestapi.data.ResponseObject;
+import org.secureauth.sarestapi.data.*;
 import org.secureauth.sarestapi.util.JSONUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,22 +31,22 @@ import com.sun.jersey.client.urlconnection.HTTPSProperties;
 /**
  * @author rrowcliffe@secureauth.com
  *
- * <p>
- * Copyright 2015 SecureAuth Corporation
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- * </p>
+Copyright (c) 2015, SecureAuth
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
+
+1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+
+2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
+
+3. Neither the name of the copyright holder nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+
 public class SAExecuter {
 
     private com.sun.jersey.api.client.config.ClientConfig config = null;
@@ -494,4 +491,145 @@ public class SAExecuter {
 
     }
 
+    //Run AccessHistories Post
+    public ResponseObject executeAccessHistory(String auth, String query, AccessHistoryRequest accessHistoryRequest, String ts)throws Exception{
+
+        if(client == null) {
+            createConnection();
+        }
+
+        WebResource service = null;
+        ClientResponse response = null;
+        String responseStr=null;
+        ResponseObject accessHistory =null;
+        try{
+            service = client.resource(query);
+
+            response = service.accept(MediaType.APPLICATION_JSON).
+                    type(MediaType.APPLICATION_JSON).
+                    header("Authorization", auth).
+                    header("X-SA-Date", ts).
+                    post(ClientResponse.class, JSONUtil.getJSONStringFromObject(accessHistoryRequest));
+            responseStr= response.getEntity(String.class);
+            JAXBContext context = JAXBContext.newInstance(ResponseObject.class);
+            context.createUnmarshaller();
+            InputStream inStream = new ByteArrayInputStream(responseStr.getBytes());
+            ObjectMapper objectMapper = new ObjectMapper();
+            objectMapper.configure(SerializationConfig.Feature.AUTO_DETECT_FIELDS, true);
+            accessHistory = objectMapper.readValue(inStream,ResponseObject.class);
+
+
+        }catch(Exception e){
+            logger.error(new StringBuilder().append("Exception Running Access History POST: \nQuery:\n\t")
+                    .append(query).append("\nError:").append(e.getMessage()).append(".\nResponse code is ").append(response).toString(), e);
+        }
+        return accessHistory;
+
+    }
+    // Run DFP Validate
+    public DFPValidateResponse executeDFPValidate(String auth, String query, DFPValidateRequest dfpValidateRequest, String ts)throws Exception{
+
+        if(client == null) {
+            createConnection();
+        }
+
+        WebResource service = null;
+        ClientResponse response = null;
+        String responseStr=null;
+        DFPValidateResponse dfpValidateResponse =null;
+        try{
+            service = client.resource(query);
+
+            response = service.accept(MediaType.APPLICATION_JSON).
+                    type(MediaType.APPLICATION_JSON).
+                    header("Authorization", auth).
+                    header("X-SA-Date", ts).
+                    post(ClientResponse.class, JSONUtil.getJSONStringFromObject(dfpValidateRequest));
+            responseStr= response.getEntity(String.class);
+            JAXBContext context = JAXBContext.newInstance(ResponseObject.class);
+            context.createUnmarshaller();
+            InputStream inStream = new ByteArrayInputStream(responseStr.getBytes());
+            ObjectMapper objectMapper = new ObjectMapper();
+            objectMapper.configure(SerializationConfig.Feature.AUTO_DETECT_FIELDS, true);
+            dfpValidateResponse = objectMapper.readValue(inStream,DFPValidateResponse.class);
+
+
+        }catch(Exception e){
+            logger.error(new StringBuilder().append("Exception Running Access History POST: \nQuery:\n\t")
+                    .append(query).append("\nError:").append(e.getMessage()).append(".\nResponse code is ").append(response).toString(), e);
+        }
+        return dfpValidateResponse;
+
+    }
+
+    // Run DFP Confirm
+    public DFPConfirmResponse executeDFPConfirm(String auth, String query, DFPConfirmRequest dfpConfirmRequest, String ts)throws Exception{
+
+        if(client == null) {
+            createConnection();
+        }
+
+        WebResource service = null;
+        ClientResponse response = null;
+        String responseStr=null;
+        DFPConfirmResponse dfpConfirmResponse =null;
+        try{
+            service = client.resource(query);
+
+            response = service.accept(MediaType.APPLICATION_JSON).
+                    type(MediaType.APPLICATION_JSON).
+                    header("Authorization", auth).
+                    header("X-SA-Date", ts).
+                    post(ClientResponse.class, JSONUtil.getJSONStringFromObject(dfpConfirmRequest));
+            responseStr= response.getEntity(String.class);
+            JAXBContext context = JAXBContext.newInstance(ResponseObject.class);
+            context.createUnmarshaller();
+            InputStream inStream = new ByteArrayInputStream(responseStr.getBytes());
+            ObjectMapper objectMapper = new ObjectMapper();
+            objectMapper.configure(SerializationConfig.Feature.AUTO_DETECT_FIELDS, true);
+            dfpConfirmResponse = objectMapper.readValue(inStream,DFPConfirmResponse.class);
+
+
+        }catch(Exception e){
+            logger.error(new StringBuilder().append("Exception Running Access History POST: \nQuery:\n\t")
+                    .append(query).append("\nError:").append(e.getMessage()).append(".\nResponse code is ").append(response).toString(), e);
+        }
+        return dfpConfirmResponse;
+
+    }
+
+    //Get Factors for the user requested
+    public <T> T executeGetJSObject(String auth, String query,String ts,  Class<T> valueType)throws Exception {
+        if(client == null) {
+            createConnection();
+        }
+
+        WebResource service = null;
+        ClientResponse response = null;
+        String factors=null;
+        T jsObjectResponse =null;
+        try{
+
+            service = client.resource(query);
+            service.header("Authorization", auth);
+            response = service.accept(MediaType.APPLICATION_JSON).
+                    header("Authorization", auth).
+                    header("X-SA-Date", ts).
+                    get(ClientResponse.class);
+            factors= response.getEntity(String.class);
+
+            //System.out.println(factors);
+            JAXBContext context = JAXBContext.newInstance(valueType);
+            context.createUnmarshaller();
+
+            InputStream inStream = new ByteArrayInputStream(factors.getBytes());
+            jsObjectResponse = new ObjectMapper().readValue(inStream, valueType);
+
+        }catch(Exception e){
+            logger.error(new StringBuilder().append("Exception getting JS Object SRC: \nQuery:\n\t")
+                    .append(query).append("\nError:").append(e.getMessage()).append(".\nResponse code is ").append(response).toString(), e);
+        }
+        return jsObjectResponse;
+
+    }
 }
