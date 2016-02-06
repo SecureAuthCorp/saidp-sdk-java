@@ -16,9 +16,9 @@ Requirements:
 
 Dependencies:
 ------------
-Jersey 1.19
-Commons Codec 1.10
-SLF4J 1.7.13
+* Jersey 1.19
+* Commons Codec 1.10
+* SLF4J 1.7.13
 
 Building:
 --------
