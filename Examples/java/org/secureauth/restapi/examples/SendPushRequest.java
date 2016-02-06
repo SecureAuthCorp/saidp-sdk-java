@@ -12,15 +12,15 @@ import org.secureauth.sarestapi.data.ResponseObject;
 public class SendPushRequest {
 
 	// Define our User Variables
-	private static String user = "lding";
+	private static String user = "user";
 
 	// Required for connectivity to Appliance
-	private static String applianceHost = "qaportal2.gosecureauth.com";
+	private static String applianceHost = "host.example.com";
 	private static String appliancePort = "443";
 	private static boolean applianceSSL = true;
 	private static String realm = "secureauth11";
-	private static String applicationID = "5e0f658a77484a0aa799bafd0f04c28c";
-	private static String applicationKey = "5a264feaa95a348d8fa64bf038d8add50638bdc807f0940e817e1045c518d57d";
+	private static String applicationID = "..........";
+	private static String applicationKey = "...........";
 
 	public static void main(String[] args) throws MalformedURLException,
 			URISyntaxException, InterruptedException {
