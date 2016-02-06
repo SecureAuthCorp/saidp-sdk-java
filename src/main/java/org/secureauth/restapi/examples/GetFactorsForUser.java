@@ -1,59 +1,57 @@
 package org.secureauth.restapi.examples;
 
 
-import java.net.MalformedURLException;
-import java.net.URISyntaxException;
-
 import org.secureauth.sarestapi.SAAccess;
+import org.secureauth.sarestapi.data.Factors;
 import org.secureauth.sarestapi.data.FactorsResponse;
+import org.secureauth.sarestapi.data.IPEval;
+import org.secureauth.sarestapi.data.ResponseObject;
 
 
 /**
  * @author rrowcliffe@secureauth.com
- * <p>
- *     SAAccess is a class that allows access to the SecureAuth REST API. The intention is to provide an easy method to access
- *     the Secureauth Authentication Rest Services.
- * </p>
  *
- * <p>
- * Copyright 2015 SecureAuth Corporation
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- * </p>
+Copyright (c) 2015, SecureAuth
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
+
+1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+
+2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
+
+3. Neither the name of the copyright holder nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+
 public class GetFactorsForUser {
 
     //Define our User Variables
-    private static String user = "lding";
+    private static String user = "user";
+    private static String password = "password";
+    private static String otp = "";
 
     //Required for connectivity to Appliance
-    private static String applianceHost = "qaportal2.gosecureauth.com";
+    private static String applianceHost = "host.example.com";
     private static String appliancePort = "443";
     private static boolean applianceSSL = true;
-	private static String realm = "secureauth33";
-	private static String applicationID = "7635d6e3be694291b08c7243bb9e2db5";
-	private static String applicationKey = "2714b243644a50565fc6b318f2b50463c6d1da066dd83dd71f093b923decd025";
+    private static String realm = "secureauth1";
+    private static String applicationID = "..........";
+    private static String applicationKey = ".........";
 
 
-    public static void main(String[] args) throws MalformedURLException, URISyntaxException{
+    public static void main(String[] args){
 
         //Create Instance of SAAccess Object
         SAAccess saAccess = new SAAccess(applianceHost,appliancePort,applianceSSL,realm, applicationID, applicationKey);
 
         System.out.println("Start Test++++++++++++++++++");
         //Grab all available Factors for a user
-        getFactors(saAccess, user);
-        
+        FactorsResponse factorsResponse = getFactors(saAccess, user);
+
         System.out.println("End Test++++++++++++++++++++");
 
     }
@@ -64,7 +62,7 @@ public class GetFactorsForUser {
         if(!factorsResponse.getStatus().equalsIgnoreCase("invalid")){
             System.out.println("FACTORS +++++++++++++++++\n" + factorsResponse.toString());
             System.out.println("END FACTORS++++++++++++++");
-            }else{
+        }else{
             System.out.println("Failed to get factors " + factorsResponse.getMessage());
         }
         return factorsResponse;
