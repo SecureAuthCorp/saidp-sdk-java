@@ -156,13 +156,13 @@ public class JSONUtil {
         return stringBuilder.toString();
     }
 
-    public static DFP getObjectFromJSONString(String dfpJsonString){
+    public static DFPValidateRequest getObjectFromJSONString(String dfpJsonString){
         ObjectMapper mapper = new ObjectMapper();
         StringBuilder stringBuilder = new StringBuilder();
-        DFP dfp = new DFP();
+        DFPValidateRequest dfpValidateRequest = new DFPValidateRequest();
 
         try{
-            dfp = mapper.readValue(dfpJsonString,DFP.class);
+            dfpValidateRequest = mapper.readValue(dfpJsonString,DFPValidateRequest.class);
 
 
         }catch (JsonGenerationException e) {
@@ -179,6 +179,6 @@ public class JSONUtil {
 
         }
 
-        return dfp;
+        return dfpValidateRequest;
     }
 }

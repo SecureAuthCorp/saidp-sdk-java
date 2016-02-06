@@ -30,7 +30,7 @@ public class DFPValidateRequest {
 
     private String user_id;
     private String host_address;
-    private DFP fingerprint;
+    private DFP fingerprint = new DFP();
 
     public String getUser_id() {
         return user_id;

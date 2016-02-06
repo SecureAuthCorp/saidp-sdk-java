@@ -514,15 +514,15 @@ import org.slf4j.LoggerFactory;
     public DFPValidateResponse DFPValidateNewFingerprint(String userid, String host_address, String jsonString, String accept, String accept_charset, String accept_encoding, String accept_language){
         String ts = getServerTime();
         RestApiHeader restApiHeader =new RestApiHeader();
-        DFPValidateRequest dfpValidateRequest =new DFPValidateRequest();
+        DFPValidateRequest dfpValidateRequest = JSONUtil.getObjectFromJSONString(jsonString);
         dfpValidateRequest.setUser_id(userid);
         dfpValidateRequest.setHost_address(host_address);
-        DFP dfp = JSONUtil.getObjectFromJSONString(jsonString);
-        dfp.setAccept(accept);
-        dfp.setAccept_charset(accept_charset);
-        dfp.setAccept_language(accept_language);
-        dfp.setAccept_encoding(accept_encoding);
-        dfpValidateRequest.setFingerprint(dfp);
+        dfpValidateRequest.getFingerprint().setAccept(accept);
+        dfpValidateRequest.getFingerprint().setAccept_charset(accept_charset);
+        dfpValidateRequest.getFingerprint().setAccept_language(accept_language);
+        dfpValidateRequest.getFingerprint().setAccept_encoding(accept_encoding);
+
+
 
 
 
