@@ -4,9 +4,7 @@ package org.secureauth.sarestapi.util;
 import java.io.UnsupportedEncodingException;
 
 import org.apache.commons.codec.binary.Base64;
-import org.secureauth.sarestapi.data.AuthRequest;
-import org.secureauth.sarestapi.data.IPEvalRequest;
-import org.secureauth.sarestapi.data.SAAuth;
+import org.secureauth.sarestapi.data.*;
 import org.secureauth.sarestapi.resources.s;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,22 +12,21 @@ import org.slf4j.LoggerFactory;
 
 /**
  * @author rrowcliffe@secureauth.com
- *
- * <p>
- * Copyright 2015 SecureAuth Corporation
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- * </p>
+
+Copyright (c) 2015, SecureAuth
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
+
+1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+
+2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
+
+3. Neither the name of the copyright holder nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 public class RestApiHeader {
 
@@ -84,6 +81,99 @@ public class RestApiHeader {
                 .append(saAuth.getApplicationID()).append("\n")
                 .append(s.SLASH + uriPath).append("\n")
                 .append(JSONUtil.getJSONStringFromObject(ipEvalRequest));
+
+
+
+        //Create a SHA256 Hash
+        String base64Sha = "";
+        try {
+            base64Sha = new String(Base64.encodeBase64(HMACUtil.encode(saAuth.getApplicationKey(), stringBuilder.toString())));
+        }catch(Exception e){
+            logger.error(new StringBuilder().append("Exception occurred while generating Authorization Header\n").append(e.getMessage()).append("\n").toString(), e);
+        }
+
+        String appId = saAuth.getApplicationID() + ":" + base64Sha;
+        logger.trace(new StringBuilder("Auth Header before second encoding  ").append(appId).append("\n").toString());
+        try {
+            authHeader = "Basic " + Base64.encodeBase64String(appId.getBytes("UTF-8"));
+        }catch(UnsupportedEncodingException uee){
+            logger.error( new StringBuilder().append("Exception Encoding\n").append(uee.getMessage()).append("\n").toString(), uee);
+        }
+
+        return authHeader;
+    }
+
+    public String getAuthorizationHeader(SAAuth saAuth , String requestMethod, String uriPath, AccessHistoryRequest accessHistoryRequest, String ts){
+
+        //Build our string for the AuthHeader
+        stringBuilder = new StringBuilder();
+        stringBuilder.append(requestMethod).append("\n")
+                .append(ts).append("\n")
+                .append(saAuth.getApplicationID()).append("\n")
+                .append(s.SLASH + uriPath).append("\n")
+                .append(JSONUtil.getJSONStringFromObject(accessHistoryRequest));
+
+
+
+        //Create a SHA256 Hash
+        String base64Sha = "";
+        try {
+            base64Sha = new String(Base64.encodeBase64(HMACUtil.encode(saAuth.getApplicationKey(), stringBuilder.toString())));
+        }catch(Exception e){
+            logger.error(new StringBuilder().append("Exception occurred while generating Authorization Header\n").append(e.getMessage()).append("\n").toString(), e);
+        }
+
+        String appId = saAuth.getApplicationID() + ":" + base64Sha;
+        logger.trace(new StringBuilder("Auth Header before second encoding  ").append(appId).append("\n").toString());
+        try {
+            authHeader = "Basic " + Base64.encodeBase64String(appId.getBytes("UTF-8"));
+        }catch(UnsupportedEncodingException uee){
+            logger.error( new StringBuilder().append("Exception Encoding\n").append(uee.getMessage()).append("\n").toString(), uee);
+        }
+
+        return authHeader;
+    }
+
+    public String getAuthorizationHeader(SAAuth saAuth , String requestMethod, String uriPath, DFPConfirmRequest dfpConfirmRequest, String ts){
+
+        //Build our string for the AuthHeader
+        stringBuilder = new StringBuilder();
+        stringBuilder.append(requestMethod).append("\n")
+                .append(ts).append("\n")
+                .append(saAuth.getApplicationID()).append("\n")
+                .append(s.SLASH + uriPath).append("\n")
+                .append(JSONUtil.getJSONStringFromObject(dfpConfirmRequest));
+
+
+
+        //Create a SHA256 Hash
+        String base64Sha = "";
+        try {
+            base64Sha = new String(Base64.encodeBase64(HMACUtil.encode(saAuth.getApplicationKey(), stringBuilder.toString())));
+        }catch(Exception e){
+            logger.error(new StringBuilder().append("Exception occurred while generating Authorization Header\n").append(e.getMessage()).append("\n").toString(), e);
+        }
+
+        String appId = saAuth.getApplicationID() + ":" + base64Sha;
+        logger.trace(new StringBuilder("Auth Header before second encoding  ").append(appId).append("\n").toString());
+        try {
+            authHeader = "Basic " + Base64.encodeBase64String(appId.getBytes("UTF-8"));
+        }catch(UnsupportedEncodingException uee){
+            logger.error( new StringBuilder().append("Exception Encoding\n").append(uee.getMessage()).append("\n").toString(), uee);
+        }
+
+        return authHeader;
+    }
+
+    public String getAuthorizationHeader(SAAuth saAuth , String requestMethod, String uriPath, DFPValidateRequest dfpValidateRequest, String ts){
+
+        //Build our string for the AuthHeader
+        stringBuilder = new StringBuilder();
+        stringBuilder.append(requestMethod).append("\n")
+                .append(ts).append("\n")
+                .append(saAuth.getApplicationID()).append("\n")
+                .append(s.SLASH + uriPath).append("\n")
+                .append(JSONUtil.getJSONStringFromObject(dfpValidateRequest));
 
 
 

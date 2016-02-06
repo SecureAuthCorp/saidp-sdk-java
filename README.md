@@ -1,25 +1,33 @@
 SAAccess
 ===========
 
-The SAAccess is a solution that allows access to SecureAuth's REST api. The intention
+SAAccess is a solution that allows access to SecureAuth's REST api. The intention
 is to provide a easy and a standard method to to access the SecureAuth Appliance REST
 service. Developers working with the REST API tend to write their own REST
 client using either Jersey libraries or base java IO classes. SAAccess sdk
 relies on a core class org.secureauth.sarestapi.SAAccess.
 
-The SDK version 0.9.0. is written to support SecureAuth Appliance 8.1 and newer.
+The SDK version 0.9.1. is written to support SecureAuth Appliance 8.2 and newer.
 
 Requirements:
 ------------
 * Requires Java 1.7 or Newer
 * Requires gradle to build the package
 
+Dependencies:
+------------
+Jersey 1.19
+Commons Codec 1.10
+SLF4J 1.7.13
+
 Building:
 --------
 1. Fork the Repo to local machine
-2. Run gradle jar
+2. Run gradle distZip
 
-Add the saLib folder to your classpath for use with any of your projects
+Unzip $PROJECTHOME/build/distributions/saRestApi-sdk-x.x.x.zip
+Copy the libs folder from the unzipped package in $PROJECTHOME/build/distributions to your classpath for use with any of your projects
+Or add saRestApi-sdk as a dependency in your current project.
 
 Usage:
 -----
