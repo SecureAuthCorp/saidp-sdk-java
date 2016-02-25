@@ -42,7 +42,6 @@ public class GetFactorsForUser {
     private static String applicationID = "..........";
     private static String applicationKey = ".........";
 
-
     public static void main(String[] args){
 
         //Create Instance of SAAccess Object

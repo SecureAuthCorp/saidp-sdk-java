@@ -2,6 +2,8 @@ package org.secureauth.sarestapi.resources;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
@@ -15,6 +17,7 @@ import javax.net.ssl.X509TrustManager;
 import javax.ws.rs.core.MediaType;
 import javax.xml.bind.JAXBContext;
 
+import org.apache.commons.codec.Charsets;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.SerializationConfig;
 import org.secureauth.sarestapi.data.*;
@@ -130,17 +133,17 @@ public class SAExecuter {
                     header("X-SA-Date", ts).
                     get(ClientResponse.class);
             factors= response.getEntity(String.class);
-
-            //System.out.println(factors);
+            
             JAXBContext context = JAXBContext.newInstance(valueType);
             context.createUnmarshaller();
 
-            InputStream inStream = new ByteArrayInputStream(factors.getBytes());
+            InputStream inStream = new ByteArrayInputStream(factors.getBytes(StandardCharsets.UTF_8));
             factorsResponse = new ObjectMapper().readValue(inStream, valueType);
 
         }catch(Exception e){
             logger.error(new StringBuilder().append("Exception getting User Factors: \nQuery:\n\t")
-                    .append(query).append("\nError:").append(e.getMessage()).append(".\nResponse code is ").append(response).toString(), e);
+                    .append(query).append("\nError:").append(e.getMessage()).append(".\nResponse code is ").append(response).toString()
+                    + "; Raw response:" + factors, e);
         }
         return factorsResponse;
 
@@ -171,7 +174,7 @@ public class SAExecuter {
 
             JAXBContext context = JAXBContext.newInstance(ResponseObject.class);
             context.createUnmarshaller();
-            InputStream inStream = new ByteArrayInputStream(responseStr.getBytes());
+            InputStream inStream = new ByteArrayInputStream(responseStr.getBytes(StandardCharsets.UTF_8));
 
             responseObject = new ObjectMapper().readValue(inStream,ResponseObject.class);
 
@@ -206,7 +209,7 @@ public class SAExecuter {
             responseStr=response.getEntity(String.class);
             JAXBContext context = JAXBContext.newInstance(ResponseObject.class);
             context.createUnmarshaller();
-            InputStream inStream = new ByteArrayInputStream(responseStr.getBytes());
+            InputStream inStream = new ByteArrayInputStream(responseStr.getBytes(StandardCharsets.UTF_8));
             responseObject = new ObjectMapper().readValue(inStream,ResponseObject.class);
 
 
@@ -240,7 +243,7 @@ public class SAExecuter {
             responseStr= response.getEntity(String.class);
             JAXBContext context = JAXBContext.newInstance(ResponseObject.class);
             context.createUnmarshaller();
-            InputStream inStream = new ByteArrayInputStream(responseStr.getBytes());
+            InputStream inStream = new ByteArrayInputStream(responseStr.getBytes(StandardCharsets.UTF_8));
             responseObject = new ObjectMapper().readValue(inStream,ResponseObject.class);
 
         }catch(Exception e){
@@ -273,7 +276,7 @@ public class SAExecuter {
             responseStr= response.getEntity(String.class);
             JAXBContext context = JAXBContext.newInstance(ResponseObject.class);
             context.createUnmarshaller();
-            InputStream inStream = new ByteArrayInputStream(responseStr.getBytes());
+            InputStream inStream = new ByteArrayInputStream(responseStr.getBytes(StandardCharsets.UTF_8));
             responseObject = new ObjectMapper().readValue(inStream,ResponseObject.class);
 
 
@@ -307,7 +310,7 @@ public class SAExecuter {
             responseStr= response.getEntity(String.class);
             JAXBContext context = JAXBContext.newInstance(ResponseObject.class);
             context.createUnmarshaller();
-            InputStream inStream = new ByteArrayInputStream(responseStr.getBytes());
+            InputStream inStream = new ByteArrayInputStream(responseStr.getBytes(StandardCharsets.UTF_8));
             responseObject = new ObjectMapper().readValue(inStream,ResponseObject.class);
 
 
@@ -341,7 +344,7 @@ public class SAExecuter {
             responseStr= response.getEntity(String.class);
             JAXBContext context = JAXBContext.newInstance(ResponseObject.class);
             context.createUnmarshaller();
-            InputStream inStream = new ByteArrayInputStream(responseStr.getBytes());
+            InputStream inStream = new ByteArrayInputStream(responseStr.getBytes(StandardCharsets.UTF_8));
             responseObject = new ObjectMapper().readValue(inStream,ResponseObject.class);
 
 
@@ -375,7 +378,7 @@ public class SAExecuter {
             responseStr= response.getEntity(String.class);
             JAXBContext context = JAXBContext.newInstance(ResponseObject.class);
             context.createUnmarshaller();
-            InputStream inStream = new ByteArrayInputStream(responseStr.getBytes());
+            InputStream inStream = new ByteArrayInputStream(responseStr.getBytes(StandardCharsets.UTF_8));
             responseObject = new ObjectMapper().readValue(inStream,ResponseObject.class);
 
 
@@ -409,7 +412,7 @@ public class SAExecuter {
             responseStr= response.getEntity(String.class);
             JAXBContext context = JAXBContext.newInstance(valueType);
             context.createUnmarshaller();
-            InputStream inStream = new ByteArrayInputStream(responseStr.getBytes());
+            InputStream inStream = new ByteArrayInputStream(responseStr.getBytes(StandardCharsets.UTF_8));
             responseObject = new ObjectMapper().readValue(inStream,valueType);
 
 
@@ -443,7 +446,7 @@ public class SAExecuter {
             responseStr= response.getEntity(String.class);
             JAXBContext context = JAXBContext.newInstance(ResponseObject.class);
             context.createUnmarshaller();
-            InputStream inStream = new ByteArrayInputStream(responseStr.getBytes());
+            InputStream inStream = new ByteArrayInputStream(responseStr.getBytes(StandardCharsets.UTF_8));
             responseObject = new ObjectMapper().readValue(inStream,ResponseObject.class);
 
 
@@ -477,7 +480,7 @@ public class SAExecuter {
             responseStr= response.getEntity(String.class);
             JAXBContext context = JAXBContext.newInstance(ResponseObject.class);
             context.createUnmarshaller();
-            InputStream inStream = new ByteArrayInputStream(responseStr.getBytes());
+            InputStream inStream = new ByteArrayInputStream(responseStr.getBytes(StandardCharsets.UTF_8));
             ObjectMapper objectMapper = new ObjectMapper();
             objectMapper.configure(SerializationConfig.Feature.AUTO_DETECT_FIELDS, true);
             ipEval = objectMapper.readValue(inStream,IPEval.class);
