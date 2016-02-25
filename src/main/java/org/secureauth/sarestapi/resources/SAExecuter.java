@@ -143,7 +143,8 @@ public class SAExecuter {
 
         }catch(Exception e){
             logger.error(new StringBuilder().append("Exception getting User Factors: \nQuery:\n\t")
-                    .append(query).append("\nError:").append(e.getMessage()).append(".\nResponse code is ").append(response).toString(), e);
+                    .append(query).append("\nError:").append(e.getMessage()).append(".\nResponse code is ").append(response).toString()
+                    + "; Raw response:" + factors, e);
         }
         return factorsResponse;
 
