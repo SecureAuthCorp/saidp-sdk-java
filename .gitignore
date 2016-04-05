@@ -5,3 +5,5 @@
 /.settings
 /logs/
 /build/
+/src/test/java/org/secureauth/restapi/test/
+/src/main/java/org/secureauth/restapi/examples/

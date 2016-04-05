@@ -127,7 +127,20 @@ import org.slf4j.LoggerFactory;
     }
         return null;
     }
-
+    
+	public String executeGetRequest(String query) {
+		String ts = getServerTime();
+		RestApiHeader restApiHeader = new RestApiHeader();
+		query = saAuth.getRealm() + query;
+		String header = restApiHeader.getAuthorizationHeader(saAuth, "GET", query, ts);
+		try {
+			return saExecuter.executeRawGetRequest(header, saBaseURL.getApplianceURL() + query, ts);
+		} catch (Exception e) {
+			logger.error("Exception occurred executing REST query::\n" + e.getMessage() + "\n", e);
+		}
+		return null;
+	}
+    
     /**
      * <p>
      *     Send push to accept request asynchronously 

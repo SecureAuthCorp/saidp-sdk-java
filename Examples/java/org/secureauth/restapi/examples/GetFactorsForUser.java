@@ -35,7 +35,7 @@ public class GetFactorsForUser {
 
     //Define our User Variables
     private static String user = "lding";
-    private static String password = "Password123";
+    private static String password = "XXXXXXXXXX";
     private static String otp = "";
 
     //Required for connectivity to Appliance
