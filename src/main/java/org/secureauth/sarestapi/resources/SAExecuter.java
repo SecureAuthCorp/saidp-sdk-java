@@ -18,9 +18,13 @@ import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.MediaType;
 import javax.xml.bind.JAXBContext;
 
+import com.fasterxml.jackson.databind.MapperFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.javafx.collections.MappingChange;
-//import org.codehaus.jackson.map.ObjectMapper;
-//import org.codehaus.jackson.map.SerializationConfig;
+/*
+import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.map.SerializationConfig;
+*/
 import org.secureauth.sarestapi.data.*;
 import org.secureauth.sarestapi.util.JSONUtil;
 import org.slf4j.Logger;
@@ -34,12 +38,13 @@ import org.glassfish.jersey.client.ClientConfig;
 import javax.ws.rs.core.Response;
 
 
-
-//import com.sun.jersey.api.client.Client;
-//import com.sun.jersey.api.client.ClientResponse;
-//import com.sun.jersey.api.client.WebResource;
-//import com.sun.jersey.api.client.config.DefaultClientConfig;
-//import com.sun.jersey.client.urlconnection.HTTPSProperties;
+/*
+import com.sun.jersey.api.client.Client;
+import com.sun.jersey.api.client.ClientResponse;
+import com.sun.jersey.api.client.WebResource;
+import com.sun.jersey.api.client.config.DefaultClientConfig;
+import com.sun.jersey.client.urlconnection.HTTPSProperties;
+*/
 
 /**
  * @author rrowcliffe@secureauth.com
@@ -147,7 +152,7 @@ public class SAExecuter {
         try{
 
             target = client.target(query);
-            response = target.request().header("Authorization", auth).
+            response = target.request().
                     accept(MediaType.APPLICATION_JSON).
                     header("Authorization", auth).
                     header("X-SA-Date", ts).
@@ -266,6 +271,8 @@ public class SAExecuter {
                     header("Authorization", auth).
                     header("X-SA-Date", ts).
                     post(Entity.entity(JSONUtil.getJSONStringFromObject(authRequest), MediaType.APPLICATION_JSON));
+
+            responseObject=response.readEntity(ResponseObject.class);
             /*
             responseStr= response.getEntity(String.class);
             JAXBContext context = JAXBContext.newInstance(ResponseObject.class);
@@ -301,6 +308,8 @@ public class SAExecuter {
                     header("Authorization", auth).
                     header("X-SA-Date", ts).
                     post(Entity.entity(JSONUtil.getJSONStringFromObject(authRequest), MediaType.APPLICATION_JSON));
+
+            responseObject=response.readEntity(ResponseObject.class);
             /*
             responseStr= response.getEntity(String.class);
             JAXBContext context = JAXBContext.newInstance(ResponseObject.class);
@@ -337,6 +346,8 @@ public class SAExecuter {
                     header("Authorization", auth).
                     header("X-SA-Date", ts).
                     post(Entity.entity(JSONUtil.getJSONStringFromObject(authRequest), MediaType.APPLICATION_JSON));
+
+            responseObject=response.readEntity(ResponseObject.class);
             /*
             responseStr= response.getEntity(String.class);
             JAXBContext context = JAXBContext.newInstance(ResponseObject.class);
@@ -373,6 +384,8 @@ public class SAExecuter {
                     header("Authorization", auth).
                     header("X-SA-Date", ts).
                     post(Entity.entity(JSONUtil.getJSONStringFromObject(authRequest), MediaType.APPLICATION_JSON));
+
+            responseObject=response.readEntity(ResponseObject.class);
             /*
             responseStr= response.getEntity(String.class);
             JAXBContext context = JAXBContext.newInstance(ResponseObject.class);
@@ -409,6 +422,8 @@ public class SAExecuter {
                     header("Authorization", auth).
                     header("X-SA-Date", ts).
                     post(Entity.entity(JSONUtil.getJSONStringFromObject(authRequest), MediaType.APPLICATION_JSON));
+
+            responseObject=response.readEntity(ResponseObject.class);
             /*
             responseStr= response.getEntity(String.class);
             JAXBContext context = JAXBContext.newInstance(ResponseObject.class);
@@ -445,6 +460,8 @@ public class SAExecuter {
                     header("Authorization", auth).
                     header("X-SA-Date", ts).
                     post(Entity.entity(JSONUtil.getJSONStringFromObject(authRequest),MediaType.APPLICATION_JSON));
+
+            responseObject=response.readEntity(valueType);
             /*
             responseStr= response.getEntity(String.class);
             JAXBContext context = JAXBContext.newInstance(valueType);
@@ -481,6 +498,8 @@ public class SAExecuter {
                     header("Authorization", auth).
                     header("X-SA-Date", ts).
                     post(Entity.entity(JSONUtil.getJSONStringFromObject(authRequest),MediaType.APPLICATION_JSON));
+
+            responseObject=response.readEntity(ResponseObject.class);
             /*
             responseStr= response.getEntity(String.class);
             JAXBContext context = JAXBContext.newInstance(ResponseObject.class);
@@ -508,6 +527,7 @@ public class SAExecuter {
         Response response = null;
         String responseStr=null;
         IPEval ipEval =null;
+
         try{
             target = client.target(query);
 
@@ -517,15 +537,18 @@ public class SAExecuter {
                     header("Authorization", auth).
                     header("X-SA-Date", ts).
                     post(Entity.entity(JSONUtil.getJSONStringFromObject(ipEvalRequest), MediaType.APPLICATION_JSON));
-            /*
-            responseStr= response.getEntity(String.class);
-            JAXBContext context = JAXBContext.newInstance(ResponseObject.class);
+            System.out.println(response.getStatus());
+            //ipEval =response.readEntity(IPEval.class);
+
+            responseStr= response.readEntity(String.class);
+            System.out.println(responseStr);
+            JAXBContext context = JAXBContext.newInstance(Response.class);
             context.createUnmarshaller();
             InputStream inStream = new ByteArrayInputStream(responseStr.getBytes());
             ObjectMapper objectMapper = new ObjectMapper();
-            objectMapper.configure(SerializationConfig.Feature.AUTO_DETECT_FIELDS, true);
+            objectMapper.configure(MapperFeature.AUTO_DETECT_FIELDS, true);
             ipEval = objectMapper.readValue(inStream,IPEval.class);
-             */
+
 
         }catch(Exception e){
             logger.error(new StringBuilder().append("Exception Running IP Evaluation: \nQuery:\n\t")
@@ -555,6 +578,8 @@ public class SAExecuter {
                     header("Authorization", auth).
                     header("X-SA-Date", ts).
                     post(Entity.entity(JSONUtil.getJSONStringFromObject(accessHistoryRequest),MediaType.APPLICATION_JSON));
+
+            accessHistory = response.readEntity(ResponseObject.class);
             /*
             responseStr= response.getEntity(String.class);
             JAXBContext context = JAXBContext.newInstance(ResponseObject.class);
@@ -592,6 +617,8 @@ public class SAExecuter {
                     header("Authorization", auth).
                     header("X-SA-Date", ts).
                     post(Entity.entity(JSONUtil.getJSONStringFromObject(dfpValidateRequest),MediaType.APPLICATION_JSON));
+
+            dfpValidateResponse = response.readEntity(DFPValidateResponse.class);
             /*
             responseStr= response.getEntity(String.class);
             JAXBContext context = JAXBContext.newInstance(ResponseObject.class);
@@ -630,6 +657,8 @@ public class SAExecuter {
                     header("Authorization", auth).
                     header("X-SA-Date", ts).
                     post(Entity.entity(JSONUtil.getJSONStringFromObject(dfpConfirmRequest),MediaType.APPLICATION_JSON));
+
+            dfpConfirmResponse =response.readEntity(DFPConfirmResponse.class);
             /*
             responseStr= response.getEntity(String.class);
             JAXBContext context = JAXBContext.newInstance(ResponseObject.class);
@@ -667,8 +696,7 @@ public class SAExecuter {
                     header("Authorization", auth).
                     header("X-SA-Date", ts).
                     get();
-            jsObjectResponse = response.readEntity(valueType);
-
+            jsObjectResponse= response.readEntity(valueType);
             /*
             //System.out.println(factors);
             JAXBContext context = JAXBContext.newInstance(valueType);
