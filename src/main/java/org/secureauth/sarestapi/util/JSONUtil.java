@@ -1,9 +1,8 @@
 package org.secureauth.sarestapi.util;
 
 
-import org.codehaus.jackson.JsonGenerationException;
-import org.codehaus.jackson.map.JsonMappingException;
-import org.codehaus.jackson.map.ObjectMapper;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.secureauth.sarestapi.data.*;
 
 import java.io.IOException;
@@ -29,28 +28,19 @@ OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
 
 
 public class JSONUtil {
+
     public JSONUtil (){}
 
     public static String getJSONStringFromObject(AuthRequest authRequest){
         ObjectMapper mapper = new ObjectMapper();
         StringBuilder stringBuilder = new StringBuilder();
 
-        try{
+        try {
 
             stringBuilder.append(mapper.writeValueAsString(authRequest));
 
-        }catch (JsonGenerationException e) {
-
-            e.printStackTrace();
-
-        } catch (JsonMappingException e) {
-
-            e.printStackTrace();
-
-        }catch (IOException e) {
-
-            e.printStackTrace();
-
+        }catch(JsonProcessingException jpe){
+            jpe.printStackTrace();
         }
 
         return stringBuilder.toString();
@@ -64,18 +54,8 @@ public class JSONUtil {
 
             stringBuilder.append(mapper.writeValueAsString(ipEvalRequest));
 
-        }catch (JsonGenerationException e) {
-
-            e.printStackTrace();
-
-        } catch (JsonMappingException e) {
-
-            e.printStackTrace();
-
-        }catch (IOException e) {
-
-            e.printStackTrace();
-
+        }catch(JsonProcessingException jpe){
+            jpe.printStackTrace();
         }
 
         return stringBuilder.toString();
@@ -89,18 +69,8 @@ public class JSONUtil {
 
             stringBuilder.append(mapper.writeValueAsString(accessHistoryRequest));
 
-        }catch (JsonGenerationException e) {
-
-            e.printStackTrace();
-
-        } catch (JsonMappingException e) {
-
-            e.printStackTrace();
-
-        }catch (IOException e) {
-
-            e.printStackTrace();
-
+        }catch(JsonProcessingException jpe){
+            jpe.printStackTrace();
         }
 
         return stringBuilder.toString();
@@ -114,18 +84,8 @@ public class JSONUtil {
 
             stringBuilder.append(mapper.writeValueAsString(dfpValidateRequest));
 
-        }catch (JsonGenerationException e) {
-
-            e.printStackTrace();
-
-        } catch (JsonMappingException e) {
-
-            e.printStackTrace();
-
-        }catch (IOException e) {
-
-            e.printStackTrace();
-
+        }catch(JsonProcessingException jpe){
+            jpe.printStackTrace();
         }
 
         return stringBuilder.toString();
@@ -139,18 +99,8 @@ public class JSONUtil {
 
             stringBuilder.append(mapper.writeValueAsString(dfpConfirmRequest));
 
-        }catch (JsonGenerationException e) {
-
-            e.printStackTrace();
-
-        } catch (JsonMappingException e) {
-
-            e.printStackTrace();
-
-        }catch (IOException e) {
-
-            e.printStackTrace();
-
+        }catch(JsonProcessingException jpe){
+            jpe.printStackTrace();
         }
 
         return stringBuilder.toString();
@@ -165,18 +115,10 @@ public class JSONUtil {
             dfpValidateRequest = mapper.readValue(dfpJsonString,DFPValidateRequest.class);
 
 
-        }catch (JsonGenerationException e) {
-
-            e.printStackTrace();
-
-        } catch (JsonMappingException e) {
-
-            e.printStackTrace();
-
-        }catch (IOException e) {
-
-            e.printStackTrace();
-
+        }catch(JsonProcessingException jpe){
+            jpe.printStackTrace();
+        }catch(IOException ie){
+            ie.printStackTrace();
         }
 
         return dfpValidateRequest;
