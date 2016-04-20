@@ -8,7 +8,8 @@ package org.secureauth.sarestapi.data;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
-import org.codehaus.jackson.map.annotate.JsonSerialize;
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 
 /**
  * @author lding@secureauth.com
@@ -30,7 +31,7 @@ OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
  */
 
 @XmlRootElement
-@JsonSerialize(include=JsonSerialize.Inclusion.NON_NULL)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class PushAcceptDetails {
 	private String company_name, application_description, enduser_ip;
 

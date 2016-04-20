@@ -2,7 +2,8 @@ package org.secureauth.sarestapi.data;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
-import org.codehaus.jackson.map.annotate.JsonSerialize;
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 
 /**
  * @author rrowcliffe@secureauth.com
@@ -24,7 +25,7 @@ OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
  **/
 
 @XmlRootElement(name="IPEval")
-@JsonSerialize(include=JsonSerialize.Inclusion.NON_NULL)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class IPEval {
 
     private String status;

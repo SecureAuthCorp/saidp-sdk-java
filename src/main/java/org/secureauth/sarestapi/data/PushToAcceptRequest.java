@@ -1,7 +1,6 @@
 package org.secureauth.sarestapi.data;
 
-import org.codehaus.jackson.map.annotate.JsonSerialize;
-
+import com.fasterxml.jackson.annotation.JsonInclude;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
@@ -23,7 +22,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  */
 
 @XmlRootElement
-@JsonSerialize(include=JsonSerialize.Inclusion.NON_NULL)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class PushToAcceptRequest extends AuthRequest {
 
     private PushAcceptDetails push_accept_details;

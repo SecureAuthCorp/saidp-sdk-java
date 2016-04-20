@@ -4,7 +4,8 @@ package org.secureauth.sarestapi.data;
  * @author rrowcliffe@secureauth.com
  *
  */
-import org.codehaus.jackson.map.annotate.JsonSerialize;
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSeeAlso;
@@ -12,7 +13,7 @@ import java.util.ArrayList;
 
 @XmlRootElement
 @XmlSeeAlso(Factors.class)
-@JsonSerialize(include=JsonSerialize.Inclusion.NON_NULL)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class FactorsResponse {
 
     private String status;
