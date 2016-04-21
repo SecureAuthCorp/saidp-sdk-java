@@ -7,7 +7,7 @@ service. Developers working with the REST API tend to write their own REST
 client using either Jersey libraries or base java IO classes. SAAccess sdk
 relies on a core class org.secureauth.sarestapi.SAAccess.
 
-The SDK version 0.9.1. is written to support SecureAuth Appliance 8.2 and newer.
+The SDK version 0.9.2. is written to support SecureAuth Appliance 8.2 and newer.
 
 Requirements:
 ------------
@@ -16,17 +16,17 @@ Requirements:
 
 Dependencies:
 ------------
-* Jersey 1.19
+* jackson-jaxrs-json-provider 2.7.3
+* jersey-client 2.5.1
 * Commons Codec 1.10
 * SLF4J 1.7.13
 
 Building:
 --------
 1. Fork the Repo to local machine
-2. Run gradle distZip
+2. Run gradle build
 
-Unzip $PROJECTHOME/build/distributions/saRestApi-sdk-x.x.x.zip
-Copy the libs folder from the unzipped package in $PROJECTHOME/build/distributions to your classpath for use with any of your projects
+Copy the libs folder in $PROJECTHOME/build to your classpath for use with any of your projects
 Or add saRestApi-sdk as a dependency in your current project.
 
 Usage:
