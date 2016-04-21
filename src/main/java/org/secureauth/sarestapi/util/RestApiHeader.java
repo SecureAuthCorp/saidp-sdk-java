@@ -2,6 +2,7 @@ package org.secureauth.sarestapi.util;
 
 
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 
 import org.apache.commons.codec.binary.Base64;
 import org.secureauth.sarestapi.data.*;
@@ -62,11 +63,7 @@ public class RestApiHeader {
 
         String appId = saAuth.getApplicationID() + ":" + base64Sha;
         logger.trace(new StringBuilder("Auth Header before second encoding  ").append(appId).append("\n").toString());
-        try {
-            authHeader = "Basic " + Base64.encodeBase64String(appId.getBytes("UTF-8"));
-        }catch(UnsupportedEncodingException uee){
-            logger.error( new StringBuilder().append("Exception Encoding\n").append(uee.getMessage()).append("\n").toString(), uee);
-        }
+        authHeader = "Basic " + Base64.encodeBase64String(appId.getBytes(StandardCharsets.UTF_8));
 
         return authHeader;
     }
@@ -94,12 +91,8 @@ public class RestApiHeader {
 
         String appId = saAuth.getApplicationID() + ":" + base64Sha;
         logger.trace(new StringBuilder("Auth Header before second encoding  ").append(appId).append("\n").toString());
-        try {
-            authHeader = "Basic " + Base64.encodeBase64String(appId.getBytes("UTF-8"));
-        }catch(UnsupportedEncodingException uee){
-            logger.error( new StringBuilder().append("Exception Encoding\n").append(uee.getMessage()).append("\n").toString(), uee);
-        }
-
+        authHeader = "Basic " + Base64.encodeBase64String(appId.getBytes(StandardCharsets.UTF_8));
+        
         return authHeader;
     }
 
@@ -216,12 +209,8 @@ public class RestApiHeader {
 
         String appId = saAuth.getApplicationID() + ":" + base64Sha;
         logger.trace(new StringBuilder("Auth Header before second encoding  ").append(appId).append("\n").toString());
-        try {
-            authHeader = "Basic " + Base64.encodeBase64String(appId.getBytes("UTF-8"));
-        }catch(UnsupportedEncodingException uee){
-            logger.error(new StringBuilder().append("Exception Encoding\n").append(uee.getMessage()).append("\n").toString(), uee);
-        }
-
+        authHeader = "Basic " + Base64.encodeBase64String(appId.getBytes(StandardCharsets.UTF_8));
+        
         return authHeader;
     }
 

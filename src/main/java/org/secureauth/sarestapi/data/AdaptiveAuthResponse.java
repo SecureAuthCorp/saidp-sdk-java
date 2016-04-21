@@ -28,7 +28,7 @@ OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class AdaptiveAuthResponse extends ResponseObject {
 
-    private String realm_workflow, suggested_action;
+    private String realm_workflow, suggested_action, redirect_url;
 
 	public String getRealm_workflow() {
 		return realm_workflow;
@@ -44,5 +44,13 @@ public class AdaptiveAuthResponse extends ResponseObject {
 
 	public void setSuggested_action(String suggested_action) {
 		this.suggested_action = suggested_action;
+	}
+
+	public String getRedirect_url() {
+		return redirect_url;
+	}
+
+	public void setRedirect_url(String redirect_url) {
+		this.redirect_url = redirect_url;
 	}
 }
