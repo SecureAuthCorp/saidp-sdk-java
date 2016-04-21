@@ -476,7 +476,7 @@ import org.slf4j.LoggerFactory;
      * @return {@link org.secureauth.sarestapi.data.DFPConfirmResponse}
      *
      */
-    public DFPConfirmResponse DFPConfirm(String userid, String fingerprint_id){
+      public DFPConfirmResponse DFPConfirm(String userid, String fingerprint_id){
         String ts = getServerTime();
         RestApiHeader restApiHeader =new RestApiHeader();
         DFPConfirmRequest dfpConfirmRequest =new DFPConfirmRequest();
