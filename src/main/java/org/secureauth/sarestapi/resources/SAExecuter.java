@@ -5,7 +5,6 @@ import java.io.InputStream;
 import java.security.SecureRandom;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
-import java.util.Map;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
@@ -14,17 +13,15 @@ import javax.net.ssl.SSLSession;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 import javax.ws.rs.client.Entity;
-import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.MediaType;
-import javax.xml.bind.JAXBContext;
 
-import com.fasterxml.jackson.databind.MapperFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sun.javafx.collections.MappingChange;
 /*
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.SerializationConfig;
 */
+import com.fasterxml.jackson.databind.MapperFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import org.secureauth.sarestapi.data.*;
 import org.secureauth.sarestapi.util.JSONUtil;
 import org.slf4j.Logger;
@@ -36,6 +33,7 @@ import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.WebTarget;
 import org.glassfish.jersey.client.ClientConfig;
 import javax.ws.rs.core.Response;
+import javax.xml.bind.JAXBContext;
 
 
 /*
@@ -100,7 +98,7 @@ public class SAExecuter {
             logger.error(new StringBuilder().append("Exception occurred while attempting to setup SSL security. ").toString(), ex);
         }
 
-        //logger.error("Setting url connection!");
+
         HttpsURLConnection.setDefaultSSLSocketFactory(ctx.getSocketFactory());
 
         try{
@@ -113,13 +111,6 @@ public class SAExecuter {
                             }
                     )
                     .build();
-            /*
-            config.getProperties().put(HTTPSProperties.PROPERTY_HTTPS_PROPERTIES, new HTTPSProperties(
-                    new HostnameVerifier(){
-                        @Override
-                        public boolean verify(String hostname, SSLSession session){return true;}
-                    },ctx));
-            */
 
         }catch(Exception e){
             logger.error(new StringBuilder().append("Exception occurred while attempting to associating our SSL cert to the session.").toString(), e);
@@ -147,7 +138,6 @@ public class SAExecuter {
 
         WebTarget target = null;
         Response response = null;
-        String factors=null;
         T genericResponse =null;
         try{
 
@@ -159,18 +149,11 @@ public class SAExecuter {
                     get();
             genericResponse = response.readEntity(valueType);
 
-            //System.out.println(factors);
-            /*
-            JAXBContext context = JAXBContext.newInstance(valueType);
-            context.createUnmarshaller();
-
-            InputStream inStream = new ByteArrayInputStream(factors.getBytes());
-            factorsResponse = new ObjectMapper().readValue(inStream, valueType);
-*/
         }catch(Exception e){
             logger.error(new StringBuilder().append("Exception getting User Factors: \nQuery:\n\t")
-                    .append(query).append("\nError:").append(e.getMessage()).append(".\nResponse code is ").append(response).toString(), e);
+                    .append(query).append("\nError:").append(e.getMessage()).append(".\nResponse code is ").append(response.getStatus()).toString(), e);
         }
+        response.close();
         return genericResponse;
 
     }
@@ -185,32 +168,24 @@ public class SAExecuter {
 
         WebTarget target = null;
         Response response = null;
-        String responseStr=null;
+
         ResponseObject responseObject =null;
         try{
             target = client.target(query);
 
             response = target.request().
                     accept(MediaType.APPLICATION_JSON).
-                    //type(MediaType.APPLICATION_JSON).
                     header("Authorization", header).
                     header("X-SA-Date", ts).
                     post(Entity.entity(JSONUtil.getJSONStringFromObject(authRequest),MediaType.APPLICATION_JSON));
 
             responseObject = response.readEntity(ResponseObject.class);
 
-            /*
-            JAXBContext context = JAXBContext.newInstance(ResponseObject.class);
-            context.createUnmarshaller();
-            InputStream inStream = new ByteArrayInputStream(responseStr.getBytes());
-
-            responseObject = new ObjectMapper().readValue(inStream,ResponseObject.class);
-            */
-
         }catch(Exception e){
             logger.error(new StringBuilder().append("Exception Validating User: \nQuery:\n\t")
-                    .append(query).append("\nError: \n\t").append(responseStr).append(".\nResponse code is ").append(response).toString(), e);
+                    .append(query).append("\nError: \n\t").append((String) response.readEntity(String.class)).append(".\nResponse code is ").append(response.getStatus()).toString(), e);
         }
+        response.close();
         return responseObject;
 
     }
@@ -224,29 +199,22 @@ public class SAExecuter {
 
         WebTarget target = null;
         Response response = null;
-        String responseStr=null;
         ResponseObject responseObject =null;
         try{
 
             target = client.target(query);
             response = target.request().
                     accept(MediaType.APPLICATION_JSON).
-                    //type(MediaType.APPLICATION_JSON).
                     header("Authorization", auth).
                     header("X-SA-Date", ts).
                     post(Entity.entity(JSONUtil.getJSONStringFromObject(authRequest), MediaType.APPLICATION_JSON));
             responseObject=response.readEntity(ResponseObject.class);
-            /*
-            JAXBContext context = JAXBContext.newInstance(ResponseObject.class);
-            context.createUnmarshaller();
-            InputStream inStream = new ByteArrayInputStream(responseStr.getBytes());
-            responseObject = new ObjectMapper().readValue(inStream,ResponseObject.class);
-            */
 
         }catch(Exception e){
             logger.error(new StringBuilder().append("Exception Validating User Password: \nQuery:\n\t")
-                    .append(query).append("\nError:").append(e.getMessage()).append(".\nResponse code is ").append(response).toString(), e);
+                    .append(query).append("\nError:").append(e.getMessage()).append(".\nResponse code is ").append(response.getStatus()).toString(), e);
         }
+        response.close();
         return responseObject;
 
     }
@@ -260,30 +228,23 @@ public class SAExecuter {
 
         WebTarget target = null;
         Response response = null;
-        String responseStr=null;
         ResponseObject responseObject =null;
         try{
 
             target = client.target(query);
             response = target.request().
                     accept(MediaType.APPLICATION_JSON).
-                    //type(MediaType.APPLICATION_JSON).
                     header("Authorization", auth).
                     header("X-SA-Date", ts).
                     post(Entity.entity(JSONUtil.getJSONStringFromObject(authRequest), MediaType.APPLICATION_JSON));
 
             responseObject=response.readEntity(ResponseObject.class);
-            /*
-            responseStr= response.getEntity(String.class);
-            JAXBContext context = JAXBContext.newInstance(ResponseObject.class);
-            context.createUnmarshaller();
-            InputStream inStream = new ByteArrayInputStream(responseStr.getBytes());
-            responseObject = new ObjectMapper().readValue(inStream,ResponseObject.class);
-            */
+
         }catch(Exception e){
             logger.error(new StringBuilder().append("Exception Validating KBA: \nQuery:\n\t")
-                    .append(query).append("\nError:").append(e.getMessage()).append(".\nResponse code is ").append(response).toString(), e);
+                    .append(query).append("\nError:").append(e.getMessage()).append(".\nResponse code is ").append(response.getStatus()).toString(), e);
         }
+        response.close();
         return responseObject;
 
     }
@@ -297,31 +258,23 @@ public class SAExecuter {
 
         WebTarget target = null;
         Response response = null;
-        String responseStr=null;
         ResponseObject responseObject =null;
         try{
 
             target = client.target(query);
             response = target.request()
                     .accept(MediaType.APPLICATION_JSON).
-                    //type(MediaType.APPLICATION_JSON).
                     header("Authorization", auth).
                     header("X-SA-Date", ts).
                     post(Entity.entity(JSONUtil.getJSONStringFromObject(authRequest), MediaType.APPLICATION_JSON));
 
             responseObject=response.readEntity(ResponseObject.class);
-            /*
-            responseStr= response.getEntity(String.class);
-            JAXBContext context = JAXBContext.newInstance(ResponseObject.class);
-            context.createUnmarshaller();
-            InputStream inStream = new ByteArrayInputStream(responseStr.getBytes());
-            responseObject = new ObjectMapper().readValue(inStream,ResponseObject.class);
-            */
 
         }catch(Exception e){
             logger.error(new StringBuilder().append("Exception Validating OATH: \nQuery:\n\t")
-                    .append(query).append("\nError:").append(e.getMessage()).append(".\nResponse code is ").append(response).toString(), e);
+                    .append(query).append("\nError:").append(e.getMessage()).append(".\nResponse code is ").append(response.getStatus()).toString(), e);
         }
+        response.close();
         return responseObject;
 
     }
@@ -335,7 +288,6 @@ public class SAExecuter {
 
         WebTarget target = null;
         Response response = null;
-        String responseStr=null;
         ResponseObject responseObject =null;
         try{
 
@@ -348,18 +300,13 @@ public class SAExecuter {
                     post(Entity.entity(JSONUtil.getJSONStringFromObject(authRequest), MediaType.APPLICATION_JSON));
 
             responseObject=response.readEntity(ResponseObject.class);
-            /*
-            responseStr= response.getEntity(String.class);
-            JAXBContext context = JAXBContext.newInstance(ResponseObject.class);
-            context.createUnmarshaller();
-            InputStream inStream = new ByteArrayInputStream(responseStr.getBytes());
-            responseObject = new ObjectMapper().readValue(inStream,ResponseObject.class);
-            */
+
 
         }catch(Exception e){
             logger.error(new StringBuilder().append("Exception Delivering OTP by Phone: \nQuery:\n\t")
-                    .append(query).append("\nError:").append(e.getMessage()).append(".\nResponse code is ").append(response).toString(), e);
+                    .append(query).append("\nError:").append(e.getMessage()).append(".\nResponse code is ").append(response.getStatus()).toString(), e);
         }
+        response.close();
         return responseObject;
 
     }
@@ -373,31 +320,23 @@ public class SAExecuter {
 
         WebTarget target = null;
         Response response = null;
-        String responseStr=null;
         ResponseObject responseObject =null;
         try{
 
             target = client.target(query);
             response = target.request()
                     .accept(MediaType.APPLICATION_JSON).
-                    //type(MediaType.APPLICATION_JSON).
                     header("Authorization", auth).
                     header("X-SA-Date", ts).
                     post(Entity.entity(JSONUtil.getJSONStringFromObject(authRequest), MediaType.APPLICATION_JSON));
 
             responseObject=response.readEntity(ResponseObject.class);
-            /*
-            responseStr= response.getEntity(String.class);
-            JAXBContext context = JAXBContext.newInstance(ResponseObject.class);
-            context.createUnmarshaller();
-            InputStream inStream = new ByteArrayInputStream(responseStr.getBytes());
-            responseObject = new ObjectMapper().readValue(inStream,ResponseObject.class);
-            */
 
         }catch(Exception e){
             logger.error(new StringBuilder().append("Exception Delivering OTP by SMS: \nQuery:\n\t")
-                    .append(query).append("\nError:").append(e.getMessage()).append(".\nResponse code is ").append(response).toString(), e);
+                    .append(query).append("\nError:").append(e.getMessage()).append(".\nResponse code is ").append(response.getStatus()).toString(), e);
         }
+        response.close();
         return responseObject;
 
     }
@@ -411,31 +350,24 @@ public class SAExecuter {
 
         WebTarget target = null;
         Response response = null;
-        String responseStr=null;
         ResponseObject responseObject =null;
         try{
 
             target = client.target(query);
             response = target.request().
                     accept(MediaType.APPLICATION_JSON).
-                    //type(MediaType.APPLICATION_JSON).
                     header("Authorization", auth).
                     header("X-SA-Date", ts).
                     post(Entity.entity(JSONUtil.getJSONStringFromObject(authRequest), MediaType.APPLICATION_JSON));
 
             responseObject=response.readEntity(ResponseObject.class);
-            /*
-            responseStr= response.getEntity(String.class);
-            JAXBContext context = JAXBContext.newInstance(ResponseObject.class);
-            context.createUnmarshaller();
-            InputStream inStream = new ByteArrayInputStream(responseStr.getBytes());
-            responseObject = new ObjectMapper().readValue(inStream,ResponseObject.class);
-            */
+
 
         }catch(Exception e){
             logger.error(new StringBuilder().append("Exception Delivering OTP by Email: \nQuery:\n\t")
-                    .append(query).append("\nError:").append(e.getMessage()).append(".\nResponse code is ").append(response).toString(), e);
+                    .append(query).append("\nError:").append(e.getMessage()).append(".\nResponse code is ").append(response.getStatus()).toString(), e);
         }
+        response.close();
         return responseObject;
 
     }
@@ -449,31 +381,23 @@ public class SAExecuter {
 
         WebTarget target = null;
         Response response = null;
-        String responseStr=null;
         T responseObject =null;
         try{
 
             target = client.target(query);
             response = target.request().
                     accept(MediaType.APPLICATION_JSON).
-                    //type(MediaType.APPLICATION_JSON).
                     header("Authorization", auth).
                     header("X-SA-Date", ts).
                     post(Entity.entity(JSONUtil.getJSONStringFromObject(authRequest),MediaType.APPLICATION_JSON));
 
             responseObject=response.readEntity(valueType);
-            /*
-            responseStr= response.getEntity(String.class);
-            JAXBContext context = JAXBContext.newInstance(valueType);
-            context.createUnmarshaller();
-            InputStream inStream = new ByteArrayInputStream(responseStr.getBytes());
-            responseObject = new ObjectMapper().readValue(inStream,valueType);
-            */
 
         }catch(Exception e){
             logger.error(new StringBuilder().append("Exception Delivering OTP by Push: \nQuery:\n\t")
-                    .append(query).append("\nError:").append(e.getMessage()).append(".\nResponse code is ").append(response).toString(), e);
+                    .append(query).append("\nError:").append(e.getMessage()).append(".\nResponse code is ").append(response.getStatus()).toString(), e);
         }
+        response.close();
         return responseObject;
 
     }
@@ -487,31 +411,24 @@ public class SAExecuter {
 
         WebTarget target = null;
         Response response = null;
-        String responseStr=null;
         ResponseObject responseObject =null;
         try{
 
             target = client.target(query);
             response = target.request().
                     accept(MediaType.APPLICATION_JSON).
-                    //type(MediaType.APPLICATION_JSON).
                     header("Authorization", auth).
                     header("X-SA-Date", ts).
                     post(Entity.entity(JSONUtil.getJSONStringFromObject(authRequest),MediaType.APPLICATION_JSON));
 
             responseObject=response.readEntity(ResponseObject.class);
-            /*
-            responseStr= response.getEntity(String.class);
-            JAXBContext context = JAXBContext.newInstance(ResponseObject.class);
-            context.createUnmarshaller();
-            InputStream inStream = new ByteArrayInputStream(responseStr.getBytes());
-            responseObject = new ObjectMapper().readValue(inStream,ResponseObject.class);
-            */
+
 
         }catch(Exception e){
             logger.error(new StringBuilder().append("Exception Delivering OTP by HelpDesk: \nQuery:\n\t")
-                    .append(query).append("\nError:").append(e.getMessage()).append(".\nResponse code is ").append(response).toString(), e);
+                    .append(query).append("\nError:").append(e.getMessage()).append(".\nResponse code is ").append(response.getStatus()).toString(), e);
         }
+        response.close();
         return responseObject;
 
     }
@@ -529,31 +446,24 @@ public class SAExecuter {
         IPEval ipEval =null;
 
         try{
+
             target = client.target(query);
+
 
             response = target.request().
                     accept(MediaType.APPLICATION_JSON).
-                    //type(MediaType.APPLICATION_JSON).
                     header("Authorization", auth).
                     header("X-SA-Date", ts).
                     post(Entity.entity(JSONUtil.getJSONStringFromObject(ipEvalRequest), MediaType.APPLICATION_JSON));
-            System.out.println(response.getStatus());
-            //ipEval =response.readEntity(IPEval.class);
 
-            responseStr= response.readEntity(String.class);
-            System.out.println(responseStr);
-            JAXBContext context = JAXBContext.newInstance(Response.class);
-            context.createUnmarshaller();
-            InputStream inStream = new ByteArrayInputStream(responseStr.getBytes());
-            ObjectMapper objectMapper = new ObjectMapper();
-            objectMapper.configure(MapperFeature.AUTO_DETECT_FIELDS, true);
-            ipEval = objectMapper.readValue(inStream,IPEval.class);
+            ipEval = response.readEntity(IPEval.class);
 
 
         }catch(Exception e){
             logger.error(new StringBuilder().append("Exception Running IP Evaluation: \nQuery:\n\t")
-                    .append(query).append("\nError:").append(e.getMessage()).append(".\nResponse code is ").append(response).toString(), e);
+                    .append(query).append("\nError:").append(e.getMessage()).append(".\nResponse code is ").append(response.getStatus()).toString(), e);
         }
+        response.close();
         return ipEval;
 
     }
@@ -567,33 +477,24 @@ public class SAExecuter {
 
         WebTarget target = null;
         Response response = null;
-        String responseStr=null;
         ResponseObject accessHistory =null;
         try{
             target = client.target(query);
 
             response = target.request().
                     accept(MediaType.APPLICATION_JSON).
-                    //type(MediaType.APPLICATION_JSON).
                     header("Authorization", auth).
                     header("X-SA-Date", ts).
                     post(Entity.entity(JSONUtil.getJSONStringFromObject(accessHistoryRequest),MediaType.APPLICATION_JSON));
 
             accessHistory = response.readEntity(ResponseObject.class);
-            /*
-            responseStr= response.getEntity(String.class);
-            JAXBContext context = JAXBContext.newInstance(ResponseObject.class);
-            context.createUnmarshaller();
-            InputStream inStream = new ByteArrayInputStream(responseStr.getBytes());
-            ObjectMapper objectMapper = new ObjectMapper();
-            objectMapper.configure(SerializationConfig.Feature.AUTO_DETECT_FIELDS, true);
-            accessHistory = objectMapper.readValue(inStream,ResponseObject.class);
-            */
+
 
         }catch(Exception e){
             logger.error(new StringBuilder().append("Exception Running Access History POST: \nQuery:\n\t")
-                    .append(query).append("\nError:").append(e.getMessage()).append(".\nResponse code is ").append(response).toString(), e);
+                    .append(query).append("\nError:").append(e.getMessage()).append(".\nResponse code is ").append(response.getStatus()).toString(), e);
         }
+        response.close();
         return accessHistory;
 
     }
@@ -606,33 +507,23 @@ public class SAExecuter {
 
         WebTarget target = null;
         Response response = null;
-        String responseStr=null;
         DFPValidateResponse dfpValidateResponse =null;
         try{
             target = client.target(query);
 
             response = target.request().
                     accept(MediaType.APPLICATION_JSON).
-                    //type(MediaType.APPLICATION_JSON).
                     header("Authorization", auth).
                     header("X-SA-Date", ts).
                     post(Entity.entity(JSONUtil.getJSONStringFromObject(dfpValidateRequest),MediaType.APPLICATION_JSON));
 
             dfpValidateResponse = response.readEntity(DFPValidateResponse.class);
-            /*
-            responseStr= response.getEntity(String.class);
-            JAXBContext context = JAXBContext.newInstance(ResponseObject.class);
-            context.createUnmarshaller();
-            InputStream inStream = new ByteArrayInputStream(responseStr.getBytes());
-            ObjectMapper objectMapper = new ObjectMapper();
-            objectMapper.configure(SerializationConfig.Feature.AUTO_DETECT_FIELDS, true);
-            dfpValidateResponse = objectMapper.readValue(inStream,DFPValidateResponse.class);
-             */
 
         }catch(Exception e){
             logger.error(new StringBuilder().append("Exception Running Access History POST: \nQuery:\n\t")
-                    .append(query).append("\nError:").append(e.getMessage()).append(".\nResponse code is ").append(response).toString(), e);
+                    .append(query).append("\nError:").append(e.getMessage()).append(".\nResponse code is ").append(response.getStatus()).toString(), e);
         }
+        response.close();
         return dfpValidateResponse;
 
     }
@@ -646,33 +537,24 @@ public class SAExecuter {
 
         WebTarget target = null;
         Response response = null;
-        String responseStr=null;
         DFPConfirmResponse dfpConfirmResponse =null;
         try{
             target = client.target(query);
 
             response = target.request().
                     accept(MediaType.APPLICATION_JSON).
-                    //type(MediaType.APPLICATION_JSON).
                     header("Authorization", auth).
                     header("X-SA-Date", ts).
                     post(Entity.entity(JSONUtil.getJSONStringFromObject(dfpConfirmRequest),MediaType.APPLICATION_JSON));
 
             dfpConfirmResponse =response.readEntity(DFPConfirmResponse.class);
-            /*
-            responseStr= response.getEntity(String.class);
-            JAXBContext context = JAXBContext.newInstance(ResponseObject.class);
-            context.createUnmarshaller();
-            InputStream inStream = new ByteArrayInputStream(responseStr.getBytes());
-            ObjectMapper objectMapper = new ObjectMapper();
-            objectMapper.configure(SerializationConfig.Feature.AUTO_DETECT_FIELDS, true);
-            dfpConfirmResponse = objectMapper.readValue(inStream,DFPConfirmResponse.class);
-            */
+
 
         }catch(Exception e){
             logger.error(new StringBuilder().append("Exception Running Access History POST: \nQuery:\n\t")
-                    .append(query).append("\nError:").append(e.getMessage()).append(".\nResponse code is ").append(response).toString(), e);
+                    .append(query).append("\nError:").append(e.getMessage()).append(".\nResponse code is ").append(response.getStatus()).toString(), e);
         }
+        response.close();
         return dfpConfirmResponse;
 
     }
@@ -685,30 +567,22 @@ public class SAExecuter {
 
         WebTarget target = null;
         Response response = null;
-        String factors=null;
         T jsObjectResponse =null;
         try{
 
             target = client.target(query);
-            //target.header("Authorization", auth);
             response = target.request().
                     accept(MediaType.APPLICATION_JSON).
                     header("Authorization", auth).
                     header("X-SA-Date", ts).
                     get();
             jsObjectResponse= response.readEntity(valueType);
-            /*
-            //System.out.println(factors);
-            JAXBContext context = JAXBContext.newInstance(valueType);
-            context.createUnmarshaller();
 
-            InputStream inStream = new ByteArrayInputStream(factors.getBytes());
-            jsObjectResponse = new ObjectMapper().readValue(inStream, valueType);
-            */
         }catch(Exception e){
             logger.error(new StringBuilder().append("Exception getting JS Object SRC: \nQuery:\n\t")
-                    .append(query).append("\nError:").append(e.getMessage()).append(".\nResponse code is ").append(response).toString(), e);
+                    .append(query).append("\nError:").append(e.getMessage()).append(".\nResponse code is ").append(response.getStatus()).toString(), e);
         }
+        response.close();
         return jsObjectResponse;
 
     }
