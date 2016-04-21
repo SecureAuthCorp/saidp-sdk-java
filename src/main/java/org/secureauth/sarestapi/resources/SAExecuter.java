@@ -1,7 +1,6 @@
 package org.secureauth.sarestapi.resources;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
+
 import java.security.SecureRandom;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
@@ -15,13 +14,7 @@ import javax.net.ssl.X509TrustManager;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.MediaType;
 
-/*
-import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.jackson.map.SerializationConfig;
-*/
-import com.fasterxml.jackson.databind.MapperFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
+
 import org.secureauth.sarestapi.data.*;
 import org.secureauth.sarestapi.util.JSONUtil;
 import org.slf4j.Logger;
@@ -33,16 +26,7 @@ import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.WebTarget;
 import org.glassfish.jersey.client.ClientConfig;
 import javax.ws.rs.core.Response;
-import javax.xml.bind.JAXBContext;
 
-
-/*
-import com.sun.jersey.api.client.Client;
-import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.client.WebResource;
-import com.sun.jersey.api.client.config.DefaultClientConfig;
-import com.sun.jersey.client.urlconnection.HTTPSProperties;
-*/
 
 /**
  * @author rrowcliffe@secureauth.com
