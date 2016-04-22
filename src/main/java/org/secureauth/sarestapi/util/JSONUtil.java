@@ -3,6 +3,7 @@ package org.secureauth.sarestapi.util;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
 import org.secureauth.sarestapi.data.*;
 
 import java.io.IOException;
@@ -122,5 +123,16 @@ public class JSONUtil {
         }
 
         return dfpValidateRequest;
+    }
+
+    public static String convertObjectToJSON(Object object){
+        ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
+        String json = null;
+        try {
+            json = ow.writeValueAsString(object);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+        return json;
     }
 }
