@@ -3,6 +3,8 @@ package org.secureauth.restapi.test;
 
 import org.secureauth.sarestapi.SAAccess;
 import org.secureauth.sarestapi.data.*;
+import org.secureauth.sarestapi.util.JSONUtil;
+import org.secureauth.sarestapi.util.XMLUtil;
 
 
 /**
@@ -36,12 +38,12 @@ public class TestRestAPI {
     //private static String otp = "584233";
 
     //Required for connectivity to Appliance
-    private static String applianceHost = "host.domain.com";
+    private static String applianceHost = "host.example.com";
     private static String appliancePort = "443";
     private static boolean applianceSSL = true;
     private static String realm = "secureauth1";
-    private static String applicationID = "....................";
-    private static String applicationKey = "......................";
+    private static String applicationID = ".................";
+    private static String applicationKey = "................";
 
     public static void main(String[] args) {
 
@@ -124,12 +126,12 @@ public class TestRestAPI {
 */
             //Test KBQ / KBA
 
-            if(factor.getType().equalsIgnoreCase("kbq")){
+/*            if(factor.getType().equalsIgnoreCase("kbq")){
                 if(factor.getId().equalsIgnoreCase("KBQ1")){
                     testKBQ(saAccess, user, "zzzzzzzzzzzzzz", factor.getId());
                 }
             }
-
+*/
         }
 
         //Grab Threat Feed data based on user and IP Address
@@ -233,7 +235,8 @@ public class TestRestAPI {
         IPEval ipEval = saAccess.iPEvaluation(userid, ip_address);
         System.out.println("Start IPEvaluation  +++++++++++++++++");
         if (ipEval != null) {
-            System.out.println(ipEval.toString());
+            System.out.println(JSONUtil.convertObjectToJSON(ipEval));
+            System.out.println(XMLUtil.convertObjectToXML(ipEval));
         } else {
             System.out.println("If you See this then Something went Wrong!!");
         }
