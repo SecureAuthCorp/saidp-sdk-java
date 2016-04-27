@@ -30,6 +30,7 @@ OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
 public class DFPConfirmResponse {
 
     private String fingerprint_id;
+    private String fingerprint_name;
     private String user_id;
     private String status;
     private String message;
@@ -66,10 +67,19 @@ public class DFPConfirmResponse {
         this.message = message;
     }
 
+    public String getFingerprint_name() {
+        return fingerprint_name;
+    }
+
+    public void setFingerprint_name(String fingerprint_name) {
+        this.fingerprint_name = fingerprint_name;
+    }
+
     @Override
     public String toString(){
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("\t").append("FingerPrint ID:").append(fingerprint_id);
+        stringBuilder.append("\n\t").append("FingerPrint Name:").append(fingerprint_name);
         stringBuilder.append("\n\t").append("User ID:").append(user_id);
         stringBuilder.append("\n\t").append("Status:").append(status);
         stringBuilder.append("\n\t").append("Message:").append(message);
