@@ -2,6 +2,7 @@ package org.secureauth.sarestapi.util;
 
 
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
 
 import org.apache.commons.codec.binary.Base64;
@@ -189,7 +190,7 @@ public class RestApiHeader {
         return authHeader;
     }
 
-    public String getAuthorizationHeader(SAAuth saAuth , String requestMethod, String uriPath, BehaveBioRequest behaveBioRequest, String ts){
+    public String getAuthorizationHeader(SAAuth saAuth , String requestMethod, String uriPath, Object object, String ts){
 
         //Build our string for the AuthHeader
         stringBuilder = new StringBuilder();
@@ -197,7 +198,7 @@ public class RestApiHeader {
                 .append(ts).append("\n")
                 .append(saAuth.getApplicationID()).append("\n")
                 .append(s.SLASH + uriPath).append("\n")
-                .append(JSONUtil.convertObjectToJSON(behaveBioRequest));
+                .append(JSONUtil.convertObjectToJSON(object));
 
 
 
