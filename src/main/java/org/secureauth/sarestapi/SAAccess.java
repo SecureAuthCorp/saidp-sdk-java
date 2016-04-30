@@ -251,6 +251,33 @@ import org.slf4j.LoggerFactory;
 
     /**
      * <p>
+     *     Checks the users pin against SecureAuth Datastore
+     * </p>
+     * @param userid the userid of the identity
+     * @param pin The pin of the user to validate
+     * @return {@link org.secureauth.sarestapi.data.ResponseObject}
+     */
+    public ResponseObject validateUserPin(String userid, String pin){
+        String ts = getServerTime();
+        RestApiHeader restApiHeader = new RestApiHeader();
+        AuthRequest authRequest = new AuthRequest();
+
+        authRequest.setUser_id(userid);
+        authRequest.setType("pin");
+        authRequest.setToken(pin);
+
+        String header = restApiHeader.getAuthorizationHeader(saAuth,"POST", AuthQuery.queryAuth(saAuth.getRealm()), authRequest,ts);
+
+        try{
+            return saExecuter.executeValidateUserPin(header,saBaseURL.getApplianceURL() + AuthQuery.queryAuth(saAuth.getRealm()),authRequest,ts);
+        }catch (Exception e){
+            logger.error(new StringBuilder().append("Exception occurred executing REST query::\n").append(e.getMessage()).append("\n").toString(), e);
+        }
+        return null;
+    }
+
+    /**
+     * <p>
      *     Validate the users Answer to a KB Question
      * </p>
      * @param userid the userid of the identity
