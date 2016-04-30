@@ -38,6 +38,8 @@ public class s {
     public static final String APPLIANCE_DFP_VALIDATE=APPLIANCE_DFP + "/validate";
     public static final String APPLIANCE_DFP_CONFIRM=APPLIANCE_DFP + "/confirm";
     public static final String APPLIANCE_ACCESSHISTORY="/api/" + API_VERSION + "/accesshistory";
+    public static final String APPLIANCE_BEHAVEBIO="/api/" + API_VERSION + "/behavebio";
+    public static final String APPLIANCE_BEHAVEBIO_JS=APPLIANCE_BEHAVEBIO + "/js";
 
     public static final String STATUS_INVALID="invalid";
     public static final String STATUS_SERVER_ERROR="server_error";
