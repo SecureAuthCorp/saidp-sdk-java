@@ -1,9 +1,7 @@
 package org.secureauth.sarestapi.resources;
 
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
+
 import java.security.SecureRandom;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
@@ -17,8 +15,6 @@ import javax.net.ssl.X509TrustManager;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.MediaType;
 
-
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.secureauth.sarestapi.data.*;
 import org.secureauth.sarestapi.util.JSONUtil;
 import org.slf4j.Logger;
@@ -555,7 +551,6 @@ public class SAExecuter {
 
         WebTarget target = null;
         Response response = null;
-        String responseStr = null;
         DFPConfirmResponse dfpConfirmResponse =null;
         try{
             target = client.target(query);
@@ -579,7 +574,7 @@ public class SAExecuter {
 
     }
 
-    //Get Factors for the user requested
+    //Get JavaScript Source for DFP and Behavioral
     public <T> T executeGetJSObject(String auth, String query,String ts,  Class<T> valueType)throws Exception {
         if(client == null) {
             createConnection();
@@ -604,6 +599,68 @@ public class SAExecuter {
         }
         response.close();
         return jsObjectResponse;
+
+    }
+
+    //Run BehaveBio Post
+    public BehaveBioResponse executeBehaveBioPost(String auth, String query, BehaveBioRequest behaveBioRequest, String ts)throws Exception{
+
+        if(client == null) {
+            createConnection();
+        }
+
+        WebTarget target = null;
+        Response response = null;
+        BehaveBioResponse behaveBioResponse =null;
+        try{
+            target = client.target(query);
+
+            response = target.request().
+                    accept(MediaType.APPLICATION_JSON).
+                    header("Authorization", auth).
+                    header("X-SA-Date", ts).
+                    post(Entity.entity(JSONUtil.convertObjectToJSON(behaveBioRequest),MediaType.APPLICATION_JSON));
+
+            behaveBioResponse = response.readEntity(BehaveBioResponse.class);
+
+
+        }catch(Exception e){
+            logger.error(new StringBuilder().append("Exception Running BehaveBio POST: \nQuery:\n\t")
+                    .append(query).append("\nError:").append(e.getMessage()).append(".\nResponse code is ").append(response.getStatus()).toString(), e);
+        }
+        response.close();
+        return behaveBioResponse;
+
+    }
+
+    //Run BehaveBio Put
+    public ResponseObject executeBehaveBioReset(String auth, String query, BehaveBioResetRequest behaveBioResetRequest, String ts)throws Exception{
+
+        if(client == null) {
+            createConnection();
+        }
+
+        WebTarget target = null;
+        Response response = null;
+        ResponseObject behaveBioResponse =null;
+        try{
+            target = client.target(query);
+
+            response = target.request().
+                    accept(MediaType.APPLICATION_JSON).
+                    header("Authorization", auth).
+                    header("X-SA-Date", ts).
+                    post(Entity.entity(JSONUtil.convertObjectToJSON(behaveBioResetRequest),MediaType.APPLICATION_JSON));
+
+            behaveBioResponse = response.readEntity(ResponseObject.class);
+
+
+        }catch(Exception e){
+            logger.error(new StringBuilder().append("Exception Running BehaveBio POST: \nQuery:\n\t")
+                    .append(query).append("\nError:").append(e.getMessage()).append(".\nResponse code is ").append(response.getStatus()).toString(), e);
+        }
+        response.close();
+        return behaveBioResponse;
 
     }
 }
