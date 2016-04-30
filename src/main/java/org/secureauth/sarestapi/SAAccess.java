@@ -593,6 +593,78 @@ import org.slf4j.LoggerFactory;
     }
 
 
+    /**
+     * <p>
+     *     Submit Behave Bio Profile using the Rest API
+     * </p>
+     * @param userid The User ID that you want to validate from
+     * @param behaviorProfile The Behavioral Profile of the user
+     * @param hostAddress The IP Address of the user
+     * @param userAgent  The Browser User Agent of the user
+     *
+     * @return {@link org.secureauth.sarestapi.data.BehaveBioResponse}
+     *
+     */
+    public BehaveBioResponse BehaveBioProfileSubmit(String userid, String behaviorProfile, String hostAddress, String userAgent){
+        String ts = getServerTime();
+        RestApiHeader restApiHeader =new RestApiHeader();
+        BehaveBioRequest behaveBioRequest = new BehaveBioRequest();
+        behaveBioRequest.setUserId(userid);
+        behaveBioRequest.setBeviorProfile(behaviorProfile);
+        behaveBioRequest.setHostAddress(hostAddress);
+        behaveBioRequest.setUserAgent(userAgent);
+
+        String header = restApiHeader.getAuthorizationHeader(saAuth,"POST", BehaveBioQuery.queryBehaveBio(saAuth.getRealm()), behaveBioRequest, ts);
+
+        try{
+
+            return saExecuter.executeBehaveBioPost(header,saBaseURL.getApplianceURL() + BehaveBioQuery.queryBehaveBio(saAuth.getRealm()), behaveBioRequest, ts);
+
+        }catch (Exception e){
+            logger.error(new StringBuilder().append("Exception occurred executing REST query::\n").append(e.getMessage()).append("\n").toString(), e);
+        }
+
+        return null;
+    }
+
+    /**
+     * <p>
+     *     Submit Reset Request to Behave Bio Profile using the Rest API
+     * </p>
+     * @param userid The User ID that you want to validate from
+     * @param fieldName The Behavioral FieldName to Reset
+     * @param fieldType The Behavioral FieldType to Reset
+     * @param deviceType  The Behavioral DeviceType to Reset
+     *
+     * @return {@link org.secureauth.sarestapi.data.ResponseObject}
+     *
+     */
+    public ResponseObject BehaveBioProfileReset(String userid, String fieldName, String fieldType, String deviceType){
+        String ts = getServerTime();
+        RestApiHeader restApiHeader =new RestApiHeader();
+        BehaveBioResetRequest behaveBioResetRequest = new BehaveBioResetRequest();
+        behaveBioResetRequest.setUserId(userid);
+        behaveBioResetRequest.setFieldName(fieldName);
+        behaveBioResetRequest.setFieldType(fieldType);
+        behaveBioResetRequest.setDeviceType(deviceType);
+
+        String header = restApiHeader.getAuthorizationHeader(saAuth,"PUT", BehaveBioQuery.queryBehaveBio(saAuth.getRealm()), behaveBioResetRequest, ts);
+
+        try{
+
+            return saExecuter.executeBehaveBioReset(header,saBaseURL.getApplianceURL() + BehaveBioQuery.queryBehaveBio(saAuth.getRealm()), behaveBioResetRequest, ts);
+
+        }catch (Exception e){
+            logger.error(new StringBuilder().append("Exception occurred executing REST query::\n").append(e.getMessage()).append("\n").toString(), e);
+        }
+
+        return null;
+    }
+
+    /**
+     * END of Behavior Bio Metrics Methods
+     *
+     */
 
     /**
      * End of All SA Access methods
