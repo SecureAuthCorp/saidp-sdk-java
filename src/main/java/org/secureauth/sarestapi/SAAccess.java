@@ -587,6 +587,27 @@ import org.slf4j.LoggerFactory;
         return null;
     }
 
+    /**
+     * <p>
+     *     Returns the url for the JavaScript Source for BehaveBio
+     * </p>
+     * @return {@link org.secureauth.sarestapi.data.JSObjectResponse}
+     */
+    public JSObjectResponse BehaveBioJSSrc(){
+        String ts = getServerTime();
+        RestApiHeader restApiHeader = new RestApiHeader();
+        String header = restApiHeader.getAuthorizationHeader(saAuth,"GET",BehaveBioQuery.queryBehaveBiojs(saAuth.getRealm()),ts);
+
+
+        try{
+            return saExecuter.executeGetJSObject(header,saBaseURL.getApplianceURL() + BehaveBioQuery.queryBehaveBiojs(saAuth.getRealm()),ts, JSObjectResponse.class);
+
+        }catch (Exception e){
+            logger.error(new StringBuilder().append("Exception occurred executing REST query::\n").append(e.getMessage()).append("\n").toString(), e);
+        }
+        return null;
+    }
+
     String getServerTime() {
         Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
         SimpleDateFormat dateFormat = new SimpleDateFormat(
