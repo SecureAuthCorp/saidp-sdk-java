@@ -189,6 +189,37 @@ public class RestApiHeader {
         return authHeader;
     }
 
+    public String getAuthorizationHeader(SAAuth saAuth , String requestMethod, String uriPath, BehaveBioRequest behaveBioRequest, String ts){
+
+        //Build our string for the AuthHeader
+        stringBuilder = new StringBuilder();
+        stringBuilder.append(requestMethod).append("\n")
+                .append(ts).append("\n")
+                .append(saAuth.getApplicationID()).append("\n")
+                .append(s.SLASH + uriPath).append("\n")
+                .append(JSONUtil.convertObjectToJSON(behaveBioRequest));
+
+
+
+        //Create a SHA256 Hash
+        String base64Sha = "";
+        try {
+            base64Sha = new String(Base64.encodeBase64(HMACUtil.encode(saAuth.getApplicationKey(), stringBuilder.toString())));
+        }catch(Exception e){
+            logger.error(new StringBuilder().append("Exception occurred while generating Authorization Header\n").append(e.getMessage()).append("\n").toString(), e);
+        }
+
+        String appId = saAuth.getApplicationID() + ":" + base64Sha;
+        logger.trace(new StringBuilder("Auth Header before second encoding  ").append(appId).append("\n").toString());
+        try {
+            authHeader = "Basic " + Base64.encodeBase64String(appId.getBytes("UTF-8"));
+        }catch(UnsupportedEncodingException uee){
+            logger.error( new StringBuilder().append("Exception Encoding\n").append(uee.getMessage()).append("\n").toString(), uee);
+        }
+
+        return authHeader;
+    }
+
     public String getAuthorizationHeader(SAAuth saAuth, String requestMethod, String uriPath, String ts){
         //Build our string for the AuthHeader
         stringBuilder = new StringBuilder();
