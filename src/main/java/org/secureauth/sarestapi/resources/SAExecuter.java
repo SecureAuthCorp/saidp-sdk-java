@@ -1,6 +1,9 @@
 package org.secureauth.sarestapi.resources;
 
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
@@ -15,6 +18,7 @@ import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.MediaType;
 
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.secureauth.sarestapi.data.*;
 import org.secureauth.sarestapi.util.JSONUtil;
 import org.slf4j.Logger;
@@ -26,6 +30,7 @@ import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.WebTarget;
 import org.glassfish.jersey.client.ClientConfig;
 import javax.ws.rs.core.Response;
+import javax.xml.bind.JAXBContext;
 
 
 /**
@@ -176,6 +181,35 @@ public class SAExecuter {
 
     //Validate Users Password
     public ResponseObject executeValidateUserPassword(String auth,String query, AuthRequest authRequest,String ts)throws Exception{
+
+        if(client == null) {
+            createConnection();
+        }
+
+        WebTarget target = null;
+        Response response = null;
+        ResponseObject responseObject =null;
+        try{
+
+            target = client.target(query);
+            response = target.request().
+                    accept(MediaType.APPLICATION_JSON).
+                    header("Authorization", auth).
+                    header("X-SA-Date", ts).
+                    post(Entity.entity(JSONUtil.getJSONStringFromObject(authRequest), MediaType.APPLICATION_JSON));
+            responseObject=response.readEntity(ResponseObject.class);
+
+        }catch(Exception e){
+            logger.error(new StringBuilder().append("Exception Validating User Password: \nQuery:\n\t")
+                    .append(query).append("\nError:").append(e.getMessage()).append(".\nResponse code is ").append(response.getStatus()).toString(), e);
+        }
+        response.close();
+        return responseObject;
+
+    }
+
+    //Validate Users Pin
+    public ResponseObject executeValidateUserPin(String auth,String query, AuthRequest authRequest,String ts)throws Exception{
 
         if(client == null) {
             createConnection();
@@ -521,6 +555,7 @@ public class SAExecuter {
 
         WebTarget target = null;
         Response response = null;
+        String responseStr = null;
         DFPConfirmResponse dfpConfirmResponse =null;
         try{
             target = client.target(query);
@@ -531,11 +566,12 @@ public class SAExecuter {
                     header("X-SA-Date", ts).
                     post(Entity.entity(JSONUtil.getJSONStringFromObject(dfpConfirmRequest),MediaType.APPLICATION_JSON));
 
-            dfpConfirmResponse =response.readEntity(DFPConfirmResponse.class);
+
+            dfpConfirmResponse = response.readEntity(DFPConfirmResponse.class);
 
 
         }catch(Exception e){
-            logger.error(new StringBuilder().append("Exception Running Access History POST: \nQuery:\n\t")
+            logger.error(new StringBuilder().append("Exception Running DFP Confirm POST: \nQuery:\n\t")
                     .append(query).append("\nError:").append(e.getMessage()).append(".\nResponse code is ").append(response.getStatus()).toString(), e);
         }
         response.close();
