@@ -170,29 +170,7 @@ import org.slf4j.LoggerFactory;
         return null;
     }
     
-    public static String encode(String input) {
-        StringBuilder resultStr = new StringBuilder();
-        for (char ch : input.toCharArray()) {
-            if (isUnsafe(ch)) {
-                resultStr.append('%');
-                resultStr.append(toHex(ch / 16));
-                resultStr.append(toHex(ch % 16));
-            } else {
-                resultStr.append(ch);
-            }
-        }
-        return resultStr.toString();
-    }
 
-    private static char toHex(int ch) {
-        return (char) (ch < 10 ? '0' + ch : 'A' + ch - 10);
-    }
-
-    private static boolean isUnsafe(char ch) {
-        if (ch > 128 || ch < 0)
-            return true;
-        return " %$&+,/:;=?@<>#%".indexOf(ch) >= 0;
-    }
 
     /**
      *
@@ -588,8 +566,14 @@ import org.slf4j.LoggerFactory;
     }
 
     /**
+     * Start of Behavior Bio Metrics Methods
+     *
+     */
+
+
+    /**
      * <p>
-     *     Returns the url for the JavaScript Source for BehaveBio
+     *     Returns the url for the JavaScript Source for BehaveBioMetrics
      * </p>
      * @return {@link org.secureauth.sarestapi.data.JSObjectResponse}
      */
@@ -606,6 +590,41 @@ import org.slf4j.LoggerFactory;
             logger.error(new StringBuilder().append("Exception occurred executing REST query::\n").append(e.getMessage()).append("\n").toString(), e);
         }
         return null;
+    }
+
+
+
+    /**
+     * End of All SA Access methods
+     */
+
+    /**
+     *
+     * Start Helper Methods
+     */
+
+    public static String encode(String input) {
+        StringBuilder resultStr = new StringBuilder();
+        for (char ch : input.toCharArray()) {
+            if (isUnsafe(ch)) {
+                resultStr.append('%');
+                resultStr.append(toHex(ch / 16));
+                resultStr.append(toHex(ch % 16));
+            } else {
+                resultStr.append(ch);
+            }
+        }
+        return resultStr.toString();
+    }
+
+    private static char toHex(int ch) {
+        return (char) (ch < 10 ? '0' + ch : 'A' + ch - 10);
+    }
+
+    private static boolean isUnsafe(char ch) {
+        if (ch > 128 || ch < 0)
+            return true;
+        return " %$&+,/:;=?@<>#%".indexOf(ch) >= 0;
     }
 
     String getServerTime() {
