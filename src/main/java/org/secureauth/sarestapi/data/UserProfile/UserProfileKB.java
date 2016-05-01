@@ -1,4 +1,4 @@
-package org.secureauth.sarestapi.data;
+package org.secureauth.sarestapi.data.UserProfile;
 
 import java.util.HashMap;
 

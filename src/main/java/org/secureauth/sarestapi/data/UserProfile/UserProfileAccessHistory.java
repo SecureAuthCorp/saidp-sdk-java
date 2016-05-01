@@ -1,4 +1,4 @@
-package org.secureauth.sarestapi.data;
+package org.secureauth.sarestapi.data.UserProfile;
 
 /**
  * Created by rrowcliffe on 5/1/16.
