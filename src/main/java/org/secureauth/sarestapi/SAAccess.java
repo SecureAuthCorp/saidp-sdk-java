@@ -6,6 +6,9 @@ import java.util.Locale;
 import java.util.TimeZone;
 
 import org.secureauth.sarestapi.data.*;
+import org.secureauth.sarestapi.data.BehavioralBio.BehaveBioRequest;
+import org.secureauth.sarestapi.data.BehavioralBio.BehaveBioResetRequest;
+import org.secureauth.sarestapi.data.BehavioralBio.BehaveBioResponse;
 import org.secureauth.sarestapi.queries.*;
 import org.secureauth.sarestapi.resources.SAExecuter;
 import org.secureauth.sarestapi.util.JSONUtil;
@@ -602,7 +605,7 @@ import org.slf4j.LoggerFactory;
      * @param hostAddress The IP Address of the user
      * @param userAgent  The Browser User Agent of the user
      *
-     * @return {@link org.secureauth.sarestapi.data.BehaveBioResponse}
+     * @return {@link BehaveBioResponse}
      *
      */
     public BehaveBioResponse BehaveBioProfileSubmit(String userid, String behaviorProfile, String hostAddress, String userAgent){

@@ -16,6 +16,9 @@ import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.MediaType;
 
 import org.secureauth.sarestapi.data.*;
+import org.secureauth.sarestapi.data.BehavioralBio.BehaveBioRequest;
+import org.secureauth.sarestapi.data.BehavioralBio.BehaveBioResetRequest;
+import org.secureauth.sarestapi.data.BehavioralBio.BehaveBioResponse;
 import org.secureauth.sarestapi.util.JSONUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,7 +29,6 @@ import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.WebTarget;
 import org.glassfish.jersey.client.ClientConfig;
 import javax.ws.rs.core.Response;
-import javax.xml.bind.JAXBContext;
 
 
 /**
