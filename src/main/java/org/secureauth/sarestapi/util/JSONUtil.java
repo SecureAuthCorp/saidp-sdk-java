@@ -42,4 +42,23 @@ public class JSONUtil {
         }
         return json;
     }
+
+
+    public static DFPValidateRequest getObjectFromJSONString(String dfpJsonString){
+        ObjectMapper mapper = new ObjectMapper();
+        StringBuilder stringBuilder = new StringBuilder();
+        DFPValidateRequest dfpValidateRequest = new DFPValidateRequest();
+
+        try{
+            dfpValidateRequest = mapper.readValue(dfpJsonString,DFPValidateRequest.class);
+
+
+        }catch(JsonProcessingException jpe){
+            jpe.printStackTrace();
+        }catch(IOException ie){
+            ie.printStackTrace();
+        }
+
+        return dfpValidateRequest;
+    }
 }
