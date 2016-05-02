@@ -55,7 +55,10 @@ public class SAExecuter {
     private ClientConfig config = null;
     private Client client=null;
     private static Logger logger=LoggerFactory.getLogger(SAExecuter.class);
-    
+    private SABaseURL saBaseURL = null;
+    public SAExecuter(SABaseURL saBaseURL){
+        this.saBaseURL = saBaseURL;
+    }
     //Set up our Connection
     private void createConnection() throws Exception{
 
@@ -77,26 +80,28 @@ public class SAExecuter {
         };
 
         SSLContext ctx = null;
-
+        HostnameVerifier hostnameVerifier = new HostnameVerifier() {
+            @Override
+            public boolean verify(String s, SSLSession sslSession) {
+                return saBaseURL.isSelfSigned();
+            }
+        };
         try{
             ctx = SSLContext.getInstance("TLS");
             ctx.init(null, certs, new SecureRandom());
+            HttpsURLConnection.setDefaultSSLSocketFactory(ctx.getSocketFactory());
+            HttpsURLConnection.setDefaultHostnameVerifier(hostnameVerifier);
         }catch(java.security.GeneralSecurityException ex){
             logger.error(new StringBuilder().append("Exception occurred while attempting to setup SSL security. ").toString(), ex);
         }
 
 
-        HttpsURLConnection.setDefaultSSLSocketFactory(ctx.getSocketFactory());
+
 
         try{
              client = ClientBuilder.newBuilder()
                     .sslContext(ctx)
-                    .hostnameVerifier(
-                            new HostnameVerifier(){
-                                @Override
-                                public boolean verify(String hostname, SSLSession session){return true;}
-                            }
-                    )
+                    .hostnameVerifier(hostnameVerifier)
                     .build();
 
         }catch(Exception e){
@@ -665,4 +670,7 @@ public class SAExecuter {
         return behaveBioResponse;
 
     }
+
+    //Run Get UserProfile
+
 }

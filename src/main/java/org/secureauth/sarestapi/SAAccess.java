@@ -9,6 +9,7 @@ import org.secureauth.sarestapi.data.*;
 import org.secureauth.sarestapi.data.BehavioralBio.BehaveBioRequest;
 import org.secureauth.sarestapi.data.BehavioralBio.BehaveBioResetRequest;
 import org.secureauth.sarestapi.data.BehavioralBio.BehaveBioResponse;
+import org.secureauth.sarestapi.data.UserProfile.UserProfileResponse;
 import org.secureauth.sarestapi.queries.*;
 import org.secureauth.sarestapi.resources.SAExecuter;
 import org.secureauth.sarestapi.util.JSONUtil;
@@ -46,9 +47,27 @@ import org.slf4j.LoggerFactory;
     public SAAccess(String host, String port,boolean ssl, String realm, String applicationID, String applicationKey){
         saBaseURL=new SABaseURL(host,port,ssl);
         saAuth = new SAAuth(applicationID,applicationKey,realm);
-        saExecuter=new SAExecuter();
+        saExecuter=new SAExecuter(saBaseURL);
     }
 
+    /**
+     *<p>
+     *     Returns a SAAccess Object that can be used to query the SecureAuth Rest API
+     *     This should be the default object used when setting up connectivity to the SecureAuth Appliance
+     *</p>
+     * @param host FQDN of the SecureAuth Appliance
+     * @param port The port used to access the web application on the Appliance.
+     * @param ssl Use SSL
+     * @param selfSigned  Support for SeflSigned Certificates. Setting to enable disable self signed cert support
+     * @param realm the Configured Realm that enables the RESTApi
+     * @param applicationID The Application ID from the Configured Realm
+     * @param applicationKey The Application Key from the Configured Realm
+     */
+    public SAAccess(String host, String port,boolean ssl,boolean selfSigned, String realm, String applicationID, String applicationKey){
+        saBaseURL=new SABaseURL(host,port,ssl,selfSigned);
+        saAuth = new SAAuth(applicationID,applicationKey,realm);
+        saExecuter=new SAExecuter(saBaseURL);
+    }
 
     /**
      * <p>
@@ -667,6 +686,38 @@ import org.slf4j.LoggerFactory;
     /**
      * END of Behavior Bio Metrics Methods
      *
+     */
+
+    /**
+     * Start of IDM Methods
+     */
+
+    /**
+     * <p>
+     *     Returns the UserProfile for the specified user
+     * </p>
+     * @param userid the userid of the identity you wish to have a list of possible second factors
+     * @return {@link org.secureauth.sarestapi.data.UserProfile.UserProfileResponse}
+     */
+    public UserProfileResponse getUserProfile(String userid){
+        userid = encode(userid);
+        String ts = getServerTime();
+        RestApiHeader restApiHeader = new RestApiHeader();
+        String header = restApiHeader.getAuthorizationHeader(saAuth,"GET",IDMQueries.queryUserProfile(saAuth.getRealm(),userid),ts);
+
+
+        try{
+            return saExecuter.executeGetRequest(header,saBaseURL.getApplianceURL() + IDMQueries.queryUserProfile(saAuth.getRealm(),userid),ts, UserProfileResponse.class);
+
+        }catch (Exception e){
+            logger.error(new StringBuilder().append("Exception occurred executing REST query::\n").append(e.getMessage()).append("\n").toString(), e);
+        }
+        return null;
+    }
+
+
+    /**
+     * End of IDM Methods
      */
 
     /**

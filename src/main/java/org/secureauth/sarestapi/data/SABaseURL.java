@@ -23,6 +23,7 @@ public class SABaseURL {
     private String appliance = "localhost";
     private String port = "443";
     private boolean useSSL = true;
+    private boolean selfSigned = false;
 
 
     public String getApplianceURL(){
@@ -44,6 +45,13 @@ public class SABaseURL {
         this.appliance=appliance;
         this.port=port;
         this.useSSL=useSSL;
+    }
+
+    public SABaseURL(String appliance, String port, boolean useSSL, boolean selfSigned){
+        this.appliance=appliance;
+        this.port=port;
+        this.useSSL=useSSL;
+        this.selfSigned=selfSigned;
     }
 
 
@@ -71,4 +79,11 @@ public class SABaseURL {
         this.useSSL = useSSL;
     }
 
+    public boolean isSelfSigned() {
+        return selfSigned;
+    }
+
+    public void setSelfSigned(boolean selfSigned) {
+        this.selfSigned = selfSigned;
+    }
 }
