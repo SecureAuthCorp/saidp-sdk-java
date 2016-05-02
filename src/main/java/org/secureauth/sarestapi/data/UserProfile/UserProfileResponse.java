@@ -7,10 +7,7 @@ import org.secureauth.sarestapi.util.JSONUtil;
  */
 public class UserProfileResponse {
     private String userId;
-    private UserProfileProperties properties;
-    private UserProfileKBAKBQ knowledgeBase;
-    private UserProfileGroups groups;
-    private UserProfileAccessHistories accessHistories;
+    private UserProfile userProfile;
     private String status;
     private String message;
 
@@ -22,36 +19,12 @@ public class UserProfileResponse {
         this.userId = userId;
     }
 
-    public UserProfileProperties getProperties() {
-        return properties;
+    public UserProfile getUserProfile() {
+        return userProfile;
     }
 
-    public void setProperties(UserProfileProperties properties) {
-        this.properties = properties;
-    }
-
-    public UserProfileKBAKBQ getKnowledgeBase() {
-        return knowledgeBase;
-    }
-
-    public void setKnowledgeBase(UserProfileKBAKBQ knowledgeBase) {
-        this.knowledgeBase = knowledgeBase;
-    }
-
-    public UserProfileGroups getGroups() {
-        return groups;
-    }
-
-    public void setGroups(UserProfileGroups groups) {
-        this.groups = groups;
-    }
-
-    public UserProfileAccessHistories getAccessHistories() {
-        return accessHistories;
-    }
-
-    public void setAccessHistories(UserProfileAccessHistories accessHistories) {
-        this.accessHistories = accessHistories;
+    public void setUserProfile(UserProfile userProfile) {
+        this.userProfile = userProfile;
     }
 
     public String getStatus() {
