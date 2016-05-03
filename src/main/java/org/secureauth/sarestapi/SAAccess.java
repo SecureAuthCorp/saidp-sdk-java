@@ -9,6 +9,7 @@ import org.secureauth.sarestapi.data.*;
 import org.secureauth.sarestapi.data.BehavioralBio.BehaveBioRequest;
 import org.secureauth.sarestapi.data.BehavioralBio.BehaveBioResetRequest;
 import org.secureauth.sarestapi.data.BehavioralBio.BehaveBioResponse;
+import org.secureauth.sarestapi.data.UserProfile.UserPasswordRequest;
 import org.secureauth.sarestapi.data.UserProfile.UserProfileResponse;
 import org.secureauth.sarestapi.queries.*;
 import org.secureauth.sarestapi.resources.SAExecuter;
@@ -715,6 +716,59 @@ import org.slf4j.LoggerFactory;
         return null;
     }
 
+    /**
+     * <p>
+     *     Administrative Password Reset for the specified user
+     * </p>
+     * @param userid the userid of the identity you wish to have a list of possible second factors
+     * @param password the users new password
+     * @return {@link org.secureauth.sarestapi.data.ResponseObject
+     */
+    public ResponseObject passwordReset(String userid, String password){
+        userid = encode(userid);
+        String ts = getServerTime();
+        UserPasswordRequest userPasswordRequest = new UserPasswordRequest();
+        userPasswordRequest.setPassword(password);
+        RestApiHeader restApiHeader = new RestApiHeader();
+        String header = restApiHeader.getAuthorizationHeader(saAuth,"POST",IDMQueries.queryUserResetPwd(saAuth.getRealm(),userid),ts);
+
+
+        try{
+            return saExecuter.executeGetRequest(header,saBaseURL.getApplianceURL() + IDMQueries.queryUserResetPwd(saAuth.getRealm(),userid),ts, ResponseObject.class);
+
+        }catch (Exception e){
+            logger.error(new StringBuilder().append("Exception occurred executing REST query::\n").append(e.getMessage()).append("\n").toString(), e);
+        }
+        return null;
+    }
+
+    /**
+     * <p>
+     *     Self Service Password Reset for the specified user
+     * </p>
+     * @param userid the userid of the identity you wish to have a list of possible second factors
+     * @param currentPassword the users Current password
+     * @param newPassword the users new Password
+     * @return {@link org.secureauth.sarestapi.data.ResponseObject
+     */
+    public ResponseObject passwordChange(String userid, String currentPassword, String newPassword){
+        userid = encode(userid);
+        String ts = getServerTime();
+        UserPasswordRequest userPasswordRequest = new UserPasswordRequest();
+        userPasswordRequest.setCurrentPassword(currentPassword);
+        userPasswordRequest.setNewPassword(newPassword);
+        RestApiHeader restApiHeader = new RestApiHeader();
+        String header = restApiHeader.getAuthorizationHeader(saAuth,"POST",IDMQueries.queryUserChangePwd(saAuth.getRealm(),userid),ts);
+
+
+        try{
+            return saExecuter.executeGetRequest(header,saBaseURL.getApplianceURL() + IDMQueries.queryUserChangePwd(saAuth.getRealm(),userid),ts, ResponseObject.class);
+
+        }catch (Exception e){
+            logger.error(new StringBuilder().append("Exception occurred executing REST query::\n").append(e.getMessage()).append("\n").toString(), e);
+        }
+        return null;
+    }
 
     /**
      * End of IDM Methods
@@ -760,4 +814,9 @@ import org.slf4j.LoggerFactory;
         dateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
         return dateFormat.format(calendar.getTime());
     }
+
+    /**
+     *
+     * End Helper Methods
+     */
 }
