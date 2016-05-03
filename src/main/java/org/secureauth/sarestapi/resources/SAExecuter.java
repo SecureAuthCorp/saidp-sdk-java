@@ -19,6 +19,7 @@ import org.secureauth.sarestapi.data.*;
 import org.secureauth.sarestapi.data.BehavioralBio.BehaveBioRequest;
 import org.secureauth.sarestapi.data.BehavioralBio.BehaveBioResetRequest;
 import org.secureauth.sarestapi.data.BehavioralBio.BehaveBioResponse;
+import org.secureauth.sarestapi.data.UserProfile.UserPasswordRequest;
 import org.secureauth.sarestapi.util.JSONUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -671,6 +672,66 @@ public class SAExecuter {
 
     }
 
-    //Run Get UserProfile
+    //Run Password Reset (Admin level reset)
+    public ResponseObject executeUserPasswordReset(String auth, String query, UserPasswordRequest userPasswordRequest, String ts)throws Exception{
+
+        if(client == null) {
+            createConnection();
+        }
+
+        WebTarget target = null;
+        Response response = null;
+        ResponseObject passwordResetResponse =null;
+        try{
+            target = client.target(query);
+
+            response = target.request().
+                    accept(MediaType.APPLICATION_JSON).
+                    header("Authorization", auth).
+                    header("X-SA-Date", ts).
+                    post(Entity.entity(JSONUtil.convertObjectToJSON(userPasswordRequest),MediaType.APPLICATION_JSON));
+
+            passwordResetResponse = response.readEntity(ResponseObject.class);
+
+
+        }catch(Exception e){
+            logger.error(new StringBuilder().append("Exception Running Password Reset POST: \nQuery:\n\t")
+                    .append(query).append("\nError:").append(e.getMessage()).append(".\nResponse code is ").append(response.getStatus()).toString(), e);
+        }
+        response.close();
+        return passwordResetResponse;
+
+    }
+
+    //Run Change Password (Self Service)
+    public ResponseObject executeUserPasswordChange(String auth, String query, UserPasswordRequest userPasswordRequest, String ts)throws Exception{
+
+        if(client == null) {
+            createConnection();
+        }
+
+        WebTarget target = null;
+        Response response = null;
+        ResponseObject passwordChangeResponse =null;
+        try{
+            target = client.target(query);
+
+            response = target.request().
+                    accept(MediaType.APPLICATION_JSON).
+                    header("Authorization", auth).
+                    header("X-SA-Date", ts).
+                    post(Entity.entity(JSONUtil.convertObjectToJSON(userPasswordRequest),MediaType.APPLICATION_JSON));
+
+            passwordChangeResponse = response.readEntity(ResponseObject.class);
+
+
+        }catch(Exception e){
+            logger.error(new StringBuilder().append("Exception Running Password Reset POST: \nQuery:\n\t")
+                    .append(query).append("\nError:").append(e.getMessage()).append(".\nResponse code is ").append(response.getStatus()).toString(), e);
+        }
+        response.close();
+        return passwordChangeResponse;
+
+    }
 
 }
