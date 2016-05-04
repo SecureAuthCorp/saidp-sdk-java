@@ -35,6 +35,7 @@ public class IPEvaluation {
     private String risk_desc;
     private Geoloc geoloc;
     private Factoring factoring;
+    private String factor_description;
 
 
     public String getMethod() {
@@ -93,6 +94,13 @@ public class IPEvaluation {
         this.factoring = factoring;
     }
 
+    public String getFactor_description() {
+        return factor_description;
+    }
+
+    public void setFactor_description(String factor_description) {
+        this.factor_description = factor_description;
+    }
 
     @Override
     public String toString(){
