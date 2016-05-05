@@ -52,11 +52,14 @@ public class SAExecuter {
     private ClientConfig config = null;
     private Client client=null;
     private static Logger logger=LoggerFactory.getLogger(SAExecuter.class);
-    
+
     //Set up our Connection
     private void createConnection() throws Exception{
 
         config = new ClientConfig();
+        SSLContext ctx = null;
+        ctx = SSLContext.getInstance("TLS");
+
 
         TrustManager[] certs = new TrustManager[]{
                 new X509TrustManager(){
@@ -73,42 +76,22 @@ public class SAExecuter {
                 }
         };
 
-        SSLContext ctx = null;
+        ctx.init(null, certs, new SecureRandom());
 
         try{
-            ctx = SSLContext.getInstance("TLS");
-            ctx.init(null, certs, new SecureRandom());
-        }catch(java.security.GeneralSecurityException ex){
-            logger.error(new StringBuilder().append("Exception occurred while attempting to setup SSL security. ").toString(), ex);
-        }
-
-
-        HttpsURLConnection.setDefaultSSLSocketFactory(ctx.getSocketFactory());
-
-        try{
-             client = ClientBuilder.newBuilder()
+            client = ClientBuilder.newBuilder()
+                    .withConfig(config)
                     .sslContext(ctx)
-                    .hostnameVerifier(
-                            new HostnameVerifier(){
-                                @Override
-                                public boolean verify(String hostname, SSLSession session){return true;}
-                            }
-                    )
+                    .hostnameVerifier(new HostnameVerifier() {
+                        @Override
+                        public boolean verify(String s, SSLSession sslSession) {
+                            return true;
+                        }
+                    })
                     .build();
 
         }catch(Exception e){
             logger.error(new StringBuilder().append("Exception occurred while attempting to associating our SSL cert to the session.").toString(), e);
-        }
-
-        try{
-            client = ClientBuilder.newClient(config);
-        }catch(Exception e){
-            StringBuilder bud = new StringBuilder();
-            for(StackTraceElement st: e.getStackTrace()){
-                bud.append(st.toString()).append("\n");
-            }
-            throw new Exception(new StringBuilder().append("Exception occurred while attempting to create connection object. Exception: ")
-                    .append(e.getMessage()).append("\nStackTraceElements:\n").append(bud.toString()).toString());
         }
 
         if(client == null) throw new Exception(new StringBuilder().append("Unable to create connection object, creation attempt returned NULL.").toString());
