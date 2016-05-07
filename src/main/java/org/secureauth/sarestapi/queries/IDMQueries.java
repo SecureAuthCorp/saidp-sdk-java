@@ -63,7 +63,7 @@ public class IDMQueries {
     /*
     Single Group to Multiple Users
      */
-    public static String queryGrouptToUsers(String realm, String groupId){
+    public static String queryGroupToUsers(String realm, String groupId){
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append(realm).append(s.APPLIANCE_IDM_GROUPS).append(encodeGroup(groupId)).append(s.APPLIANCE_IDM_USERS);
         return stringBuilder.toString();
@@ -72,7 +72,7 @@ public class IDMQueries {
     /*
     Single Group to Single User
      */
-    public static String queryGrouptToUser(String realm, String userName, String groupId){
+    public static String queryGroupToUser(String realm, String userName, String groupId){
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append(realm).append(s.APPLIANCE_IDM_GROUPS).append(encodeGroup(groupId)).append(s.APPLIANCE_IDM_USERS).append(userName);
         return stringBuilder.toString();
