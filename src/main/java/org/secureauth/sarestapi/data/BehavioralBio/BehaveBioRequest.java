@@ -1,6 +1,7 @@
 package org.secureauth.sarestapi.data.BehavioralBio;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import org.secureauth.sarestapi.util.JSONUtil;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -46,5 +47,10 @@ public class BehaveBioRequest {
 
     public void setUserAgent(String userAgent) {
         this.userAgent = userAgent;
+    }
+
+    @Override
+    public String toString(){
+        return JSONUtil.convertObjectToJSON(this);
     }
 }
