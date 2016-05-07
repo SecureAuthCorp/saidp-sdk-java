@@ -52,6 +52,7 @@ public class s {
     public static final String STATUS_VALID="valid";
     public static final String STATUS_FOUND="found";
     public static final String STATUS_VERIFIED="verified";
+    public static final String STATUS_NOT_FOUND="not_found";
 
     public static final String PHONES="Phones";
     public static final String PHONE="Phone";
