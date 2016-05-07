@@ -1,6 +1,7 @@
 package org.secureauth.sarestapi.data;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import org.secureauth.sarestapi.util.JSONUtil;
 
 
 import javax.xml.bind.annotation.XmlRootElement;
@@ -50,4 +51,6 @@ public class PushAcceptStatus {
 	public void setMessage(String message) {
 		this.message = message;
 	}
+
+
 }

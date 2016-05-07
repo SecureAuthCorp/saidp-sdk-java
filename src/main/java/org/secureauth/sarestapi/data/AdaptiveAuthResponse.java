@@ -3,6 +3,7 @@ package org.secureauth.sarestapi.data;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
+import org.secureauth.sarestapi.util.JSONUtil;
 
 
 import javax.xml.bind.annotation.XmlRootElement;
@@ -54,5 +55,10 @@ public class AdaptiveAuthResponse extends ResponseObject {
 
 	public void setRedirect_url(String redirect_url) {
 		this.redirect_url = redirect_url;
+	}
+
+	@Override
+	public String toString(){
+		return JSONUtil.convertObjectToJSON(this);
 	}
 }

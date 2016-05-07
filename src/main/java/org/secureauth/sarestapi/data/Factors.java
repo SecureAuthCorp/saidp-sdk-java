@@ -2,6 +2,7 @@ package org.secureauth.sarestapi.data;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import org.secureauth.sarestapi.resources.s;
+import org.secureauth.sarestapi.util.JSONUtil;
 
 import javax.xml.bind.annotation.XmlRootElement;
 import java.util.ArrayList;
@@ -68,16 +69,6 @@ public class Factors {
 
     @Override
     public String toString(){
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("\n\t\t").append("Type:").append(type);
-        stringBuilder.append("\n\t\t").append("ID:").append(id);
-        stringBuilder.append("\n\t\t").append("Value:").append(value);
-        stringBuilder.append("\n\t\t").append("Capabilities:");
-        if(capabilities != null) {
-            for (String capability : capabilities) {
-                stringBuilder.append("\n\t\t\t").append(capability);
-            }
-        }
-        return stringBuilder.toString();
+        return JSONUtil.convertObjectToJSON(this);
     }
 }

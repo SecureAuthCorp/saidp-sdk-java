@@ -1,6 +1,7 @@
 package org.secureauth.sarestapi.data;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import org.secureauth.sarestapi.util.JSONUtil;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -38,8 +39,6 @@ public class JSObjectResponse {
 
     @Override
     public String toString(){
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("\t").append("SRC:").append(src);
-        return stringBuilder.toString();
+        return JSONUtil.convertObjectToJSON(this);
     }
 }

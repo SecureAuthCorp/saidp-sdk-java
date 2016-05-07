@@ -1,6 +1,7 @@
 package org.secureauth.sarestapi.data;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import org.secureauth.sarestapi.util.JSONUtil;
 
 
 import javax.xml.bind.annotation.XmlRootElement;
@@ -57,5 +58,10 @@ public class IPEvalRequest {
 
     public void setIp_address(String ip_address) {
         this.ip_address = ip_address;
+    }
+
+    @Override
+    public String toString(){
+        return JSONUtil.convertObjectToJSON(this);
     }
 }

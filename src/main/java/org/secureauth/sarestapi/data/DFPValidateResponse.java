@@ -1,6 +1,7 @@
 package org.secureauth.sarestapi.data;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import org.secureauth.sarestapi.util.JSONUtil;
 
 
 import javax.xml.bind.annotation.XmlRootElement;
@@ -95,14 +96,6 @@ public class DFPValidateResponse {
 
     @Override
     public String toString(){
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("\t").append("FingerPrint ID:").append(fingerprint_id);
-        stringBuilder.append("\n\t").append("FingerPrint Name:").append(fingerprint_name);
-        stringBuilder.append("\n\t").append("Score:").append(score);
-        stringBuilder.append("\n\t").append("Match Score:").append(match_score);
-        stringBuilder.append("\n\t").append("Update Score:").append(update_score);
-        stringBuilder.append("\n\t").append("Status:").append(status);
-        stringBuilder.append("\n\t").append("Message:").append(message);
-        return stringBuilder.toString();
+        return JSONUtil.convertObjectToJSON(this);
     }
 }

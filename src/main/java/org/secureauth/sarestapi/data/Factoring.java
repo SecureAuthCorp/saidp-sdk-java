@@ -1,6 +1,7 @@
 package org.secureauth.sarestapi.data;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import org.secureauth.sarestapi.util.JSONUtil;
 
 
 import javax.xml.bind.annotation.XmlRootElement;
@@ -49,10 +50,6 @@ public class Factoring {
 
         @Override
         public String toString(){
-                StringBuilder stringBuilder = new StringBuilder();
-                stringBuilder.append("\n\t\t\t").append("Threat Category:").append(threatCategory);
-                stringBuilder.append("\n\t\t\t").append("Threat Type:").append(threatType);
-
-                return stringBuilder.toString();
+                return JSONUtil.convertObjectToJSON(this);
         }
 }

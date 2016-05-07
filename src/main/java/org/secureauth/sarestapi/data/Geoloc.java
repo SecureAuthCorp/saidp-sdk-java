@@ -1,6 +1,7 @@
 package org.secureauth.sarestapi.data;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import org.secureauth.sarestapi.util.JSONUtil;
 
 
 import javax.xml.bind.annotation.XmlRootElement;
@@ -114,16 +115,6 @@ public class Geoloc {
 
     @Override
     public String toString(){
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("\n\t\t\t").append("Country:").append(country);
-        stringBuilder.append("\n\t\t\t").append("Country Code:").append(country_code);
-        stringBuilder.append("\n\t\t\t").append("Region:").append(region);
-        stringBuilder.append("\n\t\t\t").append("Region Code:").append(region_code);
-        stringBuilder.append("\n\t\t\t").append("City:").append(city);
-        stringBuilder.append("\n\t\t\t").append("Latitude:").append(latitude);
-        stringBuilder.append("\n\t\t\t").append("Longtitude:").append(longtitude);
-        stringBuilder.append("\n\t\t\t").append("Internet Service Provider:").append(internet_service_provider);
-        stringBuilder.append("\n\t\t\t").append("Organization:").append(organization);
-        return stringBuilder.toString();
+        return JSONUtil.convertObjectToJSON(this);
     }
 }

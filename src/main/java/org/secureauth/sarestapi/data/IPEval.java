@@ -3,6 +3,7 @@ package org.secureauth.sarestapi.data;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import org.secureauth.sarestapi.util.JSONUtil;
 
 
 /**
@@ -58,10 +59,6 @@ public class IPEval {
 
     @Override
     public String toString(){
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("\t").append("Status:").append(status);
-        stringBuilder.append("\n\t").append("Message:").append(message);
-        stringBuilder.append("\n\t").append("IP Evaluation:").append(ip_evaluation);
-        return stringBuilder.toString();
+        return JSONUtil.convertObjectToJSON(this);
     }
 }

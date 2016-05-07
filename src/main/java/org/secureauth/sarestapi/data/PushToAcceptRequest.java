@@ -1,6 +1,8 @@
 package org.secureauth.sarestapi.data;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import org.secureauth.sarestapi.util.JSONUtil;
+
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
@@ -33,6 +35,11 @@ public class PushToAcceptRequest extends AuthRequest {
 
 	public void setPush_accept_details(PushAcceptDetails push_accept_details) {
 		this.push_accept_details = push_accept_details;
+	}
+
+	@Override
+	public String toString(){
+		return JSONUtil.convertObjectToJSON(this);
 	}
 
 }

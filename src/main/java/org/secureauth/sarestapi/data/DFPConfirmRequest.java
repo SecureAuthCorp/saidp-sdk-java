@@ -1,6 +1,7 @@
 package org.secureauth.sarestapi.data;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import org.secureauth.sarestapi.util.JSONUtil;
 
 
 import javax.xml.bind.annotation.XmlRootElement;
@@ -48,5 +49,10 @@ public class DFPConfirmRequest {
 
     public void setFingerprint_id(String fingerprint_id) {
         this.fingerprint_id = fingerprint_id;
+    }
+
+    @Override
+    public String toString(){
+        return JSONUtil.convertObjectToJSON(this);
     }
 }

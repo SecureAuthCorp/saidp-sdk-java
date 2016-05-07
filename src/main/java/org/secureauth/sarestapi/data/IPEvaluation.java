@@ -1,6 +1,7 @@
 package org.secureauth.sarestapi.data;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import org.secureauth.sarestapi.util.JSONUtil;
 
 
 import javax.xml.bind.annotation.XmlRootElement;
@@ -104,14 +105,6 @@ public class IPEvaluation {
 
     @Override
     public String toString(){
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("\n\t\t").append("Method:").append(method);
-        stringBuilder.append("\n\t\t").append("IP:").append(ip);
-        stringBuilder.append("\n\t\t").append("Risk Factor:").append(risk_factor);
-        stringBuilder.append("\n\t\t").append("Risk Color:").append(risk_color);
-        stringBuilder.append("\n\t\t").append("Risk Description:").append(risk_desc);
-        stringBuilder.append("\n\t\t").append("geoloc:").append(geoloc);
-        stringBuilder.append("\n\t\t").append("factoring:").append(factoring);
-        return stringBuilder.toString();
+        return JSONUtil.convertObjectToJSON(this);
     }
 }
