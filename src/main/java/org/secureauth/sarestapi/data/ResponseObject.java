@@ -1,6 +1,7 @@
 package org.secureauth.sarestapi.data;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import org.secureauth.sarestapi.util.JSONUtil;
 
 
 import javax.xml.bind.annotation.XmlRootElement;
@@ -76,18 +77,6 @@ public class ResponseObject {
 
     @Override
     public String toString(){
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("\t").append("Status:").append(status);
-        stringBuilder.append("\n\t").append("Message:").append(message);
-        if(user_id != null) {
-            stringBuilder.append("\n\t").append("User_ID:").append(user_id);
-        }
-        if(reference_id != null) {
-            stringBuilder.append("\n\t").append("reference_id:").append(reference_id);
-        }
-        if(otp > 0) {
-            stringBuilder.append("\n\t").append("OTP:").append(otp);
-        }
-        return stringBuilder.toString();
+        return JSONUtil.convertObjectToJSON(this);
     }
 }
