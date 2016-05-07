@@ -2,6 +2,9 @@ package org.secureauth.sarestapi.queries;
 
 import org.secureauth.sarestapi.resources.s;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+
 /**
  * @author rrowcliffe@secureauth.com
  *
@@ -53,7 +56,7 @@ public class IDMQueries {
      */
     public static String queryUserToGroup(String realm, String userName, String groupId){
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(realm).append(s.APPLIANCE_USERS).append(userName).append(s.APPLIANCE_IDM_USERS_GROUPS).append(groupId);
+        stringBuilder.append(realm).append(s.APPLIANCE_USERS).append(userName).append(s.APPLIANCE_IDM_USERS_GROUPS).append(encodeGroup(groupId));
         return stringBuilder.toString();
     }
 
@@ -62,7 +65,7 @@ public class IDMQueries {
      */
     public static String queryGrouptToUsers(String realm, String groupId){
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(realm).append(s.APPLIANCE_IDM_GROUPS).append(groupId).append(s.APPLIANCE_IDM_USERS);
+        stringBuilder.append(realm).append(s.APPLIANCE_IDM_GROUPS).append(encodeGroup(groupId)).append(s.APPLIANCE_IDM_USERS);
         return stringBuilder.toString();
     }
 
@@ -71,7 +74,7 @@ public class IDMQueries {
      */
     public static String queryGrouptToUser(String realm, String userName, String groupId){
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(realm).append(s.APPLIANCE_IDM_GROUPS).append(groupId).append(s.APPLIANCE_IDM_USERS).append(userName);
+        stringBuilder.append(realm).append(s.APPLIANCE_IDM_GROUPS).append(encodeGroup(groupId)).append(s.APPLIANCE_IDM_USERS).append(userName);
         return stringBuilder.toString();
     }
 
@@ -83,5 +86,15 @@ public class IDMQueries {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append(realm).append(s.APPLIANCE_USERS).append(userName).append(s.APPLIANCE_IDM_GROUPS).append(userName);
         return stringBuilder.toString();
+    }
+
+    private static String encodeGroup(String groupId){
+        String encodedGroupId = null;
+        try{
+            encodedGroupId = URLEncoder.encode(groupId,"UTF-8").replace("+", "%20");
+        }catch(UnsupportedEncodingException uee){
+            uee.printStackTrace();
+        }
+        return encodedGroupId;
     }
 }
