@@ -103,8 +103,5 @@ public class IPEvaluation {
         this.factor_description = factor_description;
     }
 
-    @Override
-    public String toString(){
-        return JSONUtil.convertObjectToJSON(this);
-    }
+
 }

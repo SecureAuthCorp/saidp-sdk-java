@@ -113,8 +113,5 @@ public class Geoloc {
     }
 
 
-    @Override
-    public String toString(){
-        return JSONUtil.convertObjectToJSON(this);
-    }
+
 }

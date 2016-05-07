@@ -48,8 +48,5 @@ public class Factoring {
                 this.threatCategory = threatCategory;
         }
 
-        @Override
-        public String toString(){
-                return JSONUtil.convertObjectToJSON(this);
-        }
+
 }
