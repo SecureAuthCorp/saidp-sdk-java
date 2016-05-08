@@ -6,7 +6,7 @@ import java.util.HashMap;
 /**
  * Created by rrowcliffe on 5/8/16.
  */
-public class FailureResponse extends BaseResponse {
+public class GroupAssociationResponse extends BaseResponse {
     HashMap<String,ArrayList<String>> failures = new HashMap<>();
 
     public HashMap<String, ArrayList<String>> getFailures() {
