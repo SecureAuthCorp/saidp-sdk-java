@@ -1,6 +1,11 @@
-org.secureauth.restapi.examples
 org.secureauth.sarestapi
 org.secureauth.sarestapi.data
+org.secureauth.sarestapi.data.BehavioralBio
+org.secureauth.sarestapi.data.Requests
+org.secureauth.sarestapi.data.Response
+org.secureauth.sarestapi.data.UserProfile
+org.secureauth.sarestapi.filters
+org.secureauth.sarestapi.interfaces
 org.secureauth.sarestapi.queries
 org.secureauth.sarestapi.resources
 org.secureauth.sarestapi.util
