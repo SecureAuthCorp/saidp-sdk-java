@@ -13,6 +13,9 @@ import org.secureauth.sarestapi.data.Requests.*;
 import org.secureauth.sarestapi.data.Response.*;
 import org.secureauth.sarestapi.data.Requests.UserPasswordRequest;
 import org.secureauth.sarestapi.data.Response.UserProfileResponse;
+import org.secureauth.sarestapi.data.UserProfile.NewUserProfile;
+import org.secureauth.sarestapi.data.UserProfile.UserToGroups;
+import org.secureauth.sarestapi.data.UserProfile.UsersToGroup;
 import org.secureauth.sarestapi.queries.*;
 import org.secureauth.sarestapi.resources.SAExecuter;
 import org.secureauth.sarestapi.util.JSONUtil;
@@ -697,6 +700,140 @@ import org.slf4j.LoggerFactory;
 
     /**
      * <p>
+     *     Creates User / Profile
+     * </p>
+     * @param newUserProfile The newUserProfile Object
+     * @return {@link ResponseObject}
+     */
+    public ResponseObject createUser(NewUserProfile newUserProfile){
+        String ts = getServerTime();
+        RestApiHeader restApiHeader = new RestApiHeader();
+        String header = restApiHeader.getAuthorizationHeader(saAuth,"POST",IDMQueries.queryUsers(saAuth.getRealm()),ts);
+
+        /*
+        At a minimum creating a user requires UserId and Passowrd
+         */
+        if(newUserProfile.getUserId() != null && !newUserProfile.getUserId().isEmpty() && newUserProfile.getPassword() != null && !newUserProfile.getPassword().isEmpty()){
+            try{
+                return saExecuter.executeUserProfileCreateRequest(header,saBaseURL.getApplianceURL() + IDMQueries.queryUsers(saAuth.getRealm()),newUserProfile,ts,ResponseObject.class);
+
+            }catch (Exception e){
+                logger.error(new StringBuilder().append("Exception occurred executing REST query::\n").append(e.getMessage()).append("\n").toString(), e);
+            }
+        }
+        return null;
+    }
+
+    /**
+     * <p>
+     *     Update User / Profile
+     * </p>
+     * @param newUserProfile The User'sProfile Object to be updated
+     * @return {@link ResponseObject}
+     */
+    public ResponseObject updateUser(NewUserProfile newUserProfile){
+        String ts = getServerTime();
+        RestApiHeader restApiHeader = new RestApiHeader();
+        String header = restApiHeader.getAuthorizationHeader(saAuth,"PUT",IDMQueries.queryUsers(saAuth.getRealm()),ts);
+
+
+            try{
+                return saExecuter.executeUserProfileUpdateRequest(header,saBaseURL.getApplianceURL() + IDMQueries.queryUserProfile(saAuth.getRealm(),newUserProfile.getUserId()),newUserProfile,ts,ResponseObject.class);
+
+            }catch (Exception e){
+                logger.error(new StringBuilder().append("Exception occurred executing REST query::\n").append(e.getMessage()).append("\n").toString(), e);
+            }
+
+        return null;
+    }
+
+    /**
+     * <p>
+     *     Associate User to Group
+     * </p>
+     * @param userid the user id of the identity
+     * @param groupName The Name of the group to associate the user to
+     * @return {@link GroupAssociationResponse}
+     */
+    public GroupAssociationResponse addUserToGroup(String userid, String groupName){
+        String ts = getServerTime();
+        RestApiHeader restApiHeader = new RestApiHeader();
+        String header = restApiHeader.getAuthorizationHeader(saAuth,"POST", IDMQueries.queryUserToGroup(saAuth.getRealm(),userid,groupName),ts);
+
+        try{
+            return saExecuter.executeSingleUserToSingleGroup(header,saBaseURL.getApplianceURL() + IDMQueries.queryUserToGroup(saAuth.getRealm(),userid,groupName), ts, GroupAssociationResponse.class);
+        }catch (Exception e){
+            logger.error(new StringBuilder().append("Exception occurred executing REST query::\n").append(e.getMessage()).append("\n").toString(), e);
+        }
+        return null;
+    }
+
+    /**
+     * <p>
+     *     Associate Group to Users
+     * </p>
+     * @param usersToGroup The Users to Group object holding the userIds
+     * @param groupName The Name of the group to associate the user to
+     * @return {@link GroupAssociationResponse}
+     */
+    public GroupAssociationResponse addUserToGroup(UsersToGroup usersToGroup, String groupName){
+        String ts = getServerTime();
+        RestApiHeader restApiHeader = new RestApiHeader();
+        String header = restApiHeader.getAuthorizationHeader(saAuth,"POST", IDMQueries.queryGroupToUsers(saAuth.getRealm(),groupName),ts);
+
+        try{
+            return saExecuter.executeGroupToUsersRequest(header,saBaseURL.getApplianceURL() + IDMQueries.queryGroupToUsers(saAuth.getRealm(),groupName), usersToGroup, ts, GroupAssociationResponse.class);
+        }catch (Exception e){
+            logger.error(new StringBuilder().append("Exception occurred executing REST query::\n").append(e.getMessage()).append("\n").toString(), e);
+        }
+        return null;
+    }
+
+
+    /**
+     * <p>
+     *     Associate Group to User
+     * </p>
+     * @param groupName the Group Name
+     * @param userid The userId to associate to the group
+     * @return {@link GroupAssociationResponse}
+     */
+    public GroupAssociationResponse addGroupToUser(String groupName, String userid){
+        String ts = getServerTime();
+        RestApiHeader restApiHeader = new RestApiHeader();
+        String header = restApiHeader.getAuthorizationHeader(saAuth,"POST", IDMQueries.queryGroupToUser(saAuth.getRealm(),userid,groupName),ts);
+
+        try{
+            return saExecuter.executeSingleGroupToSingleUser(header,saBaseURL.getApplianceURL() + IDMQueries.queryGroupToUser(saAuth.getRealm(),userid,groupName), ts, GroupAssociationResponse.class);
+        }catch (Exception e){
+            logger.error(new StringBuilder().append("Exception occurred executing REST query::\n").append(e.getMessage()).append("\n").toString(), e);
+        }
+        return null;
+    }
+
+    /**
+     * <p>
+     *     Associate User To Groups
+     * </p>
+     * @param userId The UserId we are going to assign Groups to
+     * @param userToGroups The UserToGroups Object holding the list of groups to associate to the user
+     * @return {@link GroupAssociationResponse}
+     */
+    public GroupAssociationResponse addUserToGroups(String userId, UserToGroups userToGroups){
+        String ts = getServerTime();
+        RestApiHeader restApiHeader = new RestApiHeader();
+        String header = restApiHeader.getAuthorizationHeader(saAuth,"POST", IDMQueries.queryUserToGroups(saAuth.getRealm(),userId),ts);
+
+        try{
+            return saExecuter.executeUserToGroupsRequest(header,saBaseURL.getApplianceURL() + IDMQueries.queryUserToGroups(saAuth.getRealm(),userId), userToGroups, ts, GroupAssociationResponse.class);
+        }catch (Exception e){
+            logger.error(new StringBuilder().append("Exception occurred executing REST query::\n").append(e.getMessage()).append("\n").toString(), e);
+        }
+        return null;
+    }
+
+    /**
+     * <p>
      *     Returns the UserProfile for the specified user
      * </p>
      * @param userid the userid of the identity you wish to have a list of possible second factors
@@ -736,7 +873,7 @@ import org.slf4j.LoggerFactory;
 
 
         try{
-            return saExecuter.executeGetRequest(header,saBaseURL.getApplianceURL() + IDMQueries.queryUserResetPwd(saAuth.getRealm(),userid),ts, ResponseObject.class);
+            return saExecuter.executeUserPasswordReset(header,saBaseURL.getApplianceURL() + IDMQueries.queryUserResetPwd(saAuth.getRealm(),userid),userPasswordRequest,ts);
 
         }catch (Exception e){
             logger.error(new StringBuilder().append("Exception occurred executing REST query::\n").append(e.getMessage()).append("\n").toString(), e);
@@ -764,7 +901,7 @@ import org.slf4j.LoggerFactory;
 
 
         try{
-            return saExecuter.executeGetRequest(header,saBaseURL.getApplianceURL() + IDMQueries.queryUserChangePwd(saAuth.getRealm(),userid),ts, ResponseObject.class);
+            return saExecuter.executeUserPasswordChange(header,saBaseURL.getApplianceURL() + IDMQueries.queryUserChangePwd(saAuth.getRealm(),userid),userPasswordRequest,ts);
 
         }catch (Exception e){
             logger.error(new StringBuilder().append("Exception occurred executing REST query::\n").append(e.getMessage()).append("\n").toString(), e);
