@@ -7,7 +7,8 @@ service. Developers working with the REST API tend to write their own REST
 client using either Jersey libraries or base java IO classes. SAAccess sdk
 relies on a core class org.secureauth.sarestapi.SAAccess.
 
-The SDK version 1.0.0. is written to support SecureAuth Appliance 9.0 and newer. 
+The SDK version 1.0.0. is written to support SecureAuth Appliance 9.0 and newer.
+ 
 The SDK will support SecureAuth 8.2 but some capabilities were not available in SecureAuth 8.2
 
 This is a community driven project, if you would like to contribute please fork and update. Changes will be reviewed then added to the project.
