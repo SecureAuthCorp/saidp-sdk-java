@@ -3,6 +3,7 @@ package org.secureauth.sarestapi.data;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import org.secureauth.sarestapi.data.Response.BaseResponse;
 import org.secureauth.sarestapi.util.JSONUtil;
 
 
@@ -27,7 +28,7 @@ OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
 
 @XmlRootElement(name="IPEval")
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class IPEval extends BaseResponse{
+public class IPEval extends BaseResponse {
 
     private IPEvaluation ip_evaluation;
 

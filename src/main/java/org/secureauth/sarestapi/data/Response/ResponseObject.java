@@ -1,6 +1,7 @@
-package org.secureauth.sarestapi.data;
+package org.secureauth.sarestapi.data.Response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import org.secureauth.sarestapi.data.Response.BaseResponse;
 import org.secureauth.sarestapi.util.JSONUtil;
 
 
@@ -24,15 +25,14 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
 OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+
 @XmlRootElement
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class AuthRequest {
+public class ResponseObject extends BaseResponse {
 
-    String user_id;
-    private String type;
-    private String token;
-    private String factor_id;
-
+    private String user_id;
+    private String reference_id;
+    private int otp;
 
     public String getUser_id() {
         return user_id;
@@ -42,33 +42,24 @@ public class AuthRequest {
         this.user_id = user_id;
     }
 
-    public String getType() {
-        return type;
+    public int getOtp() {
+        return otp;
     }
 
-    public void setType(String type) {
-        this.type = type;
+    public void setOtp(int otp) {
+        this.otp = otp;
     }
 
-    public String getToken() {
-        return token;
-    }
+	public String getReference_id() {
+		return reference_id;
+	}
 
-    public void setToken(String token) {
-        this.token = token;
-    }
-
-    public String getFactor_id() {
-        return factor_id;
-    }
-
-    public void setFactor_id(String factor_id) {
-        this.factor_id = factor_id;
-    }
+	public void setReference_id(String reference_id) {
+		this.reference_id = reference_id;
+	}
 
     @Override
     public String toString(){
         return JSONUtil.convertObjectToJSON(this);
     }
-
 }

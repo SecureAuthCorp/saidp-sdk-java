@@ -1,13 +1,13 @@
-package org.secureauth.sarestapi.data;
+package org.secureauth.sarestapi.data.Response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import org.secureauth.sarestapi.util.JSONUtil;
 
+
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
- * @author rrowcliffe@secureauth.com
- *
+ * @author lding@secureauth.com
  *
 Copyright (c) 2015, SecureAuth
 All rights reserved.
@@ -23,35 +23,40 @@ Redistribution and use in source and binary forms, with or without modification,
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
 IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
 OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-**/
+ */
 
 @XmlRootElement
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class AccessHistoryRequest {
+public class AdaptiveAuthResponse extends ResponseObject {
 
-    private String user_id;
-    private String ip_address;
+    private String realm_workflow, suggested_action, redirect_url;
 
+	public String getRealm_workflow() {
+		return realm_workflow;
+	}
 
+	public void setRealm_workflow(String realm_workflow) {
+		this.realm_workflow = realm_workflow;
+	}
 
-    public String getUser_id() {
-        return user_id;
-    }
+	public String getSuggested_action() {
+		return suggested_action;
+	}
 
-    public void setUser_id(String user_id) {
-        this.user_id = user_id;
-    }
+	public void setSuggested_action(String suggested_action) {
+		this.suggested_action = suggested_action;
+	}
 
-    public String getIp_address() {
-        return ip_address;
-    }
+	public String getRedirect_url() {
+		return redirect_url;
+	}
 
-    public void setIp_address(String ip_address) {
-        this.ip_address = ip_address;
-    }
+	public void setRedirect_url(String redirect_url) {
+		this.redirect_url = redirect_url;
+	}
 
-    @Override
-    public String toString(){
-        return JSONUtil.convertObjectToJSON(this);
-    }
+	@Override
+	public String toString(){
+		return JSONUtil.convertObjectToJSON(this);
+	}
 }

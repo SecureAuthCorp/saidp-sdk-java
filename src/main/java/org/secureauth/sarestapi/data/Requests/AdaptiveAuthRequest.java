@@ -1,8 +1,6 @@
-package org.secureauth.sarestapi.data;
+package org.secureauth.sarestapi.data.Requests;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectWriter;
 import org.secureauth.sarestapi.util.JSONUtil;
 
 
@@ -29,33 +27,37 @@ OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
 
 @XmlRootElement
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class AdaptiveAuthResponse extends ResponseObject {
+public class AdaptiveAuthRequest extends AuthRequest {
 
-    private String realm_workflow, suggested_action, redirect_url;
+    private AAParameters parameters;
 
-	public String getRealm_workflow() {
-		return realm_workflow;
+    public AdaptiveAuthRequest(String user_id, String ip) {
+    	this.user_id = user_id;
+    	parameters = new AAParameters();
+    	parameters.setIp_address(ip);
+    }
+    
+	public AAParameters getParameters() {
+		return parameters;
 	}
 
-	public void setRealm_workflow(String realm_workflow) {
-		this.realm_workflow = realm_workflow;
+	public void setParameters(AAParameters parameters) {
+		this.parameters = parameters;
 	}
+    
+    @XmlRootElement
+	@JsonInclude(JsonInclude.Include.NON_NULL)
+    public static class AAParameters {
+    	private String ip_address;
 
-	public String getSuggested_action() {
-		return suggested_action;
-	}
+		public String getIp_address() {
+			return ip_address;
+		}
 
-	public void setSuggested_action(String suggested_action) {
-		this.suggested_action = suggested_action;
-	}
-
-	public String getRedirect_url() {
-		return redirect_url;
-	}
-
-	public void setRedirect_url(String redirect_url) {
-		this.redirect_url = redirect_url;
-	}
+		public void setIp_address(String ip_address) {
+			this.ip_address = ip_address;
+		}
+    }
 
 	@Override
 	public String toString(){

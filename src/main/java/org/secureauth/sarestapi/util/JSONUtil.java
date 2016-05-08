@@ -4,7 +4,7 @@ package org.secureauth.sarestapi.util;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
-import org.secureauth.sarestapi.data.*;
+import org.secureauth.sarestapi.data.Requests.DFPValidateRequest;
 
 import java.io.IOException;
 

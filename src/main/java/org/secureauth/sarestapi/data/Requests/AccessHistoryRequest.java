@@ -1,13 +1,13 @@
-package org.secureauth.sarestapi.data;
+package org.secureauth.sarestapi.data.Requests;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import org.secureauth.sarestapi.util.JSONUtil;
-
 
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * @author rrowcliffe@secureauth.com
+ *
  *
 Copyright (c) 2015, SecureAuth
 All rights reserved.
@@ -23,15 +23,16 @@ Redistribution and use in source and binary forms, with or without modification,
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
 IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
 OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
+**/
 
 @XmlRootElement
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class ResponseObject extends BaseResponse{
+public class AccessHistoryRequest {
 
     private String user_id;
-    private String reference_id;
-    private int otp;
+    private String ip_address;
+
+
 
     public String getUser_id() {
         return user_id;
@@ -41,21 +42,13 @@ public class ResponseObject extends BaseResponse{
         this.user_id = user_id;
     }
 
-    public int getOtp() {
-        return otp;
+    public String getIp_address() {
+        return ip_address;
     }
 
-    public void setOtp(int otp) {
-        this.otp = otp;
+    public void setIp_address(String ip_address) {
+        this.ip_address = ip_address;
     }
-
-	public String getReference_id() {
-		return reference_id;
-	}
-
-	public void setReference_id(String reference_id) {
-		this.reference_id = reference_id;
-	}
 
     @Override
     public String toString(){

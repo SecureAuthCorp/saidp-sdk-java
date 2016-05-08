@@ -7,7 +7,6 @@ import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 
 import javax.net.ssl.HostnameVerifier;
-import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSession;
 import javax.net.ssl.TrustManager;
@@ -17,9 +16,14 @@ import javax.ws.rs.core.MediaType;
 
 import org.secureauth.sarestapi.data.*;
 import org.secureauth.sarestapi.data.BehavioralBio.BehaveBioRequest;
-import org.secureauth.sarestapi.data.BehavioralBio.BehaveBioResetRequest;
-import org.secureauth.sarestapi.data.BehavioralBio.BehaveBioResponse;
-import org.secureauth.sarestapi.data.UserProfile.UserPasswordRequest;
+import org.secureauth.sarestapi.data.Requests.BehaveBioResetRequest;
+import org.secureauth.sarestapi.data.Response.BehaveBioResponse;
+import org.secureauth.sarestapi.data.Requests.*;
+import org.secureauth.sarestapi.data.Response.DFPConfirmResponse;
+import org.secureauth.sarestapi.data.Response.DFPValidateResponse;
+import org.secureauth.sarestapi.data.Response.ResponseObject;
+import org.secureauth.sarestapi.data.Requests.UserPasswordRequest;
+import org.secureauth.sarestapi.filters.SACheckRequestFilter;
 import org.secureauth.sarestapi.util.JSONUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,6 +58,7 @@ OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
 public class SAExecuter {
 
     private ClientConfig config = null;
+
     private Client client=null;
     private static Logger logger=LoggerFactory.getLogger(SAExecuter.class);
     private SABaseURL saBaseURL = null;
@@ -64,6 +69,9 @@ public class SAExecuter {
     private void createConnection() throws Exception{
 
         config = new ClientConfig();
+        SSLContext ctx = null;
+        ctx = SSLContext.getInstance("TLS");
+
 
         TrustManager[] certs = new TrustManager[]{
                 new X509TrustManager(){
@@ -80,44 +88,23 @@ public class SAExecuter {
                 }
         };
 
-        SSLContext ctx = null;
-        HostnameVerifier hostnameVerifier = new HostnameVerifier() {
-            @Override
-            public boolean verify(String s, SSLSession sslSession) {
-                return saBaseURL.isSelfSigned();
-            }
-        };
-        try{
-            ctx = SSLContext.getInstance("TLS");
-            ctx.init(null, certs, new SecureRandom());
-            HttpsURLConnection.setDefaultSSLSocketFactory(ctx.getSocketFactory());
-            HttpsURLConnection.setDefaultHostnameVerifier(hostnameVerifier);
-        }catch(java.security.GeneralSecurityException ex){
-            logger.error(new StringBuilder().append("Exception occurred while attempting to setup SSL security. ").toString(), ex);
-        }
-
-
-
+        ctx.init(null, certs, new SecureRandom());
 
         try{
+            config.register(SACheckRequestFilter.class);
              client = ClientBuilder.newBuilder()
-                    .sslContext(ctx)
-                    .hostnameVerifier(hostnameVerifier)
+                     .withConfig(config)
+                     .sslContext(ctx)
+                    .hostnameVerifier(new HostnameVerifier() {
+                        @Override
+                        public boolean verify(String s, SSLSession sslSession) {
+                            return saBaseURL.isSelfSigned();
+                        }
+                    })
                     .build();
 
         }catch(Exception e){
             logger.error(new StringBuilder().append("Exception occurred while attempting to associating our SSL cert to the session.").toString(), e);
-        }
-
-        try{
-            client = ClientBuilder.newClient(config);
-        }catch(Exception e){
-            StringBuilder bud = new StringBuilder();
-            for(StackTraceElement st: e.getStackTrace()){
-                bud.append(st.toString()).append("\n");
-            }
-            throw new Exception(new StringBuilder().append("Exception occurred while attempting to create connection object. Exception: ")
-                    .append(e.getMessage()).append("\nStackTraceElements:\n").append(bud.toString()).toString());
         }
 
         if(client == null) throw new Exception(new StringBuilder().append("Unable to create connection object, creation attempt returned NULL.").toString());
@@ -334,7 +321,7 @@ public class SAExecuter {
     }
 
     //Validate User OATH by SMS
-    public ResponseObject executeOTPBySMS(String auth,String query, AuthRequest authRequest,String ts)throws Exception{
+    public ResponseObject executeOTPBySMS(String auth, String query, AuthRequest authRequest, String ts)throws Exception{
 
         if(client == null) {
             createConnection();
@@ -456,7 +443,7 @@ public class SAExecuter {
     }
 
     //Run IP Evaluation against user and IP Address
-    public IPEval executeIPEval(String auth,String query, IPEvalRequest ipEvalRequest, String ts)throws Exception{
+    public IPEval executeIPEval(String auth, String query, IPEvalRequest ipEvalRequest, String ts)throws Exception{
 
         if(client == null) {
             createConnection();
@@ -599,7 +586,7 @@ public class SAExecuter {
                     header("Authorization", auth).
                     header("X-SA-Date", ts).
                     get();
-            jsObjectResponse= response.readEntity(valueType);
+            jsObjectResponse = response.readEntity(valueType);
 
         }catch(Exception e){
             logger.error(new StringBuilder().append("Exception getting JS Object SRC: \nQuery:\n\t")

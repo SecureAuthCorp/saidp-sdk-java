@@ -1,19 +1,26 @@
 package org.secureauth.sarestapi.data.UserProfile;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
+import javax.xml.bind.annotation.XmlRootElement;
+import java.util.HashMap;
+
 /**
  * Created by rrowcliffe on 5/2/16.
  */
+@XmlRootElement
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class UserProfile {
-    private UserProfileProperties properties;
+    private HashMap<String,UserProfileProperty> properties = new HashMap<>();
     private UserProfileKBAKBQ knowledgeBase;
     private UserProfileGroups groups;
     private UserProfileAccessHistories accessHistories;
 
-    public UserProfileProperties getProperties() {
+    public HashMap<String, UserProfileProperty> getProperties() {
         return properties;
     }
 
-    public void setProperties(UserProfileProperties properties) {
+    public void setProperties(HashMap<String, UserProfileProperty> properties) {
         this.properties = properties;
     }
 

@@ -1,6 +1,7 @@
-package org.secureauth.sarestapi.data;
+package org.secureauth.sarestapi.data.Requests;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import org.secureauth.sarestapi.data.DFP;
 import org.secureauth.sarestapi.util.JSONUtil;
 
 
@@ -28,53 +29,34 @@ OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
 
 @XmlRootElement
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class DFPValidateResponse extends BaseResponse{
+public class DFPValidateRequest {
 
-    private String fingerprint_id;
-    private String fingerprint_name;
-    private double score;
-    private double match_score;
-    private double update_score;
+    private String user_id;
+    private String host_address;
+    private DFP fingerprint = new DFP();
 
-
-    public String getFingerprint_id() {
-        return fingerprint_id;
+    public String getUser_id() {
+        return user_id;
     }
 
-    public void setFingerprint_id(String fingerprint_id) {
-        this.fingerprint_id = fingerprint_id;
+    public void setUser_id(String user_id) {
+        this.user_id = user_id;
     }
 
-    public String getFingerprint_name() {
-        return fingerprint_name;
+    public String getHost_address() {
+        return host_address;
     }
 
-    public void setFingerprint_name(String fingerprint_name) {
-        this.fingerprint_name = fingerprint_name;
+    public void setHost_address(String host_address) {
+        this.host_address = host_address;
     }
 
-    public double getScore() {
-        return score;
+    public DFP getFingerprint() {
+        return fingerprint;
     }
 
-    public void setScore(double score) {
-        this.score = score;
-    }
-
-    public double getMatch_score() {
-        return match_score;
-    }
-
-    public void setMatch_score(double match_score) {
-        this.match_score = match_score;
-    }
-
-    public double getUpdate_score() {
-        return update_score;
-    }
-
-    public void setUpdate_score(double update_score) {
-        this.update_score = update_score;
+    public void setFingerprint(DFP fingerprint) {
+        this.fingerprint = fingerprint;
     }
 
     @Override

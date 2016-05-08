@@ -1,4 +1,4 @@
-package org.secureauth.sarestapi.data;
+package org.secureauth.sarestapi.data.Response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import org.secureauth.sarestapi.util.JSONUtil;
@@ -7,7 +7,8 @@ import org.secureauth.sarestapi.util.JSONUtil;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
- * @author lding@secureauth.com
+ * @author rrowcliffe@secureauth.com
+ *
  *
 Copyright (c) 2015, SecureAuth
 All rights reserved.
@@ -23,44 +24,61 @@ Redistribution and use in source and binary forms, with or without modification,
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
 IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
 OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
+**/
 
 @XmlRootElement
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class AdaptiveAuthRequest extends AuthRequest {
+public class DFPValidateResponse extends BaseResponse{
 
-    private AAParameters parameters;
+    private String fingerprint_id;
+    private String fingerprint_name;
+    private double score;
+    private double match_score;
+    private double update_score;
 
-    public AdaptiveAuthRequest(String user_id, String ip) {
-    	this.user_id = user_id;
-    	parameters = new AAParameters();
-    	parameters.setIp_address(ip);
-    }
-    
-	public AAParameters getParameters() {
-		return parameters;
-	}
 
-	public void setParameters(AAParameters parameters) {
-		this.parameters = parameters;
-	}
-    
-    @XmlRootElement
-	@JsonInclude(JsonInclude.Include.NON_NULL)
-    public static class AAParameters {
-    	private String ip_address;
-
-		public String getIp_address() {
-			return ip_address;
-		}
-
-		public void setIp_address(String ip_address) {
-			this.ip_address = ip_address;
-		}
+    public String getFingerprint_id() {
+        return fingerprint_id;
     }
 
-	@Override
-	public String toString(){
-		return JSONUtil.convertObjectToJSON(this);
-	}
+    public void setFingerprint_id(String fingerprint_id) {
+        this.fingerprint_id = fingerprint_id;
+    }
+
+    public String getFingerprint_name() {
+        return fingerprint_name;
+    }
+
+    public void setFingerprint_name(String fingerprint_name) {
+        this.fingerprint_name = fingerprint_name;
+    }
+
+    public double getScore() {
+        return score;
+    }
+
+    public void setScore(double score) {
+        this.score = score;
+    }
+
+    public double getMatch_score() {
+        return match_score;
+    }
+
+    public void setMatch_score(double match_score) {
+        this.match_score = match_score;
+    }
+
+    public double getUpdate_score() {
+        return update_score;
+    }
+
+    public void setUpdate_score(double update_score) {
+        this.update_score = update_score;
+    }
+
+    @Override
+    public String toString(){
+        return JSONUtil.convertObjectToJSON(this);
+    }
 }

@@ -7,10 +7,12 @@ import java.util.TimeZone;
 
 import org.secureauth.sarestapi.data.*;
 import org.secureauth.sarestapi.data.BehavioralBio.BehaveBioRequest;
-import org.secureauth.sarestapi.data.BehavioralBio.BehaveBioResetRequest;
-import org.secureauth.sarestapi.data.BehavioralBio.BehaveBioResponse;
-import org.secureauth.sarestapi.data.UserProfile.UserPasswordRequest;
-import org.secureauth.sarestapi.data.UserProfile.UserProfileResponse;
+import org.secureauth.sarestapi.data.Requests.BehaveBioResetRequest;
+import org.secureauth.sarestapi.data.Response.BehaveBioResponse;
+import org.secureauth.sarestapi.data.Requests.*;
+import org.secureauth.sarestapi.data.Response.*;
+import org.secureauth.sarestapi.data.Requests.UserPasswordRequest;
+import org.secureauth.sarestapi.data.Response.UserProfileResponse;
 import org.secureauth.sarestapi.queries.*;
 import org.secureauth.sarestapi.resources.SAExecuter;
 import org.secureauth.sarestapi.util.JSONUtil;
@@ -105,7 +107,7 @@ import org.slf4j.LoggerFactory;
      *     Returns the list of Factors available for the specified user
      * </p>
      * @param userid the userid of the identity you wish to have a list of possible second factors
-     * @return {@link org.secureauth.sarestapi.data.FactorsResponse}
+     * @return {@link FactorsResponse}
      */
     public FactorsResponse factorsByUser(String userid){
     	userid = encode(userid);
@@ -129,7 +131,7 @@ import org.slf4j.LoggerFactory;
      * </p>
      * @param userid the user id of the identity
      * @param endUserIP the IP of requesting client
-     * @return {@link org.secureauth.sarestapi.data.FactorsResponse}
+     * @return {@link FactorsResponse}
      */
     public ResponseObject sendPushToAcceptReq(String userid, String factor_id, String endUserIP, String clientCompany, String clientDescription){
         String ts = getServerTime();
@@ -163,7 +165,7 @@ import org.slf4j.LoggerFactory;
      * </p>
      * @param userid the user id of the identity
      * @param endUserIP the IP of requesting client
-     * @return {@link org.secureauth.sarestapi.data.FactorsResponse}
+     * @return {@link FactorsResponse}
      */
     public AdaptiveAuthResponse adaptiveAuthQuery(String userid, String endUserIP){
         String ts = getServerTime();
@@ -201,7 +203,7 @@ import org.slf4j.LoggerFactory;
      *     Checks if the Username exists within the datastore within SecureAuth
      * </p>
      * @param userid the userid of the identity
-     * @return {@link org.secureauth.sarestapi.data.ResponseObject}
+     * @return {@link ResponseObject}
      */
     public ResponseObject validateUser(String userid){
 
@@ -229,7 +231,7 @@ import org.slf4j.LoggerFactory;
      * </p>
      * @param userid the userid of the identity
      * @param password The password of the user to validate
-     * @return {@link org.secureauth.sarestapi.data.ResponseObject}
+     * @return {@link ResponseObject}
      */
     public ResponseObject validateUserPassword(String userid, String password){
         String ts = getServerTime();
@@ -256,7 +258,7 @@ import org.slf4j.LoggerFactory;
      * </p>
      * @param userid the userid of the identity
      * @param pin The pin of the user to validate
-     * @return {@link org.secureauth.sarestapi.data.ResponseObject}
+     * @return {@link ResponseObject}
      */
     public ResponseObject validateUserPin(String userid, String pin){
         String ts = getServerTime();
@@ -284,7 +286,7 @@ import org.slf4j.LoggerFactory;
      * @param userid the userid of the identity
      * @param answer The answer to the KBA
      * @param factor_id the KB Id to be compared against
-     * @return {@link org.secureauth.sarestapi.data.ResponseObject}
+     * @return {@link ResponseObject}
      */
     public ResponseObject validateKba(String userid, String answer, String factor_id){
         String ts = getServerTime();
@@ -313,7 +315,7 @@ import org.slf4j.LoggerFactory;
      * @param userid the userid of the identity
      * @param otp The One Time Passcode to validate
      * @param factor_id The Device Identifier
-     * @return {@link org.secureauth.sarestapi.data.ResponseObject}
+     * @return {@link ResponseObject}
      */
     public ResponseObject validateOath(String userid, String otp, String factor_id){
         String ts = getServerTime();
@@ -341,7 +343,7 @@ import org.slf4j.LoggerFactory;
      * </p>
      * @param userid the userid of the identity
      * @param factor_id  Phone Property   "Phone1"
-     * @return {@link org.secureauth.sarestapi.data.ResponseObject}
+     * @return {@link ResponseObject}
      */
     public ResponseObject deliverOTPByPhone(String userid, String factor_id){
         String ts = getServerTime();
@@ -368,7 +370,7 @@ import org.slf4j.LoggerFactory;
      * </p>
      * @param userid the userid of the identity
      * @param factor_id  Phone Property   "Phone1"
-     * @return {@link org.secureauth.sarestapi.data.ResponseObject}
+     * @return {@link ResponseObject}
      */
     public ResponseObject deliverOTPBySMS(String userid, String factor_id){
         String ts = getServerTime();
@@ -394,7 +396,7 @@ import org.slf4j.LoggerFactory;
      * </p>
      * @param userid the userid of the identity
      * @param factor_id  Email Property   "Email1"
-     * @return {@link org.secureauth.sarestapi.data.ResponseObject}
+     * @return {@link ResponseObject}
      */
     public ResponseObject deliverOTPByEmail(String userid, String factor_id){
         String ts = getServerTime();
@@ -420,7 +422,7 @@ import org.slf4j.LoggerFactory;
      * </p>
      * @param userid the userid of the identity
      * @param factor_id  Device Property   "z0y9x87wv6u5t43srq2p1on"
-     * @return {@link org.secureauth.sarestapi.data.ResponseObject}
+     * @return {@link ResponseObject}
      */
     public ResponseObject deliverOTPByPush(String userid, String factor_id){
         String ts = getServerTime();
@@ -446,7 +448,7 @@ import org.slf4j.LoggerFactory;
      * </p>
      * @param userid the userid of the identity
      * @param factor_id  Help Desk Property   "HelpDesk1"
-     * @return {@link org.secureauth.sarestapi.data.ResponseObject}
+     * @return {@link ResponseObject}
      */
     public ResponseObject deliverOTPByHelpDesk(String userid, String factor_id){
         String ts = getServerTime();
@@ -472,7 +474,7 @@ import org.slf4j.LoggerFactory;
      * </p>
      * @param userid The User ID that you want to validate from
      * @param ip_address The IP Address of the user to be stored in the Datastore for use when evaluating Geo-Velocity
-     * @return {@link org.secureauth.sarestapi.data.AccessHistoryRequest}
+     * @return {@link AccessHistoryRequest}
      *
      */
     public ResponseObject accessHistory(String userid, String ip_address){
@@ -501,7 +503,7 @@ import org.slf4j.LoggerFactory;
      * </p>
      * @param userid The User ID that you want to validate from
      * @param fingerprint_id The ID of the finger print to check against the data store
-     * @return {@link org.secureauth.sarestapi.data.DFPConfirmResponse}
+     * @return {@link DFPConfirmResponse}
      *
      */
       public DFPConfirmResponse DFPConfirm(String userid, String fingerprint_id){
@@ -536,7 +538,7 @@ import org.slf4j.LoggerFactory;
      * @param accept_charset The accept Charset supplied by the client from the application server
      * @param accept_encoding The accept Encoding supplied by the client from the application server
      * @param accept_language The accepted language by the client supplied by the application server
-     * @return {@link org.secureauth.sarestapi.data.DFPValidateResponse}
+     * @return {@link DFPValidateResponse}
      *
      */
     public DFPValidateResponse DFPValidateNewFingerprint(String userid, String host_address, String jsonString, String accept, String accept_charset, String accept_encoding, String accept_language){
@@ -571,7 +573,7 @@ import org.slf4j.LoggerFactory;
      * <p>
      *     Returns the url for the JavaScript Source for DFP
      * </p>
-     * @return {@link org.secureauth.sarestapi.data.JSObjectResponse}
+     * @return {@link JSObjectResponse}
      */
     public JSObjectResponse javaScriptSrc(){
         String ts = getServerTime();
@@ -598,7 +600,7 @@ import org.slf4j.LoggerFactory;
      * <p>
      *     Returns the url for the JavaScript Source for BehaveBioMetrics
      * </p>
-     * @return {@link org.secureauth.sarestapi.data.JSObjectResponse}
+     * @return {@link JSObjectResponse}
      */
     public JSObjectResponse BehaveBioJSSrc(){
         String ts = getServerTime();
@@ -659,7 +661,7 @@ import org.slf4j.LoggerFactory;
      * @param fieldType The Behavioral FieldType to Reset
      * @param deviceType  The Behavioral DeviceType to Reset
      *
-     * @return {@link org.secureauth.sarestapi.data.ResponseObject}
+     * @return {@link ResponseObject}
      *
      */
     public ResponseObject BehaveBioProfileReset(String userid, String fieldName, String fieldType, String deviceType){
@@ -698,7 +700,7 @@ import org.slf4j.LoggerFactory;
      *     Returns the UserProfile for the specified user
      * </p>
      * @param userid the userid of the identity you wish to have a list of possible second factors
-     * @return {@link org.secureauth.sarestapi.data.UserProfile.UserProfileResponse}
+     * @return {@link UserProfileResponse}
      */
     public UserProfileResponse getUserProfile(String userid){
         userid = encode(userid);
@@ -722,7 +724,7 @@ import org.slf4j.LoggerFactory;
      * </p>
      * @param userid the userid of the identity you wish to have a list of possible second factors
      * @param password the users new password
-     * @return {@link org.secureauth.sarestapi.data.ResponseObject
+     * @return {@link ResponseObject
      */
     public ResponseObject passwordReset(String userid, String password){
         userid = encode(userid);
@@ -749,7 +751,7 @@ import org.slf4j.LoggerFactory;
      * @param userid the userid of the identity you wish to have a list of possible second factors
      * @param currentPassword the users Current password
      * @param newPassword the users new Password
-     * @return {@link org.secureauth.sarestapi.data.ResponseObject
+     * @return {@link ResponseObject
      */
     public ResponseObject passwordChange(String userid, String currentPassword, String newPassword){
         userid = encode(userid);

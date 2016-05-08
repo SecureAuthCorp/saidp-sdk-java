@@ -2,7 +2,7 @@ package org.secureauth.sarestapi.interfaces;
 
 import org.secureauth.sarestapi.SAAccess;
 import org.secureauth.sarestapi.data.IPEval;
-import org.secureauth.sarestapi.data.ResponseObject;
+import org.secureauth.sarestapi.data.Response.ResponseObject;
 
 /**
  * Created by rrowcliffe on 5/7/16.

@@ -1,4 +1,4 @@
-package org.secureauth.sarestapi.data.BehavioralBio;
+package org.secureauth.sarestapi.data.Requests;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import org.secureauth.sarestapi.util.JSONUtil;

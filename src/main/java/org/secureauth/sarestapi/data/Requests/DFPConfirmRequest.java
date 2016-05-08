@@ -1,4 +1,4 @@
-package org.secureauth.sarestapi.data;
+package org.secureauth.sarestapi.data.Requests;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import org.secureauth.sarestapi.util.JSONUtil;
@@ -28,11 +28,10 @@ OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
 
 @XmlRootElement
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class IPEvalRequest {
+public class DFPConfirmRequest {
 
     private String user_id;
-    private String type;
-    private String ip_address;
+    private String fingerprint_id;
 
 
 
@@ -44,20 +43,12 @@ public class IPEvalRequest {
         this.user_id = user_id;
     }
 
-    public String getType() {
-        return type;
+    public String getFingerprint_id() {
+        return fingerprint_id;
     }
 
-    public void setType(String type) {
-        this.type = type;
-    }
-
-    public String getIp_address() {
-        return ip_address;
-    }
-
-    public void setIp_address(String ip_address) {
-        this.ip_address = ip_address;
+    public void setFingerprint_id(String fingerprint_id) {
+        this.fingerprint_id = fingerprint_id;
     }
 
     @Override

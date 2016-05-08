@@ -1,7 +1,8 @@
-package org.secureauth.sarestapi.data.BehavioralBio;
+package org.secureauth.sarestapi.data.Response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import org.secureauth.sarestapi.data.BaseResponse;
+import org.secureauth.sarestapi.data.BehavioralBio.BehaveBioResults;
+import org.secureauth.sarestapi.data.Response.BaseResponse;
 import org.secureauth.sarestapi.util.JSONUtil;
 
 import javax.xml.bind.annotation.XmlRootElement;
