@@ -726,7 +726,7 @@ public class SAExecuter {
     }
 
     //Update User Profile
-    public <T> T executeUserProfileUpdateRequest(String auth, String query, UserProfile userProfile, String ts, Class<T> valueType)throws Exception{
+    public <T> T executeUserProfileUpdateRequest(String auth, String query, NewUserProfile userProfile, String ts, Class<T> valueType)throws Exception{
 
         if(client == null) {
             createConnection();
@@ -756,7 +756,7 @@ public class SAExecuter {
     }
 
     //create User Profile
-    public <T> T executeUserProfileCreateRequest(String auth, String query, NewUserProfile userProfile, String ts, Class<T> valueType)throws Exception{
+    public <T> T executeUserProfileCreateRequest(String auth, String query, NewUserProfile newUserProfile, String ts, Class<T> valueType)throws Exception{
 
         if(client == null) {
             createConnection();
@@ -772,7 +772,7 @@ public class SAExecuter {
                     accept(MediaType.APPLICATION_JSON).
                     header("Authorization", auth).
                     header("X-SA-Date", ts).
-                    post(Entity.entity(JSONUtil.convertObjectToJSON(userProfile),MediaType.APPLICATION_JSON));
+                    post(Entity.entity(JSONUtil.convertObjectToJSON(newUserProfile),MediaType.APPLICATION_JSON));
 
             responseObject=response.readEntity(valueType);
 
