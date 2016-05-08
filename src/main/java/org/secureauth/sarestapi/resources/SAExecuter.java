@@ -23,6 +23,10 @@ import org.secureauth.sarestapi.data.Response.DFPConfirmResponse;
 import org.secureauth.sarestapi.data.Response.DFPValidateResponse;
 import org.secureauth.sarestapi.data.Response.ResponseObject;
 import org.secureauth.sarestapi.data.Requests.UserPasswordRequest;
+import org.secureauth.sarestapi.data.UserProfile.NewUserProfile;
+import org.secureauth.sarestapi.data.UserProfile.UserProfile;
+import org.secureauth.sarestapi.data.UserProfile.UserToGroups;
+import org.secureauth.sarestapi.data.UserProfile.UsersToGroup;
 import org.secureauth.sarestapi.filters.SACheckRequestFilter;
 import org.secureauth.sarestapi.util.JSONUtil;
 import org.slf4j.Logger;
@@ -718,6 +722,182 @@ public class SAExecuter {
         }
         response.close();
         return passwordChangeResponse;
+
+    }
+
+    //Update User Profile
+    public <T> T executeUserProfileUpdateRequest(String auth, String query, UserProfile userProfile, String ts, Class<T> valueType)throws Exception{
+
+        if(client == null) {
+            createConnection();
+        }
+
+        WebTarget target = null;
+        Response response = null;
+        T responseObject =null;
+        try{
+
+            target = client.target(query);
+            response = target.request().
+                    accept(MediaType.APPLICATION_JSON).
+                    header("Authorization", auth).
+                    header("X-SA-Date", ts).
+                    post(Entity.entity(JSONUtil.convertObjectToJSON(userProfile),MediaType.APPLICATION_JSON));
+
+            responseObject=response.readEntity(valueType);
+
+        }catch(Exception e){
+            logger.error(new StringBuilder().append("Exception Updating User Profile: \nQuery:\n\t")
+                    .append(query).append("\nError:").append(e.getMessage()).append(".\nResponse code is ").append(response.getStatus()).toString(), e);
+        }
+        response.close();
+        return responseObject;
+
+    }
+
+    //create User Profile
+    public <T> T executeUserProfileCreateRequest(String auth, String query, NewUserProfile userProfile, String ts, Class<T> valueType)throws Exception{
+
+        if(client == null) {
+            createConnection();
+        }
+
+        WebTarget target = null;
+        Response response = null;
+        T responseObject =null;
+        try{
+
+            target = client.target(query);
+            response = target.request().
+                    accept(MediaType.APPLICATION_JSON).
+                    header("Authorization", auth).
+                    header("X-SA-Date", ts).
+                    post(Entity.entity(JSONUtil.convertObjectToJSON(userProfile),MediaType.APPLICATION_JSON));
+
+            responseObject=response.readEntity(valueType);
+
+        }catch(Exception e){
+            logger.error(new StringBuilder().append("Exception Updating User Profile: \nQuery:\n\t")
+                    .append(query).append("\nError:").append(e.getMessage()).append(".\nResponse code is ").append(response.getStatus()).toString(), e);
+        }
+        response.close();
+        return responseObject;
+
+    }
+
+    //Single User to Single Group
+    public <T> T executeSingleUserToSingleGroup(String auth, String query,String ts,  Class<T> valueType)throws Exception {
+        if(client == null) {
+            createConnection();
+        }
+
+        WebTarget target = null;
+        Response response = null;
+        T genericResponse =null;
+        try{
+
+            target = client.target(query);
+            response = target.request().
+                    accept(MediaType.APPLICATION_JSON).
+                    header("Authorization", auth).
+                    header("X-SA-Date", ts).
+                    post(null);
+            genericResponse = response.readEntity(valueType);
+
+        }catch(Exception e){
+            logger.error(new StringBuilder().append("Exception Adding user to Group: \nQuery:\n\t")
+                    .append(query).append("\nError:").append(e.getMessage()).append(".\nResponse code is ").append(response.getStatus()).toString(), e);
+        }
+        response.close();
+        return genericResponse;
+
+    }
+
+    //Single Group Multiple Users
+    public <T> T executeGroupToUsersRequest(String auth, String query, UsersToGroup usersToGroup, String ts, Class<T> valueType)throws Exception{
+
+        if(client == null) {
+            createConnection();
+        }
+
+        WebTarget target = null;
+        Response response = null;
+        T responseObject =null;
+        try{
+
+            target = client.target(query);
+            response = target.request().
+                    accept(MediaType.APPLICATION_JSON).
+                    header("Authorization", auth).
+                    header("X-SA-Date", ts).
+                    post(Entity.entity(JSONUtil.convertObjectToJSON(usersToGroup),MediaType.APPLICATION_JSON));
+
+            responseObject=response.readEntity(valueType);
+
+        }catch(Exception e){
+            logger.error(new StringBuilder().append("Exception Associating Users to Group: \nQuery:\n\t")
+                    .append(query).append("\nError:").append(e.getMessage()).append(".\nResponse code is ").append(response.getStatus()).toString(), e);
+        }
+        response.close();
+        return responseObject;
+
+    }
+
+    //Single Group to Single User
+    public <T> T executeSingleGroupToSingleUser(String auth, String query,String ts,  Class<T> valueType)throws Exception {
+        if(client == null) {
+            createConnection();
+        }
+
+        WebTarget target = null;
+        Response response = null;
+        T genericResponse =null;
+        try{
+
+            target = client.target(query);
+            response = target.request().
+                    accept(MediaType.APPLICATION_JSON).
+                    header("Authorization", auth).
+                    header("X-SA-Date", ts).
+                    post(null);
+            genericResponse = response.readEntity(valueType);
+
+        }catch(Exception e){
+            logger.error(new StringBuilder().append("Exception Adding Group to User: \nQuery:\n\t")
+                    .append(query).append("\nError:").append(e.getMessage()).append(".\nResponse code is ").append(response.getStatus()).toString(), e);
+        }
+        response.close();
+        return genericResponse;
+
+    }
+
+    //Signle User to Multiple Groups
+    public <T> T executeUserToGroupsRequest(String auth, String query, UserToGroups userToGroups, String ts, Class<T> valueType)throws Exception{
+
+        if(client == null) {
+            createConnection();
+        }
+
+        WebTarget target = null;
+        Response response = null;
+        T responseObject =null;
+        try{
+
+            target = client.target(query);
+            response = target.request().
+                    accept(MediaType.APPLICATION_JSON).
+                    header("Authorization", auth).
+                    header("X-SA-Date", ts).
+                    post(Entity.entity(JSONUtil.convertObjectToJSON(userToGroups),MediaType.APPLICATION_JSON));
+
+            responseObject=response.readEntity(valueType);
+
+        }catch(Exception e){
+            logger.error(new StringBuilder().append("Exception Associating Users to Group: \nQuery:\n\t")
+                    .append(query).append("\nError:").append(e.getMessage()).append(".\nResponse code is ").append(response.getStatus()).toString(), e);
+        }
+        response.close();
+        return responseObject;
 
     }
 
