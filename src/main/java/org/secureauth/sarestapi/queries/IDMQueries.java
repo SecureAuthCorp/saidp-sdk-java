@@ -27,6 +27,17 @@ OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
 
 public class IDMQueries {
 
+    /*
+    User Creation
+     */
+    public static String queryUsers(String realm){
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append(realm).append(s.APPLIANCE_USERS);
+        return stringBuilder.toString();
+    }
+    /*
+    Users Profile
+    */
     public static String queryUserProfile(String realm, String userName){
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append(realm).append(s.APPLIANCE_USERS).append(userName);
