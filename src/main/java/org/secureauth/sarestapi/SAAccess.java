@@ -60,6 +60,7 @@ import org.slf4j.LoggerFactory;
      *<p>
      *     Returns a SAAccess Object that can be used to query the SecureAuth Rest API
      *     This should be the default object used when setting up connectivity to the SecureAuth Appliance
+     *     This Object will allow users to support selfSigned Certificates
      *</p>
      * @param host FQDN of the SecureAuth Appliance
      * @param port The port used to access the web application on the Appliance.
