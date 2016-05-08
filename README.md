@@ -44,6 +44,7 @@ Then select Registration Methods and Scroll Down to Authentication API. Click th
 String applianceHost = "example.domain.com";
 String appliancePort = "443";
 boolean applianceSSL = true;
+boolean selfSigned = true;
 String realm = "secureauth2";
 String applicationID = ".........";
 String applicationKey = ".........";
@@ -51,7 +52,7 @@ String applicationKey = ".........";
  /*
  This will create the instance of the SAAccess which is able to execute REST calls.
  */
-SAAccess saAccess=new SAAccess(applianceHost, appliancePort, applianceSSL, realm, applicationID, applicationKey);
+SAAccess saAccess=new SAAccess(applianceHost, appliancePort, applianceSSL, selfSigned, realm, applicationID, applicationKey);
 
 
 // To validate a user exists in your data store all you need to run the following.
@@ -61,7 +62,10 @@ System.out.println(saAccess.validateUser("USERNAME").toString());
 ResponseObject validUser = saAccess.validateUser("USERNAME")
 if(validUser != null){
             if(validUser.getStatus().equalsIgnoreCase("found")){
-            System.out.println("Matched User")
+                System.out.println("Matched User")
+            }
+            if(validUser.getStatus().equalsIgnoreCase("not_found")){
+                System.out.println("User was not found in DataStore!")
             }
 }
 
