@@ -11,7 +11,7 @@ apply plugin: 'distribution'
 
 group = 'com.secureauth.api'
 
-version = '0.9.2'
+version = '1.0.0'
 jar {
     baseName = 'saRestApi'
 }
