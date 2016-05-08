@@ -132,8 +132,12 @@ import org.slf4j.LoggerFactory;
      * <p>
      *     Send push to accept request asynchronously 
      * </p>
-     * @param userid the user id of the identity
-     * @param endUserIP the IP of requesting client
+     *
+     * @param userid  the user id of the identity
+     * @param factor_id the P2A Id to be compared against
+     * @param endUserIP The End Users IP Address
+     * @param clientCompany The Client Company Name
+     * @param clientDescription The Client Description
      * @return {@link FactorsResponse}
      */
     public ResponseObject sendPushToAcceptReq(String userid, String factor_id, String endUserIP, String clientCompany, String clientDescription){
@@ -861,7 +865,7 @@ import org.slf4j.LoggerFactory;
      * </p>
      * @param userid the userid of the identity you wish to have a list of possible second factors
      * @param password the users new password
-     * @return {@link ResponseObject
+     * @return {@link ResponseObject}
      */
     public ResponseObject passwordReset(String userid, String password){
         userid = encode(userid);
@@ -888,7 +892,7 @@ import org.slf4j.LoggerFactory;
      * @param userid the userid of the identity you wish to have a list of possible second factors
      * @param currentPassword the users Current password
      * @param newPassword the users new Password
-     * @return {@link ResponseObject
+     * @return {@link ResponseObject}
      */
     public ResponseObject passwordChange(String userid, String currentPassword, String newPassword){
         userid = encode(userid);
@@ -922,6 +926,11 @@ import org.slf4j.LoggerFactory;
      * Start Helper Methods
      */
 
+    /**
+     *
+     * @param input The user String to be encoded
+     * @return String
+     */
     public static String encode(String input) {
         StringBuilder resultStr = new StringBuilder();
         for (char ch : input.toCharArray()) {
