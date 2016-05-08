@@ -27,29 +27,11 @@ OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
 
 @XmlRootElement
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class ResponseObject {
+public class ResponseObject extends BaseResponse{
 
-    private String status;
-    private String message;
     private String user_id;
     private String reference_id;
     private int otp;
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
-    }
 
     public String getUser_id() {
         return user_id;

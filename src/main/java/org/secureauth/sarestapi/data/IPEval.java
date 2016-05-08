@@ -27,27 +27,9 @@ OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
 
 @XmlRootElement(name="IPEval")
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class IPEval {
+public class IPEval extends BaseResponse{
 
-    private String status;
-    private String message;
     private IPEvaluation ip_evaluation;
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
-    }
 
     public IPEvaluation getIp_evaluation() {
         return ip_evaluation;

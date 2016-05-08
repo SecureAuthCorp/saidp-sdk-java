@@ -15,29 +15,10 @@ import java.util.ArrayList;
 @XmlRootElement
 @XmlSeeAlso(Factors.class)
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class FactorsResponse {
+public class FactorsResponse extends BaseResponse{
 
-    private String status;
-    private String message;
     private String user_id;
     private ArrayList<Factors> factors = new ArrayList<Factors>();
-
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
-    }
 
     public String getUser_id() {
         return user_id;

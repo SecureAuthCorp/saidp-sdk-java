@@ -1,15 +1,20 @@
 package org.secureauth.sarestapi.data.UserProfile;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import org.secureauth.sarestapi.data.BaseResponse;
 import org.secureauth.sarestapi.util.JSONUtil;
+
+import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * Created by rrowcliffe on 5/1/16.
  */
-public class UserProfileResponse {
+@XmlRootElement
+@JsonInclude(JsonInclude.Include.NON_NULL)
+public class UserProfileResponse extends BaseResponse{
     private String userId;
     private UserProfile userProfile;
-    private String status;
-    private String message;
+
 
     public String getUserId() {
         return userId;
@@ -25,22 +30,6 @@ public class UserProfileResponse {
 
     public void setUserProfile(UserProfile userProfile) {
         this.userProfile = userProfile;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
     }
 
     @Override

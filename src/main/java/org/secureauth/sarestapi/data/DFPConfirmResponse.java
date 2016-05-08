@@ -28,13 +28,12 @@ OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
 
 @XmlRootElement
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class DFPConfirmResponse {
+public class DFPConfirmResponse extends BaseResponse{
 
     private String fingerprint_id;
     private String fingerprint_name;
     private String user_id;
-    private String status;
-    private String message;
+
 
     public String getFingerprint_id() {
         return fingerprint_id;
@@ -50,22 +49,6 @@ public class DFPConfirmResponse {
 
     public void setUser_id(String user_id) {
         this.user_id = user_id;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
     }
 
     public String getFingerprint_name() {

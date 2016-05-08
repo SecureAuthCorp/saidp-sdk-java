@@ -28,15 +28,14 @@ OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
 
 @XmlRootElement
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class DFPValidateResponse {
+public class DFPValidateResponse extends BaseResponse{
 
     private String fingerprint_id;
     private String fingerprint_name;
     private double score;
     private double match_score;
     private double update_score;
-    private String status;
-    private String message;
+
 
     public String getFingerprint_id() {
         return fingerprint_id;
@@ -76,22 +75,6 @@ public class DFPValidateResponse {
 
     public void setUpdate_score(double update_score) {
         this.update_score = update_score;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
     }
 
     @Override

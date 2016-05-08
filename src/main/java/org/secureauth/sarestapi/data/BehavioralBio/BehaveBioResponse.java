@@ -1,6 +1,7 @@
 package org.secureauth.sarestapi.data.BehavioralBio;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import org.secureauth.sarestapi.data.BaseResponse;
 import org.secureauth.sarestapi.util.JSONUtil;
 
 import javax.xml.bind.annotation.XmlRootElement;
@@ -10,11 +11,10 @@ import javax.xml.bind.annotation.XmlRootElement;
  */
 @XmlRootElement
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class BehaveBioResponse {
+public class BehaveBioResponse extends BaseResponse{
 
     private BehaveBioResults behaveBioResults;
-    private String status;
-    private String message;
+
 
     public BehaveBioResults getBehaveBioResults() {
         return behaveBioResults;
@@ -22,22 +22,6 @@ public class BehaveBioResponse {
 
     public void setBehaveBioResults(BehaveBioResults behaveBioResults) {
         this.behaveBioResults = behaveBioResults;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
     }
 
     @Override
