@@ -15,9 +15,9 @@ public interface AuthenticationInterface {
 
     FactorsResponse getFactorsForUser(SAAccess saAccess, String userId);
 
-    ResponseObject validateOath(SAAccess saAccess, String otp, String factorId);
+    ResponseObject validateOath(SAAccess saAccess,String userId, String otp, String factorId);
 
-    ResponseObject validatePushOTP(SAAccess saAccess, String factorId);
+    ResponseObject validatePushOTP(SAAccess saAccess,String userId, String factorId);
 
     ResponseObject sendSmsOTP(SAAccess saAccess, String userId, String factorId);
 
