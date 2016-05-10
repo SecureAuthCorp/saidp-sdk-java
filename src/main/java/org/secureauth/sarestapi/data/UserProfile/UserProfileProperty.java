@@ -1,11 +1,14 @@
 package org.secureauth.sarestapi.data.UserProfile;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 /**
  * Created by rrowcliffe on 5/1/16.
  */
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class UserProfileProperty {
     private String value;
-    private boolean isWritable;
+    private String isWritable;
     private String displayName;
 
     public String getValue() {
@@ -16,12 +19,12 @@ public class UserProfileProperty {
         this.value = value;
     }
 
-    public boolean isWritable() {
+    public String getIsWritable() {
         return isWritable;
     }
 
-    public void setWritable(boolean writable) {
-        isWritable = writable;
+    public void setIsWritable(String isWritable) {
+        this.isWritable = isWritable;
     }
 
     public String getDisplayName() {
