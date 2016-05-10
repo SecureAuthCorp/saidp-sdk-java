@@ -874,7 +874,7 @@ import org.slf4j.LoggerFactory;
         UserPasswordRequest userPasswordRequest = new UserPasswordRequest();
         userPasswordRequest.setPassword(password);
         RestApiHeader restApiHeader = new RestApiHeader();
-        String header = restApiHeader.getAuthorizationHeader(saAuth,"POST",IDMQueries.queryUserResetPwd(saAuth.getRealm(),userid),ts);
+        String header = restApiHeader.getAuthorizationHeader(saAuth,"POST",IDMQueries.queryUserResetPwd(saAuth.getRealm(),userid),userPasswordRequest,ts);
 
 
         try{
@@ -902,7 +902,7 @@ import org.slf4j.LoggerFactory;
         userPasswordRequest.setCurrentPassword(currentPassword);
         userPasswordRequest.setNewPassword(newPassword);
         RestApiHeader restApiHeader = new RestApiHeader();
-        String header = restApiHeader.getAuthorizationHeader(saAuth,"POST",IDMQueries.queryUserChangePwd(saAuth.getRealm(),userid),ts);
+        String header = restApiHeader.getAuthorizationHeader(saAuth,"POST",IDMQueries.queryUserChangePwd(saAuth.getRealm(),userid),userPasswordRequest,ts);
 
 
         try{
