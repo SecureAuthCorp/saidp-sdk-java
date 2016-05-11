@@ -5,6 +5,7 @@ import org.secureauth.sarestapi.data.Response.GroupAssociationResponse;
 import org.secureauth.sarestapi.data.Response.ResponseObject;
 import org.secureauth.sarestapi.data.Response.UserProfileResponse;
 import org.secureauth.sarestapi.data.UserProfile.NewUserProfile;
+import org.secureauth.sarestapi.data.UserProfile.UserProfile;
 import org.secureauth.sarestapi.data.UserProfile.UserToGroups;
 import org.secureauth.sarestapi.data.UserProfile.UsersToGroup;
 
@@ -15,11 +16,11 @@ public interface IDMInterface {
 
     ResponseObject createUser(SAAccess saAccess, NewUserProfile newUserProfile);
 
-    ResponseObject updateUser(SAAccess saAccess, NewUserProfile newUserProfile);
+    ResponseObject updateUser(SAAccess saAccess, String userId, NewUserProfile newUserProfile);
 
-    GroupAssociationResponse addUserToGroup(SAAccess saAccess, String userid, String groupName);
+    ResponseObject addUserToGroup(SAAccess saAccess, String userid, String groupName);
 
-    GroupAssociationResponse addUserToGroup(SAAccess saAccess, UsersToGroup usersToGroup, String groupName);
+    GroupAssociationResponse addUsersToGroup(SAAccess saAccess, UsersToGroup usersToGroup, String groupName);
 
     GroupAssociationResponse addGroupToUser(SAAccess saAccess, String groupName, String userid);
 
