@@ -1,6 +1,7 @@
 package org.secureauth.sarestapi.data.Response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import org.secureauth.sarestapi.util.JSONUtil;
 
 import javax.xml.bind.annotation.XmlRootElement;
 import java.util.ArrayList;
@@ -20,5 +21,10 @@ public class GroupAssociationResponse extends BaseResponse {
 
     public void setFailures(HashMap<String, ArrayList<String>> failures) {
         this.failures = failures;
+    }
+
+    @Override
+    public String toString(){
+        return JSONUtil.convertObjectToJSON(this);
     }
 }
