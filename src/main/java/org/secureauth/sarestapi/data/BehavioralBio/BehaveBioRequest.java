@@ -13,7 +13,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 public class BehaveBioRequest {
 
     private String userId;
-    private String beviorProfile;
+    private String behaviorProfile;
     private String hostAddress;
     private String userAgent;
 
@@ -25,12 +25,12 @@ public class BehaveBioRequest {
         this.userId = userId;
     }
 
-    public String getBeviorProfile() {
-        return beviorProfile;
+    public String getBehaviorProfile() {
+        return behaviorProfile;
     }
 
-    public void setBeviorProfile(String beviorProfile) {
-        this.beviorProfile = beviorProfile;
+    public void setBehaviorProfile(String behaviorProfile) {
+        this.behaviorProfile = behaviorProfile;
     }
 
     public String getHostAddress() {
