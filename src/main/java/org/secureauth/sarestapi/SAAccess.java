@@ -14,6 +14,7 @@ import org.secureauth.sarestapi.data.Response.*;
 import org.secureauth.sarestapi.data.Requests.UserPasswordRequest;
 import org.secureauth.sarestapi.data.Response.UserProfileResponse;
 import org.secureauth.sarestapi.data.UserProfile.NewUserProfile;
+import org.secureauth.sarestapi.data.UserProfile.UserProfile;
 import org.secureauth.sarestapi.data.UserProfile.UserToGroups;
 import org.secureauth.sarestapi.data.UserProfile.UsersToGroup;
 import org.secureauth.sarestapi.queries.*;
@@ -713,7 +714,7 @@ import org.slf4j.LoggerFactory;
     public ResponseObject createUser(NewUserProfile newUserProfile){
         String ts = getServerTime();
         RestApiHeader restApiHeader = new RestApiHeader();
-        String header = restApiHeader.getAuthorizationHeader(saAuth,"POST",IDMQueries.queryUsers(saAuth.getRealm()),ts);
+        String header = restApiHeader.getAuthorizationHeader(saAuth,"POST",IDMQueries.queryUsers(saAuth.getRealm()),newUserProfile,ts);
 
         /*
         At a minimum creating a user requires UserId and Passowrd
@@ -733,17 +734,21 @@ import org.slf4j.LoggerFactory;
      * <p>
      *     Update User / Profile
      * </p>
-     * @param newUserProfile The User'sProfile Object to be updated
+     * @param userProfile The User'sProfile Object to be updated
      * @return {@link ResponseObject}
      */
-    public ResponseObject updateUser(NewUserProfile newUserProfile){
+    public ResponseObject updateUser(String userId, NewUserProfile userProfile){
         String ts = getServerTime();
         RestApiHeader restApiHeader = new RestApiHeader();
-        String header = restApiHeader.getAuthorizationHeader(saAuth,"PUT",IDMQueries.queryUsers(saAuth.getRealm()),ts);
+        String header = restApiHeader.getAuthorizationHeader(saAuth,"PUT",IDMQueries.queryUserProfile(saAuth.getRealm(),userId),userProfile,ts);
 
 
             try{
-                return saExecuter.executeUserProfileUpdateRequest(header,saBaseURL.getApplianceURL() + IDMQueries.queryUserProfile(saAuth.getRealm(),newUserProfile.getUserId()),newUserProfile,ts,ResponseObject.class);
+                return saExecuter.executeUserProfileUpdateRequest(header,
+                        saBaseURL.getApplianceURL() + IDMQueries.queryUserProfile(saAuth.getRealm(),userId),
+                        userProfile,
+                        ts,
+                        ResponseObject.class);
 
             }catch (Exception e){
                 logger.error(new StringBuilder().append("Exception occurred executing REST query::\n").append(e.getMessage()).append("\n").toString(), e);
@@ -760,13 +765,13 @@ import org.slf4j.LoggerFactory;
      * @param groupName The Name of the group to associate the user to
      * @return {@link GroupAssociationResponse}
      */
-    public GroupAssociationResponse addUserToGroup(String userid, String groupName){
+    public ResponseObject addUserToGroup(String userid, String groupName){
         String ts = getServerTime();
         RestApiHeader restApiHeader = new RestApiHeader();
         String header = restApiHeader.getAuthorizationHeader(saAuth,"POST", IDMQueries.queryUserToGroup(saAuth.getRealm(),userid,groupName),ts);
 
         try{
-            return saExecuter.executeSingleUserToSingleGroup(header,saBaseURL.getApplianceURL() + IDMQueries.queryUserToGroup(saAuth.getRealm(),userid,groupName), ts, GroupAssociationResponse.class);
+            return saExecuter.executeSingleUserToSingleGroup(header,saBaseURL.getApplianceURL() + IDMQueries.queryUserToGroup(saAuth.getRealm(),userid,groupName), ts, ResponseObject.class);
         }catch (Exception e){
             logger.error(new StringBuilder().append("Exception occurred executing REST query::\n").append(e.getMessage()).append("\n").toString(), e);
         }
@@ -781,10 +786,10 @@ import org.slf4j.LoggerFactory;
      * @param groupName The Name of the group to associate the user to
      * @return {@link GroupAssociationResponse}
      */
-    public GroupAssociationResponse addUserToGroup(UsersToGroup usersToGroup, String groupName){
+    public GroupAssociationResponse addUsersToGroup(UsersToGroup usersToGroup, String groupName){
         String ts = getServerTime();
         RestApiHeader restApiHeader = new RestApiHeader();
-        String header = restApiHeader.getAuthorizationHeader(saAuth,"POST", IDMQueries.queryGroupToUsers(saAuth.getRealm(),groupName),ts);
+        String header = restApiHeader.getAuthorizationHeader(saAuth,"POST", IDMQueries.queryGroupToUsers(saAuth.getRealm(),groupName),usersToGroup,ts);
 
         try{
             return saExecuter.executeGroupToUsersRequest(header,saBaseURL.getApplianceURL() + IDMQueries.queryGroupToUsers(saAuth.getRealm(),groupName), usersToGroup, ts, GroupAssociationResponse.class);
@@ -827,7 +832,7 @@ import org.slf4j.LoggerFactory;
     public GroupAssociationResponse addUserToGroups(String userId, UserToGroups userToGroups){
         String ts = getServerTime();
         RestApiHeader restApiHeader = new RestApiHeader();
-        String header = restApiHeader.getAuthorizationHeader(saAuth,"POST", IDMQueries.queryUserToGroups(saAuth.getRealm(),userId),ts);
+        String header = restApiHeader.getAuthorizationHeader(saAuth,"POST", IDMQueries.queryUserToGroups(saAuth.getRealm(),userId),userToGroups,ts);
 
         try{
             return saExecuter.executeUserToGroupsRequest(header,saBaseURL.getApplianceURL() + IDMQueries.queryUserToGroups(saAuth.getRealm(),userId), userToGroups, ts, GroupAssociationResponse.class);
