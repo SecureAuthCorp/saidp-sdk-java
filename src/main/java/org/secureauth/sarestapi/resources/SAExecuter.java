@@ -652,7 +652,7 @@ public class SAExecuter {
                     accept(MediaType.APPLICATION_JSON).
                     header("Authorization", auth).
                     header("X-SA-Date", ts).
-                    post(Entity.entity(JSONUtil.convertObjectToJSON(behaveBioResetRequest),MediaType.APPLICATION_JSON));
+                    put(Entity.entity(JSONUtil.convertObjectToJSON(behaveBioResetRequest),MediaType.APPLICATION_JSON));
 
             behaveBioResponse = response.readEntity(ResponseObject.class);
 
