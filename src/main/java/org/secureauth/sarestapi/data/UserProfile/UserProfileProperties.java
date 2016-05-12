@@ -10,7 +10,7 @@ import java.util.HashMap;
  */
 @XmlRootElement(name="properties")
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class UserProfileProperties {
+public class  UserProfileProperties {
 
     private HashMap<String,UserProfileProperty> properties = new HashMap<>();
 

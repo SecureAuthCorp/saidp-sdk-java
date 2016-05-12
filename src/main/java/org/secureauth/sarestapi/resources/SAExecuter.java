@@ -622,7 +622,7 @@ public class SAExecuter {
                     header("Authorization", auth).
                     header("X-SA-Date", ts).
                     post(Entity.entity(JSONUtil.convertObjectToJSON(behaveBioRequest),MediaType.APPLICATION_JSON));
-
+            //System.out.println(response.readEntity(String.class));
             behaveBioResponse = response.readEntity(BehaveBioResponse.class);
 
 

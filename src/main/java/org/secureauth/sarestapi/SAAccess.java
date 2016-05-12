@@ -644,7 +644,7 @@ import org.slf4j.LoggerFactory;
         RestApiHeader restApiHeader =new RestApiHeader();
         BehaveBioRequest behaveBioRequest = new BehaveBioRequest();
         behaveBioRequest.setUserId(userid);
-        behaveBioRequest.setBeviorProfile(behaviorProfile);
+        behaveBioRequest.setBehaviorProfile(behaviorProfile);
         behaveBioRequest.setHostAddress(hostAddress);
         behaveBioRequest.setUserAgent(userAgent);
 
