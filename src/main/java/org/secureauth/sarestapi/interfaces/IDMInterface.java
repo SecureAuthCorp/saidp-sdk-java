@@ -18,7 +18,7 @@ public interface IDMInterface {
 
     ResponseObject updateUser(SAAccess saAccess, String userId, NewUserProfile newUserProfile);
 
-    ResponseObject addUserToGroup(SAAccess saAccess, String userid, String groupName);
+    ResponseObject addUserToGroup(SAAccess saAccess, String userId, String groupName);
 
     GroupAssociationResponse addUsersToGroup(SAAccess saAccess, UsersToGroup usersToGroup, String groupName);
 
@@ -26,11 +26,11 @@ public interface IDMInterface {
 
     GroupAssociationResponse addUserToGroups(SAAccess saAccess, String userId, UserToGroups userToGroups);
 
-    UserProfileResponse getUserProfile(SAAccess saAccess, String userid);
+    UserProfileResponse getUserProfile(SAAccess saAccess, String userId);
 
-    ResponseObject passwordReset(SAAccess saAccess, String userid, String password);
+    ResponseObject passwordReset(SAAccess saAccess, String userId, String password);
 
-    ResponseObject passwordChange(SAAccess saAccess, String userid, String currentPassword, String newPassword);
+    ResponseObject passwordChange(SAAccess saAccess, String userId, String currentPassword, String newPassword);
 
 
 }
