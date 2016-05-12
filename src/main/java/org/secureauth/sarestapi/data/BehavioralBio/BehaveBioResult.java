@@ -1,49 +1,53 @@
 package org.secureauth.sarestapi.data.BehavioralBio;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * Created by rrowcliffe on 4/30/16.
  */
-@XmlRootElement
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class BehaveBioResult {
-    private String ControlID;
-    private double Score;
-    private double Confidence;
-    private int Count;
+    @JsonProperty("ControlID")
+    private String controlID;
+    @JsonProperty("Score")
+    private double score;
+    @JsonProperty("Confidence")
+    private double confidence;
+    @JsonProperty("Count")
+    private int count;
 
     public String getControlID() {
-        return ControlID;
+        return controlID;
     }
 
     public void setControlID(String controlID) {
-        ControlID = controlID;
+        this.controlID = controlID;
     }
 
     public double getScore() {
-        return Score;
+        return score;
     }
 
     public void setScore(double score) {
-        Score = score;
+        this.score = score;
     }
 
     public double getConfidence() {
-        return Confidence;
+        return confidence;
     }
 
     public void setConfidence(double confidence) {
-        Confidence = confidence;
+        this.confidence = confidence;
     }
 
     public int getCount() {
-        return Count;
+        return count;
     }
 
     public void setCount(int count) {
-        Count = count;
+        this.count = count;
     }
 }
