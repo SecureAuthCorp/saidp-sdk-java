@@ -12,13 +12,14 @@ import java.util.HashMap;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class UserProfileKBAKBQ {
 
-    private HashMap<String,UserProfileKB> knowledegeBase = new HashMap<>();
+    private HashMap<String,UserProfileKB> knowledgeBase = new HashMap<>();
 
-    public HashMap<String, UserProfileKB> getKnowledegeBase() {
-        return knowledegeBase;
+
+    public HashMap<String, UserProfileKB> getKnowledgeBase() {
+        return knowledgeBase;
     }
 
-    public void setKnowledegeBase(HashMap<String, UserProfileKB> knowledegeBase) {
-        this.knowledegeBase = knowledegeBase;
+    public void setKnowledgeBase(HashMap<String, UserProfileKB> knowledgeBase) {
+        this.knowledgeBase = knowledgeBase;
     }
 }
