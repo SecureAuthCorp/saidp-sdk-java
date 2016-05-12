@@ -14,6 +14,7 @@ import javax.net.ssl.X509TrustManager;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.MediaType;
 
+import com.oracle.javafx.jmx.json.JSONException;
 import org.secureauth.sarestapi.data.*;
 import org.secureauth.sarestapi.data.BehavioralBio.BehaveBioRequest;
 import org.secureauth.sarestapi.data.Requests.BehaveBioResetRequest;
@@ -38,6 +39,8 @@ import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.WebTarget;
 import org.glassfish.jersey.client.ClientConfig;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.StreamingOutput;
+import javax.xml.bind.JAXBException;
 
 
 /**
@@ -131,10 +134,10 @@ public class SAExecuter {
                     header("Authorization", auth).
                     header("X-SA-Date", ts).
                     get();
-            genericResponse = response.readEntity(valueType);
+          genericResponse = response.readEntity(valueType);
 
         }catch(Exception e){
-            logger.error(new StringBuilder().append("Exception getting User Factors: \nQuery:\n\t")
+            logger.error(new StringBuilder().append("Exception Get Request: \nQuery:\n\t")
                     .append(query).append("\nError:").append(e.getMessage()).append(".\nResponse code is ").append(response.getStatus()).toString(), e);
         }
         response.close();
@@ -726,7 +729,7 @@ public class SAExecuter {
     }
 
     //Update User Profile
-    public <T> T executeUserProfileUpdateRequest(String auth, String query, NewUserProfile userProfile, String ts, Class<T> valueType)throws Exception{
+    public <T> T executeUserProfileUpdateRequest(String auth, String query,NewUserProfile userProfile, String ts, Class<T> valueType)throws Exception{
 
         if(client == null) {
             createConnection();
@@ -742,7 +745,7 @@ public class SAExecuter {
                     accept(MediaType.APPLICATION_JSON).
                     header("Authorization", auth).
                     header("X-SA-Date", ts).
-                    post(Entity.entity(JSONUtil.convertObjectToJSON(userProfile),MediaType.APPLICATION_JSON));
+                    put(Entity.entity(JSONUtil.convertObjectToJSON(userProfile), MediaType.APPLICATION_JSON));
 
             responseObject=response.readEntity(valueType);
 
@@ -777,7 +780,7 @@ public class SAExecuter {
             responseObject=response.readEntity(valueType);
 
         }catch(Exception e){
-            logger.error(new StringBuilder().append("Exception Updating User Profile: \nQuery:\n\t")
+            logger.error(new StringBuilder().append("Exception Creating User Profile: \nQuery:\n\t")
                     .append(query).append("\nError:").append(e.getMessage()).append(".\nResponse code is ").append(response.getStatus()).toString(), e);
         }
         response.close();
@@ -801,7 +804,7 @@ public class SAExecuter {
                     accept(MediaType.APPLICATION_JSON).
                     header("Authorization", auth).
                     header("X-SA-Date", ts).
-                    post(null);
+                    post(Entity.entity("",MediaType.APPLICATION_JSON));
             genericResponse = response.readEntity(valueType);
 
         }catch(Exception e){
@@ -859,7 +862,7 @@ public class SAExecuter {
                     accept(MediaType.APPLICATION_JSON).
                     header("Authorization", auth).
                     header("X-SA-Date", ts).
-                    post(null);
+                    post(Entity.entity("",MediaType.APPLICATION_JSON));
             genericResponse = response.readEntity(valueType);
 
         }catch(Exception e){

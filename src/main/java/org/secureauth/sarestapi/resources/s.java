@@ -31,7 +31,7 @@ public class s {
     public static final String APPLIANCE_AUTH="/api/"+ API_VERSION +"/auth";
     public static final String APPLIANCE_AAUTH="/api/"+ API_VERSION +"/adaptauth";
     public static final String APPLIANCE_USERS="/api/"+ API_VERSION + "/users/";
-    public static final String APPLIANCE_IDM_USERS="/users";
+    public static final String APPLIANCE_IDM_USERS="/users/";
     public static final String APPLIANCE_IDM_USERS_PASSWD_RESET="/resetpwd";
     public static final String APPLIANCE_IDM_USERS_PASSWD_CHANGE="/changepwd";
     public static final String APPLIANCE_IDM_USERS_GROUPS="/groups/";
