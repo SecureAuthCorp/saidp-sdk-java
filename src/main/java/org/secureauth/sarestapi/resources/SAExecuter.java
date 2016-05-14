@@ -66,10 +66,12 @@ public class SAExecuter {
 
     private Client client=null;
     private static Logger logger=LoggerFactory.getLogger(SAExecuter.class);
+
     private SABaseURL saBaseURL = null;
     public SAExecuter(SABaseURL saBaseURL){
         this.saBaseURL = saBaseURL;
     }
+
     //Set up our Connection
     private void createConnection() throws Exception{
 
@@ -96,6 +98,7 @@ public class SAExecuter {
         ctx.init(null, certs, new SecureRandom());
 
         try{
+
             config.register(SACheckRequestFilter.class);
              client = ClientBuilder.newBuilder()
                      .withConfig(config)

@@ -98,10 +98,11 @@ public class IPEvaluation {
     public String getFactor_description() {
         return factor_description;
     }
-
+    
     public void setFactor_description(String factor_description) {
         this.factor_description = factor_description;
     }
+
 
 
 }
