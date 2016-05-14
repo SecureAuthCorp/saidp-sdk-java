@@ -72,5 +72,20 @@ if(validUser != null){
 
 ```
 
-For Enhancements or updates please us the github issues.
-For support please email: rrowcliffe@secureauth.com
+Changes:
+--------
+With the 9.0Support Branch the following was changed
+
+* Updated Data Objects to extend from a BaseResponse Object
+* Created Interfaces for making the implementation of the API easier.
+* Refactored the structure of the data objects
+* Updated Data Objects toString to support JSON Output.
+* Created a Client Side Filter to force specific headers existing on each request
+* Updated Query Objects to support new BehaveBio and IDM Features
+* Updated TestClass to use Interfaces
+* Created Individual Interface Impl classes
+
+
+
+For Enhancements or updates please use the github issues.
+ 
