@@ -5,11 +5,10 @@ buildscript {
 }
 
 apply plugin: 'java'
-apply plugin: 'eclipse'
 apply plugin: 'maven'
-apply plugin: 'distribution'
 
-group = 'com.secureauth.api'
+
+group = 'org.secureauth.sarestapi'
 
 version = '1.0.0'
 jar {
@@ -20,11 +19,7 @@ repositories {
     mavenCentral()
 }
 
-distributions {
-    main{
-        baseName = "saRestApi"
-    }
-}
+
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
@@ -40,8 +35,7 @@ task copyToLib(type: Copy){
 }
 
 build.dependsOn(copyToLib)
-
-
+build.dependsOn(javadoc)
 
 task wrapper(type: Wrapper) {
     gradleVersion = '2.7'
