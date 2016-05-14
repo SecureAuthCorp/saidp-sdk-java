@@ -734,6 +734,7 @@ import org.slf4j.LoggerFactory;
      * <p>
      *     Update User / Profile
      * </p>
+     * @param userId the UserID tied to the Profile Object
      * @param userProfile The User'sProfile Object to be updated
      * @return {@link ResponseObject}
      */
