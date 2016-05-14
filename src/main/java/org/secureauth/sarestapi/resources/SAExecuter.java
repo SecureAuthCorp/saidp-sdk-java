@@ -14,7 +14,6 @@ import javax.net.ssl.X509TrustManager;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.MediaType;
 
-import com.oracle.javafx.jmx.json.JSONException;
 import org.secureauth.sarestapi.data.*;
 import org.secureauth.sarestapi.data.BehavioralBio.BehaveBioRequest;
 import org.secureauth.sarestapi.data.Requests.BehaveBioResetRequest;
@@ -25,7 +24,7 @@ import org.secureauth.sarestapi.data.Response.DFPValidateResponse;
 import org.secureauth.sarestapi.data.Response.ResponseObject;
 import org.secureauth.sarestapi.data.Requests.UserPasswordRequest;
 import org.secureauth.sarestapi.data.UserProfile.NewUserProfile;
-import org.secureauth.sarestapi.data.UserProfile.UserProfile;
+
 import org.secureauth.sarestapi.data.UserProfile.UserToGroups;
 import org.secureauth.sarestapi.data.UserProfile.UsersToGroup;
 import org.secureauth.sarestapi.filters.SACheckRequestFilter;
@@ -39,8 +38,7 @@ import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.WebTarget;
 import org.glassfish.jersey.client.ClientConfig;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.StreamingOutput;
-import javax.xml.bind.JAXBException;
+
 
 
 /**
@@ -622,7 +620,7 @@ public class SAExecuter {
                     header("Authorization", auth).
                     header("X-SA-Date", ts).
                     post(Entity.entity(JSONUtil.convertObjectToJSON(behaveBioRequest),MediaType.APPLICATION_JSON));
-            //System.out.println(response.readEntity(String.class));
+
             behaveBioResponse = response.readEntity(BehaveBioResponse.class);
 
 
