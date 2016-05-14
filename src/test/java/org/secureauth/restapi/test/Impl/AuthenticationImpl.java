@@ -1,24 +1,18 @@
-package org.secureauth.restapi.test;
+package org.secureauth.restapi.test.Impl;
 
 import org.secureauth.sarestapi.SAAccess;
-import org.secureauth.sarestapi.data.IPEval;
 import org.secureauth.sarestapi.data.PushAcceptStatus;
 import org.secureauth.sarestapi.data.Response.FactorsResponse;
-import org.secureauth.sarestapi.data.Response.JSObjectResponse;
 import org.secureauth.sarestapi.data.Response.ResponseObject;
-import org.secureauth.sarestapi.interfaces.AdaptiveAuthenticationInterface;
 import org.secureauth.sarestapi.interfaces.AuthenticationInterface;
-import org.secureauth.sarestapi.interfaces.JavascriptResource;
 import org.secureauth.sarestapi.resources.s;
-import org.secureauth.sarestapi.util.JSONUtil;
-import org.secureauth.sarestapi.util.XMLUtil;
 
 /**
- * Created by rrowcliffe on 5/8/16.
+ * Created by rrowcliffe on 5/14/16.
  */
-public class InterfaceTestImpl implements AuthenticationInterface, AdaptiveAuthenticationInterface, JavascriptResource {
+public class AuthenticationImpl implements AuthenticationInterface {
 
-    public InterfaceTestImpl(){}
+    public AuthenticationImpl(){}
 
     @Override
     public ResponseObject validateUser(SAAccess saAccess, String userId) {
@@ -129,50 +123,5 @@ public class InterfaceTestImpl implements AuthenticationInterface, AdaptiveAuthe
         } while ("PENDING".equals(status.getMessage()));
         //break;
         System.out.println("END Push 2 Accept Test+++++++++++++++++++");
-    }
-
-    @Override
-    public IPEval ipThreatCheck(SAAccess saAccess, String userid, String ip_address) {
-        IPEval ipEval = saAccess.iPEvaluation(userid, ip_address);
-        System.out.println("Start IPEvaluation  +++++++++++++++++");
-        if (ipEval != null) {
-            System.out.println(ipEval.toString());
-        } else {
-            System.out.println("If you See this then Something went Wrong!!");
-        }
-        System.out.println("End IPEvaluation  +++++++++++++++++");
-        return ipEval;
-    }
-
-    @Override
-    public ResponseObject updateAccessHistories(SAAccess saAccess, String user, String ip_address) {
-        System.out.println("START Access Histories test +++++++++");
-        ResponseObject ahistories = saAccess.accessHistory(user, ip_address);
-        System.out.println(ahistories.toString());
-        System.out.println("END Access Histories test +++++++++++");
-        return ahistories;
-    }
-
-    @Override
-    public ResponseObject submitAdaptiveAuth(SAAccess saAccess, String user, String ipAddress) {
-        System.out.println("Start Adaptive Test ++++++++++++++++");
-        ResponseObject responseObject = saAccess.adaptiveAuthQuery(user,ipAddress);
-        System.out.println(responseObject.toString());
-        System.out.println("End Adaptive Test ++++++++++++++++++");
-        return responseObject;
-    }
-
-    @Override
-    public JSObjectResponse getDFPJavaScriptSrc(SAAccess saAccess) {
-        System.out.println("START JavaScript Get URL Request ++++++++");
-        JSObjectResponse jsObject = saAccess.javaScriptSrc();
-        if(jsObject != null){
-            System.out.println(jsObject.getSrc());
-        }else{
-            System.out.println("Effed");
-        }
-
-        System.out.println("END JavaScript Get URL Request ++++++++");
-        return jsObject;
     }
 }
