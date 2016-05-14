@@ -31,6 +31,11 @@ public class s {
     public static final String APPLIANCE_AUTH="/api/"+ API_VERSION +"/auth";
     public static final String APPLIANCE_AAUTH="/api/"+ API_VERSION +"/adaptauth";
     public static final String APPLIANCE_USERS="/api/"+ API_VERSION + "/users/";
+    public static final String APPLIANCE_IDM_USERS="/users/";
+    public static final String APPLIANCE_IDM_USERS_PASSWD_RESET="/resetpwd";
+    public static final String APPLIANCE_IDM_USERS_PASSWD_CHANGE="/changepwd";
+    public static final String APPLIANCE_IDM_USERS_GROUPS="/groups/";
+    public static final String APPLIANCE_IDM_GROUPS="/api/" + API_VERSION + "/groups/";
     public static final String APPLIANCE_FACTORS="/factors";
     public static final String APPLIANCE_IPEVAL="/api/"+ API_VERSION + "/ipeval";
     public static final String APPLIANCE_DFP="/api/" + API_VERSION + "/dfp";
@@ -38,12 +43,18 @@ public class s {
     public static final String APPLIANCE_DFP_VALIDATE=APPLIANCE_DFP + "/validate";
     public static final String APPLIANCE_DFP_CONFIRM=APPLIANCE_DFP + "/confirm";
     public static final String APPLIANCE_ACCESSHISTORY="/api/" + API_VERSION + "/accesshistory";
+    public static final String APPLIANCE_BEHAVEBIO="/api/" + API_VERSION + "/behavebio";
+    public static final String APPLIANCE_BEHAVEBIO_JS=APPLIANCE_BEHAVEBIO + "/js";
+
 
     public static final String STATUS_INVALID="invalid";
     public static final String STATUS_SERVER_ERROR="server_error";
     public static final String STATUS_VALID="valid";
     public static final String STATUS_FOUND="found";
     public static final String STATUS_VERIFIED="verified";
+    public static final String STATUS_NOT_FOUND="not_found";
+    public static final String STATUS_FAILED="failed";
+    public static final String STATUS_ERROR="error";
 
     public static final String PHONES="Phones";
     public static final String PHONE="Phone";

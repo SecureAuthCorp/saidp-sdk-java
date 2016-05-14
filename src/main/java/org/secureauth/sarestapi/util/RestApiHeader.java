@@ -2,6 +2,7 @@ package org.secureauth.sarestapi.util;
 
 
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
 
 import org.apache.commons.codec.binary.Base64;
@@ -36,40 +37,8 @@ public class RestApiHeader {
     private static Logger logger=LoggerFactory.getLogger(RestApiHeader.class);
     public RestApiHeader(){}
 
-    public String getAuthorizationHeader(SAAuth saAuth , String requestMethod, String uriPath, AuthRequest authRequest,String ts){
-
-
-        //Build our string for the AuthHeader
-        stringBuilder = new StringBuilder();
-        stringBuilder.append(requestMethod).append("\n")
-                .append(ts).append("\n")
-                .append(saAuth.getApplicationID()).append("\n")
-                .append( s.SLASH + uriPath).append("\n")
-                .append(JSONUtil.getJSONStringFromObject(authRequest));
-
-        //System.out.println("\nRequest: \n" + stringBuilder + "\n");
-
-        //System.out.println("Auth JSON : " + JSONUtil.getJSONStringFromObject(authRequest));
-
-
-
-        //Create a SHA256 Hash
-        String base64Sha = "";
-        try {
-            base64Sha = new String(Base64.encodeBase64(HMACUtil.encode(saAuth.getApplicationKey(), stringBuilder.toString())));
-        }catch(Exception e){
-            logger.error(new StringBuilder().append("Exception occurred while generating Authorization Header\n").append(e.getMessage()).append("\n").toString(), e);
-        }
-
-        String appId = saAuth.getApplicationID() + ":" + base64Sha;
-        logger.trace(new StringBuilder("Auth Header before second encoding  ").append(appId).append("\n").toString());
-        authHeader = "Basic " + Base64.encodeBase64String(appId.getBytes(StandardCharsets.UTF_8));
-
-        return authHeader;
-    }
-
-
-    public String getAuthorizationHeader(SAAuth saAuth , String requestMethod, String uriPath, IPEvalRequest ipEvalRequest, String ts){
+    //Payload in header
+    public String getAuthorizationHeader(SAAuth saAuth , String requestMethod, String uriPath, Object object, String ts){
 
         //Build our string for the AuthHeader
         stringBuilder = new StringBuilder();
@@ -77,34 +46,7 @@ public class RestApiHeader {
                 .append(ts).append("\n")
                 .append(saAuth.getApplicationID()).append("\n")
                 .append(s.SLASH + uriPath).append("\n")
-                .append(JSONUtil.getJSONStringFromObject(ipEvalRequest));
-
-
-
-        //Create a SHA256 Hash
-        String base64Sha = "";
-        try {
-            base64Sha = new String(Base64.encodeBase64(HMACUtil.encode(saAuth.getApplicationKey(), stringBuilder.toString())));
-        }catch(Exception e){
-            logger.error(new StringBuilder().append("Exception occurred while generating Authorization Header\n").append(e.getMessage()).append("\n").toString(), e);
-        }
-
-        String appId = saAuth.getApplicationID() + ":" + base64Sha;
-        logger.trace(new StringBuilder("Auth Header before second encoding  ").append(appId).append("\n").toString());
-        authHeader = "Basic " + Base64.encodeBase64String(appId.getBytes(StandardCharsets.UTF_8));
-        
-        return authHeader;
-    }
-
-    public String getAuthorizationHeader(SAAuth saAuth , String requestMethod, String uriPath, AccessHistoryRequest accessHistoryRequest, String ts){
-
-        //Build our string for the AuthHeader
-        stringBuilder = new StringBuilder();
-        stringBuilder.append(requestMethod).append("\n")
-                .append(ts).append("\n")
-                .append(saAuth.getApplicationID()).append("\n")
-                .append(s.SLASH + uriPath).append("\n")
-                .append(JSONUtil.getJSONStringFromObject(accessHistoryRequest));
+                .append(JSONUtil.convertObjectToJSON(object));
 
 
 
@@ -127,68 +69,7 @@ public class RestApiHeader {
         return authHeader;
     }
 
-    public String getAuthorizationHeader(SAAuth saAuth , String requestMethod, String uriPath, DFPConfirmRequest dfpConfirmRequest, String ts){
-
-        //Build our string for the AuthHeader
-        stringBuilder = new StringBuilder();
-        stringBuilder.append(requestMethod).append("\n")
-                .append(ts).append("\n")
-                .append(saAuth.getApplicationID()).append("\n")
-                .append(s.SLASH + uriPath).append("\n")
-                .append(JSONUtil.getJSONStringFromObject(dfpConfirmRequest));
-
-
-
-        //Create a SHA256 Hash
-        String base64Sha = "";
-        try {
-            base64Sha = new String(Base64.encodeBase64(HMACUtil.encode(saAuth.getApplicationKey(), stringBuilder.toString())));
-        }catch(Exception e){
-            logger.error(new StringBuilder().append("Exception occurred while generating Authorization Header\n").append(e.getMessage()).append("\n").toString(), e);
-        }
-
-        String appId = saAuth.getApplicationID() + ":" + base64Sha;
-        logger.trace(new StringBuilder("Auth Header before second encoding  ").append(appId).append("\n").toString());
-        try {
-            authHeader = "Basic " + Base64.encodeBase64String(appId.getBytes("UTF-8"));
-        }catch(UnsupportedEncodingException uee){
-            logger.error( new StringBuilder().append("Exception Encoding\n").append(uee.getMessage()).append("\n").toString(), uee);
-        }
-
-        return authHeader;
-    }
-
-    public String getAuthorizationHeader(SAAuth saAuth , String requestMethod, String uriPath, DFPValidateRequest dfpValidateRequest, String ts){
-
-        //Build our string for the AuthHeader
-        stringBuilder = new StringBuilder();
-        stringBuilder.append(requestMethod).append("\n")
-                .append(ts).append("\n")
-                .append(saAuth.getApplicationID()).append("\n")
-                .append(s.SLASH + uriPath).append("\n")
-                .append(JSONUtil.getJSONStringFromObject(dfpValidateRequest));
-
-
-
-        //Create a SHA256 Hash
-        String base64Sha = "";
-        try {
-            base64Sha = new String(Base64.encodeBase64(HMACUtil.encode(saAuth.getApplicationKey(), stringBuilder.toString())));
-        }catch(Exception e){
-            logger.error(new StringBuilder().append("Exception occurred while generating Authorization Header\n").append(e.getMessage()).append("\n").toString(), e);
-        }
-
-        String appId = saAuth.getApplicationID() + ":" + base64Sha;
-        logger.trace(new StringBuilder("Auth Header before second encoding  ").append(appId).append("\n").toString());
-        try {
-            authHeader = "Basic " + Base64.encodeBase64String(appId.getBytes("UTF-8"));
-        }catch(UnsupportedEncodingException uee){
-            logger.error( new StringBuilder().append("Exception Encoding\n").append(uee.getMessage()).append("\n").toString(), uee);
-        }
-
-        return authHeader;
-    }
-
+    //No Payload in header
     public String getAuthorizationHeader(SAAuth saAuth, String requestMethod, String uriPath, String ts){
         //Build our string for the AuthHeader
         stringBuilder = new StringBuilder();

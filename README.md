@@ -7,7 +7,11 @@ service. Developers working with the REST API tend to write their own REST
 client using either Jersey libraries or base java IO classes. SAAccess sdk
 relies on a core class org.secureauth.sarestapi.SAAccess.
 
-The SDK version 0.9.2. is written to support SecureAuth Appliance 8.2 and newer.
+The SDK version 1.0.0. is written to support SecureAuth Appliance 9.0 and newer.
+ 
+The SDK will support SecureAuth 8.2 but some capabilities were not available in SecureAuth 8.2
+
+This is a community driven project, if you would like to contribute please fork and update. Changes will be reviewed then added to the project.
 
 Requirements:
 ------------
@@ -41,6 +45,7 @@ Then select Registration Methods and Scroll Down to Authentication API. Click th
 String applianceHost = "example.domain.com";
 String appliancePort = "443";
 boolean applianceSSL = true;
+boolean selfSigned = true;
 String realm = "secureauth2";
 String applicationID = ".........";
 String applicationKey = ".........";
@@ -48,7 +53,7 @@ String applicationKey = ".........";
  /*
  This will create the instance of the SAAccess which is able to execute REST calls.
  */
-SAAccess saAccess=new SAAccess(applianceHost, appliancePort, applianceSSL, realm, applicationID, applicationKey);
+SAAccess saAccess=new SAAccess(applianceHost, appliancePort, applianceSSL, selfSigned, realm, applicationID, applicationKey);
 
 
 // To validate a user exists in your data store all you need to run the following.
@@ -58,11 +63,29 @@ System.out.println(saAccess.validateUser("USERNAME").toString());
 ResponseObject validUser = saAccess.validateUser("USERNAME")
 if(validUser != null){
             if(validUser.getStatus().equalsIgnoreCase("found")){
-            System.out.println("Matched User")
+                System.out.println("Matched User")
+            }
+            if(validUser.getStatus().equalsIgnoreCase("not_found")){
+                System.out.println("User was not found in DataStore!")
             }
 }
 
 ```
 
+Changes:
+--------
+With the 9.0Support Branch the following was changed
 
-For support please email: rrowcliffe@secureauth.com
+* Updated Data Objects to extend from a BaseResponse Object
+* Created Interfaces for making the implementation of the API easier.
+* Refactored the structure of the data objects
+* Updated Data Objects toString to support JSON Output.
+* Created a Client Side Filter to force specific headers existing on each request
+* Updated Query Objects to support new BehaveBio and IDM Features
+* Updated TestClass to use Interfaces
+* Created Individual Interface Impl classes
+
+
+
+For Enhancements or updates please use the github issues.
+ 

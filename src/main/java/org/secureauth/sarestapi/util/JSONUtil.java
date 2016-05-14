@@ -4,7 +4,7 @@ package org.secureauth.sarestapi.util;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
-import org.secureauth.sarestapi.data.*;
+import org.secureauth.sarestapi.data.Requests.DFPValidateRequest;
 
 import java.io.IOException;
 
@@ -32,80 +32,17 @@ public class JSONUtil {
 
     public JSONUtil (){}
 
-    public static String getJSONStringFromObject(AuthRequest authRequest){
-        ObjectMapper mapper = new ObjectMapper();
-        StringBuilder stringBuilder = new StringBuilder();
-
+     public static String convertObjectToJSON(Object object){
+        ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
+        String json = null;
         try {
-
-            stringBuilder.append(mapper.writeValueAsString(authRequest));
-
-        }catch(JsonProcessingException jpe){
-            jpe.printStackTrace();
+            json = ow.writeValueAsString(object);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
         }
-
-        return stringBuilder.toString();
+        return json;
     }
 
-    public static String getJSONStringFromObject(IPEvalRequest ipEvalRequest){
-        ObjectMapper mapper = new ObjectMapper();
-        StringBuilder stringBuilder = new StringBuilder();
-
-        try{
-
-            stringBuilder.append(mapper.writeValueAsString(ipEvalRequest));
-
-        }catch(JsonProcessingException jpe){
-            jpe.printStackTrace();
-        }
-
-        return stringBuilder.toString();
-    }
-
-    public static String getJSONStringFromObject(AccessHistoryRequest accessHistoryRequest){
-        ObjectMapper mapper = new ObjectMapper();
-        StringBuilder stringBuilder = new StringBuilder();
-
-        try{
-
-            stringBuilder.append(mapper.writeValueAsString(accessHistoryRequest));
-
-        }catch(JsonProcessingException jpe){
-            jpe.printStackTrace();
-        }
-
-        return stringBuilder.toString();
-    }
-
-    public static String getJSONStringFromObject(DFPValidateRequest dfpValidateRequest){
-        ObjectMapper mapper = new ObjectMapper();
-        StringBuilder stringBuilder = new StringBuilder();
-
-        try{
-
-            stringBuilder.append(mapper.writeValueAsString(dfpValidateRequest));
-
-        }catch(JsonProcessingException jpe){
-            jpe.printStackTrace();
-        }
-
-        return stringBuilder.toString();
-    }
-
-    public static String getJSONStringFromObject(DFPConfirmRequest dfpConfirmRequest){
-        ObjectMapper mapper = new ObjectMapper();
-        StringBuilder stringBuilder = new StringBuilder();
-
-        try{
-
-            stringBuilder.append(mapper.writeValueAsString(dfpConfirmRequest));
-
-        }catch(JsonProcessingException jpe){
-            jpe.printStackTrace();
-        }
-
-        return stringBuilder.toString();
-    }
 
     public static DFPValidateRequest getObjectFromJSONString(String dfpJsonString){
         ObjectMapper mapper = new ObjectMapper();
@@ -123,16 +60,5 @@ public class JSONUtil {
         }
 
         return dfpValidateRequest;
-    }
-
-    public static String convertObjectToJSON(Object object){
-        ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
-        String json = null;
-        try {
-            json = ow.writeValueAsString(object);
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-        }
-        return json;
     }
 }

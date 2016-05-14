@@ -1,6 +1,7 @@
 package org.secureauth.sarestapi.data;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import org.secureauth.sarestapi.util.JSONUtil;
 
 
 import javax.xml.bind.annotation.XmlRootElement;
@@ -149,21 +150,7 @@ public class DFP {
 
     @Override
     public String toString(){
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("\t").append("Fonts:").append(fonts);
-        stringBuilder.append("\n\t").append("Plugins:").append(plugins);
-        stringBuilder.append("\n\t").append("TimeZone:").append(timezone);
-        stringBuilder.append("\n\t").append("Video:").append(video);
-        stringBuilder.append("\n\t").append("Local Storage:").append(local_storage);
-        stringBuilder.append("\n\t").append("Session Storage:").append(session_storage);
-        stringBuilder.append("\n\t").append("IE User Data:").append(ie_user_data);
-        stringBuilder.append("\n\t").append("Cookie Enabled:").append(cookie_enabled);
-        stringBuilder.append("\n\t").append("User Agent:").append(user_agent);
-        stringBuilder.append("\n\t").append("Accept:").append(accept);
-        stringBuilder.append("\n\t").append("Accept Charset:").append(accept_charset);
-        stringBuilder.append("\n\t").append("Accept Encoding:").append(accept_encoding);
-        stringBuilder.append("\n\t").append("Accept Language:").append(accept_language);
-        return stringBuilder.toString();
+        return JSONUtil.convertObjectToJSON(this);
     }
 
 }
