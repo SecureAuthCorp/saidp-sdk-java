@@ -1,6 +1,7 @@
 package org.secureauth.sarestapi.interfaces;
 
 import org.secureauth.sarestapi.SAAccess;
+import org.secureauth.sarestapi.data.Response.BaseResponse;
 import org.secureauth.sarestapi.data.Response.FactorsResponse;
 import org.secureauth.sarestapi.data.Response.ResponseObject;
 
@@ -9,13 +10,13 @@ import org.secureauth.sarestapi.data.Response.ResponseObject;
  */
 public interface AuthenticationInterface {
 
-    ResponseObject validateUser(SAAccess saAccess, String userId);
+    BaseResponse validateUser(SAAccess saAccess, String userId);
 
-    ResponseObject validatePassword(SAAccess saAccess, String userId, String password);
+    BaseResponse validatePassword(SAAccess saAccess, String userId, String password);
 
     FactorsResponse getFactorsForUser(SAAccess saAccess, String userId);
 
-    ResponseObject validateOath(SAAccess saAccess,String userId, String otp, String factorId);
+    BaseResponse validateOath(SAAccess saAccess,String userId, String otp, String factorId);
 
     ResponseObject validatePushOTP(SAAccess saAccess,String userId, String factorId);
 
@@ -25,7 +26,9 @@ public interface AuthenticationInterface {
 
     ResponseObject sendEmailOTP(SAAccess saAccess, String userId, String factorId);
 
-    ResponseObject validateKBQ(SAAccess saAccess, String userId, String answer, String factorId);
+    BaseResponse validateKBQ(SAAccess saAccess, String userId, String answer, String factorId);
+
+    BaseResponse validatePin(SAAccess saAccess, String userId, String pin);
 
 
     void PushToAccept(SAAccess saAccess, String user, String factorID, String ipAddress) throws InterruptedException;

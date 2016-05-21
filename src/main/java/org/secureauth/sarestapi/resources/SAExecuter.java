@@ -17,11 +17,8 @@ import javax.ws.rs.core.MediaType;
 import org.secureauth.sarestapi.data.*;
 import org.secureauth.sarestapi.data.BehavioralBio.BehaveBioRequest;
 import org.secureauth.sarestapi.data.Requests.BehaveBioResetRequest;
-import org.secureauth.sarestapi.data.Response.BehaveBioResponse;
+import org.secureauth.sarestapi.data.Response.*;
 import org.secureauth.sarestapi.data.Requests.*;
-import org.secureauth.sarestapi.data.Response.DFPConfirmResponse;
-import org.secureauth.sarestapi.data.Response.DFPValidateResponse;
-import org.secureauth.sarestapi.data.Response.ResponseObject;
 import org.secureauth.sarestapi.data.Requests.UserPasswordRequest;
 import org.secureauth.sarestapi.data.UserProfile.NewUserProfile;
 
@@ -147,7 +144,7 @@ public class SAExecuter {
     }
 
     //Validate User against Repository
-    public ResponseObject executeValidateUser(String header,String query, AuthRequest authRequest,String ts)throws Exception{
+    public BaseResponse executeValidateUser(String header,String query, AuthRequest authRequest,String ts)throws Exception{
 
         if(client == null) {
             createConnection();
@@ -157,7 +154,7 @@ public class SAExecuter {
         WebTarget target = null;
         Response response = null;
 
-        ResponseObject responseObject =null;
+        BaseResponse responseObject =null;
         try{
             target = client.target(query);
 
@@ -167,7 +164,7 @@ public class SAExecuter {
                     header("X-SA-Date", ts).
                     post(Entity.entity(JSONUtil.convertObjectToJSON(authRequest),MediaType.APPLICATION_JSON));
 
-            responseObject = response.readEntity(ResponseObject.class);
+            responseObject = response.readEntity(BaseResponse.class);
 
         }catch(Exception e){
             logger.error(new StringBuilder().append("Exception Validating User: \nQuery:\n\t")
@@ -179,7 +176,7 @@ public class SAExecuter {
     }
 
     //Validate Users Password
-    public ResponseObject executeValidateUserPassword(String auth,String query, AuthRequest authRequest,String ts)throws Exception{
+    public BaseResponse executeValidateUserPassword(String auth,String query, AuthRequest authRequest,String ts)throws Exception{
 
         if(client == null) {
             createConnection();
@@ -187,7 +184,7 @@ public class SAExecuter {
 
         WebTarget target = null;
         Response response = null;
-        ResponseObject responseObject =null;
+        BaseResponse responseObject =null;
         try{
 
             target = client.target(query);
@@ -196,7 +193,7 @@ public class SAExecuter {
                     header("Authorization", auth).
                     header("X-SA-Date", ts).
                     post(Entity.entity(JSONUtil.convertObjectToJSON(authRequest), MediaType.APPLICATION_JSON));
-            responseObject=response.readEntity(ResponseObject.class);
+            responseObject=response.readEntity(BaseResponse.class);
 
         }catch(Exception e){
             logger.error(new StringBuilder().append("Exception Validating User Password: \nQuery:\n\t")
@@ -208,7 +205,7 @@ public class SAExecuter {
     }
 
     //Validate Users Pin
-    public ResponseObject executeValidateUserPin(String auth,String query, AuthRequest authRequest,String ts)throws Exception{
+    public BaseResponse executeValidateUserPin(String auth,String query, AuthRequest authRequest,String ts)throws Exception{
 
         if(client == null) {
             createConnection();
@@ -216,7 +213,7 @@ public class SAExecuter {
 
         WebTarget target = null;
         Response response = null;
-        ResponseObject responseObject =null;
+        BaseResponse responseObject =null;
         try{
 
             target = client.target(query);
@@ -225,7 +222,7 @@ public class SAExecuter {
                     header("Authorization", auth).
                     header("X-SA-Date", ts).
                     post(Entity.entity(JSONUtil.convertObjectToJSON(authRequest), MediaType.APPLICATION_JSON));
-            responseObject=response.readEntity(ResponseObject.class);
+            responseObject=response.readEntity(BaseResponse.class);
 
         }catch(Exception e){
             logger.error(new StringBuilder().append("Exception Validating User Password: \nQuery:\n\t")
@@ -237,7 +234,7 @@ public class SAExecuter {
     }
 
     //Validate Users KBA
-    public ResponseObject executeValidateKba(String auth,String query, AuthRequest authRequest, String ts)throws Exception{
+    public BaseResponse executeValidateKba(String auth,String query, AuthRequest authRequest, String ts)throws Exception{
 
         if(client == null) {
             createConnection();
@@ -245,7 +242,7 @@ public class SAExecuter {
 
         WebTarget target = null;
         Response response = null;
-        ResponseObject responseObject =null;
+        BaseResponse responseObject =null;
         try{
 
             target = client.target(query);
@@ -255,7 +252,7 @@ public class SAExecuter {
                     header("X-SA-Date", ts).
                     post(Entity.entity(JSONUtil.convertObjectToJSON(authRequest), MediaType.APPLICATION_JSON));
 
-            responseObject=response.readEntity(ResponseObject.class);
+            responseObject=response.readEntity(BaseResponse.class);
 
         }catch(Exception e){
             logger.error(new StringBuilder().append("Exception Validating KBA: \nQuery:\n\t")
@@ -267,7 +264,7 @@ public class SAExecuter {
     }
 
     //Validate User Oath Token
-    public ResponseObject executeValidateOath(String auth,String query, AuthRequest authRequest, String ts)throws Exception{
+    public BaseResponse executeValidateOath(String auth,String query, AuthRequest authRequest, String ts)throws Exception{
 
         if(client == null) {
             createConnection();
@@ -275,7 +272,7 @@ public class SAExecuter {
 
         WebTarget target = null;
         Response response = null;
-        ResponseObject responseObject =null;
+        BaseResponse responseObject =null;
         try{
 
             target = client.target(query);
@@ -285,7 +282,7 @@ public class SAExecuter {
                     header("X-SA-Date", ts).
                     post(Entity.entity(JSONUtil.convertObjectToJSON(authRequest), MediaType.APPLICATION_JSON));
 
-            responseObject=response.readEntity(ResponseObject.class);
+            responseObject=response.readEntity(BaseResponse.class);
 
         }catch(Exception e){
             logger.error(new StringBuilder().append("Exception Validating OATH: \nQuery:\n\t")

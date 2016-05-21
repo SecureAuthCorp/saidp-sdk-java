@@ -214,7 +214,7 @@ import org.slf4j.LoggerFactory;
      * @param userid the userid of the identity
      * @return {@link ResponseObject}
      */
-    public ResponseObject validateUser(String userid){
+    public BaseResponse validateUser(String userid){
 
         String ts = getServerTime();
         RestApiHeader restApiHeader = new RestApiHeader();
@@ -242,7 +242,7 @@ import org.slf4j.LoggerFactory;
      * @param password The password of the user to validate
      * @return {@link ResponseObject}
      */
-    public ResponseObject validateUserPassword(String userid, String password){
+    public BaseResponse validateUserPassword(String userid, String password){
         String ts = getServerTime();
         RestApiHeader restApiHeader = new RestApiHeader();
         AuthRequest authRequest = new AuthRequest();
@@ -269,7 +269,7 @@ import org.slf4j.LoggerFactory;
      * @param pin The pin of the user to validate
      * @return {@link ResponseObject}
      */
-    public ResponseObject validateUserPin(String userid, String pin){
+    public BaseResponse validateUserPin(String userid, String pin){
         String ts = getServerTime();
         RestApiHeader restApiHeader = new RestApiHeader();
         AuthRequest authRequest = new AuthRequest();
@@ -297,7 +297,7 @@ import org.slf4j.LoggerFactory;
      * @param factor_id the KB Id to be compared against
      * @return {@link ResponseObject}
      */
-    public ResponseObject validateKba(String userid, String answer, String factor_id){
+    public BaseResponse validateKba(String userid, String answer, String factor_id){
         String ts = getServerTime();
         RestApiHeader restApiHeader = new RestApiHeader();
         AuthRequest authRequest = new AuthRequest();
@@ -326,7 +326,7 @@ import org.slf4j.LoggerFactory;
      * @param factor_id The Device Identifier
      * @return {@link ResponseObject}
      */
-    public ResponseObject validateOath(String userid, String otp, String factor_id){
+    public BaseResponse validateOath(String userid, String otp, String factor_id){
         String ts = getServerTime();
         RestApiHeader restApiHeader = new RestApiHeader();
         AuthRequest authRequest = new AuthRequest();
