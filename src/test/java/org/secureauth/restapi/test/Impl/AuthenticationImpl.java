@@ -2,6 +2,7 @@ package org.secureauth.restapi.test.Impl;
 
 import org.secureauth.sarestapi.SAAccess;
 import org.secureauth.sarestapi.data.PushAcceptStatus;
+import org.secureauth.sarestapi.data.Response.BaseResponse;
 import org.secureauth.sarestapi.data.Response.FactorsResponse;
 import org.secureauth.sarestapi.data.Response.ResponseObject;
 import org.secureauth.sarestapi.interfaces.AuthenticationInterface;
@@ -15,9 +16,9 @@ public class AuthenticationImpl implements AuthenticationInterface {
     public AuthenticationImpl(){}
 
     @Override
-    public ResponseObject validateUser(SAAccess saAccess, String userId) {
+    public BaseResponse validateUser(SAAccess saAccess, String userId) {
         //Validate the User Exists
-        ResponseObject responseObject = saAccess.validateUser(userId);
+        BaseResponse responseObject = saAccess.validateUser(userId);
         if (responseObject != null) {
 
             if (responseObject.getStatus().equalsIgnoreCase("found")) {
@@ -36,8 +37,8 @@ public class AuthenticationImpl implements AuthenticationInterface {
     }
 
     @Override
-    public ResponseObject validatePassword(SAAccess saAccess, String userid, String password) {
-        ResponseObject passObject = saAccess.validateUserPassword(userid, password);
+    public BaseResponse validatePassword(SAAccess saAccess, String userid, String password) {
+        BaseResponse passObject = saAccess.validateUserPassword(userid, password);
         if (passObject != null) {
 
             System.out.println("Password Test+++++++");
@@ -60,8 +61,8 @@ public class AuthenticationImpl implements AuthenticationInterface {
     }
 
     @Override
-    public ResponseObject validateOath(SAAccess saAccess,String user, String otp, String factorId) {
-        ResponseObject responseObject = saAccess.validateOath(user, otp, factorId);
+    public BaseResponse validateOath(SAAccess saAccess,String user, String otp, String factorId) {
+        BaseResponse responseObject = saAccess.validateOath(user, otp, factorId);
         System.out.println("Start OATH Test+++++++++++++++");
         System.out.println(responseObject.toString());
         System.out.println("End OATH Test+++++++++++++++");
@@ -99,13 +100,23 @@ public class AuthenticationImpl implements AuthenticationInterface {
     }
 
     @Override
-    public ResponseObject validateKBQ(SAAccess saAccess, String userid, String answer, String factorId) {
+    public BaseResponse validateKBQ(SAAccess saAccess, String userid, String answer, String factorId) {
         System.out.println("TEST KBQ:  " + factorId);
-        ResponseObject kba = saAccess.validateKba(userid, answer, factorId);
+        BaseResponse kba = saAccess.validateKba(userid, answer, factorId);
         System.out.println(kba.toString());
         System.out.println("END KBQ +++++++++++");
 
         return kba;
+    }
+
+    @Override
+    public BaseResponse validatePin(SAAccess saAccess, String userId, String pin) {
+        System.out.println("TEST Pin Validation  " );
+        BaseResponse pinResponse = saAccess.validateUserPin(userId, pin);
+        System.out.println(pinResponse.toString());
+        System.out.println("END PIN +++++++++++");
+
+        return pinResponse;
     }
 
 
