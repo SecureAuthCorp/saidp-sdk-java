@@ -30,17 +30,9 @@ OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ResponseObject extends BaseResponse {
 
-    private String user_id;
+
     private String reference_id;
     private int otp;
-
-    public String getUser_id() {
-        return user_id;
-    }
-
-    public void setUser_id(String user_id) {
-        this.user_id = user_id;
-    }
 
     public int getOtp() {
         return otp;

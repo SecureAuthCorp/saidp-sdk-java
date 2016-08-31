@@ -16,19 +16,11 @@ import java.util.List;
 @XmlRootElement
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class UserProfileResponse extends BaseResponse{
-    private String userId;
+
     private HashMap<String,UserProfileProperty> properties = new HashMap<>();
     private HashMap<String,UserProfileKB> knowledgeBase = new HashMap<>();
     private List<String> groups = new ArrayList<>();
     private List<UserProfileAccessHistory> accessHistories = new ArrayList<>();
-
-    public String getUserId() {
-        return userId;
-    }
-
-    public void setUserId(String userId) {
-        this.userId = userId;
-    }
 
     public HashMap<String, UserProfileProperty> getProperties() {
         return properties;
