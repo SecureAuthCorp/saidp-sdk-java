@@ -31,6 +31,8 @@ public class Factoring {
 
         private int threatType;
         private int threatCategory;
+        private double latitude;
+        private double longitude;
 
         public int getThreatType() {
                 return threatType;
@@ -48,5 +50,19 @@ public class Factoring {
                 this.threatCategory = threatCategory;
         }
 
+        public double getLatitude() {
+                return latitude;
+        }
 
+        public void setLatitude(double latitude) {
+                this.latitude = latitude;
+        }
+
+        public double getLongitude() {
+                return longitude;
+        }
+
+        public void setLongitude(double longitude) {
+                this.longitude = longitude;
+        }
 }
