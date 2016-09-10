@@ -115,7 +115,7 @@ import org.slf4j.LoggerFactory;
      * @return {@link FactorsResponse}
      */
     public FactorsResponse factorsByUser(String userid){
-    	userid = encode(userid);
+//    	userid = encode(userid);
         String ts = getServerTime();
         RestApiHeader restApiHeader = new RestApiHeader();
         String header = restApiHeader.getAuthorizationHeader(saAuth,"GET",FactorsQuery.queryFactors(saAuth.getRealm(),userid),ts);
