@@ -29,7 +29,7 @@ public class UserProfileResponse extends BaseResponse{
     public void setUserId(String userId) {
         this.userId = userId;
     }
-    
+
     public HashMap<String, UserProfileProperty> getProperties() {
         return properties;
     }
