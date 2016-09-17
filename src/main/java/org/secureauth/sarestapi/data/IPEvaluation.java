@@ -1,10 +1,13 @@
 package org.secureauth.sarestapi.data;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.sun.javafx.collections.MappingChange;
 import org.secureauth.sarestapi.util.JSONUtil;
 
 
 import javax.xml.bind.annotation.XmlRootElement;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author rrowcliffe@secureauth.com
@@ -35,7 +38,7 @@ public class IPEvaluation {
     private String risk_color;
     private String risk_desc;
     private Geoloc geoloc;
-    private Factoring factoring;
+    private Map<String,String> factoring = new HashMap<>();
     private String factor_description;
 
 
@@ -87,11 +90,11 @@ public class IPEvaluation {
         this.geoloc = geoloc;
     }
 
-    public Factoring getFactoring() {
+    public Map<String, String> getFactoring() {
         return factoring;
     }
 
-    public void setFactoring(Factoring factoring) {
+    public void setFactoring(Map<String, String> factoring) {
         this.factoring = factoring;
     }
 
