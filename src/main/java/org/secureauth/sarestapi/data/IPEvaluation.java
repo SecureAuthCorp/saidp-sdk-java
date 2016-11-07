@@ -39,7 +39,7 @@ public class IPEvaluation {
     private String risk_desc;
     private Geoloc geoloc;
     private Map<String,String> factoring = new HashMap<>();
-    private String factor_description;
+    private Map<String,String> factor_description = new HashMap<>();
 
 
     public String getMethod() {
@@ -98,11 +98,11 @@ public class IPEvaluation {
         this.factoring = factoring;
     }
 
-    public String getFactor_description() {
+    public Map<String, String> getFactor_description() {
         return factor_description;
     }
     
-    public void setFactor_description(String factor_description) {
+    public void setFactor_description(Map<String, String> factor_description) {
         this.factor_description = factor_description;
     }
 
