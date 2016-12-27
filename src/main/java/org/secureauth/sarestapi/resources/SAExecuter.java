@@ -902,4 +902,67 @@ public class SAExecuter {
 
     }
 
+    //Run NumberProfile Post
+    public NumberProfileResponse executeNumberProfilePost(String auth, String query, NumberProfileRequest numberProfileRequest, String ts)throws Exception{
+
+        if(client == null) {
+            createConnection();
+        }
+
+        WebTarget target = null;
+        Response response = null;
+        NumberProfileResponse numberProfileResponse =null;
+        try{
+            target = client.target(query);
+
+            response = target.request().
+                    accept(MediaType.APPLICATION_JSON).
+                    header("Authorization", auth).
+                    header("X-SA-Date", ts).
+                    post(Entity.entity(JSONUtil.convertObjectToJSON(numberProfileRequest),MediaType.APPLICATION_JSON));
+
+            numberProfileResponse = response.readEntity(NumberProfileResponse.class);
+
+            response.close();
+        }catch(Exception e){
+            logger.error(new StringBuilder().append("Exception Running NumberProfile POST: \nQuery:\n\t")
+                    .append(query).append("\nError:").append(e.getMessage()).toString(), e);
+        }
+
+        return numberProfileResponse;
+
+    }
+
+    //Run Number Profile Put
+    public BaseResponse executeNumberProfileUpdate(String auth, String query, NumberProfileUpdateRequest numberProfileUpdateRequest, String ts)throws Exception{
+
+        if(client == null) {
+            createConnection();
+        }
+
+        WebTarget target = null;
+        Response response = null;
+        BaseResponse numberProfileUpdateResponse =null;
+        try{
+            target = client.target(query);
+
+            response = target.request().
+                    accept(MediaType.APPLICATION_JSON).
+                    header("Authorization", auth).
+                    header("X-SA-Date", ts).
+                    put(Entity.entity(JSONUtil.convertObjectToJSON(numberProfileUpdateRequest),MediaType.APPLICATION_JSON));
+
+            numberProfileUpdateResponse = response.readEntity(BaseResponse.class);
+
+            response.close();
+        }catch(Exception e){
+            logger.error(new StringBuilder().append("Exception Running NumberProfile POST: \nQuery:\n\t")
+                    .append(query).append("\nError:").append(e.getMessage()).toString(), e);
+        }
+
+        return numberProfileUpdateResponse;
+
+    }
+
+
 }
