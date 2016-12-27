@@ -376,7 +376,35 @@ import org.slf4j.LoggerFactory;
 
     /**
      * <p>
-     *     Send One Time Passcode by SMS
+     *     Send One Time Passcode by Phone Ad Hoc
+     * </p>
+     * @param userid the userid of the identity
+     * @param phoneNumber  Phone Number to call
+     * @return {@link ResponseObject}
+     */
+    public ResponseObject deliverAdHocOTPByPhone(String userid, String phoneNumber){
+        String ts = getServerTime();
+        RestApiHeader restApiHeader = new RestApiHeader();
+        AuthRequest authRequest = new AuthRequest();
+
+        authRequest.setUser_id(userid);
+        authRequest.setType("call");
+        authRequest.setToken(phoneNumber);
+
+        String header = restApiHeader.getAuthorizationHeader(saAuth,"POST", AuthQuery.queryAuth(saAuth.getRealm()), authRequest,ts);
+
+        try{
+            return saExecuter.executeOTPByPhone(header,saBaseURL.getApplianceURL() + AuthQuery.queryAuth(saAuth.getRealm()),authRequest,ts);
+        }catch (Exception e){
+            logger.error(new StringBuilder().append("Exception occurred executing REST query::\n").append(e.getMessage()).append("\n").toString(), e);
+        }
+        return null;
+    }
+
+
+    /**
+     * <p>
+     *     Send One Time Passcode by SMS to Registered User
      * </p>
      * @param userid the userid of the identity
      * @param factor_id  Phone Property   "Phone1"
@@ -390,6 +418,32 @@ import org.slf4j.LoggerFactory;
         authRequest.setUser_id(userid);
         authRequest.setType("sms");
         authRequest.setFactor_id(factor_id);
+        String header = restApiHeader.getAuthorizationHeader(saAuth,"POST", AuthQuery.queryAuth(saAuth.getRealm()), authRequest,ts);
+
+        try{
+            return saExecuter.executeOTPBySMS(header,saBaseURL.getApplianceURL() + AuthQuery.queryAuth(saAuth.getRealm()),authRequest,ts);
+        }catch (Exception e){
+            logger.error(new StringBuilder().append("Exception occurred executing REST query::\n").append(e.getMessage()).append("\n").toString(), e);
+        }
+        return null;
+    }
+
+    /**
+     * <p>
+     *     Send One Time Passcode by SMS Ad Hoc
+     * </p>
+     * @param userid the userid of the identity
+     * @param phoneNumber  Phone Number to send SMS to
+     * @return {@link ResponseObject}
+     */
+    public ResponseObject deliverAdHocOTPBySMS(String userid, String phoneNumber){
+        String ts = getServerTime();
+        RestApiHeader restApiHeader = new RestApiHeader();
+        AuthRequest authRequest = new AuthRequest();
+
+        authRequest.setUser_id(userid);
+        authRequest.setType("sms");
+        authRequest.setToken(phoneNumber);
         String header = restApiHeader.getAuthorizationHeader(saAuth,"POST", AuthQuery.queryAuth(saAuth.getRealm()), authRequest,ts);
 
         try{
@@ -425,6 +479,33 @@ import org.slf4j.LoggerFactory;
         }
         return null;
     }
+
+    /**
+     * <p>
+     *     Send One Time Passcode by Email Ad Hoc
+     * </p>
+     * @param userid the userid of the identity
+     * @param emailAddress  Email Address
+     * @return {@link ResponseObject}
+     */
+    public ResponseObject deliverAdHocOTPByEmail(String userid, String emailAddress){
+        String ts = getServerTime();
+        RestApiHeader restApiHeader = new RestApiHeader();
+        AuthRequest authRequest = new AuthRequest();
+
+        authRequest.setUser_id(userid);
+        authRequest.setType("email");
+        authRequest.setToken(emailAddress);
+        String header = restApiHeader.getAuthorizationHeader(saAuth,"POST", AuthQuery.queryAuth(saAuth.getRealm()), authRequest,ts);
+
+        try{
+            return saExecuter.executeOTPByEmail(header,saBaseURL.getApplianceURL() + AuthQuery.queryAuth(saAuth.getRealm()), authRequest,ts);
+        }catch (Exception e){
+            logger.error(new StringBuilder().append("Exception occurred executing REST query::\n").append(e.getMessage()).append("\n").toString(), e);
+        }
+        return null;
+    }
+
 
     /**
      * <p>
