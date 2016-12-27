@@ -1,8 +1,6 @@
 package org.secureauth.sarestapi.interfaces;
 
 import org.secureauth.sarestapi.SAAccess;
-import org.secureauth.sarestapi.data.Response.BaseResponse;
-import org.secureauth.sarestapi.data.Response.FactorsResponse;
 import org.secureauth.sarestapi.data.Response.ResponseObject;
 
 /**
