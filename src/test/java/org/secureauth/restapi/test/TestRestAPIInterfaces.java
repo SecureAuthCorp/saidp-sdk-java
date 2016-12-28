@@ -6,6 +6,7 @@ import org.secureauth.sarestapi.SAAccess;
 import org.secureauth.sarestapi.data.Factors;
 import org.secureauth.sarestapi.data.Response.FactorsResponse;
 import org.secureauth.sarestapi.data.UserProfile.*;
+import org.secureauth.sarestapi.interfaces.AdHocInterface;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,8 +38,8 @@ public class TestRestAPIInterfaces {
     private static Logger logger = LoggerFactory.getLogger(TestRestAPIInterfaces.class);
     //Define our User Variables
     private static String user = "user";
-    private static String password = "xxxxxxxxx";
-    private static String otp = "584233";
+    private static String password = "PassWord";
+    private static String otp = "#####";
 
     //Required for connectivity to Appliance
     private static String applianceHost = "host.domain.com";
@@ -46,13 +47,15 @@ public class TestRestAPIInterfaces {
     private static boolean applianceSSL = true;
     private static boolean selfSigned = true;
     private static String realm = "secureauth1";
-    private static String applicationID = "..............";
-    private static String applicationKey = ".....................";
+    private static String applicationID = "#######################";
+    private static String applicationKey = "################################";
 
     public static void main(String[] args) {
 
         //Create Instance of SAAccess Object
         SAAccess saAccess = new SAAccess(applianceHost, appliancePort, applianceSSL, selfSigned, realm, applicationID, applicationKey);
+
+
 
         //Get Interface Implementations
         AuthenticationImpl authentication = new AuthenticationImpl();
@@ -60,11 +63,46 @@ public class TestRestAPIInterfaces {
         DeviceRecognitionImpl deviceRecognition = new DeviceRecognitionImpl();
         BehaveBioImpl behaveBio = new BehaveBioImpl();
         IDMImpl idm = new IDMImpl();
+        AdHocImpl adHoc = new AdHocImpl();
+        PhoneNumberProfileImpl phoneNumberProfile = new PhoneNumberProfileImpl();
 
         System.out.println("Start Test++++++++++++++++++");
 
-        /*
-        Authentication Tests
+
+        /**
+         * Start Ad Hoc Tests
+         */
+
+        //Phone Call
+        adHoc.sendAdHocPhoneOTP(saAccess,"user","##########");
+
+        //SMS
+        adHoc.sendAdHocSmsOTP(saAccess,"user", "##########");
+
+        //Email
+        adHoc.sendAdHocEmailOTP(saAccess, "UserID", "user@domian.com");
+
+        /**
+         * End Ad Hoc Tests
+         */
+
+        /**
+         * Start Phone Number Profile Service Tests
+         */
+
+        //Run Number through the Service
+        phoneNumberProfile.submitPhoneNumber(saAccess,"User", "##########");
+
+        //Update the users Phone and carrier Options
+        phoneNumberProfile.updatePhoneNumberProfile(saAccess,"User","#######","not_ported", "US-FIXED","O2", "UK", "mobile");
+
+        /**
+         * End Phone Number Profile Service Tests
+         */
+
+
+        /**
+         * Start Authentication Tests
          */
 
         //Validate User
@@ -93,7 +131,7 @@ public class TestRestAPIInterfaces {
                 authentication.validatePushOTP(saAccess,user,factor.getId());
             }
 
-            //Test Push to Accept
+          //Test Push to Accept
             try {
                 if(factor.getType().equalsIgnoreCase("push")){
                     for (String capability : factor.getCapabilities()){
@@ -113,7 +151,7 @@ public class TestRestAPIInterfaces {
                 for (String capability : factor.getCapabilities()) {
                     //Test SMS Delivery
                     if (capability.equalsIgnoreCase("sms")) {
-                      if(factor.getId().equalsIgnoreCase("phone2")) {
+                      if(factor.getId().equalsIgnoreCase("phone1")) {
                           authentication.sendSmsOTP(saAccess, user, factor.getId());
                       }
                     }
@@ -165,24 +203,24 @@ public class TestRestAPIInterfaces {
         /*
         Device Recognition Test
         */
-            // Get Java Script Source URL
-
-
+        // Get Java Script Source URL
         deviceRecognition.getDFPJavaScriptSrc(saAccess);
 
 
-        /*
-        IDM Test
-         */
+        /**
+        * Start IDM Test
+        */
+
         idm.getUserProfile(saAccess,user);
-        idm.passwordChange(saAccess,user,"93$q!SAT", "93$q!SAT");
-        idm.passwordReset(saAccess,user,"93$q!SAT");
+
+        idm.passwordChange(saAccess,user,"Password", "Password");
+        idm.passwordReset(saAccess,user,"Password");
 
 
         //Create User test
         NewUserProfile newUserProfile = new NewUserProfile();
         newUserProfile.setUserId("restuser");
-        newUserProfile.setPassword("93$q!SAT");
+        newUserProfile.setPassword("password");
         NewUserProfileProperties newUserProfileProperties = new NewUserProfileProperties();
         newUserProfileProperties.setEmail1("user@domain.com");
         newUserProfileProperties.setFirstName("RestAPI");
@@ -248,11 +286,13 @@ public class TestRestAPIInterfaces {
         idm.addUsersToGroup(saAccess, usersToGroup, "Group E");
 
 
-        /*
-        END IDM Test
-         */
 
-        /*
+        /**
+         * END IDM Test
+         /*
+
+
+        *//*
          Start Behave Bio Test
          */
 
@@ -376,7 +416,7 @@ public class TestRestAPIInterfaces {
         behaveBio.submitBehaveBioProfile(saAccess,"restuser",bProfile.replaceAll("\\s+",""),hostIP,userAgent);
 
         //Global Reset
-        behaveBio.resetBehaveBioProfile(saAccess,"restuser","ALL","ALL","ALL");
+        //behaveBio.resetBehaveBioProfile(saAccess,"restuser","ALL","ALL","ALL");
 
         /*
          END Behave Bio Test
