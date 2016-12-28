@@ -3,6 +3,7 @@ package org.secureauth.sarestapi.data.Response;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import org.secureauth.sarestapi.data.NumberProfile.CurrentCarrier;
 import org.secureauth.sarestapi.data.NumberProfile.OriginalCarrier;
+import org.secureauth.sarestapi.util.JSONUtil;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -146,5 +147,10 @@ public class NumberProfileResponse extends BaseResponse{
 
     public void setIpWarning(String ipWarning) {
         this.ipWarning = ipWarning;
+    }
+
+    @Override
+    public String toString(){
+        return JSONUtil.convertObjectToJSON(this);
     }
 }
