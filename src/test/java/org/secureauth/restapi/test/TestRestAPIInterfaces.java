@@ -6,7 +6,6 @@ import org.secureauth.sarestapi.SAAccess;
 import org.secureauth.sarestapi.data.Factors;
 import org.secureauth.sarestapi.data.Response.FactorsResponse;
 import org.secureauth.sarestapi.data.UserProfile.*;
-import org.secureauth.sarestapi.interfaces.AdHocInterface;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
