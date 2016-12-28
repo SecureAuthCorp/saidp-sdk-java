@@ -30,8 +30,8 @@ public class CarrierStatus {
 
     /**
      *
-     * @param reason
-     * @param status
+     * @param reason explanation for the state of the carrier (network_type, ported, country, carrier) based on the configuration defined in the Web Admin
+     * @param status state of the carrier (blocked, allowed) based on the configuration defined in the Web Admin
      */
     public CarrierStatus(String status, Object reason) {
         super();
