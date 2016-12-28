@@ -7,6 +7,7 @@ import java.util.TimeZone;
 
 import org.secureauth.sarestapi.data.*;
 import org.secureauth.sarestapi.data.BehavioralBio.BehaveBioRequest;
+import org.secureauth.sarestapi.data.NumberProfile.CarrierInfo;
 import org.secureauth.sarestapi.data.Requests.BehaveBioResetRequest;
 import org.secureauth.sarestapi.data.Response.BehaveBioResponse;
 import org.secureauth.sarestapi.data.Requests.*;
@@ -115,7 +116,7 @@ import org.slf4j.LoggerFactory;
      * @return {@link FactorsResponse}
      */
     public FactorsResponse factorsByUser(String userid){
-    	userid = encode(userid);
+//    	userid = encode(userid);
         String ts = getServerTime();
         RestApiHeader restApiHeader = new RestApiHeader();
         String header = restApiHeader.getAuthorizationHeader(saAuth,"GET",FactorsQuery.queryFactors(saAuth.getRealm(),userid),ts);
@@ -375,7 +376,35 @@ import org.slf4j.LoggerFactory;
 
     /**
      * <p>
-     *     Send One Time Passcode by SMS
+     *     Send One Time Passcode by Phone Ad Hoc
+     * </p>
+     * @param userid the userid of the identity
+     * @param phoneNumber  Phone Number to call
+     * @return {@link ResponseObject}
+     */
+    public ResponseObject deliverAdHocOTPByPhone(String userid, String phoneNumber){
+        String ts = getServerTime();
+        RestApiHeader restApiHeader = new RestApiHeader();
+        AuthRequest authRequest = new AuthRequest();
+
+        authRequest.setUser_id(userid);
+        authRequest.setType("call");
+        authRequest.setToken(phoneNumber);
+
+        String header = restApiHeader.getAuthorizationHeader(saAuth,"POST", AuthQuery.queryAuth(saAuth.getRealm()), authRequest,ts);
+
+        try{
+            return saExecuter.executeOTPByPhone(header,saBaseURL.getApplianceURL() + AuthQuery.queryAuth(saAuth.getRealm()),authRequest,ts);
+        }catch (Exception e){
+            logger.error(new StringBuilder().append("Exception occurred executing REST query::\n").append(e.getMessage()).append("\n").toString(), e);
+        }
+        return null;
+    }
+
+
+    /**
+     * <p>
+     *     Send One Time Passcode by SMS to Registered User
      * </p>
      * @param userid the userid of the identity
      * @param factor_id  Phone Property   "Phone1"
@@ -389,6 +418,32 @@ import org.slf4j.LoggerFactory;
         authRequest.setUser_id(userid);
         authRequest.setType("sms");
         authRequest.setFactor_id(factor_id);
+        String header = restApiHeader.getAuthorizationHeader(saAuth,"POST", AuthQuery.queryAuth(saAuth.getRealm()), authRequest,ts);
+
+        try{
+            return saExecuter.executeOTPBySMS(header,saBaseURL.getApplianceURL() + AuthQuery.queryAuth(saAuth.getRealm()),authRequest,ts);
+        }catch (Exception e){
+            logger.error(new StringBuilder().append("Exception occurred executing REST query::\n").append(e.getMessage()).append("\n").toString(), e);
+        }
+        return null;
+    }
+
+    /**
+     * <p>
+     *     Send One Time Passcode by SMS Ad Hoc
+     * </p>
+     * @param userid the userid of the identity
+     * @param phoneNumber  Phone Number to send SMS to
+     * @return {@link ResponseObject}
+     */
+    public ResponseObject deliverAdHocOTPBySMS(String userid, String phoneNumber){
+        String ts = getServerTime();
+        RestApiHeader restApiHeader = new RestApiHeader();
+        AuthRequest authRequest = new AuthRequest();
+
+        authRequest.setUser_id(userid);
+        authRequest.setType("sms");
+        authRequest.setToken(phoneNumber);
         String header = restApiHeader.getAuthorizationHeader(saAuth,"POST", AuthQuery.queryAuth(saAuth.getRealm()), authRequest,ts);
 
         try{
@@ -424,6 +479,33 @@ import org.slf4j.LoggerFactory;
         }
         return null;
     }
+
+    /**
+     * <p>
+     *     Send One Time Passcode by Email Ad Hoc
+     * </p>
+     * @param userid the userid of the identity
+     * @param emailAddress  Email Address
+     * @return {@link ResponseObject}
+     */
+    public ResponseObject deliverAdHocOTPByEmail(String userid, String emailAddress){
+        String ts = getServerTime();
+        RestApiHeader restApiHeader = new RestApiHeader();
+        AuthRequest authRequest = new AuthRequest();
+
+        authRequest.setUser_id(userid);
+        authRequest.setType("email");
+        authRequest.setToken(emailAddress);
+        String header = restApiHeader.getAuthorizationHeader(saAuth,"POST", AuthQuery.queryAuth(saAuth.getRealm()), authRequest,ts);
+
+        try{
+            return saExecuter.executeOTPByEmail(header,saBaseURL.getApplianceURL() + AuthQuery.queryAuth(saAuth.getRealm()), authRequest,ts);
+        }catch (Exception e){
+            logger.error(new StringBuilder().append("Exception occurred executing REST query::\n").append(e.getMessage()).append("\n").toString(), e);
+        }
+        return null;
+    }
+
 
     /**
      * <p>
@@ -922,6 +1004,87 @@ import org.slf4j.LoggerFactory;
 
     /**
      * End of IDM Methods
+     */
+
+    /**
+     * Start of  Phone Number Profile Methods
+     */
+
+    /**
+     * <p>
+     *     Submit User Name and Phone Number to the Phone Number Profiling service using the Rest API
+     * </p>
+     * @param userid The User ID that you want to validate from
+     * @param phone_number The Phone number to get a profile on
+     *
+     * @return {@link NumberProfileResponse}
+     *
+     */
+    public NumberProfileResponse PhoneNumberProfileSubmit(String userid, String phone_number){
+        String ts = getServerTime();
+        RestApiHeader restApiHeader =new RestApiHeader();
+        NumberProfileRequest numberProfileRequest = new NumberProfileRequest();
+        numberProfileRequest.setUser_id(userid);
+        numberProfileRequest.setPhone_number(phone_number);
+
+        String header = restApiHeader.getAuthorizationHeader(saAuth,"POST", NumberProfileQuery.queryNumberProfile(saAuth.getRealm()), numberProfileRequest, ts);
+
+        try{
+
+            return saExecuter.executeNumberProfilePost(header,saBaseURL.getApplianceURL() + NumberProfileQuery.queryNumberProfile(saAuth.getRealm()), numberProfileRequest, ts);
+
+        }catch (Exception e){
+            logger.error(new StringBuilder().append("Exception occurred executing REST query::\n").append(e.getMessage()).append("\n").toString(), e);
+        }
+
+        return null;
+    }
+
+    /**
+     * <p>
+     *     Submit Update to Phone Number Profiling Service using the Rest API
+     * </p>
+     * @param userid The User ID that you want to validate from
+     * @param phone_number user phone number provided
+     * @param portedStatus user phone status for the option to block phone numbers that recently changed carriers (not_ported, ported)
+     * @param carrierCode 6-digit number or a concatenation of the country code and phone type
+     * @param carrier name of the carrier or a concatenation of the country code and phone type
+     * @param countryCode  2-character country code
+     * @param networkType phone connection source (landline, tollfree, mobile, virtual, unknown, landline_tollfree)
+     *
+     * @return {@link BaseResponse}
+     *
+     */
+    public BaseResponse UpdatePhoneNumberProfile(String userid, String phone_number, String portedStatus, String carrierCode, String carrier, String countryCode, String networkType){
+        String ts = getServerTime();
+        RestApiHeader restApiHeader =new RestApiHeader();
+        NumberProfileUpdateRequest numberProfileUpdateRequest = new NumberProfileUpdateRequest();
+        numberProfileUpdateRequest.setUser_id(userid);
+        numberProfileUpdateRequest.setPhone_number(phone_number);
+        numberProfileUpdateRequest.setPortedStatus(portedStatus);
+        CarrierInfo carrierInfo = new CarrierInfo();
+        carrierInfo.setCarrierCode(carrierCode);
+        carrierInfo.setCarrier(carrier);
+        carrierInfo.setCountryCode(countryCode);
+        carrierInfo.setNetworkType(networkType);
+        numberProfileUpdateRequest.setCarrierInfo(carrierInfo);
+
+        String header = restApiHeader.getAuthorizationHeader(saAuth,"PUT", NumberProfileQuery.queryNumberProfile(saAuth.getRealm()), numberProfileUpdateRequest, ts);
+
+        try{
+
+            return saExecuter.executeNumberProfileUpdate(header,saBaseURL.getApplianceURL() + NumberProfileQuery.queryNumberProfile(saAuth.getRealm()), numberProfileUpdateRequest, ts);
+
+        }catch (Exception e){
+            logger.error(new StringBuilder().append("Exception occurred executing REST query::\n").append(e.getMessage()).append("\n").toString(), e);
+        }
+
+        return null;
+    }
+
+
+    /**
+     * End of Number Profile Methods
      */
 
     /**

@@ -45,6 +45,7 @@ public class s {
     public static final String APPLIANCE_ACCESSHISTORY="/api/" + API_VERSION + "/accesshistory";
     public static final String APPLIANCE_BEHAVEBIO="/api/" + API_VERSION + "/behavebio";
     public static final String APPLIANCE_BEHAVEBIO_JS=APPLIANCE_BEHAVEBIO + "/js";
+    public static final String APPLIANCE_NUMBERPROFILE="/api/" + API_VERSION + "/numberprofile";
 
 
     public static final String STATUS_INVALID="invalid";

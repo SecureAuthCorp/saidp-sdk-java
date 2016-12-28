@@ -1,13 +1,10 @@
-package org.secureauth.sarestapi.data;
+package org.secureauth.sarestapi.data.Requests;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.sun.javafx.collections.MappingChange;
+import org.secureauth.sarestapi.data.NumberProfile.CarrierInfo;
 import org.secureauth.sarestapi.util.JSONUtil;
 
-
 import javax.xml.bind.annotation.XmlRootElement;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * @author rrowcliffe@secureauth.com
@@ -27,85 +24,51 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
 OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
-@XmlRootElement(name="ip_evaluation")
+@XmlRootElement
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class IPEvaluation {
+public class NumberProfileUpdateRequest {
 
-    private String method;
-    private String ip;
-    private int risk_factor;
-    private String risk_color;
-    private String risk_desc;
-    private Geoloc geoloc;
-    private Map<String,String> factoring = new HashMap<>();
-    private Map<String,String> factor_description = new HashMap<>();
+    private String user_id;
+    private String phone_number;
+    private String portedStatus;
+    private CarrierInfo carrierInfo;
 
 
-    public String getMethod() {
-        return method;
+    public String getUser_id() {
+        return user_id;
     }
 
-    public void setMethod(String method) {
-        this.method = method;
+    public void setUser_id(String user_id) {
+        this.user_id = user_id;
     }
 
-    public String getIp() {
-        return ip;
+    public String getPhone_number() {
+        return phone_number;
     }
 
-    public void setIp(String ip) {
-        this.ip = ip;
+    public void setPhone_number(String phone_number) {
+        this.phone_number = phone_number;
     }
 
-    public int getRisk_factor() {
-        return risk_factor;
+    public String getPortedStatus() {
+        return portedStatus;
     }
 
-    public void setRisk_factor(int risk_factor) {
-        this.risk_factor = risk_factor;
+    public void setPortedStatus(String portedStatus) {
+        this.portedStatus = portedStatus;
     }
 
-    public String getRisk_color() {
-        return risk_color;
+    public CarrierInfo getCarrierInfo() {
+        return carrierInfo;
     }
 
-    public void setRisk_color(String risk_color) {
-        this.risk_color = risk_color;
+    public void setCarrierInfo(CarrierInfo carrierInfo) {
+        this.carrierInfo = carrierInfo;
     }
 
-    public String getRisk_desc() {
-        return risk_desc;
+    @Override
+    public String toString(){
+        return JSONUtil.convertObjectToJSON(this);
     }
-
-    public void setRisk_desc(String risk_desc) {
-        this.risk_desc = risk_desc;
-    }
-
-    public Geoloc getGeoloc() {
-        return geoloc;
-    }
-
-    public void setGeoloc(Geoloc geoloc) {
-        this.geoloc = geoloc;
-    }
-
-    public Map<String, String> getFactoring() {
-        return factoring;
-    }
-
-    public void setFactoring(Map<String, String> factoring) {
-        this.factoring = factoring;
-    }
-
-    public Map<String, String> getFactor_description() {
-        return factor_description;
-    }
-    
-    public void setFactor_description(Map<String, String> factor_description) {
-        this.factor_description = factor_description;
-    }
-
-
 
 }

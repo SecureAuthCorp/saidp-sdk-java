@@ -1,24 +1,41 @@
 buildscript {
     repositories {
         mavenCentral()
+        jcenter()
+    }
+    dependencies {
+        classpath "org.jfrog.buildinfo:build-info-extractor-gradle:4.0.0"
     }
 }
 
 apply plugin: 'java'
 apply plugin: 'maven'
-
+apply plugin: 'maven-publish'
+apply plugin: 'com.jfrog.artifactory'
 
 group = 'org.secureauth.sarestapi'
-
-version = '1.0.0'
-jar {
-    baseName = 'saRestApi'
-}
+version = currentVersion
 
 repositories {
     mavenCentral()
 }
 
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+        }
+    }
+}
+
+artifactory {
+  publish {
+    defaults {
+            publications('mavenJava')
+            publishArtifacts = true
+    }
+  }
+}
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
@@ -29,6 +46,7 @@ dependencies {
     compile('commons-codec:commons-codec:1.10')
     compile('org.slf4j:slf4j-api:1.7.13')
 }
+
 task copyToLib(type: Copy){
     into "$buildDir/libs"
     from configurations.runtime

@@ -1,13 +1,10 @@
-package org.secureauth.sarestapi.data;
+package org.secureauth.sarestapi.queries;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import org.secureauth.sarestapi.util.JSONUtil;
-
-
-import javax.xml.bind.annotation.XmlRootElement;
+import org.secureauth.sarestapi.resources.s;
 
 /**
  * @author rrowcliffe@secureauth.com
+ *
  *
 Copyright (c) 2015, SecureAuth
 All rights reserved.
@@ -23,30 +20,16 @@ Redistribution and use in source and binary forms, with or without modification,
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
 IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
 OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-**/
+ */
 
-@XmlRootElement(name="factoring")
-@JsonInclude(JsonInclude.Include.NON_NULL)
-public class Factoring {
+public class NumberProfileQuery {
 
-        private int threatType;
-        private int threatCategory;
 
-        public int getThreatType() {
-                return threatType;
-        }
-
-        public void setThreatType(int threatType) {
-                this.threatType = threatType;
-        }
-
-        public int getThreatCategory() {
-                return threatCategory;
-        }
-
-        public void setThreatCategory(int threatCategory) {
-                this.threatCategory = threatCategory;
-        }
+    public static String queryNumberProfile(String realm){
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append(realm).append(s.APPLIANCE_NUMBERPROFILE);
+        return stringBuilder.toString();
+    }
 
 
 }

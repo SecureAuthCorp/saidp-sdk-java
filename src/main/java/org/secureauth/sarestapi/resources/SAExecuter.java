@@ -132,13 +132,13 @@ public class SAExecuter {
                     header("Authorization", auth).
                     header("X-SA-Date", ts).
                     get();
-          genericResponse = response.readEntity(valueType);
-
+            genericResponse = response.readEntity(valueType);
+            response.close();
         }catch(Exception e){
             logger.error(new StringBuilder().append("Exception Get Request: \nQuery:\n\t")
-                    .append(query).append("\nError:").append(e.getMessage()).append(".\nResponse code is ").append(response.getStatus()).toString(), e);
+                    .append(query).append("\nError:").append(e.getMessage()).toString(), e);
         }
-        response.close();
+
         return genericResponse;
 
     }
@@ -165,12 +165,12 @@ public class SAExecuter {
                     post(Entity.entity(JSONUtil.convertObjectToJSON(authRequest),MediaType.APPLICATION_JSON));
 
             responseObject = response.readEntity(BaseResponse.class);
-
+            response.close();
         }catch(Exception e){
             logger.error(new StringBuilder().append("Exception Validating User: \nQuery:\n\t")
-                    .append(query).append("\nError: \n\t").append((String) response.readEntity(String.class)).append(".\nResponse code is ").append(response.getStatus()).toString(), e);
+                    .append(query).append("\nError: \n\t").toString(), e);
         }
-        response.close();
+
         return responseObject;
 
     }
@@ -194,12 +194,12 @@ public class SAExecuter {
                     header("X-SA-Date", ts).
                     post(Entity.entity(JSONUtil.convertObjectToJSON(authRequest), MediaType.APPLICATION_JSON));
             responseObject=response.readEntity(BaseResponse.class);
-
+            response.close();
         }catch(Exception e){
             logger.error(new StringBuilder().append("Exception Validating User Password: \nQuery:\n\t")
-                    .append(query).append("\nError:").append(e.getMessage()).append(".\nResponse code is ").append(response.getStatus()).toString(), e);
+                    .append(query).append("\nError:").append(e.getMessage()).toString(), e);
         }
-        response.close();
+
         return responseObject;
 
     }
@@ -223,12 +223,12 @@ public class SAExecuter {
                     header("X-SA-Date", ts).
                     post(Entity.entity(JSONUtil.convertObjectToJSON(authRequest), MediaType.APPLICATION_JSON));
             responseObject=response.readEntity(BaseResponse.class);
-
+            response.close();
         }catch(Exception e){
             logger.error(new StringBuilder().append("Exception Validating User Password: \nQuery:\n\t")
-                    .append(query).append("\nError:").append(e.getMessage()).append(".\nResponse code is ").append(response.getStatus()).toString(), e);
+                    .append(query).append("\nError:").append(e.getMessage()).toString(), e);
         }
-        response.close();
+
         return responseObject;
 
     }
@@ -253,12 +253,12 @@ public class SAExecuter {
                     post(Entity.entity(JSONUtil.convertObjectToJSON(authRequest), MediaType.APPLICATION_JSON));
 
             responseObject=response.readEntity(BaseResponse.class);
-
+            response.close();
         }catch(Exception e){
             logger.error(new StringBuilder().append("Exception Validating KBA: \nQuery:\n\t")
-                    .append(query).append("\nError:").append(e.getMessage()).append(".\nResponse code is ").append(response.getStatus()).toString(), e);
+                    .append(query).append("\nError:").append(e.getMessage()).toString(), e);
         }
-        response.close();
+
         return responseObject;
 
     }
@@ -283,12 +283,12 @@ public class SAExecuter {
                     post(Entity.entity(JSONUtil.convertObjectToJSON(authRequest), MediaType.APPLICATION_JSON));
 
             responseObject=response.readEntity(BaseResponse.class);
-
+            response.close();
         }catch(Exception e){
             logger.error(new StringBuilder().append("Exception Validating OATH: \nQuery:\n\t")
-                    .append(query).append("\nError:").append(e.getMessage()).append(".\nResponse code is ").append(response.getStatus()).toString(), e);
+                    .append(query).append("\nError:").append(e.getMessage()).toString(), e);
         }
-        response.close();
+
         return responseObject;
 
     }
@@ -315,12 +315,12 @@ public class SAExecuter {
 
             responseObject=response.readEntity(ResponseObject.class);
 
-
+            response.close();
         }catch(Exception e){
             logger.error(new StringBuilder().append("Exception Delivering OTP by Phone: \nQuery:\n\t")
-                    .append(query).append("\nError:").append(e.getMessage()).append(".\nResponse code is ").append(response.getStatus()).toString(), e);
+                    .append(query).append("\nError:").append(e.getMessage()).toString(), e);
         }
-        response.close();
+
         return responseObject;
 
     }
@@ -345,12 +345,12 @@ public class SAExecuter {
                     post(Entity.entity(JSONUtil.convertObjectToJSON(authRequest), MediaType.APPLICATION_JSON));
 
             responseObject=response.readEntity(ResponseObject.class);
-
+            response.close();
         }catch(Exception e){
             logger.error(new StringBuilder().append("Exception Delivering OTP by SMS: \nQuery:\n\t")
-                    .append(query).append("\nError:").append(e.getMessage()).append(".\nResponse code is ").append(response.getStatus()).toString(), e);
+                    .append(query).append("\nError:").append(e.getMessage()).toString(), e);
         }
-        response.close();
+
         return responseObject;
 
     }
@@ -376,12 +376,12 @@ public class SAExecuter {
 
             responseObject=response.readEntity(ResponseObject.class);
 
-
+            response.close();
         }catch(Exception e){
             logger.error(new StringBuilder().append("Exception Delivering OTP by Email: \nQuery:\n\t")
-                    .append(query).append("\nError:").append(e.getMessage()).append(".\nResponse code is ").append(response.getStatus()).toString(), e);
+                    .append(query).append("\nError:").append(e.getMessage()).toString(), e);
         }
-        response.close();
+
         return responseObject;
 
     }
@@ -406,12 +406,12 @@ public class SAExecuter {
                     post(Entity.entity(JSONUtil.convertObjectToJSON(authRequest),MediaType.APPLICATION_JSON));
 
             responseObject=response.readEntity(valueType);
-
+            response.close();
         }catch(Exception e){
             logger.error(new StringBuilder().append("Exception Delivering OTP by Push: \nQuery:\n\t")
-                    .append(query).append("\nError:").append(e.getMessage()).append(".\nResponse code is ").append(response.getStatus()).toString(), e);
+                    .append(query).append("\nError:").append(e.getMessage()).toString(), e);
         }
-        response.close();
+
         return responseObject;
 
     }
@@ -437,12 +437,12 @@ public class SAExecuter {
 
             responseObject=response.readEntity(ResponseObject.class);
 
-
+            response.close();
         }catch(Exception e){
             logger.error(new StringBuilder().append("Exception Delivering OTP by HelpDesk: \nQuery:\n\t")
-                    .append(query).append("\nError:").append(e.getMessage()).append(".\nResponse code is ").append(response.getStatus()).toString(), e);
+                    .append(query).append("\nError:").append(e.getMessage()).toString(), e);
         }
-        response.close();
+
         return responseObject;
 
     }
@@ -472,12 +472,12 @@ public class SAExecuter {
 
             ipEval = response.readEntity(IPEval.class);
 
-
+            response.close();
         }catch(Exception e){
             logger.error(new StringBuilder().append("Exception Running IP Evaluation: \nQuery:\n\t")
-                    .append(query).append("\nError:").append(e.getMessage()).append(".\nResponse code is ").append(response.getStatus()).toString(), e);
+                    .append(query).append("\nError:").append(e.getMessage()).toString(), e);
         }
-        response.close();
+
         return ipEval;
 
     }
@@ -503,12 +503,12 @@ public class SAExecuter {
 
             accessHistory = response.readEntity(ResponseObject.class);
 
-
+            response.close();
         }catch(Exception e){
             logger.error(new StringBuilder().append("Exception Running Access History POST: \nQuery:\n\t")
-                    .append(query).append("\nError:").append(e.getMessage()).append(".\nResponse code is ").append(response.getStatus()).toString(), e);
+                    .append(query).append("\nError:").append(e.getMessage()).toString(), e);
         }
-        response.close();
+
         return accessHistory;
 
     }
@@ -532,12 +532,12 @@ public class SAExecuter {
                     post(Entity.entity(JSONUtil.convertObjectToJSON(dfpValidateRequest),MediaType.APPLICATION_JSON));
 
             dfpValidateResponse = response.readEntity(DFPValidateResponse.class);
-
+            response.close();
         }catch(Exception e){
             logger.error(new StringBuilder().append("Exception Running Access History POST: \nQuery:\n\t")
-                    .append(query).append("\nError:").append(e.getMessage()).append(".\nResponse code is ").append(response.getStatus()).toString(), e);
+                    .append(query).append("\nError:").append(e.getMessage()).toString(), e);
         }
-        response.close();
+
         return dfpValidateResponse;
 
     }
@@ -564,12 +564,12 @@ public class SAExecuter {
 
             dfpConfirmResponse = response.readEntity(DFPConfirmResponse.class);
 
-
+            response.close();
         }catch(Exception e){
             logger.error(new StringBuilder().append("Exception Running DFP Confirm POST: \nQuery:\n\t")
-                    .append(query).append("\nError:").append(e.getMessage()).append(".\nResponse code is ").append(response.getStatus()).toString(), e);
+                    .append(query).append("\nError:").append(e.getMessage()).toString(), e);
         }
-        response.close();
+
         return dfpConfirmResponse;
 
     }
@@ -592,12 +592,12 @@ public class SAExecuter {
                     header("X-SA-Date", ts).
                     get();
             jsObjectResponse = response.readEntity(valueType);
-
+            response.close();
         }catch(Exception e){
             logger.error(new StringBuilder().append("Exception getting JS Object SRC: \nQuery:\n\t")
-                    .append(query).append("\nError:").append(e.getMessage()).append(".\nResponse code is ").append(response.getStatus()).toString(), e);
+                    .append(query).append("\nError:").append(e.getMessage()).toString(), e);
         }
-        response.close();
+
         return jsObjectResponse;
 
     }
@@ -623,12 +623,12 @@ public class SAExecuter {
 
             behaveBioResponse = response.readEntity(BehaveBioResponse.class);
 
-
+            response.close();
         }catch(Exception e){
             logger.error(new StringBuilder().append("Exception Running BehaveBio POST: \nQuery:\n\t")
-                    .append(query).append("\nError:").append(e.getMessage()).append(".\nResponse code is ").append(response.getStatus()).toString(), e);
+                    .append(query).append("\nError:").append(e.getMessage()).toString(), e);
         }
-        response.close();
+
         return behaveBioResponse;
 
     }
@@ -654,12 +654,12 @@ public class SAExecuter {
 
             behaveBioResponse = response.readEntity(ResponseObject.class);
 
-
+            response.close();
         }catch(Exception e){
             logger.error(new StringBuilder().append("Exception Running BehaveBio POST: \nQuery:\n\t")
-                    .append(query).append("\nError:").append(e.getMessage()).append(".\nResponse code is ").append(response.getStatus()).toString(), e);
+                    .append(query).append("\nError:").append(e.getMessage()).toString(), e);
         }
-        response.close();
+
         return behaveBioResponse;
 
     }
@@ -685,12 +685,12 @@ public class SAExecuter {
 
             passwordResetResponse = response.readEntity(ResponseObject.class);
 
-
+            response.close();
         }catch(Exception e){
             logger.error(new StringBuilder().append("Exception Running Password Reset POST: \nQuery:\n\t")
-                    .append(query).append("\nError:").append(e.getMessage()).append(".\nResponse code is ").append(response.getStatus()).toString(), e);
+                    .append(query).append("\nError:").append(e.getMessage()).toString(), e);
         }
-        response.close();
+
         return passwordResetResponse;
 
     }
@@ -716,12 +716,12 @@ public class SAExecuter {
 
             passwordChangeResponse = response.readEntity(ResponseObject.class);
 
-
+            response.close();
         }catch(Exception e){
             logger.error(new StringBuilder().append("Exception Running Password Reset POST: \nQuery:\n\t")
-                    .append(query).append("\nError:").append(e.getMessage()).append(".\nResponse code is ").append(response.getStatus()).toString(), e);
+                    .append(query).append("\nError:").append(e.getMessage()).toString(), e);
         }
-        response.close();
+
         return passwordChangeResponse;
 
     }
@@ -746,12 +746,12 @@ public class SAExecuter {
                     put(Entity.entity(JSONUtil.convertObjectToJSON(userProfile), MediaType.APPLICATION_JSON));
 
             responseObject=response.readEntity(valueType);
-
+            response.close();
         }catch(Exception e){
             logger.error(new StringBuilder().append("Exception Updating User Profile: \nQuery:\n\t")
-                    .append(query).append("\nError:").append(e.getMessage()).append(".\nResponse code is ").append(response.getStatus()).toString(), e);
+                    .append(query).append("\nError:").append(e.getMessage()).toString(), e);
         }
-        response.close();
+
         return responseObject;
 
     }
@@ -776,12 +776,12 @@ public class SAExecuter {
                     post(Entity.entity(JSONUtil.convertObjectToJSON(newUserProfile),MediaType.APPLICATION_JSON));
 
             responseObject=response.readEntity(valueType);
-
+            response.close();
         }catch(Exception e){
             logger.error(new StringBuilder().append("Exception Creating User Profile: \nQuery:\n\t")
-                    .append(query).append("\nError:").append(e.getMessage()).append(".\nResponse code is ").append(response.getStatus()).toString(), e);
+                    .append(query).append("\nError:").append(e.getMessage()).toString(), e);
         }
-        response.close();
+
         return responseObject;
 
     }
@@ -804,12 +804,12 @@ public class SAExecuter {
                     header("X-SA-Date", ts).
                     post(Entity.entity("",MediaType.APPLICATION_JSON));
             genericResponse = response.readEntity(valueType);
-
+            response.close();
         }catch(Exception e){
             logger.error(new StringBuilder().append("Exception Adding user to Group: \nQuery:\n\t")
-                    .append(query).append("\nError:").append(e.getMessage()).append(".\nResponse code is ").append(response.getStatus()).toString(), e);
+                    .append(query).append("\nError:").append(e.getMessage()).toString(), e);
         }
-        response.close();
+
         return genericResponse;
 
     }
@@ -834,12 +834,12 @@ public class SAExecuter {
                     post(Entity.entity(JSONUtil.convertObjectToJSON(usersToGroup),MediaType.APPLICATION_JSON));
 
             responseObject=response.readEntity(valueType);
-
+            response.close();
         }catch(Exception e){
             logger.error(new StringBuilder().append("Exception Associating Users to Group: \nQuery:\n\t")
-                    .append(query).append("\nError:").append(e.getMessage()).append(".\nResponse code is ").append(response.getStatus()).toString(), e);
+                    .append(query).append("\nError:").append(e.getMessage()).toString(), e);
         }
-        response.close();
+
         return responseObject;
 
     }
@@ -862,12 +862,12 @@ public class SAExecuter {
                     header("X-SA-Date", ts).
                     post(Entity.entity("",MediaType.APPLICATION_JSON));
             genericResponse = response.readEntity(valueType);
-
+            response.close();
         }catch(Exception e){
             logger.error(new StringBuilder().append("Exception Adding Group to User: \nQuery:\n\t")
-                    .append(query).append("\nError:").append(e.getMessage()).append(".\nResponse code is ").append(response.getStatus()).toString(), e);
+                    .append(query).append("\nError:").append(e.getMessage()).toString(), e);
         }
-        response.close();
+
         return genericResponse;
 
     }
@@ -892,14 +892,77 @@ public class SAExecuter {
                     post(Entity.entity(JSONUtil.convertObjectToJSON(userToGroups),MediaType.APPLICATION_JSON));
 
             responseObject=response.readEntity(valueType);
-
+            response.close();
         }catch(Exception e){
             logger.error(new StringBuilder().append("Exception Associating Users to Group: \nQuery:\n\t")
-                    .append(query).append("\nError:").append(e.getMessage()).append(".\nResponse code is ").append(response.getStatus()).toString(), e);
+                    .append(query).append("\nError:").append(e.getMessage()).toString(), e);
         }
-        response.close();
+
         return responseObject;
 
     }
+
+    //Run NumberProfile Post
+    public NumberProfileResponse executeNumberProfilePost(String auth, String query, NumberProfileRequest numberProfileRequest, String ts)throws Exception{
+
+        if(client == null) {
+            createConnection();
+        }
+
+        WebTarget target = null;
+        Response response = null;
+        NumberProfileResponse numberProfileResponse =null;
+        try{
+            target = client.target(query);
+
+            response = target.request().
+                    accept(MediaType.APPLICATION_JSON).
+                    header("Authorization", auth).
+                    header("X-SA-Date", ts).
+                    post(Entity.entity(JSONUtil.convertObjectToJSON(numberProfileRequest),MediaType.APPLICATION_JSON));
+
+            numberProfileResponse = response.readEntity(NumberProfileResponse.class);
+
+            response.close();
+        }catch(Exception e){
+            logger.error(new StringBuilder().append("Exception Running NumberProfile POST: \nQuery:\n\t")
+                    .append(query).append("\nError:").append(e.getMessage()).toString(), e);
+        }
+
+        return numberProfileResponse;
+
+    }
+
+    //Run Number Profile Put
+    public BaseResponse executeNumberProfileUpdate(String auth, String query, NumberProfileUpdateRequest numberProfileUpdateRequest, String ts)throws Exception{
+
+        if(client == null) {
+            createConnection();
+        }
+
+        WebTarget target = null;
+        Response response = null;
+        BaseResponse numberProfileUpdateResponse =null;
+        try{
+            target = client.target(query);
+
+            response = target.request().
+                    accept(MediaType.APPLICATION_JSON).
+                    header("Authorization", auth).
+                    header("X-SA-Date", ts).
+                    put(Entity.entity(JSONUtil.convertObjectToJSON(numberProfileUpdateRequest),MediaType.APPLICATION_JSON));
+
+            numberProfileUpdateResponse = response.readEntity(BaseResponse.class);
+
+            response.close();
+        }catch(Exception e){
+            logger.error(new StringBuilder().append("Exception Running NumberProfile POST: \nQuery:\n\t")
+                    .append(query).append("\nError:").append(e.getMessage()).toString(), e);
+        }
+
+        return numberProfileUpdateResponse;
+
+    }
+
 
 }

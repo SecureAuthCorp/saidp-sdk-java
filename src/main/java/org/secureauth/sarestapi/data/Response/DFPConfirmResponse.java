@@ -32,7 +32,7 @@ public class DFPConfirmResponse extends BaseResponse{
 
     private String fingerprint_id;
     private String fingerprint_name;
-    private String user_id;
+
 
 
     public String getFingerprint_id() {
@@ -43,13 +43,6 @@ public class DFPConfirmResponse extends BaseResponse{
         this.fingerprint_id = fingerprint_id;
     }
 
-    public String getUser_id() {
-        return user_id;
-    }
-
-    public void setUser_id(String user_id) {
-        this.user_id = user_id;
-    }
 
     public String getFingerprint_name() {
         return fingerprint_name;

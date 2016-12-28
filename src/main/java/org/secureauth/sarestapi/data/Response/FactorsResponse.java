@@ -18,16 +18,7 @@ import java.util.ArrayList;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class FactorsResponse extends BaseResponse{
 
-    private String user_id;
     private ArrayList<Factors> factors = new ArrayList<Factors>();
-
-    public String getUser_id() {
-        return user_id;
-    }
-
-    public void setUser_id(String user_id) {
-        this.user_id = user_id;
-    }
 
     public ArrayList<Factors> getFactors() {
         return factors;

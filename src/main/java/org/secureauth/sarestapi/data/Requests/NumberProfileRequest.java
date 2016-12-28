@@ -1,9 +1,7 @@
-package org.secureauth.sarestapi.data.Response;
+package org.secureauth.sarestapi.data.Requests;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import org.secureauth.sarestapi.data.Response.BaseResponse;
 import org.secureauth.sarestapi.util.JSONUtil;
-
 
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -25,33 +23,33 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
 OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
 @XmlRootElement
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class ResponseObject extends BaseResponse {
+public class NumberProfileRequest {
+
+    private String user_id;
+    private String phone_number;
 
 
-    private String reference_id;
-    private int otp;
-
-    public int getOtp() {
-        return otp;
+    public String getUser_id() {
+        return user_id;
     }
 
-    public void setOtp(int otp) {
-        this.otp = otp;
+    public void setUser_id(String user_id) {
+        this.user_id = user_id;
     }
 
-	public String getReference_id() {
-		return reference_id;
-	}
+    public String getPhone_number() {
+        return phone_number;
+    }
 
-	public void setReference_id(String reference_id) {
-		this.reference_id = reference_id;
-	}
+    public void setPhone_number(String phone_number) {
+        this.phone_number = phone_number;
+    }
 
     @Override
     public String toString(){
         return JSONUtil.convertObjectToJSON(this);
     }
+
 }
