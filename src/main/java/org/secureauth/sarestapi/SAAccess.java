@@ -1020,7 +1020,7 @@ import org.slf4j.LoggerFactory;
      * @return {@link NumberProfileResponse}
      *
      */
-    public NumberProfileResponse NumberProfileSubmit(String userid, String phone_number){
+    public NumberProfileResponse PhoneNumberProfileSubmit(String userid, String phone_number){
         String ts = getServerTime();
         RestApiHeader restApiHeader =new RestApiHeader();
         NumberProfileRequest numberProfileRequest = new NumberProfileRequest();
