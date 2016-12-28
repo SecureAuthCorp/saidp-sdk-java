@@ -39,11 +39,11 @@ public class CurrentCarrier {
 
     /**
      *
-     * @param networkType
-     * @param carrierStatus
-     * @param countryCode
-     * @param carrier
-     * @param carrierCode
+     * @param networkType phone connection source (landline, tollfree, mobile, virtual, unknown, landline_tollfree)
+     * @param carrierStatus conatains status and reason for the status
+     * @param countryCode 2-character country code
+     * @param carrier name of the carrier or a concatenation of the country code and phone type
+     * @param carrierCode 6-digit number or a concatenation of the country code and phone type
      */
     public CurrentCarrier(String carrierCode, String carrier, String countryCode, String networkType, CarrierStatus carrierStatus) {
         super();

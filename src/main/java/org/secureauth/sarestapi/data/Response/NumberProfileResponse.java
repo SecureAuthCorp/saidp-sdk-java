@@ -31,7 +31,7 @@ public class NumberProfileResponse extends BaseResponse{
 
     /**
      *
-     * @param numberProfileResult
+     * @param numberProfileResult Result of request The Actual Object of Data
      */
     public NumberProfileResponse(NumberProfileResult numberProfileResult) {
         super();
