@@ -14,13 +14,13 @@ public class AdaptiveAuthenticationImpl implements AdaptiveAuthenticationInterfa
     @Override
     public IPEval ipThreatCheck(SAAccess saAccess, String userid, String ip_address) {
         IPEval ipEval = saAccess.iPEvaluation(userid, ip_address);
-        System.out.println("Start IPEvaluation  +++++++++++++++++");
+        //System.out.println("Start IPEvaluation  +++++++++++++++++");
         if (ipEval != null) {
             System.out.println(ipEval.toString());
         } else {
             System.out.println("If you See this then Something went Wrong!!");
         }
-        System.out.println("End IPEvaluation  +++++++++++++++++");
+       // System.out.println("End IPEvaluation  +++++++++++++++++");
         return ipEval;
     }
 

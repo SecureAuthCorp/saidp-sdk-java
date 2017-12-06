@@ -46,6 +46,8 @@ public class s {
     public static final String APPLIANCE_BEHAVEBIO="/api/" + API_VERSION + "/behavebio";
     public static final String APPLIANCE_BEHAVEBIO_JS=APPLIANCE_BEHAVEBIO + "/js";
     public static final String APPLIANCE_NUMBERPROFILE="/api/" + API_VERSION + "/numberprofile";
+    public static final String APPLIANCE_OTP="/api/" + API_VERSION + "/otp";
+    public static final String APPLIANCE_OTP_VALIDATE=APPLIANCE_OTP + "/validate";
 
 
     public static final String STATUS_INVALID="invalid";

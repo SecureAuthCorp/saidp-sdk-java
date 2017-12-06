@@ -4,6 +4,7 @@ package org.secureauth.sarestapi.util;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
+import org.secureauth.sarestapi.data.DFP.DFP;
 import org.secureauth.sarestapi.data.Requests.DFPValidateRequest;
 
 import java.io.IOException;
@@ -30,7 +31,7 @@ OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
 
 public class JSONUtil {
 
-    public JSONUtil (){}
+    public JSONUtil(){}
 
      public static String convertObjectToJSON(Object object){
         ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
@@ -60,5 +61,23 @@ public class JSONUtil {
         }
 
         return dfpValidateRequest;
+    }
+
+    public static DFP getDFPFromJSONString(String dfpJsonString){
+        ObjectMapper mapper = new ObjectMapper();
+        StringBuilder stringBuilder = new StringBuilder();
+        DFP dfp = new DFP();
+
+        try{
+            dfp = mapper.readValue(dfpJsonString,DFP.class);
+
+
+        }catch(JsonProcessingException jpe){
+            jpe.printStackTrace();
+        }catch(IOException ie){
+            ie.printStackTrace();
+        }
+
+        return dfp;
     }
 }

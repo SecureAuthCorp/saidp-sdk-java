@@ -278,9 +278,9 @@ public class SAExecuter {
             target = client.target(query);
             response = target.request()
                     .accept(MediaType.APPLICATION_JSON).
-                    header("Authorization", auth).
-                    header("X-SA-Date", ts).
-                    post(Entity.entity(JSONUtil.convertObjectToJSON(authRequest), MediaType.APPLICATION_JSON));
+                            header("Authorization", auth).
+                            header("X-SA-Date", ts).
+                            post(Entity.entity(JSONUtil.convertObjectToJSON(authRequest), MediaType.APPLICATION_JSON));
 
             responseObject=response.readEntity(BaseResponse.class);
             response.close();
@@ -309,9 +309,9 @@ public class SAExecuter {
             response = target.request().
                     accept(MediaType.APPLICATION_JSON).
                     //type(MediaType.APPLICATION_JSON).
-                    header("Authorization", auth).
-                    header("X-SA-Date", ts).
-                    post(Entity.entity(JSONUtil.convertObjectToJSON(authRequest), MediaType.APPLICATION_JSON));
+                            header("Authorization", auth).
+                            header("X-SA-Date", ts).
+                            post(Entity.entity(JSONUtil.convertObjectToJSON(authRequest), MediaType.APPLICATION_JSON));
 
             responseObject=response.readEntity(ResponseObject.class);
 
@@ -340,9 +340,9 @@ public class SAExecuter {
             target = client.target(query);
             response = target.request()
                     .accept(MediaType.APPLICATION_JSON).
-                    header("Authorization", auth).
-                    header("X-SA-Date", ts).
-                    post(Entity.entity(JSONUtil.convertObjectToJSON(authRequest), MediaType.APPLICATION_JSON));
+                            header("Authorization", auth).
+                            header("X-SA-Date", ts).
+                            post(Entity.entity(JSONUtil.convertObjectToJSON(authRequest), MediaType.APPLICATION_JSON));
 
             responseObject=response.readEntity(ResponseObject.class);
             response.close();
@@ -386,7 +386,7 @@ public class SAExecuter {
 
     }
 
-     // post request
+    // post request
     public <T> T executePostRequest(String auth,String query, AuthRequest authRequest,String ts, Class<T> valueType)throws Exception{
 
         if(client == null) {
@@ -413,6 +413,37 @@ public class SAExecuter {
         }
 
         return responseObject;
+
+    }
+
+    //VALIDATE OTP by using IDP EndPoint
+    public ValidateOTPResponse executeValidateOTP(String auth, String query, ValidateOTPRequest validateOTPRequest, String ts)throws Exception{
+
+        if(client == null) {
+            createConnection();
+        }
+
+        WebTarget target = null;
+        Response response = null;
+        ValidateOTPResponse validateOTPResponse =null;
+        try{
+            target = client.target(query);
+
+            response = target.request().
+                    accept(MediaType.APPLICATION_JSON).
+                    header("Authorization", auth).
+                    header("X-SA-Date", ts).
+                    post(Entity.entity(JSONUtil.convertObjectToJSON(validateOTPRequest),MediaType.APPLICATION_JSON));
+
+            validateOTPResponse = response.readEntity(ValidateOTPResponse.class);
+
+            response.close();
+        }catch(Exception e){
+            logger.error(new StringBuilder().append("Exception Running Validate OTP POST: \nQuery:\n\t")
+                    .append(query).append("\nError:").append(e.getMessage()).toString(), e);
+        }
+
+        return validateOTPResponse;
 
     }
 
