@@ -1,7 +1,6 @@
 package org.secureauth.sarestapi.data;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.sun.javafx.collections.MappingChange;
 import org.secureauth.sarestapi.util.JSONUtil;
 
 
