@@ -1,6 +1,7 @@
 package org.secureauth.sarestapi.data;
 
 import org.codehaus.jackson.map.annotate.JsonSerialize;
+import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.secureauth.sarestapi.resources.s;
 
 import javax.xml.bind.annotation.XmlRootElement;
@@ -10,7 +11,7 @@ import java.util.ArrayList;
  * @author rrowcliffe@secureauth.com
  *
  *
- * Copyright 2015 SecureAuth Corporation
+ * Copyright 2018 SecureAuth Corporation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,6 +28,7 @@ import java.util.ArrayList;
  */
 @XmlRootElement(name= s.FACTORS)
 @JsonSerialize(include=JsonSerialize.Inclusion.NON_NULL)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Factors {
 
     private String type;

@@ -10,7 +10,7 @@ apply plugin: 'maven'
 
 group = 'com.secureauth.api'
 
-version = '0.9.0'
+version = '0.9.1'
 jar {
     baseName = 'saRestApi'
 }
