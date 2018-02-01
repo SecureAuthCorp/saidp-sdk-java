@@ -8,9 +8,8 @@ apply plugin: 'java'
 apply plugin: 'eclipse'
 apply plugin: 'maven'
 
-group = 'com.secureauth.api'
-
-version = '0.9.1'
+group = 'org.secureauth.sarestapi'
+version = currentVersion
 jar {
     baseName = 'saRestApi'
 }
@@ -28,6 +27,22 @@ dependencies {
     compile('commons-codec:commons-codec:1.10')
     compile('org.slf4j:slf4j-api:1.7.13')
 }
+
+task copyToLib(type: Copy){
+    into "$buildDir/libs"
+    from configurations.runtime
+}
+
+task generate_zip(type: Zip) {
+   description 'Generates a zip file containing the docs and libs directories.'
+   from "$buildDir"
+   include('libs/', 'docs/')
+   archiveName "saidp-sdk-java-${version}.zip"
+}
+
+build.dependsOn(copyToLib)
+build.dependsOn(javadoc)
+generate_zip.dependsOn(build)
 
 task wrapper(type: Wrapper) {
     gradleVersion = '2.7'
