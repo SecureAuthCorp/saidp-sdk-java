@@ -45,17 +45,17 @@ import java.util.Map;
 public class Fingerprint_ {
 
     @JsonProperty("uaBrowser")
-    private DFP.UaBrowser uaBrowser;
+    private UaBrowser uaBrowser;
     @JsonProperty("uaString")
     private String uaString;
     @JsonProperty("uaDevice")
-    private DFP.UaDevice uaDevice;
+    private UaDevice uaDevice;
     @JsonProperty("uaEngine")
     private UaEngine uaEngine;
     @JsonProperty("uaOS")
-    private DFP.UaOS uaOS;
+    private UaOS uaOS;
     @JsonProperty("uaCPU")
-    private DFP.UaCPU uaCPU;
+    private UaCPU uaCPU;
     @JsonProperty("uaPlatform")
     private String uaPlatform;
     @JsonProperty("language")
@@ -105,7 +105,7 @@ public class Fingerprint_ {
     @JsonProperty("userTamperBrowser")
     private Boolean userTamperBrowser;
     @JsonProperty("touchSupport")
-    private DFP.TouchSupport touchSupport;
+    private TouchSupport touchSupport;
     @JsonProperty("cookieSupport")
     private Boolean cookieSupport;
     @JsonProperty("fonts")
@@ -114,12 +114,12 @@ public class Fingerprint_ {
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
     @JsonProperty("uaBrowser")
-    public DFP.UaBrowser getUaBrowser() {
+    public UaBrowser getUaBrowser() {
         return uaBrowser;
     }
 
     @JsonProperty("uaBrowser")
-    public void setUaBrowser(DFP.UaBrowser uaBrowser) {
+    public void setUaBrowser(UaBrowser uaBrowser) {
         this.uaBrowser = uaBrowser;
     }
 
@@ -134,12 +134,12 @@ public class Fingerprint_ {
     }
 
     @JsonProperty("uaDevice")
-    public DFP.UaDevice getUaDevice() {
+    public UaDevice getUaDevice() {
         return uaDevice;
     }
 
     @JsonProperty("uaDevice")
-    public void setUaDevice(DFP.UaDevice uaDevice) {
+    public void setUaDevice(UaDevice uaDevice) {
         this.uaDevice = uaDevice;
     }
 
@@ -154,22 +154,22 @@ public class Fingerprint_ {
     }
 
     @JsonProperty("uaOS")
-    public DFP.UaOS getUaOS() {
+    public UaOS getUaOS() {
         return uaOS;
     }
 
     @JsonProperty("uaOS")
-    public void setUaOS(DFP.UaOS uaOS) {
+    public void setUaOS(UaOS uaOS) {
         this.uaOS = uaOS;
     }
 
     @JsonProperty("uaCPU")
-    public DFP.UaCPU getUaCPU() {
+    public UaCPU getUaCPU() {
         return uaCPU;
     }
 
     @JsonProperty("uaCPU")
-    public void setUaCPU(DFP.UaCPU uaCPU) {
+    public void setUaCPU(UaCPU uaCPU) {
         this.uaCPU = uaCPU;
     }
 
@@ -414,12 +414,12 @@ public class Fingerprint_ {
     }
 
     @JsonProperty("touchSupport")
-    public DFP.TouchSupport getTouchSupport() {
+    public TouchSupport getTouchSupport() {
         return touchSupport;
     }
 
     @JsonProperty("touchSupport")
-    public void setTouchSupport(DFP.TouchSupport touchSupport) {
+    public void setTouchSupport(TouchSupport touchSupport) {
         this.touchSupport = touchSupport;
     }
 
