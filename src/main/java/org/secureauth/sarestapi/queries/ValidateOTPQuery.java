@@ -1,9 +1,6 @@
-package org.secureauth.sarestapi.data.Requests;
+package org.secureauth.sarestapi.queries;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import org.secureauth.sarestapi.util.JSONUtil;
-
-import javax.xml.bind.annotation.XmlRootElement;
+import org.secureauth.sarestapi.resources.s;
 
 /**
  * @author rrowcliffe@secureauth.com
@@ -23,42 +20,15 @@ Redistribution and use in source and binary forms, with or without modification,
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
 IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
 OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-**/
+ */
 
-@XmlRootElement
-@JsonInclude(JsonInclude.Include.NON_NULL)
-public class DFPValidateRequest {
+public class ValidateOTPQuery {
 
-    private String user_id;
-    private String host_address;
-    private org.secureauth.sarestapi.data.DFP.DFP fingerprint = new org.secureauth.sarestapi.data.DFP.DFP();
 
-    public String getUser_id() {
-        return user_id;
+    public static String queryValidateOTP(String realm){
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append(realm).append(s.APPLIANCE_OTP_VALIDATE);
+        return stringBuilder.toString();
     }
 
-    public void setUser_id(String user_id) {
-        this.user_id = user_id;
-    }
-
-    public String getHost_address() {
-        return host_address;
-    }
-
-    public void setHost_address(String host_address) {
-        this.host_address = host_address;
-    }
-
-    public org.secureauth.sarestapi.data.DFP.DFP getFingerprint() {
-        return fingerprint;
-    }
-
-    public void setFingerprint(org.secureauth.sarestapi.data.DFP.DFP fingerprint) {
-        this.fingerprint = fingerprint;
-    }
-
-    @Override
-    public String toString(){
-        return JSONUtil.convertObjectToJSON(this);
-    }
 }

@@ -14,5 +14,5 @@ public interface DeviceRecognitionInterface {
 
     DFPConfirmResponse confirmDeviceRecognition(SAAccess saAccess, String userid, String fingerprint_id);
 
-    DFPValidateResponse validateNewDevice(SAAccess saAccess, String userid, String host_address, String jsonString, String accept, String accept_charset, String accept_encoding, String accept_language);
+    DFPValidateResponse validateNewDevice(SAAccess saAccess, String userid, String host_address, String jsonString);
 }

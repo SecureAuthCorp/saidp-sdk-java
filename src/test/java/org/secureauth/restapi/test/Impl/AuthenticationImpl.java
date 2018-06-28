@@ -5,6 +5,7 @@ import org.secureauth.sarestapi.data.PushAcceptStatus;
 import org.secureauth.sarestapi.data.Response.BaseResponse;
 import org.secureauth.sarestapi.data.Response.FactorsResponse;
 import org.secureauth.sarestapi.data.Response.ResponseObject;
+import org.secureauth.sarestapi.data.Response.ValidateOTPResponse;
 import org.secureauth.sarestapi.interfaces.AuthenticationInterface;
 import org.secureauth.sarestapi.resources.s;
 
@@ -61,7 +62,7 @@ public class AuthenticationImpl implements AuthenticationInterface {
     }
 
     @Override
-    public BaseResponse validateOath(SAAccess saAccess,String user, String otp, String factorId) {
+    public BaseResponse validateOath(SAAccess saAccess, String user, String otp, String factorId) {
         BaseResponse responseObject = saAccess.validateOath(user, otp, factorId);
         System.out.println("Start OATH Test+++++++++++++++");
         System.out.println(responseObject.toString());
@@ -134,5 +135,13 @@ public class AuthenticationImpl implements AuthenticationInterface {
         } while ("PENDING".equals(status.getMessage()));
         //break;
         System.out.println("END Push 2 Accept Test+++++++++++++++++++");
+    }
+
+    @Override
+    public ValidateOTPResponse validateOTP(SAAccess saAccess, String user, String otp) {
+        System.out.println("Start Validate OTP EndPoint");
+        ValidateOTPResponse validateOTPResponse = saAccess.validateOTP(user,otp);
+        System.out.println(validateOTPResponse.toString());
+        return validateOTPResponse;
     }
 }
