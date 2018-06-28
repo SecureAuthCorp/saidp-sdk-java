@@ -117,7 +117,7 @@ public class SAAccess {
      * @return {@link FactorsResponse}
      */
     public FactorsResponse factorsByUser(String userid){
-//    	userid = encode(userid);
+    	userid = encode(userid);
         String ts = getServerTime();
         RestApiHeader restApiHeader = new RestApiHeader();
         String header = restApiHeader.getAuthorizationHeader(saAuth,"GET",FactorsQuery.queryFactors(saAuth.getRealm(),userid),ts);
@@ -1146,7 +1146,7 @@ public class SAAccess {
     String getServerTime() {
         Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
         SimpleDateFormat dateFormat = new SimpleDateFormat(
-                "EEE, dd MMM yyyy HH:mm:ss z", Locale.US);
+                "EEE, dd MMM yyyy HH:mm:ss.SSS z", Locale.US);
         dateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
         return dateFormat.format(calendar.getTime());
     }
