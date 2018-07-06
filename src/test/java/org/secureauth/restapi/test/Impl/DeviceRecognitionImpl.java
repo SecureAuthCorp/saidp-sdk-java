@@ -43,9 +43,9 @@ public class DeviceRecognitionImpl implements DeviceRecognitionInterface {
     }
 
     @Override
-    public DFPValidateResponse validateNewDevice(SAAccess saAccess, String userid, String host_address, String jsonString, String accept, String accept_charset, String accept_encoding, String accept_language) {
+    public DFPValidateResponse validateNewDevice(SAAccess saAccess, String userid, String host_address, String jsonString) {
         System.out.println("START Validate DeviceRecognition " + userid + " Request ++++++++");
-        DFPValidateResponse dfpValidateResponse = saAccess.DFPValidateNewFingerprint(userid,host_address,jsonString,accept,accept_charset,accept_encoding,accept_language);
+        DFPValidateResponse dfpValidateResponse = saAccess.DFPValidateNewFingerprint(userid,host_address,jsonString);
         if(dfpValidateResponse != null){
             System.out.println(dfpValidateResponse.toString());
             System.out.println("END Validate DeviceRecognition " + userid + " Request ++++++++");

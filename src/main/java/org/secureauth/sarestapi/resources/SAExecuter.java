@@ -25,6 +25,7 @@ import org.secureauth.sarestapi.data.UserProfile.NewUserProfile;
 import org.secureauth.sarestapi.data.UserProfile.UserToGroups;
 import org.secureauth.sarestapi.data.UserProfile.UsersToGroup;
 import org.secureauth.sarestapi.filters.SACheckRequestFilter;
+import org.secureauth.sarestapi.filters.SAResponseFilter;
 import org.secureauth.sarestapi.util.JSONUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -130,7 +131,7 @@ public class SAExecuter {
             response = target.request().
                     accept(MediaType.APPLICATION_JSON).
                     header("Authorization", auth).
-                    header("X-SA-Date", ts).
+                    header("X-SA-Ext-Date", ts).
                     get();
             genericResponse = response.readEntity(valueType);
             response.close();
@@ -161,7 +162,7 @@ public class SAExecuter {
             response = target.request().
                     accept(MediaType.APPLICATION_JSON).
                     header("Authorization", header).
-                    header("X-SA-Date", ts).
+                    header("X-SA-Ext-Date", ts).
                     post(Entity.entity(JSONUtil.convertObjectToJSON(authRequest),MediaType.APPLICATION_JSON));
 
             responseObject = response.readEntity(BaseResponse.class);
@@ -191,7 +192,7 @@ public class SAExecuter {
             response = target.request().
                     accept(MediaType.APPLICATION_JSON).
                     header("Authorization", auth).
-                    header("X-SA-Date", ts).
+                    header("X-SA-Ext-Date", ts).
                     post(Entity.entity(JSONUtil.convertObjectToJSON(authRequest), MediaType.APPLICATION_JSON));
             responseObject=response.readEntity(BaseResponse.class);
             response.close();
@@ -220,7 +221,7 @@ public class SAExecuter {
             response = target.request().
                     accept(MediaType.APPLICATION_JSON).
                     header("Authorization", auth).
-                    header("X-SA-Date", ts).
+                    header("X-SA-Ext-Date", ts).
                     post(Entity.entity(JSONUtil.convertObjectToJSON(authRequest), MediaType.APPLICATION_JSON));
             responseObject=response.readEntity(BaseResponse.class);
             response.close();
@@ -249,7 +250,7 @@ public class SAExecuter {
             response = target.request().
                     accept(MediaType.APPLICATION_JSON).
                     header("Authorization", auth).
-                    header("X-SA-Date", ts).
+                    header("X-SA-Ext-Date", ts).
                     post(Entity.entity(JSONUtil.convertObjectToJSON(authRequest), MediaType.APPLICATION_JSON));
 
             responseObject=response.readEntity(BaseResponse.class);
@@ -278,9 +279,9 @@ public class SAExecuter {
             target = client.target(query);
             response = target.request()
                     .accept(MediaType.APPLICATION_JSON).
-                    header("Authorization", auth).
-                    header("X-SA-Date", ts).
-                    post(Entity.entity(JSONUtil.convertObjectToJSON(authRequest), MediaType.APPLICATION_JSON));
+                            header("Authorization", auth).
+                            header("X-SA-Ext-Date", ts).
+                            post(Entity.entity(JSONUtil.convertObjectToJSON(authRequest), MediaType.APPLICATION_JSON));
 
             responseObject=response.readEntity(BaseResponse.class);
             response.close();
@@ -309,9 +310,9 @@ public class SAExecuter {
             response = target.request().
                     accept(MediaType.APPLICATION_JSON).
                     //type(MediaType.APPLICATION_JSON).
-                    header("Authorization", auth).
-                    header("X-SA-Date", ts).
-                    post(Entity.entity(JSONUtil.convertObjectToJSON(authRequest), MediaType.APPLICATION_JSON));
+                            header("Authorization", auth).
+                            header("X-SA-Ext-Date", ts).
+                            post(Entity.entity(JSONUtil.convertObjectToJSON(authRequest), MediaType.APPLICATION_JSON));
 
             responseObject=response.readEntity(ResponseObject.class);
 
@@ -340,9 +341,9 @@ public class SAExecuter {
             target = client.target(query);
             response = target.request()
                     .accept(MediaType.APPLICATION_JSON).
-                    header("Authorization", auth).
-                    header("X-SA-Date", ts).
-                    post(Entity.entity(JSONUtil.convertObjectToJSON(authRequest), MediaType.APPLICATION_JSON));
+                            header("Authorization", auth).
+                            header("X-SA-Ext-Date", ts).
+                            post(Entity.entity(JSONUtil.convertObjectToJSON(authRequest), MediaType.APPLICATION_JSON));
 
             responseObject=response.readEntity(ResponseObject.class);
             response.close();
@@ -371,7 +372,7 @@ public class SAExecuter {
             response = target.request().
                     accept(MediaType.APPLICATION_JSON).
                     header("Authorization", auth).
-                    header("X-SA-Date", ts).
+                    header("X-SA-Ext-Date", ts).
                     post(Entity.entity(JSONUtil.convertObjectToJSON(authRequest), MediaType.APPLICATION_JSON));
 
             responseObject=response.readEntity(ResponseObject.class);
@@ -386,7 +387,7 @@ public class SAExecuter {
 
     }
 
-     // post request
+    // post request
     public <T> T executePostRequest(String auth,String query, AuthRequest authRequest,String ts, Class<T> valueType)throws Exception{
 
         if(client == null) {
@@ -402,7 +403,7 @@ public class SAExecuter {
             response = target.request().
                     accept(MediaType.APPLICATION_JSON).
                     header("Authorization", auth).
-                    header("X-SA-Date", ts).
+                    header("X-SA-Ext-Date", ts).
                     post(Entity.entity(JSONUtil.convertObjectToJSON(authRequest),MediaType.APPLICATION_JSON));
 
             responseObject=response.readEntity(valueType);
@@ -413,6 +414,37 @@ public class SAExecuter {
         }
 
         return responseObject;
+
+    }
+
+    //VALIDATE OTP by using IDP EndPoint
+    public ValidateOTPResponse executeValidateOTP(String auth, String query, ValidateOTPRequest validateOTPRequest, String ts)throws Exception{
+
+        if(client == null) {
+            createConnection();
+        }
+
+        WebTarget target = null;
+        Response response = null;
+        ValidateOTPResponse validateOTPResponse =null;
+        try{
+            target = client.target(query);
+
+            response = target.request().
+                    accept(MediaType.APPLICATION_JSON).
+                    header("Authorization", auth).
+                    header("X-SA-Ext-Date", ts).
+                    post(Entity.entity(JSONUtil.convertObjectToJSON(validateOTPRequest),MediaType.APPLICATION_JSON));
+
+            validateOTPResponse = response.readEntity(ValidateOTPResponse.class);
+
+            response.close();
+        }catch(Exception e){
+            logger.error(new StringBuilder().append("Exception Running Validate OTP POST: \nQuery:\n\t")
+                    .append(query).append("\nError:").append(e.getMessage()).toString(), e);
+        }
+
+        return validateOTPResponse;
 
     }
 
@@ -432,7 +464,7 @@ public class SAExecuter {
             response = target.request().
                     accept(MediaType.APPLICATION_JSON).
                     header("Authorization", auth).
-                    header("X-SA-Date", ts).
+                    header("X-SA-Ext-Date", ts).
                     post(Entity.entity(JSONUtil.convertObjectToJSON(authRequest),MediaType.APPLICATION_JSON));
 
             responseObject=response.readEntity(ResponseObject.class);
@@ -467,7 +499,7 @@ public class SAExecuter {
             response = target.request().
                     accept(MediaType.APPLICATION_JSON).
                     header("Authorization", auth).
-                    header("X-SA-Date", ts).
+                    header("X-SA-Ext-Date", ts).
                     post(Entity.entity(JSONUtil.convertObjectToJSON(ipEvalRequest), MediaType.APPLICATION_JSON));
 
             ipEval = response.readEntity(IPEval.class);
@@ -498,7 +530,7 @@ public class SAExecuter {
             response = target.request().
                     accept(MediaType.APPLICATION_JSON).
                     header("Authorization", auth).
-                    header("X-SA-Date", ts).
+                    header("X-SA-Ext-Date", ts).
                     post(Entity.entity(JSONUtil.convertObjectToJSON(accessHistoryRequest),MediaType.APPLICATION_JSON));
 
             accessHistory = response.readEntity(ResponseObject.class);
@@ -528,7 +560,7 @@ public class SAExecuter {
             response = target.request().
                     accept(MediaType.APPLICATION_JSON).
                     header("Authorization", auth).
-                    header("X-SA-Date", ts).
+                    header("X-SA-Ext-Date", ts).
                     post(Entity.entity(JSONUtil.convertObjectToJSON(dfpValidateRequest),MediaType.APPLICATION_JSON));
 
             dfpValidateResponse = response.readEntity(DFPValidateResponse.class);
@@ -558,7 +590,7 @@ public class SAExecuter {
             response = target.request().
                     accept(MediaType.APPLICATION_JSON).
                     header("Authorization", auth).
-                    header("X-SA-Date", ts).
+                    header("X-SA-Ext-Date", ts).
                     post(Entity.entity(JSONUtil.convertObjectToJSON(dfpConfirmRequest),MediaType.APPLICATION_JSON));
 
 
@@ -589,7 +621,7 @@ public class SAExecuter {
             response = target.request().
                     accept(MediaType.APPLICATION_JSON).
                     header("Authorization", auth).
-                    header("X-SA-Date", ts).
+                    header("X-SA-Ext-Date", ts).
                     get();
             jsObjectResponse = response.readEntity(valueType);
             response.close();
@@ -618,7 +650,7 @@ public class SAExecuter {
             response = target.request().
                     accept(MediaType.APPLICATION_JSON).
                     header("Authorization", auth).
-                    header("X-SA-Date", ts).
+                    header("X-SA-Ext-Date", ts).
                     post(Entity.entity(JSONUtil.convertObjectToJSON(behaveBioRequest),MediaType.APPLICATION_JSON));
 
             behaveBioResponse = response.readEntity(BehaveBioResponse.class);
@@ -649,7 +681,7 @@ public class SAExecuter {
             response = target.request().
                     accept(MediaType.APPLICATION_JSON).
                     header("Authorization", auth).
-                    header("X-SA-Date", ts).
+                    header("X-SA-Ext-Date", ts).
                     put(Entity.entity(JSONUtil.convertObjectToJSON(behaveBioResetRequest),MediaType.APPLICATION_JSON));
 
             behaveBioResponse = response.readEntity(ResponseObject.class);
@@ -680,7 +712,7 @@ public class SAExecuter {
             response = target.request().
                     accept(MediaType.APPLICATION_JSON).
                     header("Authorization", auth).
-                    header("X-SA-Date", ts).
+                    header("X-SA-Ext-Date", ts).
                     post(Entity.entity(JSONUtil.convertObjectToJSON(userPasswordRequest),MediaType.APPLICATION_JSON));
 
             passwordResetResponse = response.readEntity(ResponseObject.class);
@@ -711,7 +743,7 @@ public class SAExecuter {
             response = target.request().
                     accept(MediaType.APPLICATION_JSON).
                     header("Authorization", auth).
-                    header("X-SA-Date", ts).
+                    header("X-SA-Ext-Date", ts).
                     post(Entity.entity(JSONUtil.convertObjectToJSON(userPasswordRequest),MediaType.APPLICATION_JSON));
 
             passwordChangeResponse = response.readEntity(ResponseObject.class);
@@ -742,7 +774,7 @@ public class SAExecuter {
             response = target.request().
                     accept(MediaType.APPLICATION_JSON).
                     header("Authorization", auth).
-                    header("X-SA-Date", ts).
+                    header("X-SA-Ext-Date", ts).
                     put(Entity.entity(JSONUtil.convertObjectToJSON(userProfile), MediaType.APPLICATION_JSON));
 
             responseObject=response.readEntity(valueType);
@@ -772,7 +804,7 @@ public class SAExecuter {
             response = target.request().
                     accept(MediaType.APPLICATION_JSON).
                     header("Authorization", auth).
-                    header("X-SA-Date", ts).
+                    header("X-SA-Ext-Date", ts).
                     post(Entity.entity(JSONUtil.convertObjectToJSON(newUserProfile),MediaType.APPLICATION_JSON));
 
             responseObject=response.readEntity(valueType);
@@ -801,7 +833,7 @@ public class SAExecuter {
             response = target.request().
                     accept(MediaType.APPLICATION_JSON).
                     header("Authorization", auth).
-                    header("X-SA-Date", ts).
+                    header("X-SA-Ext-Date", ts).
                     post(Entity.entity("",MediaType.APPLICATION_JSON));
             genericResponse = response.readEntity(valueType);
             response.close();
@@ -830,7 +862,7 @@ public class SAExecuter {
             response = target.request().
                     accept(MediaType.APPLICATION_JSON).
                     header("Authorization", auth).
-                    header("X-SA-Date", ts).
+                    header("X-SA-Ext-Date", ts).
                     post(Entity.entity(JSONUtil.convertObjectToJSON(usersToGroup),MediaType.APPLICATION_JSON));
 
             responseObject=response.readEntity(valueType);
@@ -859,7 +891,7 @@ public class SAExecuter {
             response = target.request().
                     accept(MediaType.APPLICATION_JSON).
                     header("Authorization", auth).
-                    header("X-SA-Date", ts).
+                    header("X-SA-Ext-Date", ts).
                     post(Entity.entity("",MediaType.APPLICATION_JSON));
             genericResponse = response.readEntity(valueType);
             response.close();
@@ -888,7 +920,7 @@ public class SAExecuter {
             response = target.request().
                     accept(MediaType.APPLICATION_JSON).
                     header("Authorization", auth).
-                    header("X-SA-Date", ts).
+                    header("X-SA-Ext-Date", ts).
                     post(Entity.entity(JSONUtil.convertObjectToJSON(userToGroups),MediaType.APPLICATION_JSON));
 
             responseObject=response.readEntity(valueType);
@@ -918,7 +950,7 @@ public class SAExecuter {
             response = target.request().
                     accept(MediaType.APPLICATION_JSON).
                     header("Authorization", auth).
-                    header("X-SA-Date", ts).
+                    header("X-SA-Ext-Date", ts).
                     post(Entity.entity(JSONUtil.convertObjectToJSON(numberProfileRequest),MediaType.APPLICATION_JSON));
 
             numberProfileResponse = response.readEntity(NumberProfileResponse.class);
@@ -949,7 +981,7 @@ public class SAExecuter {
             response = target.request().
                     accept(MediaType.APPLICATION_JSON).
                     header("Authorization", auth).
-                    header("X-SA-Date", ts).
+                    header("X-SA-Ext-Date", ts).
                     put(Entity.entity(JSONUtil.convertObjectToJSON(numberProfileUpdateRequest),MediaType.APPLICATION_JSON));
 
             numberProfileUpdateResponse = response.readEntity(BaseResponse.class);

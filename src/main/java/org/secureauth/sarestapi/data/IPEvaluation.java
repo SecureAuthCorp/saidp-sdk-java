@@ -1,7 +1,7 @@
 package org.secureauth.sarestapi.data;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.sun.javafx.collections.MappingChange;
 import org.secureauth.sarestapi.util.JSONUtil;
 
 
@@ -30,6 +30,7 @@ OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
 
 @XmlRootElement(name="ip_evaluation")
 @JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class IPEvaluation {
 
     private String method;

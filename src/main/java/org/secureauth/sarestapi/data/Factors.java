@@ -1,6 +1,8 @@
 package org.secureauth.sarestapi.data;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.secureauth.sarestapi.resources.s;
 import org.secureauth.sarestapi.util.JSONUtil;
 
@@ -28,6 +30,7 @@ OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
 
 @XmlRootElement(name= s.FACTORS)
 @JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Factors {
 
     private String type;
