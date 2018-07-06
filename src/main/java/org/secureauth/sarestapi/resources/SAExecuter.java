@@ -25,7 +25,6 @@ import org.secureauth.sarestapi.data.UserProfile.NewUserProfile;
 import org.secureauth.sarestapi.data.UserProfile.UserToGroups;
 import org.secureauth.sarestapi.data.UserProfile.UsersToGroup;
 import org.secureauth.sarestapi.filters.SACheckRequestFilter;
-import org.secureauth.sarestapi.filters.SAResponseFilter;
 import org.secureauth.sarestapi.util.JSONUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
