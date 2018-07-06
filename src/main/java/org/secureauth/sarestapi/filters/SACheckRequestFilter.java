@@ -25,6 +25,7 @@ public class SACheckRequestFilter implements ClientRequestFilter {
         if(!requestContext.getHeaders().containsKey("X-SA-Ext-Date")){
             requestContext.getHeaders().add("X-SA-Ext-Date", getServerTimeMs());
         }
+        //Technically we should never get this point
         if (!requestContext.getHeaders().containsKey("X-SA-Date") && !requestContext.getHeaders().containsKey("X-SA-Ext-Date")){
             requestContext.abortWith(Response.status(Response.Status.BAD_REQUEST).entity("X-SA-Date or X-SA-Ext-Date header must be defined.").build());
         }
@@ -39,6 +40,7 @@ public class SACheckRequestFilter implements ClientRequestFilter {
         return dateFormat.format(calendar.getTime());
     }
 
+    //Just in case we want to force the second version timestamp for older versions of IDP
     String getServerTimeSeconds() {
         Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
         SimpleDateFormat dateFormat = new SimpleDateFormat(
