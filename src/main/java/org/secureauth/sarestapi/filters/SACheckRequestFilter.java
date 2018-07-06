@@ -22,9 +22,9 @@ public class SACheckRequestFilter implements ClientRequestFilter {
         }
 
         //Moved all TimeStamp Header setting to Filter Controlled
-        if(!requestContext.getHeaders().containsKey("X-SA-Ext-Date")){
-            requestContext.getHeaders().add("X-SA-Ext-Date", getServerTimeMs());
-        }
+        //if(!requestContext.getHeaders().containsKey("X-SA-Ext-Date")){
+        //    requestContext.getHeaders().add("X-SA-Ext-Date", getServerTimeMs());
+        //}
         //Technically we should never get this point
         if (!requestContext.getHeaders().containsKey("X-SA-Date") && !requestContext.getHeaders().containsKey("X-SA-Ext-Date")){
             requestContext.abortWith(Response.status(Response.Status.BAD_REQUEST).entity("X-SA-Date or X-SA-Ext-Date header must be defined.").build());
