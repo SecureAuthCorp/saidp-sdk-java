@@ -1146,7 +1146,7 @@ public class SAAccess {
     String getServerTime() {
         Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
         SimpleDateFormat dateFormat = new SimpleDateFormat(
-                "EEE, dd MMM yyyy HH:mm:ss z", Locale.US);
+                "EEE, dd MMM yyyy HH:mm:ss.SSS z", Locale.US);
         dateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
         return dateFormat.format(calendar.getTime());
     }
