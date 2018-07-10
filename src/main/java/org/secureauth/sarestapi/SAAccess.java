@@ -117,7 +117,6 @@ public class SAAccess {
      * @return {@link FactorsResponse}
      */
     public FactorsResponse factorsByUser(String userid){
-    	userid = encode(userid);
         String ts = getServerTime();
         RestApiHeader restApiHeader = new RestApiHeader();
         String header = restApiHeader.getAuthorizationHeader(saAuth,"GET",FactorsQuery.queryFactors(saAuth.getRealm(),userid),ts);
@@ -217,7 +216,6 @@ public class SAAccess {
      * @return {@link ResponseObject}
      */
     public BaseResponse validateUser(String userid){
-        userid = encode(userid);
         String ts = getServerTime();
         RestApiHeader restApiHeader = new RestApiHeader();
         AuthRequest authRequest = new AuthRequest();
@@ -951,7 +949,6 @@ public class SAAccess {
      * @return {@link UserProfileResponse}
      */
     public UserProfileResponse getUserProfile(String userid){
-        userid = encode(userid);
         String ts = getServerTime();
         RestApiHeader restApiHeader = new RestApiHeader();
         String header = restApiHeader.getAuthorizationHeader(saAuth,"GET",IDMQueries.queryUserProfile(saAuth.getRealm(),userid),ts);
@@ -975,7 +972,6 @@ public class SAAccess {
      * @return {@link ResponseObject}
      */
     public ResponseObject passwordReset(String userid, String password){
-        userid = encode(userid);
         String ts = getServerTime();
         UserPasswordRequest userPasswordRequest = new UserPasswordRequest();
         userPasswordRequest.setPassword(password);
@@ -1002,7 +998,6 @@ public class SAAccess {
      * @return {@link ResponseObject}
      */
     public ResponseObject passwordChange(String userid, String currentPassword, String newPassword){
-        userid = encode(userid);
         String ts = getServerTime();
         UserPasswordRequest userPasswordRequest = new UserPasswordRequest();
         userPasswordRequest.setCurrentPassword(currentPassword);
@@ -1114,34 +1109,19 @@ public class SAAccess {
      * Start Helper Methods
      */
 
-    /**
-     *
-     * @param input The user String to be encoded
-     * @return String
-     */
-    public static String encode(String input) {
-        StringBuilder resultStr = new StringBuilder();
-        for (char ch : input.toCharArray()) {
-            if (isUnsafe(ch)) {
-                resultStr.append('%');
-                resultStr.append(toHex(ch / 16));
-                resultStr.append(toHex(ch % 16));
-            } else {
-                resultStr.append(ch);
-            }
-        }
-        return resultStr.toString();
-    }
-
-    private static char toHex(int ch) {
-        return (char) (ch < 10 ? '0' + ch : 'A' + ch - 10);
-    }
-
-    private static boolean isUnsafe(char ch) {
-        if (ch > 128 || ch < 0)
-            return true;
-        return " %$&+,/:;=?@<>#%".indexOf(ch) >= 0;
-    }
+    //to fetch raw json
+    public String executeGetRequest(String query) {
+		String ts = getServerTime();
+		RestApiHeader restApiHeader = new RestApiHeader();
+		query = saAuth.getRealm() + query;
+		String header = restApiHeader.getAuthorizationHeader(saAuth, "GET", query, ts);
+		try {
+			return saExecuter.executeRawGetRequest(header, saBaseURL.getApplianceURL() + query, ts);
+		} catch (Exception e) {
+			logger.error("Exception occurred executing REST query::\n" + e.getMessage() + "\n", e);
+		}
+		return null;
+	}
 
     String getServerTime() {
         Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
