@@ -171,6 +171,48 @@ public class SAAccess {
 
     /**
      * <p>
+     *     Send push to accept biometric request asynchronously
+     * </p>
+     *
+     * @param biometricType fingerprint, face
+     * @param userid  the user id of the identity
+     * @param factor_id the P2A Id to be compared against
+     * @param endUserIP The End Users IP Address
+     * @param clientCompany The Client Company Name
+     * @param clientDescription The Client Description
+     * @return {@link FactorsResponse}
+     */
+    public ResponseObject sendPushBiometricReq(String biometricType, String userid, String factor_id, String endUserIP, String clientCompany, String clientDescription) {
+        String ts = this.getServerTime();
+        RestApiHeader restApiHeader = new RestApiHeader();
+        PushToAcceptBiometricsRequest req = new PushToAcceptBiometricsRequest();
+        req.setUser_id(userid);
+        req.setType("push_accept_biometric");
+        req.setFactor_id( factor_id );
+        req.setBiometricType( biometricType );
+        PushAcceptDetails pad = new PushAcceptDetails();
+        pad.setEnduser_ip(endUserIP);
+        if (clientCompany != null) {
+            pad.setCompany_name(clientCompany);
+        }
+
+        if (clientDescription != null) {
+            pad.setApplication_description(clientDescription);
+        }
+
+        req.setPush_accept_details(pad);
+        String header = restApiHeader.getAuthorizationHeader(this.saAuth, "POST", AuthQuery.queryAuth(this.saAuth.getRealm()), req, ts);
+
+        try {
+            return (ResponseObject)this.saExecuter.executePostRequest(header, this.saBaseURL.getApplianceURL() + AuthQuery.queryAuth(this.saAuth.getRealm()), req, ts, ResponseObject.class);
+        } catch (Exception var12) {
+            logger.error("Exception occurred executing REST query::\n" + var12.getMessage() + "\n", var12);
+            return null;
+        }
+    }
+
+    /**
+     * <p>
      *     Perform adaptive auth query
      * </p>
      * @param userid the user id of the identity
