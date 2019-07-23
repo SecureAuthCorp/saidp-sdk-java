@@ -94,6 +94,13 @@ public class AuthenticationImpl implements AuthenticationInterface {
     }
 
     @Override
+    public ResponseObject sendHelpDeskOTP(SAAccess saAccess, String userid, String factorId) {
+        ResponseObject helpDeskOTP = saAccess.deliverOTPByHelpDesk(userid, factorId);
+        System.out.println("Help Desk OTP is: " + helpDeskOTP.getOtp());
+        return helpDeskOTP;
+    }
+
+    @Override
     public ResponseObject sendEmailOTP(SAAccess saAccess, String userid, String factorId) {
         ResponseObject emailOTP = saAccess.deliverOTPByEmail(userid, factorId);
         System.out.println("Email OTP is: " + emailOTP.getOtp());

@@ -25,6 +25,8 @@ public interface AuthenticationInterface {
 
     ResponseObject sendPhoneOTP(SAAccess saAccess, String userId, String factorId);
 
+    ResponseObject sendHelpDeskOTP(SAAccess saAccess, String userid, String factorId);
+
     ResponseObject sendEmailOTP(SAAccess saAccess, String userId, String factorId);
 
     BaseResponse validateKBQ(SAAccess saAccess, String userId, String answer, String factorId);
