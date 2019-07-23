@@ -522,6 +522,32 @@ public class SAAccess {
         return null;
     }
 
+        /**
+     * <p>
+     *     Send One Time Passcode by Email to Help Desk
+     * </p>
+     * @param userid the userid of the identity
+     * @param factor_id  Help Desk Property   "HelpDesk1"
+     * @return {@link ResponseObject}
+     */
+    public ResponseObject deliverHelpDeskOTPByEmail(String userid, String factor_id){
+        String ts = getServerTime();
+        RestApiHeader restApiHeader = new RestApiHeader();
+        AuthRequest authRequest = new AuthRequest();
+
+        authRequest.setUser_id(userid);
+        authRequest.setType("help_desk");
+        authRequest.setFactor_id(factor_id);
+        String header = restApiHeader.getAuthorizationHeader(saAuth,"POST", AuthQuery.queryAuth(saAuth.getRealm()), authRequest,ts);
+
+        try{
+            return saExecuter.executeOTPByEmail(header,saBaseURL.getApplianceURL() + AuthQuery.queryAuth(saAuth.getRealm()), authRequest,ts);
+        }catch (Exception e){
+            logger.error(new StringBuilder().append("Exception occurred executing REST query::\n").append(e.getMessage()).append("\n").toString(), e);
+        }
+        return null;
+    }
+
     /**
      * <p>
      *     Send One Time Passcode by Email
