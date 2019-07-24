@@ -33,6 +33,7 @@ public class ResponseObject extends BaseResponse {
 
     private String reference_id;
     private int otp;
+    private String symbol;
 
     public int getOtp() {
         return otp;
@@ -50,7 +51,15 @@ public class ResponseObject extends BaseResponse {
 		this.reference_id = reference_id;
 	}
 
-    @Override
+	public String getSymbol() {
+		return symbol;
+	}
+
+	public void setSymbol(String symbol) {
+		this.symbol = symbol;
+	}
+
+	@Override
     public String toString(){
         return JSONUtil.convertObjectToJSON(this);
     }

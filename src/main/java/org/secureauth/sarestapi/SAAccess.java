@@ -144,11 +144,19 @@ public class SAAccess {
      * @return {@link FactorsResponse}
      */
     public ResponseObject sendPushToAcceptReq(String userid, String factor_id, String endUserIP, String clientCompany, String clientDescription){
+       return sendPushReq(userid, factor_id, endUserIP, clientCompany, clientDescription, "push_accept");
+    }
+
+    public ResponseObject sendPushToAcceptSymbolReq(String userid, String factor_id, String endUserIP, String clientCompany, String clientDescription){
+        return sendPushReq(userid, factor_id, endUserIP, clientCompany, clientDescription, "push_accept_symbol");
+    }
+
+    private ResponseObject sendPushReq(String userid, String factor_id, String endUserIP, String clientCompany, String clientDescription, String type) {
         String ts = getServerTime();
         RestApiHeader restApiHeader = new RestApiHeader();
         PushToAcceptRequest req = new PushToAcceptRequest();
         req.setUser_id(userid);
-        req.setType("push_accept");
+        req.setType(type);
         req.setFactor_id(factor_id);
         PushAcceptDetails pad = new PushAcceptDetails();
         pad.setEnduser_ip(endUserIP);
