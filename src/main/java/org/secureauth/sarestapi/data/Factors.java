@@ -37,6 +37,7 @@ public class Factors {
     private String id;
     private String value;
     private ArrayList<String> capabilities;
+    private ArrayList<String> biometricTypes;
 
     public String getType() {
         return type;
@@ -68,6 +69,14 @@ public class Factors {
 
     public void setCapabilities(ArrayList<String> capabilities) {
         this.capabilities = capabilities;
+    }
+
+    public ArrayList<String> getBiometricTypes() {
+        return biometricTypes;
+    }
+
+    public void setBiometricTypes(ArrayList<String> biometricTypes) {
+        this.biometricTypes = biometricTypes;
     }
 
     @Override
