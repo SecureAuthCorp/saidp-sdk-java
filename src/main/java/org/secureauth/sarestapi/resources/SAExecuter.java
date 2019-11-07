@@ -143,6 +143,31 @@ public class SAExecuter {
 
     }
 
+    public String executeRawGetRequest(String auth, String query,String ts)throws Exception {
+        if(client == null) {
+            createConnection();
+        }
+
+        WebTarget target = null;
+        Response response = null;
+        String factors=null;
+        try{
+
+            target = client.target(query);
+            response = target.request().
+            		accept(MediaType.APPLICATION_JSON).
+                    header("Authorization", auth).
+                    header("X-SA-Ext-Date", ts).
+                    get(Response.class);
+            return response.readEntity(String.class);
+        }catch(Exception e){
+            logger.error(new StringBuilder().append("Exception getting User Factors: \nQuery:\n\t")
+                    .append(query).append("\nError:").append(e.getMessage()).append(".\nResponse code is ").append(response).toString()
+                    + "; Raw response:" + factors, e);
+        }
+        return null;
+    }
+
     //Validate User against Repository
     public BaseResponse executeValidateUser(String header,String query, AuthRequest authRequest,String ts)throws Exception{
 

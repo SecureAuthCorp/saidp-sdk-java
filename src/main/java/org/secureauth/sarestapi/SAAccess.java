@@ -117,7 +117,6 @@ public class SAAccess {
      * @return {@link FactorsResponse}
      */
     public FactorsResponse factorsByUser(String userid){
-    	userid = encode(userid);
         String ts = getServerTime();
         RestApiHeader restApiHeader = new RestApiHeader();
         String header = restApiHeader.getAuthorizationHeader(saAuth,"GET",FactorsQuery.queryFactors(saAuth.getRealm(),userid),ts);
@@ -145,11 +144,19 @@ public class SAAccess {
      * @return {@link FactorsResponse}
      */
     public ResponseObject sendPushToAcceptReq(String userid, String factor_id, String endUserIP, String clientCompany, String clientDescription){
+       return sendPushReq(userid, factor_id, endUserIP, clientCompany, clientDescription, "push_accept");
+    }
+
+    public ResponseObject sendPushToAcceptSymbolReq(String userid, String factor_id, String endUserIP, String clientCompany, String clientDescription){
+        return sendPushReq(userid, factor_id, endUserIP, clientCompany, clientDescription, "push_accept_symbol");
+    }
+
+    private ResponseObject sendPushReq(String userid, String factor_id, String endUserIP, String clientCompany, String clientDescription, String type) {
         String ts = getServerTime();
         RestApiHeader restApiHeader = new RestApiHeader();
         PushToAcceptRequest req = new PushToAcceptRequest();
         req.setUser_id(userid);
-        req.setType("push_accept");
+        req.setType(type);
         req.setFactor_id(factor_id);
         PushAcceptDetails pad = new PushAcceptDetails();
         pad.setEnduser_ip(endUserIP);
@@ -168,6 +175,48 @@ public class SAAccess {
             logger.error(new StringBuilder().append("Exception occurred executing REST query::\n").append(e.getMessage()).append("\n").toString(), e);
         }
         return null;
+    }
+
+    /**
+     * <p>
+     *     Send push to accept biometric request asynchronously
+     * </p>
+     *
+     * @param biometricType fingerprint, face
+     * @param userid  the user id of the identity
+     * @param factor_id the P2A Id to be compared against
+     * @param endUserIP The End Users IP Address
+     * @param clientCompany The Client Company Name
+     * @param clientDescription The Client Description
+     * @return {@link FactorsResponse}
+     */
+    public ResponseObject sendPushBiometricReq(String biometricType, String userid, String factor_id, String endUserIP, String clientCompany, String clientDescription) {
+        String ts = this.getServerTime();
+        RestApiHeader restApiHeader = new RestApiHeader();
+        PushToAcceptBiometricsRequest req = new PushToAcceptBiometricsRequest();
+        req.setUser_id(userid);
+        req.setType("push_accept_biometric");
+        req.setFactor_id( factor_id );
+        req.setBiometricType( biometricType );
+        PushAcceptDetails pad = new PushAcceptDetails();
+        pad.setEnduser_ip(endUserIP);
+        if (clientCompany != null) {
+            pad.setCompany_name(clientCompany);
+        }
+
+        if (clientDescription != null) {
+            pad.setApplication_description(clientDescription);
+        }
+
+        req.setPush_accept_details(pad);
+        String header = restApiHeader.getAuthorizationHeader(this.saAuth, "POST", AuthQuery.queryAuth(this.saAuth.getRealm()), req, ts);
+
+        try {
+            return (ResponseObject)this.saExecuter.executePostRequest(header, this.saBaseURL.getApplianceURL() + AuthQuery.queryAuth(this.saAuth.getRealm()), req, ts, ResponseObject.class);
+        } catch (Exception var12) {
+            logger.error("Exception occurred executing REST query::\n" + var12.getMessage() + "\n", var12);
+            return null;
+        }
     }
 
     /**
@@ -217,7 +266,6 @@ public class SAAccess {
      * @return {@link ResponseObject}
      */
     public BaseResponse validateUser(String userid){
-        userid = encode(userid);
         String ts = getServerTime();
         RestApiHeader restApiHeader = new RestApiHeader();
         AuthRequest authRequest = new AuthRequest();
@@ -476,6 +524,32 @@ public class SAAccess {
 
         try{
             return saExecuter.executeOTPBySMS(header,saBaseURL.getApplianceURL() + AuthQuery.queryAuth(saAuth.getRealm()),authRequest,ts);
+        }catch (Exception e){
+            logger.error(new StringBuilder().append("Exception occurred executing REST query::\n").append(e.getMessage()).append("\n").toString(), e);
+        }
+        return null;
+    }
+
+        /**
+     * <p>
+     *     Send One Time Passcode by Email to Help Desk
+     * </p>
+     * @param userid the userid of the identity
+     * @param factor_id  Help Desk Property   "HelpDesk1"
+     * @return {@link ResponseObject}
+     */
+    public ResponseObject deliverHelpDeskOTPByEmail(String userid, String factor_id){
+        String ts = getServerTime();
+        RestApiHeader restApiHeader = new RestApiHeader();
+        AuthRequest authRequest = new AuthRequest();
+
+        authRequest.setUser_id(userid);
+        authRequest.setType("help_desk");
+        authRequest.setFactor_id(factor_id);
+        String header = restApiHeader.getAuthorizationHeader(saAuth,"POST", AuthQuery.queryAuth(saAuth.getRealm()), authRequest,ts);
+
+        try{
+            return saExecuter.executeOTPByEmail(header,saBaseURL.getApplianceURL() + AuthQuery.queryAuth(saAuth.getRealm()), authRequest,ts);
         }catch (Exception e){
             logger.error(new StringBuilder().append("Exception occurred executing REST query::\n").append(e.getMessage()).append("\n").toString(), e);
         }
@@ -951,7 +1025,6 @@ public class SAAccess {
      * @return {@link UserProfileResponse}
      */
     public UserProfileResponse getUserProfile(String userid){
-        userid = encode(userid);
         String ts = getServerTime();
         RestApiHeader restApiHeader = new RestApiHeader();
         String header = restApiHeader.getAuthorizationHeader(saAuth,"GET",IDMQueries.queryUserProfile(saAuth.getRealm(),userid),ts);
@@ -975,7 +1048,6 @@ public class SAAccess {
      * @return {@link ResponseObject}
      */
     public ResponseObject passwordReset(String userid, String password){
-        userid = encode(userid);
         String ts = getServerTime();
         UserPasswordRequest userPasswordRequest = new UserPasswordRequest();
         userPasswordRequest.setPassword(password);
@@ -1002,7 +1074,6 @@ public class SAAccess {
      * @return {@link ResponseObject}
      */
     public ResponseObject passwordChange(String userid, String currentPassword, String newPassword){
-        userid = encode(userid);
         String ts = getServerTime();
         UserPasswordRequest userPasswordRequest = new UserPasswordRequest();
         userPasswordRequest.setCurrentPassword(currentPassword);
@@ -1114,34 +1185,19 @@ public class SAAccess {
      * Start Helper Methods
      */
 
-    /**
-     *
-     * @param input The user String to be encoded
-     * @return String
-     */
-    public static String encode(String input) {
-        StringBuilder resultStr = new StringBuilder();
-        for (char ch : input.toCharArray()) {
-            if (isUnsafe(ch)) {
-                resultStr.append('%');
-                resultStr.append(toHex(ch / 16));
-                resultStr.append(toHex(ch % 16));
-            } else {
-                resultStr.append(ch);
-            }
-        }
-        return resultStr.toString();
-    }
-
-    private static char toHex(int ch) {
-        return (char) (ch < 10 ? '0' + ch : 'A' + ch - 10);
-    }
-
-    private static boolean isUnsafe(char ch) {
-        if (ch > 128 || ch < 0)
-            return true;
-        return " %$&+,/:;=?@<>#%".indexOf(ch) >= 0;
-    }
+    //to fetch raw json
+    public String executeGetRequest(String query) {
+		String ts = getServerTime();
+		RestApiHeader restApiHeader = new RestApiHeader();
+		query = saAuth.getRealm() + query;
+		String header = restApiHeader.getAuthorizationHeader(saAuth, "GET", query, ts);
+		try {
+			return saExecuter.executeRawGetRequest(header, saBaseURL.getApplianceURL() + query, ts);
+		} catch (Exception e) {
+			logger.error("Exception occurred executing REST query::\n" + e.getMessage() + "\n", e);
+		}
+		return null;
+	}
 
     String getServerTime() {
         Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
