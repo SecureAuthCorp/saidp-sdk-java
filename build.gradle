@@ -7,6 +7,9 @@ plugins {
 apply plugin: 'maven'
 apply plugin: 'maven-publish'
 
+group = 'org.secureauth.sarestapi'
+version = currentVersion
+
 repositories {
     mavenCentral()
 }
