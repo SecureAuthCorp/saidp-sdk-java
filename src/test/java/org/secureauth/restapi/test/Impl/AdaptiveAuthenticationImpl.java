@@ -3,6 +3,7 @@ package org.secureauth.restapi.test.Impl;
 import org.secureauth.sarestapi.SAAccess;
 import org.secureauth.sarestapi.data.IPEval;
 import org.secureauth.sarestapi.data.Response.ResponseObject;
+import org.secureauth.sarestapi.exception.SARestAPIException;
 import org.secureauth.sarestapi.interfaces.AdaptiveAuthenticationInterface;
 
 /**
@@ -12,7 +13,7 @@ public class AdaptiveAuthenticationImpl implements AdaptiveAuthenticationInterfa
     public AdaptiveAuthenticationImpl(){}
 
     @Override
-    public IPEval ipThreatCheck(SAAccess saAccess, String userid, String ip_address) {
+    public IPEval ipThreatCheck(SAAccess saAccess, String userid, String ip_address) throws SARestAPIException {
         IPEval ipEval = saAccess.iPEvaluation(userid, ip_address);
         //System.out.println("Start IPEvaluation  +++++++++++++++++");
         if (ipEval != null) {

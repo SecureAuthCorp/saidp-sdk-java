@@ -26,9 +26,7 @@ public class ValidateOTPQuery {
 
 
     public static String queryValidateOTP(String realm){
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(realm).append(s.APPLIANCE_OTP_VALIDATE);
-        return stringBuilder.toString();
+        return realm + s.APPLIANCE_OTP_VALIDATE;
     }
 
 }

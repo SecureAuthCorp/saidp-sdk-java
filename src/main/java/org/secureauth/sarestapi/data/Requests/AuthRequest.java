@@ -1,6 +1,7 @@
 package org.secureauth.sarestapi.data.Requests;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.secureauth.sarestapi.util.JSONUtil;
 
 
@@ -28,18 +29,20 @@ OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class AuthRequest {
 
-    String user_id;
+    @JsonProperty("user_id")
+    protected String userId;
     private String type;
     private String token;
-    private String factor_id;
+    @JsonProperty("factor_id")
+    private String factorId;
 
 
-    public String getUser_id() {
-        return user_id;
+    public String getUserId() {
+        return userId;
     }
 
-    public void setUser_id(String user_id) {
-        this.user_id = user_id;
+    public void setUserId(String userId) {
+        this.userId = userId;
     }
 
     public String getType() {
@@ -58,12 +61,12 @@ public class AuthRequest {
         this.token = token;
     }
 
-    public String getFactor_id() {
-        return factor_id;
+    public String getFactorId() {
+        return factorId;
     }
 
-    public void setFactor_id(String factor_id) {
-        this.factor_id = factor_id;
+    public void setFactorId(String factorId) {
+        this.factorId = factorId;
     }
 
     @Override

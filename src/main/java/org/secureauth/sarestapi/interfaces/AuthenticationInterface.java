@@ -5,6 +5,7 @@ import org.secureauth.sarestapi.data.Response.BaseResponse;
 import org.secureauth.sarestapi.data.Response.FactorsResponse;
 import org.secureauth.sarestapi.data.Response.ResponseObject;
 import org.secureauth.sarestapi.data.Response.ValidateOTPResponse;
+import org.secureauth.sarestapi.exception.SARestAPIException;
 
 /**
  * Created by rrowcliffe on 5/6/16.
@@ -15,7 +16,7 @@ public interface AuthenticationInterface {
 
     BaseResponse validatePassword(SAAccess saAccess, String userId, String password);
 
-    FactorsResponse getFactorsForUser(SAAccess saAccess, String userId);
+    FactorsResponse getFactorsForUser(SAAccess saAccess, String userId) throws SARestAPIException;
 
     BaseResponse validateOath(SAAccess saAccess, String userId, String otp, String factorId);
 
@@ -36,6 +37,6 @@ public interface AuthenticationInterface {
     ValidateOTPResponse validateOTP(SAAccess saAccess, String userId, String otp);
 
 
-    void PushToAccept(SAAccess saAccess, String user, String factorID, String ipAddress) throws InterruptedException;
+    void PushToAccept(SAAccess saAccess, String user, String factorID, String ipAddress) throws InterruptedException, SARestAPIException;
 
 }

@@ -6,6 +6,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import org.secureauth.sarestapi.data.DFP.DFP;
 import org.secureauth.sarestapi.data.Requests.DFPValidateRequest;
+import org.secureauth.sarestapi.resources.SAExecuter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
@@ -31,6 +34,7 @@ OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
 
 public class JSONUtil {
 
+    private static Logger logger = LoggerFactory.getLogger(JSONUtil.class);
     public JSONUtil(){}
 
      public static String convertObjectToJSON(Object object){
@@ -39,7 +43,7 @@ public class JSONUtil {
         try {
             json = ow.writeValueAsString(object);
         } catch (JsonProcessingException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage());
         }
         return json;
     }
@@ -53,11 +57,8 @@ public class JSONUtil {
         try{
             dfpValidateRequest = mapper.readValue(dfpJsonString,DFPValidateRequest.class);
 
-
-        }catch(JsonProcessingException jpe){
-            jpe.printStackTrace();
-        }catch(IOException ie){
-            ie.printStackTrace();
+        } catch(IOException e){
+            logger.error(e.getMessage());
         }
 
         return dfpValidateRequest;
@@ -71,11 +72,8 @@ public class JSONUtil {
         try{
             dfp = mapper.readValue(dfpJsonString,DFP.class);
 
-
-        }catch(JsonProcessingException jpe){
-            jpe.printStackTrace();
-        }catch(IOException ie){
-            ie.printStackTrace();
+        } catch(IOException e){
+            logger.error(e.getMessage());
         }
 
         return dfp;

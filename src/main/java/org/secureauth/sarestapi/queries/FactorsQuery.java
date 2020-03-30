@@ -25,8 +25,6 @@ OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
 public class FactorsQuery {
 
     public static String queryFactors(String realm, String userName){
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(realm).append(s.APPLIANCE_USERS).append(userName).append(s.APPLIANCE_FACTORS);
-        return stringBuilder.toString();
+        return realm + s.APPLIANCE_USERS + userName + s.APPLIANCE_FACTORS;
     }
 }

@@ -31,8 +31,8 @@ public class AdaptiveAuthRequest extends AuthRequest {
 
     private AAParameters parameters;
 
-    public AdaptiveAuthRequest(String user_id, String ip) {
-    	this.user_id = user_id;
+    public AdaptiveAuthRequest(String userId, String ip) {
+    	this.userId = userId;
     	parameters = new AAParameters();
     	parameters.setIp_address(ip);
     }

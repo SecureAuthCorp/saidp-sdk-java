@@ -26,14 +26,10 @@ public class AuthQuery {
 
 
     public static String queryAuth(String realm){
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(realm).append(s.APPLIANCE_AUTH);
-        return stringBuilder.toString();
+        return realm + s.APPLIANCE_AUTH;
     }
     
     public static String queryAAuth(String realm){
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(realm).append(s.APPLIANCE_AAUTH);
-        return stringBuilder.toString();
+        return realm + s.APPLIANCE_AAUTH;
     }
 }

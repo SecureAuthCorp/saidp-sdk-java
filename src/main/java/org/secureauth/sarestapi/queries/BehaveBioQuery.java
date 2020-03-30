@@ -26,15 +26,11 @@ public class BehaveBioQuery {
 
 
     public static String queryBehaveBiojs(String realm){
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(realm).append(s.APPLIANCE_BEHAVEBIO_JS);
-        return stringBuilder.toString();
+        return realm + s.APPLIANCE_BEHAVEBIO_JS;
     }
     
     public static String queryBehaveBio(String realm){
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(realm).append(s.APPLIANCE_BEHAVEBIO);
-        return stringBuilder.toString();
+        return realm + s.APPLIANCE_BEHAVEBIO;
     }
 
 }

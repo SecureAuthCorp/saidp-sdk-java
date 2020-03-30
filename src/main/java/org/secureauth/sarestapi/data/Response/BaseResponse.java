@@ -1,6 +1,7 @@
 package org.secureauth.sarestapi.data.Response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.secureauth.sarestapi.util.JSONUtil;
 
 import javax.xml.bind.annotation.XmlRootElement;
@@ -13,7 +14,17 @@ import javax.xml.bind.annotation.XmlRootElement;
 public class BaseResponse {
     private String status;
     private String message;
-    private String user_id;
+    @JsonProperty("user_id")
+    private String userId;
+
+    public BaseResponse() {
+    }
+
+    public BaseResponse(String status, String message, String user_id) {
+        this.status = status;
+        this.message = message;
+        this.userId = user_id;
+    }
 
     public String getStatus() {
         return status;
@@ -31,12 +42,12 @@ public class BaseResponse {
         this.message = message;
     }
 
-    public String getUser_id() {
-        return user_id;
+    public String getUserId() {
+        return userId;
     }
 
-    public void setUser_id(String user_id) {
-        this.user_id = user_id;
+    public void setUserId(String userId) {
+        this.userId = userId;
     }
 
     @Override

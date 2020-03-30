@@ -26,9 +26,7 @@ public class AccessHistoryQuery {
 
 
     public static String queryAccessHistory(String realm){
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(realm).append(s.APPLIANCE_ACCESSHISTORY);
-        return stringBuilder.toString();
+        return realm + s.APPLIANCE_ACCESSHISTORY;
     }
 
 }

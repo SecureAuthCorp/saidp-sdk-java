@@ -6,6 +6,7 @@ import org.secureauth.sarestapi.data.Response.BaseResponse;
 import org.secureauth.sarestapi.data.Response.FactorsResponse;
 import org.secureauth.sarestapi.data.Response.ResponseObject;
 import org.secureauth.sarestapi.data.Response.ValidateOTPResponse;
+import org.secureauth.sarestapi.exception.SARestAPIException;
 import org.secureauth.sarestapi.interfaces.AuthenticationInterface;
 import org.secureauth.sarestapi.resources.s;
 
@@ -50,7 +51,7 @@ public class AuthenticationImpl implements AuthenticationInterface {
     }
 
     @Override
-    public FactorsResponse getFactorsForUser(SAAccess saAccess, String userid) {
+    public FactorsResponse getFactorsForUser(SAAccess saAccess, String userid) throws SARestAPIException {
         //Return Factors
         FactorsResponse factorsResponse = saAccess.factorsByUser(userid);
         System.out.println(factorsResponse.getMessage());
@@ -129,11 +130,11 @@ public class AuthenticationImpl implements AuthenticationInterface {
 
 
     @Override
-    public void PushToAccept(SAAccess saAccess, String user, String factorID, String ipAddress) throws InterruptedException {
+    public void PushToAccept(SAAccess saAccess, String user, String factorID, String ipAddress) throws InterruptedException, SARestAPIException {
         System.out.println("Start Push 2 Accept Test ++++++++++++++++++");
         ResponseObject ro = saAccess.sendPushToAcceptReq(user, factorID, ipAddress, null, null);
         System.out.println(ro);
-        String refId = ro.getReference_id();
+        String refId = ro.getReferenceId();
         PushAcceptStatus status;
         do {
             Thread.sleep(2000);
