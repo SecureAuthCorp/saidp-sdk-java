@@ -16,6 +16,7 @@ import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.MediaType;
 
 import org.glassfish.jersey.client.ClientProperties;
+import org.glassfish.jersey.message.internal.MessageBodyProviderNotFoundException;
 import org.secureauth.sarestapi.data.*;
 import org.secureauth.sarestapi.data.BehavioralBio.BehaveBioRequest;
 import org.secureauth.sarestapi.data.Requests.BehaveBioResetRequest;
@@ -223,11 +224,15 @@ public class SAExecuter {
                     header("Authorization", auth).
                     header("X-SA-Ext-Date", ts).
                     post(Entity.entity(JSONUtil.convertObjectToJSON(authRequest), MediaType.APPLICATION_JSON));
-            responseObject=response.readEntity(BaseResponse.class);
+            try{
+                responseObject=response.readEntity(BaseResponse.class);
+            }catch (MessageBodyProviderNotFoundException e){
+                logger.error("BAD status ("+response.getStatus() +") answer from API IdP. Please check: " + query );
+            }
             response.close();
         }catch(Exception e){
-            logger.error(new StringBuilder().append("Exception Validating User Password: \nQuery:\n\t")
-                    .append(query).append("\nError:").append(e.getMessage()).toString(), e);
+            logger.error("Exception Validating User Password: \nQuery:\n\t" +
+                    query + "\nError:" + e.getMessage(), e);
         }
 
         return responseObject;
