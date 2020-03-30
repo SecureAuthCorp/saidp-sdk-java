@@ -134,7 +134,7 @@ public class AuthenticationImpl implements AuthenticationInterface {
         System.out.println("Start Push 2 Accept Test ++++++++++++++++++");
         ResponseObject ro = saAccess.sendPushToAcceptReq(user, factorID, ipAddress, null, null);
         System.out.println(ro);
-        String refId = ro.getReferenceId();
+        String refId = ro.getReference_id();
         PushAcceptStatus status;
         do {
             Thread.sleep(2000);

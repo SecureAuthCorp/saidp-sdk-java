@@ -1,7 +1,10 @@
 package org.secureauth.sarestapi.data.Response;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonSetter;
 import org.secureauth.sarestapi.util.JSONUtil;
 
 
@@ -30,12 +33,14 @@ OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ResponseObject extends BaseResponse {
 
-	@JsonProperty("reference_id")
-    private String referenceId;
+    private String reference_id;
     private int otp;
     private String symbol;
 
-    public int getOtp() {
+	public ResponseObject(){}
+
+
+	public int getOtp() {
         return otp;
     }
 
@@ -43,12 +48,12 @@ public class ResponseObject extends BaseResponse {
         this.otp = otp;
     }
 
-	public String getReferenceId() {
-		return referenceId;
+	public String getReference_id() {
+		return reference_id;
 	}
 
-	public void setReferenceId(String referenceId) {
-		this.referenceId = referenceId;
+	public void setReference_id(String reference_id) {
+		this.reference_id = reference_id;
 	}
 
 	public String getSymbol() {

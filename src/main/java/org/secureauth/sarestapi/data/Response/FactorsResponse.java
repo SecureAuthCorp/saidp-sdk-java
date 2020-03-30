@@ -4,7 +4,9 @@ package org.secureauth.sarestapi.data.Response;
  * @author rrowcliffe@secureauth.com
  *
  */
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.secureauth.sarestapi.data.Factors;
 import org.secureauth.sarestapi.util.JSONUtil;
 
