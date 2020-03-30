@@ -29,20 +29,18 @@ OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class AuthRequest {
 
-    @JsonProperty("user_id")
-    protected String userId;
+    protected String user_id;
     private String type;
     private String token;
-    @JsonProperty("factor_id")
-    private String factorId;
+    private String factor_id;
 
 
-    public String getUserId() {
-        return userId;
+    public String getUser_id() {
+        return user_id;
     }
 
-    public void setUserId(String userId) {
-        this.userId = userId;
+    public void setUser_id(String userId) {
+        this.user_id = userId;
     }
 
     public String getType() {
@@ -61,12 +59,12 @@ public class AuthRequest {
         this.token = token;
     }
 
-    public String getFactorId() {
-        return factorId;
+    public String getFactor_id() {
+        return factor_id;
     }
 
-    public void setFactorId(String factorId) {
-        this.factorId = factorId;
+    public void setFactor_id(String factorId) {
+        this.factor_id = factorId;
     }
 
     @Override

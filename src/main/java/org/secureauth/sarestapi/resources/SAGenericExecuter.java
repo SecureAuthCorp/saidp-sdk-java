@@ -3,6 +3,7 @@ package org.secureauth.sarestapi.resources;
 import org.glassfish.jersey.client.ClientConfig;
 import org.glassfish.jersey.client.ClientProperties;
 import org.secureauth.sarestapi.data.SABaseURL;
+import org.secureauth.sarestapi.exception.SAConnectionException;
 import org.secureauth.sarestapi.exception.SARestAPIException;
 import org.secureauth.sarestapi.filters.SACheckRequestFilter;
 import org.secureauth.sarestapi.util.JSONUtil;
@@ -90,10 +91,11 @@ public class SAGenericExecuter {
 					header("Authorization", auth).
 					header("X-SA-Ext-Date", ts).
 					get();
+			checkResponseStatus(response.getStatus(), exceptionMessage, query);
 			T responseObject = response.readEntity(responseTypeClass);
 			response.close();
 			return responseObject;
-		}catch(Exception e){
+		} catch(Exception e){
 			throw new SARestAPIException(exceptionMessage + " Query: " + query, e);
 		}
 	}
@@ -115,7 +117,7 @@ public class SAGenericExecuter {
 					header("Authorization", header).
 					header("X-SA-Ext-Date", ts).
 					post(Entity.entity(JSONUtil.convertObjectToJSON(requestType),MediaType.APPLICATION_JSON));
-
+			checkResponseStatus(response.getStatus(), exceptionMessage, query);
 			T responseObject = response.readEntity(responseTypeClass);
 			response.close();
 			return responseObject;
@@ -141,6 +143,7 @@ public class SAGenericExecuter {
 					header("Authorization", auth).
 					header("X-SA-Ext-Date", ts).
 					post(Entity.entity("",MediaType.APPLICATION_JSON));
+			checkResponseStatus(response.getStatus(), exceptionMessage, query);
 			T responseObject = response.readEntity(responseTypeClass);
 			response.close();
 			return responseObject;
@@ -177,4 +180,13 @@ public class SAGenericExecuter {
 		}
 	}
 
+	private boolean errorStatus(int status){
+		return status >= 400;
+	}
+
+	private void checkResponseStatus(int status, String exceptionMessage, String query) throws SAConnectionException {
+		if (errorStatus(status)){
+			throw new SAConnectionException("Bad STATUS answer: " + status);
+		}
+	}
 }

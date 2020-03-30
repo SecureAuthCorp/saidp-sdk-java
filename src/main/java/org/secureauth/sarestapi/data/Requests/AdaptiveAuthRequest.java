@@ -32,7 +32,7 @@ public class AdaptiveAuthRequest extends AuthRequest {
     private AAParameters parameters;
 
     public AdaptiveAuthRequest(String userId, String ip) {
-    	this.userId = userId;
+    	this.user_id = userId;
     	parameters = new AAParameters();
     	parameters.setIp_address(ip);
     }

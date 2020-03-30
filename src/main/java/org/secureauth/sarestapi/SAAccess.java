@@ -51,6 +51,7 @@ public class SAAccess {
     protected SABaseURL saBaseURL;
     protected SAAuth saAuth;
     protected SAExecuter saExecuter;
+    private static ResponseObject invalidResponse;
 
     /**
      *<p>
@@ -68,6 +69,7 @@ public class SAAccess {
         saBaseURL=new SABaseURL(host,port,ssl);
         saAuth = new SAAuth(applicationID,applicationKey,realm);
         saExecuter=new SAExecuter(saBaseURL);
+        invalidResponse = buildInvalidResponseObject();
     }
 
     /**
@@ -88,6 +90,7 @@ public class SAAccess {
         saBaseURL=new SABaseURL(host,port,ssl,selfSigned);
         saAuth = new SAAuth(applicationID,applicationKey,realm);
         saExecuter=new SAExecuter(saBaseURL);
+        invalidResponse = buildInvalidResponseObject();
     }
 
     /**
@@ -154,9 +157,9 @@ public class SAAccess {
         String ts = getServerTime();
         RestApiHeader restApiHeader = new RestApiHeader();
         PushToAcceptRequest req = new PushToAcceptRequest();
-        req.setUserId(userid);
+        req.setUser_id(userid);
         req.setType(type);
-        req.setFactorId(factor_id);
+        req.setFactor_id(factor_id);
         PushAcceptDetails pad = new PushAcceptDetails();
         pad.setEnduser_ip(endUserIP);
         if (clientCompany != null) {
@@ -167,7 +170,6 @@ public class SAAccess {
         }
         req.setPush_accept_details(pad);
         String header = restApiHeader.getAuthorizationHeader(saAuth,"POST", AuthQuery.queryAuth(saAuth.getRealm()), req,ts);
-
 
         return saExecuter.executeGenericPost(header,saBaseURL.getApplianceURL() + AuthQuery.queryAuth(saAuth.getRealm()), req, ResponseObject.class, ts);
 
@@ -192,9 +194,9 @@ public class SAAccess {
         String ts = this.getServerTime();
         RestApiHeader restApiHeader = new RestApiHeader();
         PushToAcceptBiometricsRequest req = new PushToAcceptBiometricsRequest();
-        req.setUserId(userid);
+        req.setUser_id(userid);
         req.setType("push_accept_biometric");
-        req.setFactorId( factor_id );
+        req.setFactor_id( factor_id );
         req.setBiometricType( biometricType );
         PushAcceptDetails pad = new PushAcceptDetails();
         pad.setEnduser_ip(endUserIP);
@@ -230,7 +232,7 @@ public class SAAccess {
         try{
             return saExecuter.executeGenericPostRequest(header,saBaseURL.getApplianceURL() + AuthQuery.queryAAuth(saAuth.getRealm()), req, AdaptiveAuthResponse.class, ts);
         }catch (Exception e){
-            logger.error(new StringBuilder().append("Exception occurred executing REST query::\n").append(e.getMessage()).append("\n").toString(), e);
+            logger.error(new StringBuilder().append("Exception occurred executing REST query:\n").append(e.getMessage()).append("\n").toString(), e);
         }
         return null;
     }
@@ -260,7 +262,7 @@ public class SAAccess {
         RestApiHeader restApiHeader = new RestApiHeader();
         AuthRequest authRequest = new AuthRequest();
 
-        authRequest.setUserId(userid);
+        authRequest.setUser_id(userid);
         authRequest.setType("user_id");
 
         String header = restApiHeader.getAuthorizationHeader(saAuth,"POST", AuthQuery.queryAuth(saAuth.getRealm()), authRequest,ts);
@@ -281,7 +283,7 @@ public class SAAccess {
         RestApiHeader restApiHeader = new RestApiHeader();
         AuthRequest authRequest = new AuthRequest();
 
-        authRequest.setUserId(userid);
+        authRequest.setUser_id(userid);
         authRequest.setType("password");
         authRequest.setToken(password);
 
@@ -290,7 +292,7 @@ public class SAAccess {
         try{
             return saExecuter.executeValidateUserPassword(header,saBaseURL.getApplianceURL() + AuthQuery.queryAuth(saAuth.getRealm()),authRequest,ts);
         }catch (Exception e){
-            logger.error(new StringBuilder().append("Exception occurred executing REST query::\n").append(e.getMessage()).append("\n").toString(), e);
+            logger.error(new StringBuilder().append("Exception occurred executing REST query:\n").append(e.getMessage()).append("\n").toString(), e);
         }
         return null;
     }
@@ -308,7 +310,7 @@ public class SAAccess {
         RestApiHeader restApiHeader = new RestApiHeader();
         AuthRequest authRequest = new AuthRequest();
 
-        authRequest.setUserId(userid);
+        authRequest.setUser_id(userid);
         authRequest.setType("pin");
         authRequest.setToken(pin);
 
@@ -317,7 +319,7 @@ public class SAAccess {
         try{
             return saExecuter.executeValidateUserPin(header,saBaseURL.getApplianceURL() + AuthQuery.queryAuth(saAuth.getRealm()),authRequest,ts);
         }catch (Exception e){
-            logger.error(new StringBuilder().append("Exception occurred executing REST query::\n").append(e.getMessage()).append("\n").toString(), e);
+            logger.error(new StringBuilder().append("Exception occurred executing REST query:\n").append(e.getMessage()).append("\n").toString(), e);
         }
         return null;
     }
@@ -336,17 +338,17 @@ public class SAAccess {
         RestApiHeader restApiHeader = new RestApiHeader();
         AuthRequest authRequest = new AuthRequest();
 
-        authRequest.setUserId(userid);
+        authRequest.setUser_id(userid);
         authRequest.setType("kba");
         authRequest.setToken(answer);
-        authRequest.setFactorId(factor_id);
+        authRequest.setFactor_id(factor_id);
 
         String header = restApiHeader.getAuthorizationHeader(saAuth,"POST", AuthQuery.queryAuth(saAuth.getRealm()), authRequest,ts);
 
         try{
             return saExecuter.executeValidateKba(header,saBaseURL.getApplianceURL() + AuthQuery.queryAuth(saAuth.getRealm()),authRequest,ts);
         }catch (Exception e){
-            logger.error(new StringBuilder().append("Exception occurred executing REST query::\n").append(e.getMessage()).append("\n").toString(), e);
+            logger.error(new StringBuilder().append("Exception occurred executing REST query:\n").append(e.getMessage()).append("\n").toString(), e);
         }
         return null;
     }
@@ -365,17 +367,17 @@ public class SAAccess {
         RestApiHeader restApiHeader = new RestApiHeader();
         AuthRequest authRequest = new AuthRequest();
 
-        authRequest.setUserId(userid);
+        authRequest.setUser_id(userid);
         authRequest.setType("oath");
         authRequest.setToken(otp);
-        authRequest.setFactorId(factor_id);
+        authRequest.setFactor_id(factor_id);
 
         String header = restApiHeader.getAuthorizationHeader(saAuth,"POST", AuthQuery.queryAuth(saAuth.getRealm()), authRequest,ts);
 
         try{
             return saExecuter.executeValidateOath(header,saBaseURL.getApplianceURL() + AuthQuery.queryAuth(saAuth.getRealm()),authRequest,ts);
         }catch (Exception e){
-            logger.error(new StringBuilder().append("Exception occurred executing REST query::\n").append(e.getMessage()).append("\n").toString(), e);
+            logger.error(new StringBuilder().append("Exception occurred executing REST query:\n").append(e.getMessage()).append("\n").toString(), e);
         }
         return null;
     }
@@ -393,16 +395,16 @@ public class SAAccess {
         RestApiHeader restApiHeader = new RestApiHeader();
         AuthRequest authRequest = new AuthRequest();
 
-        authRequest.setUserId(userid);
+        authRequest.setUser_id(userid);
         authRequest.setType("call");
-        authRequest.setFactorId(factor_id);
+        authRequest.setFactor_id(factor_id);
 
         String header = restApiHeader.getAuthorizationHeader(saAuth,"POST", AuthQuery.queryAuth(saAuth.getRealm()), authRequest,ts);
 
         try{
             return saExecuter.executeOTPByPhone(header,saBaseURL.getApplianceURL() + AuthQuery.queryAuth(saAuth.getRealm()),authRequest,ts);
         }catch (Exception e){
-            logger.error(new StringBuilder().append("Exception occurred executing REST query::\n").append(e.getMessage()).append("\n").toString(), e);
+            logger.error(new StringBuilder().append("Exception occurred executing REST query:\n").append(e.getMessage()).append("\n").toString(), e);
         }
         return null;
     }
@@ -420,7 +422,7 @@ public class SAAccess {
         RestApiHeader restApiHeader = new RestApiHeader();
         AuthRequest authRequest = new AuthRequest();
 
-        authRequest.setUserId(userid);
+        authRequest.setUser_id(userid);
         authRequest.setType("call");
         authRequest.setToken(phoneNumber);
 
@@ -429,7 +431,7 @@ public class SAAccess {
         try{
             return saExecuter.executeOTPByPhone(header,saBaseURL.getApplianceURL() + AuthQuery.queryAuth(saAuth.getRealm()),authRequest,ts);
         }catch (Exception e){
-            logger.error(new StringBuilder().append("Exception occurred executing REST query::\n").append(e.getMessage()).append("\n").toString(), e);
+            logger.error(new StringBuilder().append("Exception occurred executing REST query:\n").append(e.getMessage()).append("\n").toString(), e);
         }
         return null;
     }
@@ -448,15 +450,15 @@ public class SAAccess {
         RestApiHeader restApiHeader = new RestApiHeader();
         AuthRequest authRequest = new AuthRequest();
 
-        authRequest.setUserId(userid);
+        authRequest.setUser_id(userid);
         authRequest.setType("sms");
-        authRequest.setFactorId(factor_id);
+        authRequest.setFactor_id(factor_id);
         String header = restApiHeader.getAuthorizationHeader(saAuth,"POST", AuthQuery.queryAuth(saAuth.getRealm()), authRequest,ts);
 
         try{
             return saExecuter.executeOTPBySMS(header,saBaseURL.getApplianceURL() + AuthQuery.queryAuth(saAuth.getRealm()),authRequest,ts);
         }catch (Exception e){
-            logger.error(new StringBuilder().append("Exception occurred executing REST query::\n").append(e.getMessage()).append("\n").toString(), e);
+            logger.error(new StringBuilder().append("Exception occurred executing REST query:\n").append(e.getMessage()).append("\n").toString(), e);
         }
         return null;
     }
@@ -483,7 +485,7 @@ public class SAAccess {
         try{
             return saExecuter.executeValidateOTP(header,saBaseURL.getApplianceURL() + ValidateOTPQuery.queryValidateOTP(saAuth.getRealm()),validateOTPRequest,ts);
         }catch (Exception e){
-            logger.error(new StringBuilder().append("Exception occurred executing REST query::\n").append(e.getMessage()).append("\n").toString(), e);
+            logger.error(new StringBuilder().append("Exception occurred executing REST query:\n").append(e.getMessage()).append("\n").toString(), e);
         }
         return null;
     }
@@ -501,7 +503,7 @@ public class SAAccess {
         RestApiHeader restApiHeader = new RestApiHeader();
         AuthRequest authRequest = new AuthRequest();
 
-        authRequest.setUserId(userid);
+        authRequest.setUser_id(userid);
         authRequest.setType("sms");
         authRequest.setToken(phoneNumber);
         String header = restApiHeader.getAuthorizationHeader(saAuth,"POST", AuthQuery.queryAuth(saAuth.getRealm()), authRequest,ts);
@@ -509,7 +511,7 @@ public class SAAccess {
         try{
             return saExecuter.executeOTPBySMS(header,saBaseURL.getApplianceURL() + AuthQuery.queryAuth(saAuth.getRealm()),authRequest,ts);
         }catch (Exception e){
-            logger.error(new StringBuilder().append("Exception occurred executing REST query::\n").append(e.getMessage()).append("\n").toString(), e);
+            logger.error(new StringBuilder().append("Exception occurred executing REST query:\n").append(e.getMessage()).append("\n").toString(), e);
         }
         return null;
     }
@@ -527,15 +529,15 @@ public class SAAccess {
         RestApiHeader restApiHeader = new RestApiHeader();
         AuthRequest authRequest = new AuthRequest();
 
-        authRequest.setUserId(userid);
+        authRequest.setUser_id(userid);
         authRequest.setType("help_desk");
-        authRequest.setFactorId(factor_id);
+        authRequest.setFactor_id(factor_id);
         String header = restApiHeader.getAuthorizationHeader(saAuth,"POST", AuthQuery.queryAuth(saAuth.getRealm()), authRequest,ts);
 
         try{
             return saExecuter.executeOTPByEmail(header,saBaseURL.getApplianceURL() + AuthQuery.queryAuth(saAuth.getRealm()), authRequest,ts);
         }catch (Exception e){
-            logger.error(new StringBuilder().append("Exception occurred executing REST query::\n").append(e.getMessage()).append("\n").toString(), e);
+            logger.error(new StringBuilder().append("Exception occurred executing REST query:\n").append(e.getMessage()).append("\n").toString(), e);
         }
         return null;
     }
@@ -553,15 +555,15 @@ public class SAAccess {
         RestApiHeader restApiHeader = new RestApiHeader();
         AuthRequest authRequest = new AuthRequest();
 
-        authRequest.setUserId(userid);
+        authRequest.setUser_id(userid);
         authRequest.setType("email");
-        authRequest.setFactorId(factor_id);
+        authRequest.setFactor_id(factor_id);
         String header = restApiHeader.getAuthorizationHeader(saAuth,"POST", AuthQuery.queryAuth(saAuth.getRealm()), authRequest,ts);
 
         try{
             return saExecuter.executeOTPByEmail(header,saBaseURL.getApplianceURL() + AuthQuery.queryAuth(saAuth.getRealm()), authRequest,ts);
         }catch (Exception e){
-            logger.error(new StringBuilder().append("Exception occurred executing REST query::\n").append(e.getMessage()).append("\n").toString(), e);
+            logger.error(new StringBuilder().append("Exception occurred executing REST query:\n").append(e.getMessage()).append("\n").toString(), e);
         }
         return null;
     }
@@ -579,7 +581,7 @@ public class SAAccess {
         RestApiHeader restApiHeader = new RestApiHeader();
         AuthRequest authRequest = new AuthRequest();
 
-        authRequest.setUserId(userid);
+        authRequest.setUser_id(userid);
         authRequest.setType("email");
         authRequest.setToken(emailAddress);
         String header = restApiHeader.getAuthorizationHeader(saAuth,"POST", AuthQuery.queryAuth(saAuth.getRealm()), authRequest,ts);
@@ -587,7 +589,7 @@ public class SAAccess {
         try{
             return saExecuter.executeOTPByEmail(header,saBaseURL.getApplianceURL() + AuthQuery.queryAuth(saAuth.getRealm()), authRequest,ts);
         }catch (Exception e){
-            logger.error(new StringBuilder().append("Exception occurred executing REST query::\n").append(e.getMessage()).append("\n").toString(), e);
+            logger.error(new StringBuilder().append("Exception occurred executing REST query:\n").append(e.getMessage()).append("\n").toString(), e);
         }
         return null;
     }
@@ -606,15 +608,15 @@ public class SAAccess {
         RestApiHeader restApiHeader = new RestApiHeader();
         AuthRequest authRequest = new AuthRequest();
 
-        authRequest.setUserId(userid);
+        authRequest.setUser_id(userid);
         authRequest.setType("push");
-        authRequest.setFactorId(factor_id);
+        authRequest.setFactor_id(factor_id);
         String header = restApiHeader.getAuthorizationHeader(saAuth,"POST", AuthQuery.queryAuth(saAuth.getRealm()), authRequest,ts);
 
         try{
             return saExecuter.executeGenericPostRequest(header,saBaseURL.getApplianceURL() + AuthQuery.queryAuth(saAuth.getRealm()), authRequest, ResponseObject.class, ts);
         }catch (Exception e){
-            logger.error(new StringBuilder().append("Exception occurred executing REST query::\n").append(e.getMessage()).append("\n").toString(), e);
+            logger.error(new StringBuilder().append("Exception occurred executing REST query:\n").append(e.getMessage()).append("\n").toString(), e);
         }
         return null;
     }
@@ -632,15 +634,15 @@ public class SAAccess {
         RestApiHeader restApiHeader = new RestApiHeader();
         AuthRequest authRequest = new AuthRequest();
 
-        authRequest.setUserId(userid);
+        authRequest.setUser_id(userid);
         authRequest.setType("help_desk");
-        authRequest.setFactorId(factor_id);
+        authRequest.setFactor_id(factor_id);
         String header = restApiHeader.getAuthorizationHeader(saAuth,"POST", AuthQuery.queryAuth(saAuth.getRealm()), authRequest,ts);
 
         try{
             return saExecuter.executeOTPByHelpDesk(header,saBaseURL.getApplianceURL() + AuthQuery.queryAuth(saAuth.getRealm()),authRequest,ts);
         }catch (Exception e){
-            logger.error(new StringBuilder().append("Exception occurred executing REST query::\n").append(e.getMessage()).append("\n").toString(), e);
+            logger.error(new StringBuilder().append("Exception occurred executing REST query:\n").append(e.getMessage()).append("\n").toString(), e);
         }
         return null;
     }
@@ -668,7 +670,7 @@ public class SAAccess {
             return saExecuter.executeAccessHistory(header,saBaseURL.getApplianceURL() + AccessHistoryQuery.queryAccessHistory(saAuth.getRealm()),accessHistoryRequest,ts);
 
         }catch (Exception e){
-            logger.error(new StringBuilder().append("Exception occurred executing REST query::\n").append(e.getMessage()).append("\n").toString(), e);
+            logger.error(new StringBuilder().append("Exception occurred executing REST query:\n").append(e.getMessage()).append("\n").toString(), e);
         }
 
         return null;
@@ -698,7 +700,7 @@ public class SAAccess {
             return saExecuter.executeDFPConfirm(header,saBaseURL.getApplianceURL() + DFPQuery.queryDFPConfirm(saAuth.getRealm()), dfpConfirmRequest, ts);
 
         }catch (Exception e){
-            logger.error(new StringBuilder().append("Exception occurred executing REST query::\n").append(e.getMessage()).append("\n").toString(), e);
+            logger.error(new StringBuilder().append("Exception occurred executing REST query:\n").append(e.getMessage()).append("\n").toString(), e);
         }
 
         return null;
@@ -730,7 +732,7 @@ public class SAAccess {
             return saExecuter.executeDFPValidate(header,saBaseURL.getApplianceURL() + DFPQuery.queryDFPValidate(saAuth.getRealm()), dfpValidateRequest, ts);
 
         }catch (Exception e){
-            logger.error(new StringBuilder().append("Exception occurred executing REST query::\n").append(e.getMessage()).append("\n").toString(), e);
+            logger.error(new StringBuilder().append("Exception occurred executing REST query:\n").append(e.getMessage()).append("\n").toString(), e);
         }
 
         return null;
@@ -752,7 +754,7 @@ public class SAAccess {
             return saExecuter.executeGetJSObject(header,saBaseURL.getApplianceURL() + DFPQuery.queryDFPjs(saAuth.getRealm()),ts, JSObjectResponse.class);
 
         }catch (Exception e){
-            logger.error(new StringBuilder().append("Exception occurred executing REST query::\n").append(e.getMessage()).append("\n").toString(), e);
+            logger.error(new StringBuilder().append("Exception occurred executing REST query:\n").append(e.getMessage()).append("\n").toString(), e);
         }
         return null;
     }
@@ -779,7 +781,7 @@ public class SAAccess {
             return saExecuter.executeGetJSObject(header,saBaseURL.getApplianceURL() + BehaveBioQuery.queryBehaveBiojs(saAuth.getRealm()),ts, JSObjectResponse.class);
 
         }catch (Exception e){
-            logger.error(new StringBuilder().append("Exception occurred executing REST query::\n").append(e.getMessage()).append("\n").toString(), e);
+            logger.error(new StringBuilder().append("Exception occurred executing REST query:\n").append(e.getMessage()).append("\n").toString(), e);
         }
         return null;
     }
@@ -813,7 +815,7 @@ public class SAAccess {
             return saExecuter.executeBehaveBioPost(header,saBaseURL.getApplianceURL() + BehaveBioQuery.queryBehaveBio(saAuth.getRealm()), behaveBioRequest, ts);
 
         }catch (Exception e){
-            logger.error(new StringBuilder().append("Exception occurred executing REST query::\n").append(e.getMessage()).append("\n").toString(), e);
+            logger.error(new StringBuilder().append("Exception occurred executing REST query:\n").append(e.getMessage()).append("\n").toString(), e);
         }
 
         return null;
@@ -847,7 +849,7 @@ public class SAAccess {
             return saExecuter.executeBehaveBioReset(header,saBaseURL.getApplianceURL() + BehaveBioQuery.queryBehaveBio(saAuth.getRealm()), behaveBioResetRequest, ts);
 
         }catch (Exception e){
-            logger.error(new StringBuilder().append("Exception occurred executing REST query::\n").append(e.getMessage()).append("\n").toString(), e);
+            logger.error(new StringBuilder().append("Exception occurred executing REST query:\n").append(e.getMessage()).append("\n").toString(), e);
         }
 
         return null;
@@ -883,7 +885,7 @@ public class SAAccess {
                         newUserProfile, ResponseObject.class, ts,"Exception Creating User Profile");
 
             }catch (Exception e){
-                logger.error(new StringBuilder().append("Exception occurred executing REST query::\n").append(e.getMessage()).append("\n").toString(), e);
+                logger.error(new StringBuilder().append("Exception occurred executing REST query:\n").append(e.getMessage()).append("\n").toString(), e);
             }
         }
         return null;
@@ -910,7 +912,7 @@ public class SAAccess {
                     ResponseObject.class, ts, "Exception Updating User Profile");
 
         }catch (Exception e){
-            logger.error(new StringBuilder().append("Exception occurred executing REST query::\n").append(e.getMessage()).append("\n").toString(), e);
+            logger.error(new StringBuilder().append("Exception occurred executing REST query:\n").append(e.getMessage()).append("\n").toString(), e);
         }
 
         return null;
@@ -933,7 +935,7 @@ public class SAAccess {
             return saExecuter.executeGenericPostRequest(header,saBaseURL.getApplianceURL() + IDMQueries.queryUserToGroup(saAuth.getRealm(),userid,groupName),
                     ts, ResponseObject.class);
         }catch (Exception e){
-            logger.error(new StringBuilder().append("Exception occurred executing REST query::\n").append(e.getMessage()).append("\n").toString(), e);
+            logger.error(new StringBuilder().append("Exception occurred executing REST query:\n").append(e.getMessage()).append("\n").toString(), e);
         }
         return null;
     }
@@ -955,7 +957,7 @@ public class SAAccess {
             return saExecuter.executeGenericPostRequest(header,saBaseURL.getApplianceURL() + IDMQueries.queryGroupToUsers(saAuth.getRealm(),groupName),
                     usersToGroup,GroupAssociationResponse.class, ts,"Exception Associating Users to Group");
         }catch (Exception e){
-            logger.error(new StringBuilder().append("Exception occurred executing REST query::\n").append(e.getMessage()).append("\n").toString(), e);
+            logger.error(new StringBuilder().append("Exception occurred executing REST query:\n").append(e.getMessage()).append("\n").toString(), e);
         }
         return null;
     }
@@ -978,7 +980,7 @@ public class SAAccess {
             return saExecuter.executeGenericPostRequest(header,saBaseURL.getApplianceURL() + IDMQueries.queryGroupToUser(saAuth.getRealm(),userid,groupName),
                     ts, GroupAssociationResponse.class, "Exception Adding Group to User");
         }catch (Exception e){
-            logger.error("Exception occurred executing REST query::\n" + e.getMessage() + "\n", e);
+            logger.error("Exception occurred executing REST query:\n" + e.getMessage() + "\n", e);
         }
         return null;
     }
@@ -1000,7 +1002,7 @@ public class SAAccess {
             return saExecuter.executeGenericPostRequest(header,saBaseURL.getApplianceURL() + IDMQueries.queryUserToGroups(saAuth.getRealm(),userId),
                     userToGroups, GroupAssociationResponse.class, ts, "Exception Associating Users to Group");
         }catch (Exception e){
-            logger.error("Exception occurred executing REST query::\n" + e.getMessage() + "\n", e);
+            logger.error("Exception occurred executing REST query:\n" + e.getMessage() + "\n", e);
         }
         return null;
     }
@@ -1022,7 +1024,7 @@ public class SAAccess {
             return saExecuter.executeGenericGetRequest(header,saBaseURL.getApplianceURL() + IDMQueries.queryUserProfile(saAuth.getRealm(),userid),ts, UserProfileResponse.class);
 
         }catch (Exception e){
-            logger.error("Exception occurred executing REST query::\n" + e.getMessage() + "\n", e);
+            logger.error("Exception occurred executing REST query:\n" + e.getMessage() + "\n", e);
         }
         return null;
     }
@@ -1047,7 +1049,7 @@ public class SAAccess {
             return saExecuter.executeUserPasswordReset(header,saBaseURL.getApplianceURL() + IDMQueries.queryUserResetPwd(saAuth.getRealm(),userid),userPasswordRequest,ts);
 
         }catch (Exception e){
-            logger.error("Exception occurred executing REST query::\n" + e.getMessage() + "\n", e);
+            logger.error("Exception occurred executing REST query:\n" + e.getMessage() + "\n", e);
         }
         return null;
     }
@@ -1074,7 +1076,7 @@ public class SAAccess {
             return saExecuter.executeUserPasswordChange(header,saBaseURL.getApplianceURL() + IDMQueries.queryUserChangePwd(saAuth.getRealm(),userid),userPasswordRequest,ts);
 
         }catch (Exception e){
-            logger.error(new StringBuilder().append("Exception occurred executing REST query::\n").append(e.getMessage()).append("\n").toString(), e);
+            logger.error(new StringBuilder().append("Exception occurred executing REST query:\n").append(e.getMessage()).append("\n").toString(), e);
         }
         return null;
     }
@@ -1111,7 +1113,7 @@ public class SAAccess {
             return saExecuter.executeNumberProfilePost(header,saBaseURL.getApplianceURL() + NumberProfileQuery.queryNumberProfile(saAuth.getRealm()), numberProfileRequest, ts);
 
         }catch (Exception e){
-            logger.error(new StringBuilder().append("Exception occurred executing REST query::\n").append(e.getMessage()).append("\n").toString(), e);
+            logger.error(new StringBuilder().append("Exception occurred executing REST query:\n").append(e.getMessage()).append("\n").toString(), e);
         }
 
         return null;
@@ -1153,7 +1155,7 @@ public class SAAccess {
             return saExecuter.executeNumberProfileUpdate(header,saBaseURL.getApplianceURL() + NumberProfileQuery.queryNumberProfile(saAuth.getRealm()), numberProfileUpdateRequest, ts);
 
         }catch (Exception e){
-            logger.error(new StringBuilder().append("Exception occurred executing REST query::\n").append(e.getMessage()).append("\n").toString(), e);
+            logger.error(new StringBuilder().append("Exception occurred executing REST query:\n").append(e.getMessage()).append("\n").toString(), e);
         }
 
         return null;
@@ -1176,5 +1178,11 @@ public class SAAccess {
         String header = restApiHeader.getAuthorizationHeader(saAuth, "GET", query, ts);
 
         return saExecuter.executeGenericGetRequest(header, saBaseURL.getApplianceURL() + query, ts, String.class, "Exception getting User Factors");
+    }
+
+    private ResponseObject buildInvalidResponseObject() {
+        ResponseObject response = new ResponseObject();
+        response.setStatus( "invalid" );
+        return response;
     }
 }
