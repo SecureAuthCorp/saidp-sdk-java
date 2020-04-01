@@ -5,6 +5,7 @@ package org.secureauth.sarestapi.resources;
 import java.security.SecureRandom;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.util.Optional;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLContext;
@@ -14,6 +15,8 @@ import javax.net.ssl.X509TrustManager;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.MediaType;
 
+import org.glassfish.jersey.client.ClientProperties;
+import org.glassfish.jersey.message.internal.MessageBodyProviderNotFoundException;
 import org.secureauth.sarestapi.data.*;
 import org.secureauth.sarestapi.data.BehavioralBio.BehaveBioRequest;
 import org.secureauth.sarestapi.data.Requests.BehaveBioResetRequest;
@@ -63,6 +66,7 @@ public class SAExecuter {
 
     private Client client=null;
     private static Logger logger=LoggerFactory.getLogger(SAExecuter.class);
+    private static final String TEN_SECONDS = "10000";
 
     private SABaseURL saBaseURL = null;
     public SAExecuter(SABaseURL saBaseURL){
@@ -107,7 +111,9 @@ public class SAExecuter {
                         }
                     })
                     .build();
-
+            int timeoutSeconds = Integer.parseInt(Optional.ofNullable(System.getProperty("rest.api.timeout")).orElse(TEN_SECONDS));
+            client.property(ClientProperties.CONNECT_TIMEOUT, timeoutSeconds);
+            client.property(ClientProperties.READ_TIMEOUT, timeoutSeconds);
         }catch(Exception e){
             logger.error(new StringBuilder().append("Exception occurred while attempting to associating our SSL cert to the session.").toString(), e);
         }
@@ -218,11 +224,15 @@ public class SAExecuter {
                     header("Authorization", auth).
                     header("X-SA-Ext-Date", ts).
                     post(Entity.entity(JSONUtil.convertObjectToJSON(authRequest), MediaType.APPLICATION_JSON));
-            responseObject=response.readEntity(BaseResponse.class);
+            try{
+                responseObject=response.readEntity(BaseResponse.class);
+            }catch (MessageBodyProviderNotFoundException e){
+                logger.error("BAD status ("+response.getStatus() +") answer from API IdP. Please check: " + query );
+            }
             response.close();
         }catch(Exception e){
-            logger.error(new StringBuilder().append("Exception Validating User Password: \nQuery:\n\t")
-                    .append(query).append("\nError:").append(e.getMessage()).toString(), e);
+            logger.error("Exception Validating User Password: \nQuery:\n\t" +
+                    query + "\nError:" + e.getMessage(), e);
         }
 
         return responseObject;
