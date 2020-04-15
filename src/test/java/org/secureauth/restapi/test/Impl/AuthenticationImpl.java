@@ -7,7 +7,7 @@ import org.secureauth.sarestapi.data.Response.FactorsResponse;
 import org.secureauth.sarestapi.data.Response.ResponseObject;
 import org.secureauth.sarestapi.data.Response.ValidateOTPResponse;
 import org.secureauth.sarestapi.interfaces.AuthenticationInterface;
-import org.secureauth.sarestapi.resources.s;
+import org.secureauth.sarestapi.resources.Resource;
 
 /**
  * Created by rrowcliffe on 5/14/16.
@@ -29,7 +29,7 @@ public class AuthenticationImpl implements AuthenticationInterface {
 
 
             }
-            if(responseObject.getStatus().equalsIgnoreCase(s.STATUS_NOT_FOUND)) {
+            if(responseObject.getStatus().equalsIgnoreCase(Resource.STATUS_NOT_FOUND)) {
                 System.out.println(responseObject.toString());
             }
 
@@ -150,5 +150,10 @@ public class AuthenticationImpl implements AuthenticationInterface {
         ValidateOTPResponse validateOTPResponse = saAccess.validateOTP(user,otp);
         System.out.println(validateOTPResponse.toString());
         return validateOTPResponse;
+    }
+
+    @Override
+    public BaseResponse sendResetThrottleReq(String userid) {
+        return null;
     }
 }

@@ -1,6 +1,6 @@
 package org.secureauth.sarestapi.queries;
 
-import org.secureauth.sarestapi.resources.s;
+import org.secureauth.sarestapi.resources.Resource;
 
 /**
  * @author rrowcliffe@secureauth.com
@@ -27,7 +27,7 @@ public class ValidateOTPQuery {
 
     public static String queryValidateOTP(String realm){
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(realm).append(s.APPLIANCE_OTP_VALIDATE);
+        stringBuilder.append(realm).append(Resource.APPLIANCE_OTP_VALIDATE);
         return stringBuilder.toString();
     }
 

@@ -35,6 +35,7 @@ public interface AuthenticationInterface {
 
     ValidateOTPResponse validateOTP(SAAccess saAccess, String userId, String otp);
 
+    BaseResponse sendResetThrottleReq(String userid);
 
     void PushToAccept(SAAccess saAccess, String user, String factorID, String ipAddress) throws InterruptedException;
 

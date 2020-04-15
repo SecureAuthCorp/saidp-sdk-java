@@ -1,6 +1,6 @@
 package org.secureauth.sarestapi.queries;
 
-import org.secureauth.sarestapi.resources.s;
+import org.secureauth.sarestapi.resources.Resource;
 
 /**
  * @author rrowcliffe@secureauth.com
@@ -27,13 +27,13 @@ public class AuthQuery {
 
     public static String queryAuth(String realm){
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(realm).append(s.APPLIANCE_AUTH);
+        stringBuilder.append(realm).append(Resource.APPLIANCE_AUTH);
         return stringBuilder.toString();
     }
     
     public static String queryAAuth(String realm){
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(realm).append(s.APPLIANCE_AAUTH);
+        stringBuilder.append(realm).append(Resource.APPLIANCE_AAUTH);
         return stringBuilder.toString();
     }
 }

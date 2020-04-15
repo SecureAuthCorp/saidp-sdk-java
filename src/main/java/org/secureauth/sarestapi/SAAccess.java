@@ -19,7 +19,9 @@ import org.secureauth.sarestapi.data.UserProfile.NewUserProfile;
 import org.secureauth.sarestapi.data.UserProfile.UserProfile;
 import org.secureauth.sarestapi.data.UserProfile.UserToGroups;
 import org.secureauth.sarestapi.data.UserProfile.UsersToGroup;
+import org.secureauth.sarestapi.exception.SARestAPIException;
 import org.secureauth.sarestapi.queries.*;
+import org.secureauth.sarestapi.resources.Resource;
 import org.secureauth.sarestapi.resources.SAExecuter;
 import org.secureauth.sarestapi.util.JSONUtil;
 import org.secureauth.sarestapi.util.RestApiHeader;
@@ -282,6 +284,28 @@ public class SAAccess {
             logger.error(new StringBuilder().append("Exception occurred executing REST query::\n").append(e.getMessage()).append("\n").toString(), e);
         }
         return null;
+    }
+
+    /**
+     * reset counter for user
+     * @param userid id of user
+     * @return base answer
+     */
+    public BaseResponse sendResetThrottleReq(String userid){
+        try{
+            String ts = getServerTime();
+            RestApiHeader restApiHeader = new RestApiHeader();
+            AuthRequest authRequest = new AuthRequest();
+
+            authRequest.setUser_id(userid);
+            authRequest.setType("user_id");
+
+            String header = restApiHeader.getAuthorizationHeader(saAuth, Resource.METHOD_GET, ThrottleQuery.queryThrottles(saAuth.getRealm(), userid), authRequest,ts);
+
+            return saExecuter.executeValidateUser(header,saBaseURL.getApplianceURL() + ThrottleQuery.queryThrottles(saAuth.getRealm(), userid),authRequest,ts);
+        }catch (Exception e){
+            throw new SARestAPIException("Exception occurred executing REST query:\n" + e.getMessage() + "\n");
+        }
     }
 
     /**
