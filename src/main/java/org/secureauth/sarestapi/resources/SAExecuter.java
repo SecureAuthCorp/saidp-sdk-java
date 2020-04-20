@@ -153,36 +153,6 @@ public class SAExecuter {
 
     }
 
-    /*
-    public <T> T executePostRequest(String auth, String query, Object payloadRequest, Class<T> valueType, String ts)throws Exception{
-
-        if(client == null) {
-            createConnection();
-        }
-
-        WebTarget target = null;
-        Response response = null;
-        T genericResponse =null;
-
-        try{
-            target = client.target(query);
-
-            response = target.request().
-                    accept(MediaType.APPLICATION_JSON).
-                    header("Authorization", auth).
-                    header("X-SA-Ext-Date", ts).
-                    post(Entity.entity(JSONUtil.convertObjectToJSON(payloadRequest),MediaType.APPLICATION_JSON));
-
-            genericResponse = response.readEntity(valueType);
-            response.close();
-        }catch(Exception e){
-            logger.error("Exception Post Request: \nQuery:\n\t" + query);
-        }
-
-        return genericResponse;
-    }
-    */
-
     public <T> T executePutRequest(String auth, String query, Object payloadRequest, Class<T> valueType, String ts)throws Exception {
         if(client == null) {
             createConnection();
