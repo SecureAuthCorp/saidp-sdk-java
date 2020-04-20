@@ -121,11 +121,10 @@ public class SAAccess {
     public FactorsResponse factorsByUser(String userid){
         String ts = getServerTime();
         RestApiHeader restApiHeader = new RestApiHeader();
-        String header = restApiHeader.getAuthorizationHeader(saAuth,"GET",FactorsQuery.queryFactors(saAuth.getRealm(),userid),ts);
-
+        String header = restApiHeader.getAuthorizationHeader(saAuth, Resource.METHOD_GET, FactorsQuery.queryFactors(saAuth.getRealm(), userid), ts);
 
         try{
-            return saExecuter.executeGetRequest(header,saBaseURL.getApplianceURL() + FactorsQuery.queryFactors(saAuth.getRealm(),userid),ts, FactorsResponse.class);
+            return saExecuter.executeGetRequest(header,saBaseURL.getApplianceURL() + FactorsQuery.queryFactors(saAuth.getRealm(),userid), ts, FactorsResponse.class);
 
         }catch (Exception e){
             logger.error(new StringBuilder().append("Exception occurred executing REST query::\n").append(e.getMessage()).append("\n").toString(), e);
@@ -287,24 +286,42 @@ public class SAAccess {
     }
 
     /**
-     * reset counter for user
-     * @param userid id of user
+     * the OTP throttling count to 0 after the end-user successfully authenticates;
+     * the attempt count is stored in a directory attribute configured in the Web Admin
+     * @param userId id of user
      * @return base answer
      */
-    public BaseResponse sendResetThrottleReq(String userid){
+    public ThrottleResponse resetThrottleReq(String userId){
+        try{
+            String ts = getServerTime();
+            RestApiHeader restApiHeader = new RestApiHeader();
+            AuthRequest authRequest = new AuthRequest();
+            ThrottleRequest throttleRequest = new ThrottleRequest(0);
+
+            String header = restApiHeader.getAuthorizationHeader(saAuth, Resource.METHOD_PUT, ThrottleQuery.queryThrottles(saAuth.getRealm(), userId), throttleRequest, ts);
+
+            return saExecuter.executePutRequest(header,saBaseURL.getApplianceURL() + ThrottleQuery.queryThrottles(saAuth.getRealm(), userId), throttleRequest,ThrottleResponse.class, ts);
+        }catch (Exception e){
+            throw new SARestAPIException("Exception occurred executing REST query:\n" + e.getMessage());
+        }
+    }
+
+    /**
+     * GET the end-user's current count of OTP usage attempts
+     * @param userId id of user
+     * @return base answer
+     */
+    public ThrottleResponse getThrottleReq(String userId){
         try{
             String ts = getServerTime();
             RestApiHeader restApiHeader = new RestApiHeader();
             AuthRequest authRequest = new AuthRequest();
 
-            authRequest.setUser_id(userid);
-            authRequest.setType("user_id");
+            String header = restApiHeader.getAuthorizationHeader(saAuth, Resource.METHOD_GET, ThrottleQuery.queryThrottles(saAuth.getRealm(), userId), ts);
 
-            String header = restApiHeader.getAuthorizationHeader(saAuth, Resource.METHOD_GET, ThrottleQuery.queryThrottles(saAuth.getRealm(), userid), authRequest,ts);
-
-            return saExecuter.executeValidateUser(header,saBaseURL.getApplianceURL() + ThrottleQuery.queryThrottles(saAuth.getRealm(), userid),authRequest,ts);
+            return saExecuter.executeGetRequest(header,saBaseURL.getApplianceURL() + ThrottleQuery.queryThrottles(saAuth.getRealm(), userId), ts, ThrottleResponse.class);
         }catch (Exception e){
-            throw new SARestAPIException("Exception occurred executing REST query:\n" + e.getMessage() + "\n");
+            throw new SARestAPIException("Exception occurred executing REST query:\n" + e.getMessage());
         }
     }
 
@@ -1205,11 +1222,11 @@ public class SAAccess {
      */
 
     /**
-     *
      * Start Helper Methods
+     * to fetch raw json
+     * @param query url
+     * @return raw response
      */
-
-    //to fetch raw json
     public String executeGetRequest(String query) {
 		String ts = getServerTime();
 		RestApiHeader restApiHeader = new RestApiHeader();
