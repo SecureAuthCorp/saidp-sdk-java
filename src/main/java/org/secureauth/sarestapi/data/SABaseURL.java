@@ -1,6 +1,7 @@
 package org.secureauth.sarestapi.data;
 
-import org.secureauth.sarestapi.resources.s;
+import org.secureauth.sarestapi.resources.Resource;
+
 /**
  * @author rrowcliffe@secureauth.com
  *
@@ -28,10 +29,10 @@ public class SABaseURL {
 
     public String getApplianceURL(){
         StringBuilder stringBuilder = new StringBuilder();
-        if(useSSL){stringBuilder.append(s.HTTPS);}
-        else{ stringBuilder.append(s.HTTP);}
+        if(useSSL){stringBuilder.append(Resource.HTTPS);}
+        else{ stringBuilder.append(Resource.HTTP);}
 
-        stringBuilder.append(appliance).append(s.COLON).append(port).append(s.SLASH);
+        stringBuilder.append(appliance).append(Resource.COLON).append(port).append(Resource.SLASH);
 
         return stringBuilder.toString();
     }

@@ -1,6 +1,6 @@
 package org.secureauth.sarestapi.queries;
 
-import org.secureauth.sarestapi.resources.s;
+import org.secureauth.sarestapi.resources.Resource;
 
 /**
  * @author rrowcliffe@secureauth.com
@@ -25,7 +25,7 @@ public class IPEvalQuery {
 
     public static String queryIPEval(String realm){
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(realm).append(s.APPLIANCE_IPEVAL);
+        stringBuilder.append(realm).append(Resource.APPLIANCE_IPEVAL);
         return stringBuilder.toString();
     }
 }

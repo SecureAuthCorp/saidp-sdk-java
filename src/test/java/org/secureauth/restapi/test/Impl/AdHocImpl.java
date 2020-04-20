@@ -4,7 +4,6 @@ import org.secureauth.sarestapi.SAAccess;
 
 import org.secureauth.sarestapi.data.Response.ResponseObject;
 import org.secureauth.sarestapi.interfaces.AdHocInterface;
-import org.secureauth.sarestapi.resources.s;
 
 /**
  * Created by rrowcliffe on 5/14/16.

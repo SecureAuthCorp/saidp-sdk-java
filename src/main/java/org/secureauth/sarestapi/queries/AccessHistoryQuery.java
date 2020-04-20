@@ -1,6 +1,6 @@
 package org.secureauth.sarestapi.queries;
 
-import org.secureauth.sarestapi.resources.s;
+import org.secureauth.sarestapi.resources.Resource;
 
 /**
  * @author rrowcliffe@secureauth.com
@@ -27,7 +27,7 @@ public class AccessHistoryQuery {
 
     public static String queryAccessHistory(String realm){
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(realm).append(s.APPLIANCE_ACCESSHISTORY);
+        stringBuilder.append(realm).append(Resource.APPLIANCE_ACCESSHISTORY);
         return stringBuilder.toString();
     }
 

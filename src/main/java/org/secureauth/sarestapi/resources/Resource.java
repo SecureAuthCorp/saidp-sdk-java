@@ -21,7 +21,7 @@ OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
  */
 
 
-public class s {
+public class Resource {
 
     public static final String API_VERSION = "v1";
     public static final String HTTPS = "https://";
@@ -48,6 +48,7 @@ public class s {
     public static final String APPLIANCE_NUMBERPROFILE="/api/" + API_VERSION + "/numberprofile";
     public static final String APPLIANCE_OTP="/api/" + API_VERSION + "/otp";
     public static final String APPLIANCE_OTP_VALIDATE=APPLIANCE_OTP + "/validate";
+    public static final String APPLIANCE_THROTTLE = "/throttle";
 
 
     public static final String STATUS_INVALID="invalid";
@@ -58,6 +59,10 @@ public class s {
     public static final String STATUS_NOT_FOUND="not_found";
     public static final String STATUS_FAILED="failed";
     public static final String STATUS_ERROR="error";
+
+    public static final String METHOD_GET = "GET";
+    public static final String METHOD_POST = "POST";
+    public static final String METHOD_PUT = "PUT";
 
     public static final String PHONES="Phones";
     public static final String PHONE="Phone";
@@ -72,12 +77,5 @@ public class s {
     public static final String FACTORS="factors";
     public static final String FACTOR="factor";
     public static final String GEOLOC="GeoLoc";
-
-
-
-
-
-
-
 
 }

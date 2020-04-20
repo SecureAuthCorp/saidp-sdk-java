@@ -1,6 +1,6 @@
 package org.secureauth.sarestapi.queries;
 
-import org.secureauth.sarestapi.resources.s;
+import org.secureauth.sarestapi.resources.Resource;
 
 /**
  * @author rrowcliffe@secureauth.com
@@ -27,13 +27,13 @@ public class BehaveBioQuery {
 
     public static String queryBehaveBiojs(String realm){
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(realm).append(s.APPLIANCE_BEHAVEBIO_JS);
+        stringBuilder.append(realm).append(Resource.APPLIANCE_BEHAVEBIO_JS);
         return stringBuilder.toString();
     }
     
     public static String queryBehaveBio(String realm){
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(realm).append(s.APPLIANCE_BEHAVEBIO);
+        stringBuilder.append(realm).append(Resource.APPLIANCE_BEHAVEBIO);
         return stringBuilder.toString();
     }
 
