@@ -5,6 +5,7 @@ import org.secureauth.sarestapi.data.PushAcceptStatus;
 import org.secureauth.sarestapi.data.Response.BaseResponse;
 import org.secureauth.sarestapi.data.Response.FactorsResponse;
 import org.secureauth.sarestapi.data.Response.ResponseObject;
+import org.secureauth.sarestapi.data.Response.ThrottleResponse;
 import org.secureauth.sarestapi.data.Response.ValidateOTPResponse;
 import org.secureauth.sarestapi.interfaces.AuthenticationInterface;
 import org.secureauth.sarestapi.resources.Resource;
@@ -153,7 +154,12 @@ public class AuthenticationImpl implements AuthenticationInterface {
     }
 
     @Override
-    public BaseResponse sendResetThrottleReq(String userid) {
-        return null;
+    public ThrottleResponse sendResetThrottleReq(SAAccess saAccess, String userid) {
+        System.out.println("TEST Reset Throttle");
+        ThrottleResponse throttleResponse = saAccess.resetThrottleReq(userid);
+        System.out.println(throttleResponse.toString());
+        System.out.println("END Reset Throttle +++++++++++");
+
+        return throttleResponse;
     }
 }
