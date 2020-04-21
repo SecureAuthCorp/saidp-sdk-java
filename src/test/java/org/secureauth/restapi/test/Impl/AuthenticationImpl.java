@@ -153,7 +153,12 @@ public class AuthenticationImpl implements AuthenticationInterface {
     }
 
     @Override
-    public BaseResponse sendResetThrottleReq(String userid) {
-        return null;
+    public BaseResponse sendResetThrottleReq(SAAccess saAccess, String userid) {
+        System.out.println("TEST Reset Throttle");
+        BaseResponse pinResponse = saAccess.resetThrottleReq(userid);
+        System.out.println(pinResponse.toString());
+        System.out.println("END Reset Throttle +++++++++++");
+
+        return pinResponse;
     }
 }
