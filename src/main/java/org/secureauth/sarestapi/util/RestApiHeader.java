@@ -2,12 +2,11 @@ package org.secureauth.sarestapi.util;
 
 
 import java.io.UnsupportedEncodingException;
-import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
 
 import org.apache.commons.codec.binary.Base64;
 import org.secureauth.sarestapi.data.*;
-import org.secureauth.sarestapi.resources.s;
+import org.secureauth.sarestapi.resources.Resource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,7 +44,7 @@ public class RestApiHeader {
         stringBuilder.append(requestMethod).append("\n")
                 .append(ts).append("\n")
                 .append(saAuth.getApplicationID()).append("\n")
-                .append(s.SLASH + uriPath).append("\n")
+                .append(Resource.SLASH + uriPath).append("\n")
                 .append(JSONUtil.convertObjectToJSON(object));
 
 
@@ -76,7 +75,7 @@ public class RestApiHeader {
         stringBuilder.append(requestMethod).append("\n")
                 .append(ts).append("\n")
                 .append(saAuth.getApplicationID()).append("\n")
-                .append(s.SLASH + uriPath);
+                .append(Resource.SLASH + uriPath);
 
         //System.out.println("\nRequest: \n" + stringBuilder + "\n");
 

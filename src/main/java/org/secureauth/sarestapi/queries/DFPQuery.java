@@ -1,6 +1,6 @@
 package org.secureauth.sarestapi.queries;
 
-import org.secureauth.sarestapi.resources.s;
+import org.secureauth.sarestapi.resources.Resource;
 
 /**
  * @author rrowcliffe@secureauth.com
@@ -27,19 +27,19 @@ public class DFPQuery {
 
     public static String queryDFPjs(String realm){
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(realm).append(s.APPLIANCE_DFP_JS);
+        stringBuilder.append(realm).append(Resource.APPLIANCE_DFP_JS);
         return stringBuilder.toString();
     }
     
     public static String queryDFPValidate(String realm){
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(realm).append(s.APPLIANCE_DFP_VALIDATE);
+        stringBuilder.append(realm).append(Resource.APPLIANCE_DFP_VALIDATE);
         return stringBuilder.toString();
     }
 
     public static String queryDFPConfirm(String realm){
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(realm).append(s.APPLIANCE_DFP_CONFIRM);
+        stringBuilder.append(realm).append(Resource.APPLIANCE_DFP_CONFIRM);
         return stringBuilder.toString();
     }
 }

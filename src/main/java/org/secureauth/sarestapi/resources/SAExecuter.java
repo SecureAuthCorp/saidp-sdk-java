@@ -5,6 +5,7 @@ package org.secureauth.sarestapi.resources;
 import java.security.SecureRandom;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.util.Optional;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLContext;
@@ -14,6 +15,8 @@ import javax.net.ssl.X509TrustManager;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.MediaType;
 
+import org.glassfish.jersey.client.ClientProperties;
+import org.glassfish.jersey.message.internal.MessageBodyProviderNotFoundException;
 import org.secureauth.sarestapi.data.*;
 import org.secureauth.sarestapi.data.BehavioralBio.BehaveBioRequest;
 import org.secureauth.sarestapi.data.Requests.BehaveBioResetRequest;
@@ -61,16 +64,18 @@ public class SAExecuter {
 
     private ClientConfig config = null;
 
-    private Client client=null;
-    private static Logger logger=LoggerFactory.getLogger(SAExecuter.class);
+    private Client client = null;
+    private static Logger logger = LoggerFactory.getLogger(SAExecuter.class);
+    private static final String TEN_SECONDS = "10000";
 
     private SABaseURL saBaseURL = null;
-    public SAExecuter(SABaseURL saBaseURL){
+
+    public SAExecuter(SABaseURL saBaseURL) {
         this.saBaseURL = saBaseURL;
     }
 
     //Set up our Connection
-    private void createConnection() throws Exception{
+    private void createConnection() throws Exception {
 
         config = new ClientConfig();
         SSLContext ctx = null;
@@ -78,28 +83,30 @@ public class SAExecuter {
 
 
         TrustManager[] certs = new TrustManager[]{
-                new X509TrustManager(){
+                new X509TrustManager() {
                     @Override
-                    public X509Certificate[] getAcceptedIssuers(){
+                    public X509Certificate[] getAcceptedIssuers() {
                         return null;
                     }
 
                     @Override
-                    public void checkServerTrusted(X509Certificate[] chain, String authType) throws CertificateException {}
+                    public void checkServerTrusted(X509Certificate[] chain, String authType) throws CertificateException {
+                    }
 
                     @Override
-                    public void checkClientTrusted(X509Certificate[] chain, String authType) throws CertificateException{}
+                    public void checkClientTrusted(X509Certificate[] chain, String authType) throws CertificateException {
+                    }
                 }
         };
 
         ctx.init(null, certs, new SecureRandom());
 
-        try{
+        try {
 
             config.register(SACheckRequestFilter.class);
-             client = ClientBuilder.newBuilder()
-                     .withConfig(config)
-                     .sslContext(ctx)
+            client = ClientBuilder.newBuilder()
+                    .withConfig(config)
+                    .sslContext(ctx)
                     .hostnameVerifier(new HostnameVerifier() {
                         @Override
                         public boolean verify(String s, SSLSession sslSession) {
@@ -107,16 +114,46 @@ public class SAExecuter {
                         }
                     })
                     .build();
-
-        }catch(Exception e){
+            int timeoutSeconds = Integer.parseInt(Optional.ofNullable(System.getProperty("rest.api.timeout")).orElse(TEN_SECONDS));
+            client.property(ClientProperties.CONNECT_TIMEOUT, timeoutSeconds);
+            client.property(ClientProperties.READ_TIMEOUT, timeoutSeconds);
+        } catch (Exception e) {
             logger.error(new StringBuilder().append("Exception occurred while attempting to associating our SSL cert to the session.").toString(), e);
         }
 
-        if(client == null) throw new Exception(new StringBuilder().append("Unable to create connection object, creation attempt returned NULL.").toString());
+        if (client == null)
+            throw new Exception(new StringBuilder().append("Unable to create connection object, creation attempt returned NULL.").toString());
     }
 
     //Get Factors for the user requested
-    public <T> T executeGetRequest(String auth, String query,String ts,  Class<T> valueType)throws Exception {
+    public <T> T executeGetRequest(String auth, String query, String ts, Class<T> valueType) throws Exception {
+        if (client == null) {
+            createConnection();
+        }
+
+        WebTarget target = null;
+        Response response = null;
+        T genericResponse = null;
+        try {
+
+            target = client.target(query);
+            response = target.request().
+                    accept(MediaType.APPLICATION_JSON).
+                    header("Authorization", auth).
+                    header("X-SA-Ext-Date", ts).
+                    get();
+            //consider using response.ok(valueType).build(); instead.
+            genericResponse = response.readEntity(valueType);
+            response.close();
+        } catch (Exception e) {
+            logger.error("Exception Get Request: \nQuery:\n\t" + query + "\nError:" + e.getMessage());
+        }
+
+        return genericResponse;
+
+    }
+
+    public <T> T executePutRequest(String auth, String query, Object payloadRequest, Class<T> valueType, String ts)throws Exception {
         if(client == null) {
             createConnection();
         }
@@ -131,12 +168,12 @@ public class SAExecuter {
                     accept(MediaType.APPLICATION_JSON).
                     header("Authorization", auth).
                     header("X-SA-Ext-Date", ts).
-                    get();
+                    put(Entity.entity(JSONUtil.convertObjectToJSON(payloadRequest),MediaType.APPLICATION_JSON));
+            //consider using response.ok(valueType).build(); instead.
             genericResponse = response.readEntity(valueType);
             response.close();
         }catch(Exception e){
-            logger.error(new StringBuilder().append("Exception Get Request: \nQuery:\n\t")
-                    .append(query).append("\nError:").append(e.getMessage()).toString(), e);
+            logger.error("Exception Put  Request: \nQuery:\n\t" + query + "\nError:" + e.getMessage());
         }
 
         return genericResponse;
@@ -218,11 +255,15 @@ public class SAExecuter {
                     header("Authorization", auth).
                     header("X-SA-Ext-Date", ts).
                     post(Entity.entity(JSONUtil.convertObjectToJSON(authRequest), MediaType.APPLICATION_JSON));
-            responseObject=response.readEntity(BaseResponse.class);
+            try{
+                responseObject=response.readEntity(BaseResponse.class);
+            }catch (MessageBodyProviderNotFoundException e){
+                logger.error("BAD status ("+response.getStatus() +") answer from API IdP. Please check: " + query );
+            }
             response.close();
         }catch(Exception e){
-            logger.error(new StringBuilder().append("Exception Validating User Password: \nQuery:\n\t")
-                    .append(query).append("\nError:").append(e.getMessage()).toString(), e);
+            logger.error("Exception Validating User Password: \nQuery:\n\t" +
+                    query + "\nError:" + e.getMessage(), e);
         }
 
         return responseObject;

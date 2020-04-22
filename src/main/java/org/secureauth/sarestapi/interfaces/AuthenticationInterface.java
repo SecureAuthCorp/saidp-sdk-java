@@ -4,6 +4,7 @@ import org.secureauth.sarestapi.SAAccess;
 import org.secureauth.sarestapi.data.Response.BaseResponse;
 import org.secureauth.sarestapi.data.Response.FactorsResponse;
 import org.secureauth.sarestapi.data.Response.ResponseObject;
+import org.secureauth.sarestapi.data.Response.ThrottleResponse;
 import org.secureauth.sarestapi.data.Response.ValidateOTPResponse;
 
 /**
@@ -35,6 +36,7 @@ public interface AuthenticationInterface {
 
     ValidateOTPResponse validateOTP(SAAccess saAccess, String userId, String otp);
 
+    ThrottleResponse sendResetThrottleReq(SAAccess saAccess, String userid);
 
     void PushToAccept(SAAccess saAccess, String user, String factorID, String ipAddress) throws InterruptedException;
 

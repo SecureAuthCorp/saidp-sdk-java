@@ -1,6 +1,6 @@
 package org.secureauth.sarestapi.queries;
 
-import org.secureauth.sarestapi.resources.s;
+import org.secureauth.sarestapi.resources.Resource;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -32,7 +32,7 @@ public class IDMQueries {
      */
     public static String queryUsers(String realm){
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(realm).append(s.APPLIANCE_USERS);
+        stringBuilder.append(realm).append(Resource.APPLIANCE_USERS);
         return stringBuilder.toString();
     }
     /*
@@ -40,7 +40,7 @@ public class IDMQueries {
     */
     public static String queryUserProfile(String realm, String userName){
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(realm).append(s.APPLIANCE_USERS).append(userName);
+        stringBuilder.append(realm).append(Resource.APPLIANCE_USERS).append(userName);
         return stringBuilder.toString();
     }
 
@@ -49,7 +49,7 @@ public class IDMQueries {
      */
     public static String queryUserResetPwd(String realm, String userName){
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(realm).append(s.APPLIANCE_USERS).append(userName).append(s.APPLIANCE_IDM_USERS_PASSWD_RESET);
+        stringBuilder.append(realm).append(Resource.APPLIANCE_USERS).append(userName).append(Resource.APPLIANCE_IDM_USERS_PASSWD_RESET);
         return stringBuilder.toString();
     }
 
@@ -58,7 +58,7 @@ public class IDMQueries {
      */
     public static String queryUserChangePwd(String realm, String userName){
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(realm).append(s.APPLIANCE_USERS).append(userName).append(s.APPLIANCE_IDM_USERS_PASSWD_CHANGE);
+        stringBuilder.append(realm).append(Resource.APPLIANCE_USERS).append(userName).append(Resource.APPLIANCE_IDM_USERS_PASSWD_CHANGE);
         return stringBuilder.toString();
     }
 
@@ -67,7 +67,7 @@ public class IDMQueries {
      */
     public static String queryUserToGroup(String realm, String userName, String groupId){
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(realm).append(s.APPLIANCE_USERS).append(userName).append(s.APPLIANCE_IDM_USERS_GROUPS).append(encodeGroup(groupId));
+        stringBuilder.append(realm).append(Resource.APPLIANCE_USERS).append(userName).append(Resource.APPLIANCE_IDM_USERS_GROUPS).append(encodeGroup(groupId));
         return stringBuilder.toString();
     }
 
@@ -76,7 +76,7 @@ public class IDMQueries {
      */
     public static String queryGroupToUsers(String realm, String groupId){
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(realm).append(s.APPLIANCE_IDM_GROUPS).append(encodeGroup(groupId)).append("/users");
+        stringBuilder.append(realm).append(Resource.APPLIANCE_IDM_GROUPS).append(encodeGroup(groupId)).append("/users");
         return stringBuilder.toString();
     }
 
@@ -85,7 +85,7 @@ public class IDMQueries {
      */
     public static String queryGroupToUser(String realm, String userName, String groupId){
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(realm).append(s.APPLIANCE_IDM_GROUPS).append(encodeGroup(groupId)).append(s.APPLIANCE_IDM_USERS).append(userName);
+        stringBuilder.append(realm).append(Resource.APPLIANCE_IDM_GROUPS).append(encodeGroup(groupId)).append(Resource.APPLIANCE_IDM_USERS).append(userName);
         return stringBuilder.toString();
     }
 
@@ -95,7 +95,7 @@ public class IDMQueries {
 
     public static String queryUserToGroups(String realm, String userName){
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(realm).append(s.APPLIANCE_USERS).append(userName).append(s.APPLIANCE_IDM_USERS_GROUPS);
+        stringBuilder.append(realm).append(Resource.APPLIANCE_USERS).append(userName).append(Resource.APPLIANCE_IDM_USERS_GROUPS);
         return stringBuilder.toString();
     }
 

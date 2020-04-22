@@ -1,6 +1,6 @@
 package org.secureauth.sarestapi.queries;
 
-import org.secureauth.sarestapi.resources.s;
+import org.secureauth.sarestapi.resources.Resource;
 
 /**
  * @author rrowcliffe@secureauth.com
@@ -27,7 +27,7 @@ public class NumberProfileQuery {
 
     public static String queryNumberProfile(String realm){
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(realm).append(s.APPLIANCE_NUMBERPROFILE);
+        stringBuilder.append(realm).append(Resource.APPLIANCE_NUMBERPROFILE);
         return stringBuilder.toString();
     }
 

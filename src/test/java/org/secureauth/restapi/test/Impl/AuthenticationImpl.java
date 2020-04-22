@@ -5,9 +5,10 @@ import org.secureauth.sarestapi.data.PushAcceptStatus;
 import org.secureauth.sarestapi.data.Response.BaseResponse;
 import org.secureauth.sarestapi.data.Response.FactorsResponse;
 import org.secureauth.sarestapi.data.Response.ResponseObject;
+import org.secureauth.sarestapi.data.Response.ThrottleResponse;
 import org.secureauth.sarestapi.data.Response.ValidateOTPResponse;
 import org.secureauth.sarestapi.interfaces.AuthenticationInterface;
-import org.secureauth.sarestapi.resources.s;
+import org.secureauth.sarestapi.resources.Resource;
 
 /**
  * Created by rrowcliffe on 5/14/16.
@@ -29,7 +30,7 @@ public class AuthenticationImpl implements AuthenticationInterface {
 
 
             }
-            if(responseObject.getStatus().equalsIgnoreCase(s.STATUS_NOT_FOUND)) {
+            if(responseObject.getStatus().equalsIgnoreCase(Resource.STATUS_NOT_FOUND)) {
                 System.out.println(responseObject.toString());
             }
 
@@ -150,5 +151,15 @@ public class AuthenticationImpl implements AuthenticationInterface {
         ValidateOTPResponse validateOTPResponse = saAccess.validateOTP(user,otp);
         System.out.println(validateOTPResponse.toString());
         return validateOTPResponse;
+    }
+
+    @Override
+    public ThrottleResponse sendResetThrottleReq(SAAccess saAccess, String userid) {
+        System.out.println("TEST Reset Throttle");
+        ThrottleResponse throttleResponse = saAccess.resetThrottleReq(userid);
+        System.out.println(throttleResponse.toString());
+        System.out.println("END Reset Throttle +++++++++++");
+
+        return throttleResponse;
     }
 }

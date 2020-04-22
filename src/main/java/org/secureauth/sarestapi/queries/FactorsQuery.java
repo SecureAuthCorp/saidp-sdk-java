@@ -1,6 +1,6 @@
 package org.secureauth.sarestapi.queries;
 
-import org.secureauth.sarestapi.resources.s;
+import org.secureauth.sarestapi.resources.Resource;
 
 /**
  * @author rrowcliffe@secureauth.com
@@ -26,7 +26,7 @@ public class FactorsQuery {
 
     public static String queryFactors(String realm, String userName){
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(realm).append(s.APPLIANCE_USERS).append(userName).append(s.APPLIANCE_FACTORS);
+        stringBuilder.append(realm).append(Resource.APPLIANCE_USERS).append(userName).append(Resource.APPLIANCE_FACTORS);
         return stringBuilder.toString();
     }
 }

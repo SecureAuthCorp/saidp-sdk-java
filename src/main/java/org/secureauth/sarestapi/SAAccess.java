@@ -19,7 +19,9 @@ import org.secureauth.sarestapi.data.UserProfile.NewUserProfile;
 import org.secureauth.sarestapi.data.UserProfile.UserProfile;
 import org.secureauth.sarestapi.data.UserProfile.UserToGroups;
 import org.secureauth.sarestapi.data.UserProfile.UsersToGroup;
+import org.secureauth.sarestapi.exception.SARestAPIException;
 import org.secureauth.sarestapi.queries.*;
+import org.secureauth.sarestapi.resources.Resource;
 import org.secureauth.sarestapi.resources.SAExecuter;
 import org.secureauth.sarestapi.util.JSONUtil;
 import org.secureauth.sarestapi.util.RestApiHeader;
@@ -119,11 +121,10 @@ public class SAAccess {
     public FactorsResponse factorsByUser(String userid){
         String ts = getServerTime();
         RestApiHeader restApiHeader = new RestApiHeader();
-        String header = restApiHeader.getAuthorizationHeader(saAuth,"GET",FactorsQuery.queryFactors(saAuth.getRealm(),userid),ts);
-
+        String header = restApiHeader.getAuthorizationHeader(saAuth, Resource.METHOD_GET, FactorsQuery.queryFactors(saAuth.getRealm(), userid), ts);
 
         try{
-            return saExecuter.executeGetRequest(header,saBaseURL.getApplianceURL() + FactorsQuery.queryFactors(saAuth.getRealm(),userid),ts, FactorsResponse.class);
+            return saExecuter.executeGetRequest(header,saBaseURL.getApplianceURL() + FactorsQuery.queryFactors(saAuth.getRealm(),userid), ts, FactorsResponse.class);
 
         }catch (Exception e){
             logger.error(new StringBuilder().append("Exception occurred executing REST query::\n").append(e.getMessage()).append("\n").toString(), e);
@@ -282,6 +283,46 @@ public class SAAccess {
             logger.error(new StringBuilder().append("Exception occurred executing REST query::\n").append(e.getMessage()).append("\n").toString(), e);
         }
         return null;
+    }
+
+    /**
+     * the OTP throttling count to 0 after the end-user successfully authenticates;
+     * the attempt count is stored in a directory attribute configured in the Web Admin
+     * @param userId id of user
+     * @return base answer
+     */
+    public ThrottleResponse resetThrottleReq(String userId){
+        try{
+            String ts = getServerTime();
+            RestApiHeader restApiHeader = new RestApiHeader();
+            AuthRequest authRequest = new AuthRequest();
+            ThrottleRequest throttleRequest = new ThrottleRequest(0);
+
+            String header = restApiHeader.getAuthorizationHeader(saAuth, Resource.METHOD_PUT, ThrottleQuery.queryThrottles(saAuth.getRealm(), userId), throttleRequest, ts);
+
+            return saExecuter.executePutRequest(header,saBaseURL.getApplianceURL() + ThrottleQuery.queryThrottles(saAuth.getRealm(), userId), throttleRequest,ThrottleResponse.class, ts);
+        }catch (Exception e){
+            throw new SARestAPIException("Exception occurred executing REST query:\n" + e.getMessage());
+        }
+    }
+
+    /**
+     * GET the end-user's current count of OTP usage attempts
+     * @param userId id of user
+     * @return base answer
+     */
+    public ThrottleResponse getThrottleReq(String userId){
+        try{
+            String ts = getServerTime();
+            RestApiHeader restApiHeader = new RestApiHeader();
+            AuthRequest authRequest = new AuthRequest();
+
+            String header = restApiHeader.getAuthorizationHeader(saAuth, Resource.METHOD_GET, ThrottleQuery.queryThrottles(saAuth.getRealm(), userId), ts);
+
+            return saExecuter.executeGetRequest(header,saBaseURL.getApplianceURL() + ThrottleQuery.queryThrottles(saAuth.getRealm(), userId), ts, ThrottleResponse.class);
+        }catch (Exception e){
+            throw new SARestAPIException("Exception occurred executing REST query:\n" + e.getMessage());
+        }
     }
 
     /**
@@ -1181,11 +1222,11 @@ public class SAAccess {
      */
 
     /**
-     *
      * Start Helper Methods
+     * to fetch raw json
+     * @param query url
+     * @return raw response
      */
-
-    //to fetch raw json
     public String executeGetRequest(String query) {
 		String ts = getServerTime();
 		RestApiHeader restApiHeader = new RestApiHeader();
