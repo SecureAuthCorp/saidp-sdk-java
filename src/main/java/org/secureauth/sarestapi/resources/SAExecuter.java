@@ -153,7 +153,37 @@ public class SAExecuter {
 
     }
 
-    public <T> T executePutRequest(String auth, String query, Object payloadRequest, Class<T> valueType, String ts)throws Exception {
+    // post request
+    public <T> T executePostRequest(String auth,String query, AuthRequest authRequest,String ts, Class<T> valueType)throws Exception{
+
+        if(client == null) {
+            createConnection();
+        }
+
+        WebTarget target = null;
+        Response response = null;
+        T responseObject =null;
+        try{
+
+            target = client.target(query);
+            response = target.request().
+                    accept(MediaType.APPLICATION_JSON).
+                    header("Authorization", auth).
+                    header("X-SA-Ext-Date", ts).
+                    post(Entity.entity(JSONUtil.convertObjectToJSON(authRequest),MediaType.APPLICATION_JSON));
+
+            responseObject=response.readEntity(valueType);
+            response.close();
+        }catch(Exception e){
+            logger.error(new StringBuilder().append("Exception Delivering OTP by Push: \nQuery:\n\t")
+                    .append(query).append("\nError:").append(e.getMessage()).toString(), e);
+        }
+
+        return responseObject;
+
+    }
+
+    public <T> T executePutRequest(String auth, String query, Object payloadRequest, Class<T> responseValueType, String ts)throws Exception {
         if(client == null) {
             createConnection();
         }
@@ -170,7 +200,7 @@ public class SAExecuter {
                     header("X-SA-Ext-Date", ts).
                     put(Entity.entity(JSONUtil.convertObjectToJSON(payloadRequest),MediaType.APPLICATION_JSON));
             //consider using response.ok(valueType).build(); instead.
-            genericResponse = response.readEntity(valueType);
+            genericResponse = response.readEntity(responseValueType);
             response.close();
         }catch(Exception e){
             logger.error("Exception Put  Request: \nQuery:\n\t" + query + "\nError:" + e.getMessage());
@@ -445,36 +475,6 @@ public class SAExecuter {
             response.close();
         }catch(Exception e){
             logger.error(new StringBuilder().append("Exception Delivering OTP by Email: \nQuery:\n\t")
-                    .append(query).append("\nError:").append(e.getMessage()).toString(), e);
-        }
-
-        return responseObject;
-
-    }
-
-    // post request
-    public <T> T executePostRequest(String auth,String query, AuthRequest authRequest,String ts, Class<T> valueType)throws Exception{
-
-        if(client == null) {
-            createConnection();
-        }
-
-        WebTarget target = null;
-        Response response = null;
-        T responseObject =null;
-        try{
-
-            target = client.target(query);
-            response = target.request().
-                    accept(MediaType.APPLICATION_JSON).
-                    header("Authorization", auth).
-                    header("X-SA-Ext-Date", ts).
-                    post(Entity.entity(JSONUtil.convertObjectToJSON(authRequest),MediaType.APPLICATION_JSON));
-
-            responseObject=response.readEntity(valueType);
-            response.close();
-        }catch(Exception e){
-            logger.error(new StringBuilder().append("Exception Delivering OTP by Push: \nQuery:\n\t")
                     .append(query).append("\nError:").append(e.getMessage()).toString(), e);
         }
 

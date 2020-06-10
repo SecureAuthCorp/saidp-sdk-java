@@ -1212,6 +1212,54 @@ public class SAAccess {
         return null;
     }
 
+    /**
+     *
+     * @param userId
+     * @return
+     */
+    public BaseResponse getUserStatus(String userId){
+        try{
+            String ts = getServerTime();
+            RestApiHeader restApiHeader =new RestApiHeader();
+
+            String query = StatusQuery.queryStatus(saAuth.getRealm(), userId);
+
+            String header = restApiHeader.getAuthorizationHeader(saAuth, Resource.METHOD_GET, query, ts);
+
+            return saExecuter.executeGetRequest(header,saBaseURL.getApplianceURL() + query, ts, BaseResponse.class);
+
+        }catch (Exception e){
+            throw new SARestAPIException("Exception occurred executing get user status query", e);
+        }
+
+    }
+
+    /**
+     *
+     * @param userId
+     * @param status
+     * @return
+     */
+    public BaseResponse setUserStatus(String userId, String status){
+        try{
+            String ts = getServerTime();
+            RestApiHeader restApiHeader = new RestApiHeader();
+
+            String query = StatusQuery.queryStatus(saAuth.getRealm(), userId);
+
+            //payload
+            StatusRequest statusRequestPayload = new StatusRequest(status);
+
+            String header = restApiHeader.getAuthorizationHeader(saAuth, Resource.METHOD_POST, query, statusRequestPayload, ts);
+
+            return saExecuter.executePutRequest(header,saBaseURL.getApplianceURL() + query, statusRequestPayload, BaseResponse.class, ts);
+
+        }catch (Exception e){
+            throw new SARestAPIException("Exception occurred executing set user status query", e);
+        }
+
+    }
+
 
     /**
      * End of Number Profile Methods
