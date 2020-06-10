@@ -1212,6 +1212,15 @@ public class SAAccess {
         return null;
     }
 
+    public BaseResponse getUserStatus(String userId){
+        String ts = getServerTime();
+        RestApiHeader restApiHeader =new RestApiHeader();
+
+        String header = restApiHeader.getAuthorizationHeader(saAuth,"PUT", NumberProfileQuery.queryNumberProfile(saAuth.getRealm()), numberProfileUpdateRequest, ts);
+
+
+    }
+
 
     /**
      * End of Number Profile Methods
