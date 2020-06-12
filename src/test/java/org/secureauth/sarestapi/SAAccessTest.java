@@ -33,7 +33,6 @@ public class SAAccessTest {
 	private static SAAccess saAccess;
 	private static SABaseURL saBaseURL;
 
-
 	@Before
 	public void setup() {
 

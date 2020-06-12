@@ -82,11 +82,11 @@ public class RestApiHeader {
         try {
             base64Sha = new String(Base64.encodeBase64(HMACUtil.encode(saAuth.getApplicationKey(), stringBuilder.toString())));
         }catch(Exception e){
-            logger.error(new StringBuilder().append("Exception occurred while generating Authorization Header\n").append(e.getMessage()).append("\n").toString(), e);
+            logger.error("Exception occurred while generating Authorization Header\n" + e.getMessage() + "\n", e);
         }
 
         String appId = saAuth.getApplicationID() + ":" + base64Sha;
-        logger.trace(new StringBuilder("Auth Header before second encoding  ").append(appId).append("\n").toString());
+        logger.trace("Auth Header before second encoding  " + appId + "\n");
         authHeader = "Basic " + Base64.encodeBase64String(appId.getBytes(StandardCharsets.UTF_8));
         
         return authHeader;

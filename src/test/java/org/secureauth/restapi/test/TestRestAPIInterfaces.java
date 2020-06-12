@@ -39,28 +39,21 @@ public class TestRestAPIInterfaces {
     private static String otp = "#####";
 
     //Required for connectivity to Appliance
-    private static String applianceHost = "qaendpoint01.gosecureauth.com";
+    private static String applianceHost = "yourhost.com";
     private static String appliancePort = "443";
     private static boolean applianceSSL = true;
     private static boolean selfSigned = true;
 
-    //qaendpoint
-    private static String realm = "secureauth53";
-    private static String applicationID = "000860c9324d4c79817d1edeeecce8ff";
-    private static String applicationKey = "e29e3f4f8a3150f579ea14bde65c9012aac65859ee1404d70c0ed655842b194b";
+    private static String realm = "realmId";
+    private static String applicationID = "appID";
+    private static String applicationKey = "appKey";
 
     public static void main(String[] args) {
 
         //Create Instance of SAAccess Object
         SAAccess saAccess = new SAAccess(applianceHost, appliancePort, applianceSSL, selfSigned, realm, applicationID, applicationKey);
 
-
-        BaseResponse baseResponse2 = saAccess.getUserStatus("mhuber");
-
-        BaseResponse baseResponse3 = saAccess.setUserStatus("mhuber", "enable");
-
-        BaseResponse baseResponse = saAccess.getUserStatus("mhuber");
-
+        BaseResponse baseResponse2 = saAccess.getUserStatus("foobar");
 
     }
 
