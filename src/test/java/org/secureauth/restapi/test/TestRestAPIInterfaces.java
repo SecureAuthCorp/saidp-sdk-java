@@ -44,12 +44,6 @@ public class TestRestAPIInterfaces {
     private static boolean applianceSSL = true;
     private static boolean selfSigned = true;
 
-
-
-    //private static String realm = "secureauth6";
-    //private static String applicationID = "bc8ad9067ca94249bfdf3458a0f33d77";
-    //private static String applicationKey = "fbc0054f4810fcf51845fe020d228d6c7487ae5690fd7f41ccb48a522ba5eae1";
-
     //qaendpoint
     private static String realm = "secureauth53";
     private static String applicationID = "000860c9324d4c79817d1edeeecce8ff";
@@ -60,16 +54,14 @@ public class TestRestAPIInterfaces {
         //Create Instance of SAAccess Object
         SAAccess saAccess = new SAAccess(applianceHost, appliancePort, applianceSSL, selfSigned, realm, applicationID, applicationKey);
 
-        BaseResponse baseResponse = saAccess.getUserStatus("mhuber");
-        BaseResponse baseResponse2 = saAccess.getUserStatus("mhuber-adm");
+
+        BaseResponse baseResponse2 = saAccess.getUserStatus("mhuber");
 
         BaseResponse baseResponse3 = saAccess.setUserStatus("mhuber", "enable");
 
-
-
+        BaseResponse baseResponse = saAccess.getUserStatus("mhuber");
 
 
     }
-
 
 }
