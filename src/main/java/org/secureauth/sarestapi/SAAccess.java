@@ -1230,7 +1230,7 @@ public class SAAccess {
 
     /**
      * Retrieves the user's status from the username in the endpoint URL and returns a response.
-     * @param userId The User ID that you want to validate from
+     * @param userId The User ID that you want to validate
      * @return {@link BaseResponse}
      */
     public BaseResponse getUserStatus(String userId){
@@ -1250,7 +1250,7 @@ public class SAAccess {
 
     /**
      * Method invokes a status to the user Id.
-     * @param userId The User ID that you want to validate from
+     * @param userId The User ID that you want to change status
      * @param status The new status [lock, unlock, enable, disable]
      * @return {@link BaseResponse}
      */
@@ -1263,7 +1263,7 @@ public class SAAccess {
             //payload
             StatusRequest statusRequestPayload = new StatusRequest(status);
 
-            String header = RestApiHeader.getAuthorizationHeader(saAuth, Resource.METHOD_POST, query, statusRequestPayload, ts);
+            String header = RestApiHeader.getAuthorizationHeader(saAuth, Resource.METHOD_POST, saBaseURL.getApplianceURL() + query, statusRequestPayload, ts);
 
             return saExecuter.executePutRequest(header,saBaseURL.getApplianceURL() + query, statusRequestPayload, BaseResponse.class, ts);
 

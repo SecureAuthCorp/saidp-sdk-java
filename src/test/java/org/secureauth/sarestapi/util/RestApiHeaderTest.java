@@ -44,6 +44,7 @@ class RestApiHeaderTest {
 		assertEquals(header, "Basic MDAwODYwYzkzMjRkNGM3OTgxN2QxZWRlZWVjY2U4ZmY6VFo0eWYveS9jbVFyRFgxMms5V0swT3dTS1FtTVRlZ1hYUmhEa2t0K3ZKOD0=");
 	}
 
+
 	private String getServerTime() {
 		LocalDateTime fixLocalDateTime = LocalDateTime.of(2020, 6, 12, 0,0);
 		DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE;

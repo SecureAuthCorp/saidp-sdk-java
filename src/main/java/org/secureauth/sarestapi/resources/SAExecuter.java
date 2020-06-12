@@ -148,7 +148,7 @@ public class SAExecuter {
             //consider using response.ok(valueType).build(); instead.
             genericResponse = response.readEntity(valueType);
             response.close();
-        } catch (NoClassDefFoundError | Exception e) {
+        } catch (Exception e) {
             logger.error("Exception Get Request: \nQuery:\n\t" + query + "\nError:" + e.getMessage());
         }
 
