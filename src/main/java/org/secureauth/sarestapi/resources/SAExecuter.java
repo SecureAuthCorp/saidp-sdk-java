@@ -27,8 +27,11 @@ import org.secureauth.sarestapi.data.UserProfile.NewUserProfile;
 
 import org.secureauth.sarestapi.data.UserProfile.UserToGroups;
 import org.secureauth.sarestapi.data.UserProfile.UsersToGroup;
+import org.secureauth.sarestapi.exception.SARestAPIException;
 import org.secureauth.sarestapi.filters.SACheckRequestFilter;
+import org.secureauth.sarestapi.queries.StatusQuery;
 import org.secureauth.sarestapi.util.JSONUtil;
+import org.secureauth.sarestapi.util.RestApiHeader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -118,11 +121,11 @@ public class SAExecuter {
             client.property(ClientProperties.CONNECT_TIMEOUT, timeoutSeconds);
             client.property(ClientProperties.READ_TIMEOUT, timeoutSeconds);
         } catch (Exception e) {
-            logger.error(new StringBuilder().append("Exception occurred while attempting to associating our SSL cert to the session.").toString(), e);
+            logger.error("Exception occurred while attempting to associating our SSL cert to the session.", e);
         }
 
         if (client == null)
-            throw new Exception(new StringBuilder().append("Unable to create connection object, creation attempt returned NULL.").toString());
+            throw new Exception("Unable to create connection object, creation attempt returned NULL.");
     }
 
     //Get Factors for the user requested
@@ -153,7 +156,44 @@ public class SAExecuter {
 
     }
 
-    public <T> T executePutRequest(String auth, String query, Object payloadRequest, Class<T> valueType, String ts)throws Exception {
+    public <T> T executeGetRequest(SAAuth saAuth, String baseUrl, String query, String ts, Class<T> valueType) throws Exception {
+
+        String header = RestApiHeader.getAuthorizationHeader(saAuth, Resource.METHOD_GET, query, ts);
+
+        return executeGetRequest(header, baseUrl + query, ts, valueType);
+    }
+
+    // post request
+    public <T> T executePostRequest(String auth,String query, AuthRequest authRequest,String ts, Class<T> valueType)throws Exception{
+
+        if(client == null) {
+            createConnection();
+        }
+
+        WebTarget target = null;
+        Response response = null;
+        T responseObject =null;
+        try{
+
+            target = client.target(query);
+            response = target.request().
+                    accept(MediaType.APPLICATION_JSON).
+                    header("Authorization", auth).
+                    header("X-SA-Ext-Date", ts).
+                    post(Entity.entity(JSONUtil.convertObjectToJSON(authRequest),MediaType.APPLICATION_JSON));
+
+            responseObject=response.readEntity(valueType);
+            response.close();
+        }catch(Exception e){
+            logger.error(new StringBuilder().append("Exception Delivering OTP by Push: \nQuery:\n\t")
+                    .append(query).append("\nError:").append(e.getMessage()).toString(), e);
+        }
+
+        return responseObject;
+
+    }
+
+    public <T> T executePutRequest(String auth, String query, Object payloadRequest, Class<T> responseValueType, String ts)throws Exception {
         if(client == null) {
             createConnection();
         }
@@ -170,7 +210,7 @@ public class SAExecuter {
                     header("X-SA-Ext-Date", ts).
                     put(Entity.entity(JSONUtil.convertObjectToJSON(payloadRequest),MediaType.APPLICATION_JSON));
             //consider using response.ok(valueType).build(); instead.
-            genericResponse = response.readEntity(valueType);
+            genericResponse = response.readEntity(responseValueType);
             response.close();
         }catch(Exception e){
             logger.error("Exception Put  Request: \nQuery:\n\t" + query + "\nError:" + e.getMessage());
@@ -445,36 +485,6 @@ public class SAExecuter {
             response.close();
         }catch(Exception e){
             logger.error(new StringBuilder().append("Exception Delivering OTP by Email: \nQuery:\n\t")
-                    .append(query).append("\nError:").append(e.getMessage()).toString(), e);
-        }
-
-        return responseObject;
-
-    }
-
-    // post request
-    public <T> T executePostRequest(String auth,String query, AuthRequest authRequest,String ts, Class<T> valueType)throws Exception{
-
-        if(client == null) {
-            createConnection();
-        }
-
-        WebTarget target = null;
-        Response response = null;
-        T responseObject =null;
-        try{
-
-            target = client.target(query);
-            response = target.request().
-                    accept(MediaType.APPLICATION_JSON).
-                    header("Authorization", auth).
-                    header("X-SA-Ext-Date", ts).
-                    post(Entity.entity(JSONUtil.convertObjectToJSON(authRequest),MediaType.APPLICATION_JSON));
-
-            responseObject=response.readEntity(valueType);
-            response.close();
-        }catch(Exception e){
-            logger.error(new StringBuilder().append("Exception Delivering OTP by Push: \nQuery:\n\t")
                     .append(query).append("\nError:").append(e.getMessage()).toString(), e);
         }
 
@@ -1058,6 +1068,23 @@ public class SAExecuter {
         }
 
         return numberProfileUpdateResponse;
+
+    }
+
+    public BaseResponse getUserStatus(String userId, String ts, SAAuth saAuth){
+        try{
+
+            RestApiHeader restApiHeader = new RestApiHeader();
+
+            String query = StatusQuery.queryStatus(saAuth.getRealm(), userId);
+
+            String header = restApiHeader.getAuthorizationHeader(saAuth, Resource.METHOD_GET, query, ts);
+
+            return executeGetRequest(header,saBaseURL.getApplianceURL() + query, ts, BaseResponse.class);
+
+        }catch (Exception e){
+            throw new SARestAPIException("Exception occurred executing get user status query", e);
+        }
 
     }
 

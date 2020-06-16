@@ -49,6 +49,7 @@ public class Resource {
     public static final String APPLIANCE_OTP="/api/" + API_VERSION + "/otp";
     public static final String APPLIANCE_OTP_VALIDATE=APPLIANCE_OTP + "/validate";
     public static final String APPLIANCE_THROTTLE = "/throttle";
+    public static final String APPLIANCE_STATUS = "/status";
 
 
     public static final String STATUS_INVALID="invalid";
