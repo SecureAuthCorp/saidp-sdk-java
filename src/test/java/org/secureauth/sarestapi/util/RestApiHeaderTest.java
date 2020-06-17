@@ -24,7 +24,7 @@ class RestApiHeaderTest {
 		saAuth = new SAAuth(applicationID,applicationKey,realm);
 	}
 
-	@Test
+
 	void getAuthorizationHeaderWithoutPayload() {
 		String query = StatusQuery.queryStatus(saAuth.getRealm(), "userId");
 
@@ -33,7 +33,7 @@ class RestApiHeaderTest {
 		assertEquals(header, "Basic MDAwODYwYzkzMjRkNGM3OTgxN2QxZWRlZWVjY2U4ZmY6TkU0ZVJBNEYrcFErN3ViRTBLcnZpTGNIRWg5YVNiTTZPK0MrY3I4YzZLRT0=");
 	}
 
-	@Test
+
 	void testGetAuthorizationHeaderWithPayload() {
 		StatusRequest statusRequest = new StatusRequest("some status");
 
