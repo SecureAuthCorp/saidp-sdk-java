@@ -15,7 +15,7 @@ This is a community driven project, if you would like to contribute please fork 
 
 Requirements:
 ------------
-* Requires Java 1.7 or Newer
+* Requires Java 11
 * Requires gradle to build the package
 
 Dependencies:
@@ -23,7 +23,9 @@ Dependencies:
 * jackson-jaxrs-json-provider 2.7.3
 * jersey-client 2.5.1
 * Commons Codec 1.10
-* SLF4J 1.7.13
+* SLF4J 1.7.28
+* jaxb 2.3.0
+* junit 5.1.0
 
 Building:
 --------
