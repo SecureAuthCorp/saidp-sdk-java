@@ -2,13 +2,10 @@ package org.secureauth.sarestapi;
 
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.secureauth.restapi.test.TestRestAPIInterfaces;
 import org.secureauth.sarestapi.data.Requests.StatusRequest;
 import org.secureauth.sarestapi.data.Response.BaseResponse;
 import org.secureauth.sarestapi.data.Response.FactorsResponse;
@@ -16,8 +13,6 @@ import org.secureauth.sarestapi.data.Response.UserProfileResponse;
 import org.secureauth.sarestapi.data.SAAuth;
 import org.secureauth.sarestapi.data.SABaseURL;
 import org.secureauth.sarestapi.queries.AuthQuery;
-import org.secureauth.sarestapi.queries.FactorsQuery;
-import org.secureauth.sarestapi.queries.IDMQueries;
 import org.secureauth.sarestapi.queries.StatusQuery;
 import org.secureauth.sarestapi.resources.SAExecuter;
 import org.slf4j.Logger;
@@ -25,7 +20,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Date;
 import java.util.Properties;
 
 import static org.junit.Assert.*;
@@ -38,20 +32,6 @@ public class SAAccessTest {
 
 	private static Logger logger = LoggerFactory.getLogger(SAAccessTest.class);
 	final private static String PROPERTIES_FILE_PATH="test.properties";
-	//SecureAuth IdP Access
-	private static String VALID_HOST;
-	private static String VALID_REALM;
-	private static String VALID_REALM_ID;
-	private static String VALID_REALM_KEY;
-	private static final String VALID_PORT = "443";
-	private static final String INVALID_HOST = "invalid.host.gosecureauth.com";
-	private static final String INVALID_REALM_ID = "9999999bb99999bb9bbbb9b9bb9b9bbb";
-	private static final String INVALID_REALM_KEY = "b99bbb9bb99b9999bb99bb99999b999999b9b90d999c9999d53eeec31b999999";
-
-	//SecureAuth RADIUS Server
-	private static String VALID_RADIUS_SHARED_SECRET;
-	private static String VALID_RADIUS_HOST;
-	private static final String REPLY_MESSAGE_ATTRIBUTE = "Reply-Message";
 
 	//User
 	private static String VALID_USERNAME;
@@ -61,17 +41,10 @@ public class SAAccessTest {
 
 	//User OATH-OTP
 	private static String VALID_FACTOR_ID_FOR_OATH_OTP;
-	private static String VALID_OATH_TOTP_SHARED_KEY;
-	private static int VALID_OATH_TOTP_LENGTH;
-	private static long VALID_OATH_TOTP_INTERVAL;
 
 	//Response messages
 	private static final String FOUND_MESSAGE = "found";
 	private static final String NOT_FOUND_MESSAGE = "not_found";
-	private static final String ACCESS_GRANTED_MESSAGE = "Access granted";
-
-	//Useful to use Totp generator
-	private static Date lastTimeThatTotpMethodWasCalled = new Date(Long.MIN_VALUE);
 
 	@Mock
 	public SAExecuter mockedSAExecuter;
@@ -191,10 +164,10 @@ public class SAAccessTest {
 			  "message" : ""
 			}
 		 */
-		BaseResponse validUserResponsePin = validUserResponsePin(userId);
+		BaseResponse validUserResponseWithOuthMessage = validUserResponseWithOuthMessage(userId);
 		//when
 		when(mockedSAExecuter.executeValidateUserPin(any(), eq(saBaseURL.getApplianceURL() + AuthQuery.queryAuth(saAuth.getRealm())), any(), any()))
-				.thenReturn(validUserResponsePin);
+				.thenReturn(validUserResponseWithOuthMessage);
 
 		BaseResponse response = saAccess.validateUserPin(VALID_USERNAME, VALID_PIN);
 		System.out.println("response: " + response.toString());
@@ -286,10 +259,10 @@ public class SAAccessTest {
 			  "message" : ""
 			}
 		 */
-		BaseResponse validUserResponsePin = validUserResponsePin(userId);
+		BaseResponse validUserResponseWithOuthMessage = validUserResponseWithOuthMessage(userId);
 		//when
 		when(mockedSAExecuter.executeValidateOath(any(), eq(saBaseURL.getApplianceURL() + AuthQuery.queryAuth(saAuth.getRealm())), any(), any()))
-				.thenReturn(validUserResponsePin);
+				.thenReturn(validUserResponseWithOuthMessage);
 
 
 		BaseResponse response = saAccess.validateOath(VALID_USERNAME, passCode, VALID_FACTOR_ID_FOR_OATH_OTP);
@@ -310,10 +283,10 @@ public class SAAccessTest {
 		 */
 
 		String invalidFactorId = "zzzz0000z0000a00zzzz000z0zz0z00z";
-		BaseResponse validUserResponsePin = invalidUserOTP(userId);
+		BaseResponse validUserResponseOtp = invalidUserOTP(userId);
 		//when
 		when(mockedSAExecuter.executeValidateOath(any(), eq(saBaseURL.getApplianceURL() + AuthQuery.queryAuth(saAuth.getRealm())), any(), any()))
-				.thenReturn(validUserResponsePin);
+				.thenReturn(validUserResponseOtp);
 
 
 		BaseResponse response = saAccess.validateOath(VALID_USERNAME, "000123", invalidFactorId);
@@ -354,10 +327,10 @@ public class SAAccessTest {
 			}
 		 */
 
-		BaseResponse validUserResponsePin = validUserResponsePin(userId);
+		BaseResponse validUserResponseWithOuthMessage = validUserResponseWithOuthMessage(userId);
 		//when
 		when(mockedSAExecuter.executeValidateUserPassword(any(), eq(saBaseURL.getApplianceURL() + AuthQuery.queryAuth(saAuth.getRealm())), any(), any()))
-				.thenReturn(validUserResponsePin);
+				.thenReturn(validUserResponseWithOuthMessage);
 
 		BaseResponse response = saAccess.validateUserPassword(VALID_USERNAME, VALID_PASSWORD);
 		System.out.println("BaseResponse: " + response.toString());
@@ -595,19 +568,19 @@ public class SAAccessTest {
 	}
 
 	public BaseResponse validUserResponse(String userId){
-		BaseResponse invalidResponse = new BaseResponse();
-		invalidResponse.setMessage("User Id not found.");
-		invalidResponse.setUser_id(userId);
-		invalidResponse.setStatus("valid");
-		return invalidResponse;
+		BaseResponse validResponse = new BaseResponse();
+		validResponse.setMessage("User Id not found.");
+		validResponse.setUser_id(userId);
+		validResponse.setStatus("valid");
+		return validResponse;
 	}
 
 	public BaseResponse successResponse(String userId){
-		BaseResponse invalidResponse = new BaseResponse();
-		invalidResponse.setMessage("User Status update complete");
-		invalidResponse.setUser_id(userId);
-		invalidResponse.setStatus("success");
-		return invalidResponse;
+		BaseResponse validResponse = new BaseResponse();
+		validResponse.setMessage("User Status update complete");
+		validResponse.setUser_id(userId);
+		validResponse.setStatus("success");
+		return validResponse;
 	}
 
 	public BaseResponse validUserInvalidAnswerResponse(String userId){
@@ -618,12 +591,12 @@ public class SAAccessTest {
 		return invalidResponse;
 	}
 
-	public BaseResponse validUserResponsePin(String userId){
-		BaseResponse invalidResponse = new BaseResponse();
-		invalidResponse.setMessage("");
-		invalidResponse.setUser_id(userId);
-		invalidResponse.setStatus("valid");
-		return invalidResponse;
+	public BaseResponse validUserResponseWithOuthMessage(String userId){
+		BaseResponse validResponse = new BaseResponse();
+		validResponse.setMessage("");
+		validResponse.setUser_id(userId);
+		validResponse.setStatus("valid");
+		return validResponse;
 	}
 
 	public UserProfileResponse validUserProfileResponse(String userId){
