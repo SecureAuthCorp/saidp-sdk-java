@@ -6,6 +6,12 @@ package org.secureauth.sarestapi.data.UserProfile;
 public class UsersToGroup {
     private String[] userIds;
 
+    public UsersToGroup(){}
+
+    public UsersToGroup(String[] userIds) {
+        this.userIds = userIds;
+    }
+
     public String[] getUserIds() {
         return userIds;
     }

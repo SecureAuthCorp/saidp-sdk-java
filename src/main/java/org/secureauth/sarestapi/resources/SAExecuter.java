@@ -213,10 +213,66 @@ public class SAExecuter {
             genericResponse = response.readEntity(responseValueType);
             response.close();
         }catch(Exception e){
-            logger.error("Exception Put  Request: \nQuery:\n\t" + query + "\nError:" + e.getMessage());
+            logger.error("Exception Put Request: \nQuery:\n\t" + query + "\nError:" + e.getMessage());
         }
 
         return genericResponse;
+
+    }
+
+    public <T> T executePostRawRequest(String auth,String query, Object authRequest, Class<T> valueType, String ts)throws Exception{
+
+        if(client == null) {
+            createConnection();
+        }
+
+        WebTarget target = null;
+        Response response = null;
+        T responseObject = null;
+        try{
+
+            target = client.target(query);
+            response = target.request().
+                    accept(MediaType.APPLICATION_JSON).
+                    header("Authorization", auth).
+                    header("X-SA-Ext-Date", ts).
+                    post(Entity.entity(JSONUtil.convertObjectToJSON(authRequest),MediaType.APPLICATION_JSON));
+
+            responseObject = response.readEntity(valueType);
+            response.close();
+        }catch(Exception e){
+            logger.error("Exception Post Request: \nQuery:\n\t" + query + "\nError:" + e.getMessage());
+        }
+
+        return responseObject;
+
+    }
+
+    public <T> T executePostRawRequestWithoutPayload(String auth,String query, Class<T> valueType, String ts)throws Exception{
+
+        if(client == null) {
+            createConnection();
+        }
+
+        WebTarget target = null;
+        Response response = null;
+        T responseObject = null;
+        try{
+
+            target = client.target(query);
+            response = target.request().
+                    accept(MediaType.APPLICATION_JSON).
+                    header("Authorization", auth).
+                    header("X-SA-Ext-Date", ts).
+                    post(Entity.entity("",MediaType.APPLICATION_JSON));
+
+            responseObject = response.readEntity(valueType);
+            response.close();
+        }catch(Exception e){
+            logger.error("Exception Post Request: \nQuery:\n\t" + query + "\nError:" + e.getMessage());
+        }
+
+        return responseObject;
 
     }
 
@@ -894,119 +950,25 @@ public class SAExecuter {
     }
 
     //Single User to Single Group
-    public <T> T executeSingleUserToSingleGroup(String auth, String query,String ts,  Class<T> valueType)throws Exception {
-        if(client == null) {
-            createConnection();
-        }
-
-        WebTarget target = null;
-        Response response = null;
-        T genericResponse =null;
-        try{
-
-            target = client.target(query);
-            response = target.request().
-                    accept(MediaType.APPLICATION_JSON).
-                    header("Authorization", auth).
-                    header("X-SA-Ext-Date", ts).
-                    post(Entity.entity("",MediaType.APPLICATION_JSON));
-            genericResponse = response.readEntity(valueType);
-            response.close();
-        }catch(Exception e){
-            logger.error(new StringBuilder().append("Exception Adding user to Group: \nQuery:\n\t")
-                    .append(query).append("\nError:").append(e.getMessage()).toString(), e);
-        }
-
-        return genericResponse;
-
+    public <T> T executeSingleUserToSingleGroup(String auth, String query, String ts, Class<T> valueType)throws Exception {
+        return executePostRawRequestWithoutPayload(auth, query, valueType, ts);
     }
 
     //Single Group Multiple Users
     public <T> T executeGroupToUsersRequest(String auth, String query, UsersToGroup usersToGroup, String ts, Class<T> valueType)throws Exception{
-
-        if(client == null) {
-            createConnection();
-        }
-
-        WebTarget target = null;
-        Response response = null;
-        T responseObject =null;
-        try{
-
-            target = client.target(query);
-            response = target.request().
-                    accept(MediaType.APPLICATION_JSON).
-                    header("Authorization", auth).
-                    header("X-SA-Ext-Date", ts).
-                    post(Entity.entity(JSONUtil.convertObjectToJSON(usersToGroup),MediaType.APPLICATION_JSON));
-
-            responseObject=response.readEntity(valueType);
-            response.close();
-        }catch(Exception e){
-            logger.error(new StringBuilder().append("Exception Associating Users to Group: \nQuery:\n\t")
-                    .append(query).append("\nError:").append(e.getMessage()).toString(), e);
-        }
-
-        return responseObject;
+        return executePostRawRequest(auth, query, usersToGroup, valueType, ts);
 
     }
 
     //Single Group to Single User
-    public <T> T executeSingleGroupToSingleUser(String auth, String query,String ts,  Class<T> valueType)throws Exception {
-        if(client == null) {
-            createConnection();
-        }
-
-        WebTarget target = null;
-        Response response = null;
-        T genericResponse =null;
-        try{
-
-            target = client.target(query);
-            response = target.request().
-                    accept(MediaType.APPLICATION_JSON).
-                    header("Authorization", auth).
-                    header("X-SA-Ext-Date", ts).
-                    post(Entity.entity("",MediaType.APPLICATION_JSON));
-            genericResponse = response.readEntity(valueType);
-            response.close();
-        }catch(Exception e){
-            logger.error(new StringBuilder().append("Exception Adding Group to User: \nQuery:\n\t")
-                    .append(query).append("\nError:").append(e.getMessage()).toString(), e);
-        }
-
-        return genericResponse;
+    public <T> T executeSingleGroupToSingleUser(String auth, String query, String ts, Class<T> valueType)throws Exception {
+        return executePostRawRequestWithoutPayload(auth, query, valueType, ts);
 
     }
 
-    //Signle User to Multiple Groups
+    //Single User to Multiple Groups
     public <T> T executeUserToGroupsRequest(String auth, String query, UserToGroups userToGroups, String ts, Class<T> valueType)throws Exception{
-
-        if(client == null) {
-            createConnection();
-        }
-
-        WebTarget target = null;
-        Response response = null;
-        T responseObject =null;
-        try{
-
-            target = client.target(query);
-            response = target.request().
-                    accept(MediaType.APPLICATION_JSON).
-                    header("Authorization", auth).
-                    header("X-SA-Ext-Date", ts).
-                    post(Entity.entity(JSONUtil.convertObjectToJSON(userToGroups),MediaType.APPLICATION_JSON));
-
-            responseObject=response.readEntity(valueType);
-            response.close();
-        }catch(Exception e){
-            logger.error(new StringBuilder().append("Exception Associating Users to Group: \nQuery:\n\t")
-                    .append(query).append("\nError:").append(e.getMessage()).toString(), e);
-        }
-
-        return responseObject;
-
+        return executePostRawRequest(auth, query, userToGroups, valueType, ts);
     }
 
     //Run NumberProfile Post

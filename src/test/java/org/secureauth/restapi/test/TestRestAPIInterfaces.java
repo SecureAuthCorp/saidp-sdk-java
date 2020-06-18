@@ -1,9 +1,6 @@
 package org.secureauth.restapi.test;
 
-
-import org.secureauth.restapi.test.Impl.*;
 import org.secureauth.sarestapi.SAAccess;
-import org.secureauth.sarestapi.data.Response.BaseResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,21 +36,18 @@ public class TestRestAPIInterfaces {
     private static String otp = "#####";
 
     //Required for connectivity to Appliance
-    private static String applianceHost = "yourhost.com";
+    private static String applianceHost = "host.example.com";
     private static String appliancePort = "443";
     private static boolean applianceSSL = true;
     private static boolean selfSigned = true;
-
-    private static String realm = "realmId";
-    private static String applicationID = "appID";
-    private static String applicationKey = "appKey";
+    private static String realm = "secureauth1";
+    private static String applicationID = "#######################";
+    private static String applicationKey = "################################";
 
     public static void main(String[] args) {
 
         //Create Instance of SAAccess Object
         SAAccess saAccess = new SAAccess(applianceHost, appliancePort, applianceSSL, selfSigned, realm, applicationID, applicationKey);
-
-        BaseResponse baseResponse2 = saAccess.getUserStatus("foobar");
 
     }
 

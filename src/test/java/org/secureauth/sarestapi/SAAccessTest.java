@@ -6,13 +6,17 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.secureauth.sarestapi.data.Requests.StatusRequest;
 import org.secureauth.sarestapi.data.Response.BaseResponse;
 import org.secureauth.sarestapi.data.Response.FactorsResponse;
 import org.secureauth.sarestapi.data.Response.UserProfileResponse;
 import org.secureauth.sarestapi.data.SAAuth;
 import org.secureauth.sarestapi.data.SABaseURL;
 import org.secureauth.sarestapi.queries.AuthQuery;
+import org.secureauth.sarestapi.data.Response.GroupAssociationResponse;
+import org.secureauth.sarestapi.data.Response.ResponseObject;
+import org.secureauth.sarestapi.data.UserProfile.UserToGroups;
+import org.secureauth.sarestapi.data.UserProfile.UsersToGroup;
+import org.secureauth.sarestapi.queries.IDMQueries;
 import org.secureauth.sarestapi.queries.StatusQuery;
 import org.secureauth.sarestapi.resources.SAExecuter;
 import org.slf4j.Logger;
@@ -60,10 +64,11 @@ public class SAAccessTest {
 	private static SAAccess saAccess;
 	private static SABaseURL saBaseURL;
 
+
 	@Before
 	public void setup() {
-		saAuth = new SAAuth(applicationID,applicationKey,realm);
-		saBaseURL = new SABaseURL(host, port,true);
+		saAuth = new SAAuth(applicationID, applicationKey, realm);
+		saBaseURL = new SABaseURL(host, port, true);
 		saAccess = new SAAccess(saBaseURL, saAuth, mockedSAExecuter);
 
 		Properties properties = new Properties();
@@ -85,7 +90,7 @@ public class SAAccessTest {
 
 		String query = StatusQuery.queryStatus(saAuth.getRealm(), userId);
 
-		BaseResponse invalidResponse = invalidUserResponse(userId);
+		BaseResponse invalidResponse = BaseResponseUtils.invalidUserResponse(userId);
 		//when
 		when(mockedSAExecuter.executeGetRequest(any(), eq(saBaseURL.getApplianceURL() + query), any(), any()))
 				.thenReturn(invalidResponse);
@@ -101,7 +106,7 @@ public class SAAccessTest {
 
 		String query = StatusQuery.queryStatus(saAuth.getRealm(), userId);
 
-		BaseResponse validUserResponse = validUserResponse(userId);
+		BaseResponse validUserResponse = BaseResponseUtils.validUserResponse(userId);
 		//when
 		when(mockedSAExecuter.executeGetRequest(any(), eq(saBaseURL.getApplianceURL() + query), any(), any()))
 				.thenReturn(validUserResponse);
@@ -113,18 +118,14 @@ public class SAAccessTest {
 	}
 
 	@Test
-	public void setUserStatus() throws Exception {
+	public void setUserStatusWhenValidStatus() throws Exception {
 		String query = StatusQuery.queryStatus(saAuth.getRealm(), userId);
 		String status = "new status";
 
-		BaseResponse successResponse = successResponse(userId);
-		//payload
-		StatusRequest statusRequestPayload = new StatusRequest(status);
+		BaseResponse successResponse = BaseResponseUtils.successResponse(userId);
 		//when
-		//header,saBaseURL.getApplianceURL() + query, statusRequestPayload, BaseResponse.class, ts
-		when(mockedSAExecuter.executePutRequest(any(), eq(saBaseURL.getApplianceURL() + query),
-				any(), any(), any()))
-				.thenReturn(successResponse);
+		when(mockedSAExecuter.executePostRawRequest(any(), eq(saBaseURL.getApplianceURL() + query),
+				any(), any(), any())).thenReturn(successResponse);
 
 		BaseResponse response = saAccess.setUserStatus(userId, status);
 
@@ -142,7 +143,7 @@ public class SAAccessTest {
 		 */
 		String invalidStringForPin = "invalid";
 
-		BaseResponse validUserInvalidAnswerResponse = validUserInvalidAnswerResponse(userId);
+		BaseResponse validUserInvalidAnswerResponse = BaseResponseUtils.validUserInvalidAnswerResponse(userId);
 		//when
 		when(mockedSAExecuter.executeValidateUserPin(any(), eq(saBaseURL.getApplianceURL() + AuthQuery.queryAuth(saAuth.getRealm())), any(), any()))
 				.thenReturn(validUserInvalidAnswerResponse);
@@ -164,7 +165,7 @@ public class SAAccessTest {
 			  "message" : ""
 			}
 		 */
-		BaseResponse validUserResponseWithOuthMessage = validUserResponseWithOuthMessage(userId);
+		BaseResponse validUserResponseWithOuthMessage = BaseResponseUtils.validUserResponseWithOuthMessage(userId);
 		//when
 		when(mockedSAExecuter.executeValidateUserPin(any(), eq(saBaseURL.getApplianceURL() + AuthQuery.queryAuth(saAuth.getRealm())), any(), any()))
 				.thenReturn(validUserResponseWithOuthMessage);
@@ -211,7 +212,7 @@ public class SAAccessTest {
 			}
 		 */
 
-		UserProfileResponse userProfileResponse = validUserProfileResponse(userId);
+		UserProfileResponse userProfileResponse = BaseResponseUtils.validUserProfileResponse(userId);
 		//when
 		when(mockedSAExecuter.executeGetRequest(any(), any(), any(), any()))
 				.thenReturn(userProfileResponse);
@@ -238,7 +239,7 @@ public class SAAccessTest {
 			}
 		 */
 
-		UserProfileResponse userProfileResponse = invalidUserProfileResponse(userId);
+		UserProfileResponse userProfileResponse = BaseResponseUtils.invalidUserProfileResponse(userId);
 		//when
 		when(mockedSAExecuter.executeGetRequest(any(), any(), any(), any()))
 				.thenReturn(userProfileResponse);
@@ -259,7 +260,7 @@ public class SAAccessTest {
 			  "message" : ""
 			}
 		 */
-		BaseResponse validUserResponseWithOuthMessage = validUserResponseWithOuthMessage(userId);
+		BaseResponse validUserResponseWithOuthMessage = BaseResponseUtils.validUserResponseWithOuthMessage(userId);
 		//when
 		when(mockedSAExecuter.executeValidateOath(any(), eq(saBaseURL.getApplianceURL() + AuthQuery.queryAuth(saAuth.getRealm())), any(), any()))
 				.thenReturn(validUserResponseWithOuthMessage);
@@ -283,7 +284,7 @@ public class SAAccessTest {
 		 */
 
 		String invalidFactorId = "zzzz0000z0000a00zzzz000z0zz0z00z";
-		BaseResponse validUserResponseOtp = invalidUserOTP(userId);
+		BaseResponse validUserResponseOtp = BaseResponseUtils.invalidUserOTP(userId);
 		//when
 		when(mockedSAExecuter.executeValidateOath(any(), eq(saBaseURL.getApplianceURL() + AuthQuery.queryAuth(saAuth.getRealm())), any(), any()))
 				.thenReturn(validUserResponseOtp);
@@ -305,7 +306,7 @@ public class SAAccessTest {
 			  "message" : "OTP is invalid."
 			}
 		 */
-		BaseResponse invalidOTP = invalidOTP(userId);
+		BaseResponse invalidOTP = BaseResponseUtils.invalidOTP(userId);
 		//when
 		when(mockedSAExecuter.executeValidateOath(any(), eq(saBaseURL.getApplianceURL() + AuthQuery.queryAuth(saAuth.getRealm())), any(), any()))
 				.thenReturn(invalidOTP);
@@ -327,7 +328,7 @@ public class SAAccessTest {
 			}
 		 */
 
-		BaseResponse validUserResponseWithOuthMessage = validUserResponseWithOuthMessage(userId);
+		BaseResponse validUserResponseWithOuthMessage = BaseResponseUtils.validUserResponseWithOuthMessage(userId);
 		//when
 		when(mockedSAExecuter.executeValidateUserPassword(any(), eq(saBaseURL.getApplianceURL() + AuthQuery.queryAuth(saAuth.getRealm())), any(), any()))
 				.thenReturn(validUserResponseWithOuthMessage);
@@ -350,7 +351,7 @@ public class SAAccessTest {
 		 */
 		String invalidPassword = "invalidPassword";
 
-		BaseResponse InvalidPassword = InvalidPassword(userId);
+		BaseResponse InvalidPassword = BaseResponseUtils.InvalidPassword(userId);
 		//when
 		when(mockedSAExecuter.executeValidateUserPassword(any(), eq(saBaseURL.getApplianceURL() + AuthQuery.queryAuth(saAuth.getRealm())), any(), any()))
 				.thenReturn(InvalidPassword);
@@ -366,7 +367,7 @@ public class SAAccessTest {
 	public void testValidatePasswordFromUnexistingUser() throws Exception {
 		String somePassword = "password";
 
-		BaseResponse invalidUserProfileResponse = invalidUserProfileResponse(userId);
+		BaseResponse invalidUserProfileResponse = BaseResponseUtils.invalidUserProfileResponse(userId);
 		//when
 		when(mockedSAExecuter.executeValidateUserPassword(any(), eq(saBaseURL.getApplianceURL() + AuthQuery.queryAuth(saAuth.getRealm())), any(), any()))
 				.thenReturn(invalidUserProfileResponse);
@@ -408,7 +409,7 @@ public class SAAccessTest {
 		 */
 
 
-		FactorsResponse validFactorsFromValidUser = validFactorsFromValidUser(userId);
+		FactorsResponse validFactorsFromValidUser = BaseResponseUtils.validFactorsFromValidUser(userId);
 		//when
 		when(mockedSAExecuter.executeGetRequest(any(), any(), any(), any()))
 				.thenReturn(validFactorsFromValidUser);
@@ -431,7 +432,7 @@ public class SAAccessTest {
 			  "factors" : [ ]
 			}
 		 */
-		FactorsResponse invalidFactorsFromValidUser = invalidFactorsFromValidUser(userId);
+		FactorsResponse invalidFactorsFromValidUser = BaseResponseUtils.invalidFactorsFromValidUser(userId);
 		//when
 		when(mockedSAExecuter.executeGetRequest(any(), any(), any(), any()))
 				.thenReturn(invalidFactorsFromValidUser);
@@ -453,7 +454,7 @@ public class SAAccessTest {
 			}
 		 */
 		String invalidNumbersForPin = "000000";
-		BaseResponse validUserInvalidAnswerResponse = validUserInvalidAnswerResponse(userId);
+		BaseResponse validUserInvalidAnswerResponse = BaseResponseUtils.validUserInvalidAnswerResponse(userId);
 		//when
 		when(mockedSAExecuter.executeValidateUserPin(any(), eq(saBaseURL.getApplianceURL() + AuthQuery.queryAuth(saAuth.getRealm())), any(), any()))
 				.thenReturn(validUserInvalidAnswerResponse);
@@ -475,7 +476,7 @@ public class SAAccessTest {
 			}
 		 */
 
-		BaseResponse validateUserWithValidInfo = validateUserWithValidInfo(userId);
+		BaseResponse validateUserWithValidInfo = BaseResponseUtils.validateUserWithValidInfo(userId);
 		//when
 		when(mockedSAExecuter.executeValidateUser(any(), eq(saBaseURL.getApplianceURL() + AuthQuery.queryAuth(saAuth.getRealm())), any(), any()))
 				.thenReturn(validateUserWithValidInfo);
@@ -497,7 +498,7 @@ public class SAAccessTest {
 			  "user_id" : "unexisting-user"
 			}
 		 */
-		BaseResponse validateUserNotFound = validateUserNotFound(userId);
+		BaseResponse validateUserNotFound = BaseResponseUtils.validateUserNotFound(userId);
 		//when
 		when(mockedSAExecuter.executeValidateUser(any(), eq(saBaseURL.getApplianceURL() + AuthQuery.queryAuth(saAuth.getRealm())), any(), any()))
 				.thenReturn(validateUserNotFound);
@@ -516,7 +517,7 @@ public class SAAccessTest {
 			  "message" : "The requested resource cannot be found."
 			}
 		 */
-		BaseResponse validateUserWithInvalidKey = validateUserWithInvalidKey(userId);
+		BaseResponse validateUserWithInvalidKey = BaseResponseUtils.validateUserWithInvalidKey(userId);
 		//when
 		when(mockedSAExecuter.executeValidateUser(any(), eq(saBaseURL.getApplianceURL() + AuthQuery.queryAuth(saAuth.getRealm())), any(), any()))
 				.thenReturn(validateUserWithInvalidKey);
@@ -536,7 +537,7 @@ public class SAAccessTest {
 			  "message" : "The requested resource cannot be found."
 			}
 		 */
-		BaseResponse validateUserWithInvalidID = validateUserWithInvalidID(userId);
+		BaseResponse validateUserWithInvalidID = BaseResponseUtils.validateUserWithInvalidID(userId);
 		//when
 		when(mockedSAExecuter.executeValidateUser(any(), eq(saBaseURL.getApplianceURL() + AuthQuery.queryAuth(saAuth.getRealm())), any(), any()))
 				.thenReturn(validateUserWithInvalidID);
@@ -550,7 +551,7 @@ public class SAAccessTest {
 	@Test
 	//@Ignore("Slow test")
 	public void testValidateUserWithInvalidHost() throws Exception  {
-		BaseResponse validateUserWithInvalidHost = validateUserWithInvalidHost(userId);
+		BaseResponse validateUserWithInvalidHost = BaseResponseUtils.validateUserWithInvalidHost(userId);
 		//when
 		when(mockedSAExecuter.executeValidateUser(any(), eq(saBaseURL.getApplianceURL() + AuthQuery.queryAuth(saAuth.getRealm())), any(), any()))
 				.thenReturn(validateUserWithInvalidHost);
@@ -559,128 +560,68 @@ public class SAAccessTest {
 		assertNull("Invalid host returns null response", response);
 	}
 
-	public BaseResponse invalidUserResponse(String userId){
-		BaseResponse invalidResponse = new BaseResponse();
-		invalidResponse.setMessage("User Id not found.");
-		invalidResponse.setUser_id(userId);
-		invalidResponse.setStatus("not_found");
-		return invalidResponse;
+	public void addUserToGroupWhenValid() throws Exception {
+		String groupName = "new group";
+
+		ResponseObject validResponse = BaseResponseUtils.validResponse();
+		//when
+		when(mockedSAExecuter.executeSingleUserToSingleGroup(any(),
+				eq(saBaseURL.getApplianceURL() + IDMQueries.queryUserToGroup(saAuth.getRealm(), userId, groupName)),
+				any(), eq(ResponseObject.class))).thenReturn(validResponse);
+
+		ResponseObject response = saAccess.addUserToGroup(userId, groupName);
+
+		Assert.assertEquals(validResponse, response);
 	}
 
-	public BaseResponse validUserResponse(String userId){
-		BaseResponse validResponse = new BaseResponse();
-		validResponse.setMessage("User Id not found.");
-		validResponse.setUser_id(userId);
-		validResponse.setStatus("valid");
-		return validResponse;
+	@Test
+	public void addUsersToGroupWhenValid() throws Exception {
+
+		String groupName = "new group", groupName2 = "other group";
+
+		GroupAssociationResponse validResponse = BaseResponseUtils.validGroupAssociationResponse();
+
+		UsersToGroup usersToGroup = new UsersToGroup(new String[]{groupName, groupName2});
+		//when
+		when(mockedSAExecuter.executeGroupToUsersRequest(any(),
+				eq(saBaseURL.getApplianceURL() + IDMQueries.queryGroupToUsers(saAuth.getRealm(), groupName)),
+				eq(usersToGroup), any(), eq(GroupAssociationResponse.class))).thenReturn(validResponse);
+
+		GroupAssociationResponse response = saAccess.addUsersToGroup(usersToGroup, groupName);
+
+		Assert.assertEquals(validResponse, response);
 	}
 
-	public BaseResponse successResponse(String userId){
-		BaseResponse validResponse = new BaseResponse();
-		validResponse.setMessage("User Status update complete");
-		validResponse.setUser_id(userId);
-		validResponse.setStatus("success");
-		return validResponse;
+	@Test
+	public void addGroupToUserWhenValid() throws Exception {
+		String groupName = "new group";
+
+		GroupAssociationResponse validResponse = BaseResponseUtils.validGroupAssociationResponse();
+
+		UsersToGroup usersToGroup = new UsersToGroup(new String[]{groupName});
+		//when
+		when(mockedSAExecuter.executeSingleGroupToSingleUser(any(),
+				eq(saBaseURL.getApplianceURL() + IDMQueries.queryGroupToUser(saAuth.getRealm(), userId, groupName)), any(),
+				eq(GroupAssociationResponse.class))).thenReturn(validResponse);
+
+		GroupAssociationResponse response = saAccess.addGroupToUser(groupName, userId);
+
+		Assert.assertEquals(validResponse, response);
 	}
 
-	public BaseResponse validUserInvalidAnswerResponse(String userId){
-		BaseResponse invalidResponse = new BaseResponse();
-		invalidResponse.setMessage("PIN is invalid.");
-		invalidResponse.setUser_id(userId);
-		invalidResponse.setStatus("invalid");
-		return invalidResponse;
-	}
+	@Test
+	public void addUserToGroupsWhenValid() throws Exception {
+		String groupName = "new group";
 
-	public BaseResponse validUserResponseWithOuthMessage(String userId){
-		BaseResponse validResponse = new BaseResponse();
-		validResponse.setMessage("");
-		validResponse.setUser_id(userId);
-		validResponse.setStatus("valid");
-		return validResponse;
-	}
+		GroupAssociationResponse validResponse = BaseResponseUtils.validGroupAssociationResponse();
 
-	public UserProfileResponse validUserProfileResponse(String userId){
-		UserProfileResponse validResponse = new UserProfileResponse();
-		validResponse.setStatus("found");
-		validResponse.setMessage("");
-		return validResponse;
-	}
+		UserToGroups usersToGroup = new UserToGroups(new String[]{groupName});
+		//when
+		when(mockedSAExecuter.executeUserToGroupsRequest(any(), eq(saBaseURL.getApplianceURL() + IDMQueries.queryUserToGroups(saAuth.getRealm(),userId)),
+				eq(usersToGroup), any(), eq(GroupAssociationResponse.class))).thenReturn(validResponse);
 
-	public UserProfileResponse invalidUserProfileResponse(String userId){
-		UserProfileResponse invalidResponse = new UserProfileResponse();
-		invalidResponse.setStatus("not_found");
-		invalidResponse.setMessage("User Id was not found.");
-		return invalidResponse;
-	}
+		GroupAssociationResponse response = saAccess.addUserToGroups(userId, usersToGroup);
 
-	public BaseResponse invalidUserOTP(String userId){
-		BaseResponse invalidResponse = new BaseResponse();
-		invalidResponse.setMessage("Request validation failed with: Unknown factor id 'zzzz0000z0000a00zzzz000z0zz0z00z'.");
-		invalidResponse.setUser_id(userId);
-		invalidResponse.setStatus("invalid");
-		return invalidResponse;
-	}
-
-	public BaseResponse invalidOTP(String userId){
-		BaseResponse invalidResponse = new BaseResponse();
-		invalidResponse.setMessage("OTP is invalid.");
-		invalidResponse.setUser_id(userId);
-		invalidResponse.setStatus("invalid");
-		return invalidResponse;
-	}
-
-	public BaseResponse InvalidPassword(String userId){
-		BaseResponse invalidResponse = new BaseResponse();
-		invalidResponse.setMessage("User Id or password is invalid.");
-		invalidResponse.setUser_id(userId);
-		invalidResponse.setStatus("invalid");
-		return invalidResponse;
-	}
-
-	public FactorsResponse validFactorsFromValidUser(String userId){
-		FactorsResponse validFactorsFromValidUser = new FactorsResponse();
-		validFactorsFromValidUser.setStatus("found");
-		validFactorsFromValidUser.setMessage("");
-		return validFactorsFromValidUser;
-	}
-
-	public FactorsResponse invalidFactorsFromValidUser(String userId){
-		FactorsResponse invalidFactorsFromValidUser = new FactorsResponse();
-		invalidFactorsFromValidUser.setStatus("not_found");
-		invalidFactorsFromValidUser.setMessage("User Id was not found.");
-		return invalidFactorsFromValidUser;
-	}
-
-	public FactorsResponse validateUserWithValidInfo(String userId){
-		FactorsResponse testValidateUserWithValidInfo = new FactorsResponse();
-		testValidateUserWithValidInfo.setStatus("found");
-		testValidateUserWithValidInfo.setMessage("User Id found");
-		return testValidateUserWithValidInfo;
-	}
-
-	public BaseResponse validateUserNotFound(String userId){
-		BaseResponse validateUserNotFound = new BaseResponse();
-		validateUserNotFound.setStatus("not_found");
-		validateUserNotFound.setMessage("User Id was not found.");
-		return validateUserNotFound;
-	}
-
-	public BaseResponse validateUserWithInvalidKey(String userId){
-		BaseResponse validateUserWithInvalidKey = new BaseResponse();
-		validateUserWithInvalidKey.setStatus("invalid");
-		validateUserWithInvalidKey.setMessage("Invalid credentials.");
-		return validateUserWithInvalidKey;
-	}
-
-	public BaseResponse validateUserWithInvalidID(String userId){
-		BaseResponse validateUserWithInvalidID = new BaseResponse();
-		validateUserWithInvalidID.setStatus("invalid");
-		validateUserWithInvalidID.setMessage("AppId is unknown.");
-		return validateUserWithInvalidID;
-	}
-
-	public BaseResponse validateUserWithInvalidHost(String userId){
-		BaseResponse validateUserWithInvalidHost = new BaseResponse();
-		return null;
+		Assert.assertEquals(validResponse, response);
 	}
 }
