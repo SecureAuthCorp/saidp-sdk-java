@@ -82,6 +82,22 @@ public class SAAccess {
     }
 
     /**
+     *<p>
+     *     Returns a SAAccess Object that can be used to query the SecureAuth Rest API
+     *     This should be the default object used when setting up connectivity to the SecureAuth Appliance
+     *     This Object will allow users to support selfSigned Certificates
+     *</p>
+     * @param saBaseURL {@link org.secureauth.sarestapi.data.SABaseURL}
+     * @param saAuth {@link org.secureauth.sarestapi.data.SAAuth}
+     * @param saExecuter {@link org.secureauth.sarestapi.resources.SAExecuter}
+     */
+    public SAAccess(SABaseURL saBaseURL, SAAuth saAuth, SAExecuter saExecuter){
+        this.saBaseURL= saBaseURL;
+        this.saAuth = saAuth;
+        this.saExecuter = saExecuter;
+    }
+
+    /**
      * <p>
      *     Returns IP Risk Evaluation from the Rest API
      * </p>
@@ -1212,12 +1228,48 @@ public class SAAccess {
         return null;
     }
 
+    /**
+     * Retrieves the user's status from the username in the endpoint URL and returns a response.
+     * @param userId The User ID that you want to validate
+     * @return {@link BaseResponse}
+     */
     public BaseResponse getUserStatus(String userId){
-        String ts = getServerTime();
-        RestApiHeader restApiHeader =new RestApiHeader();
+        try{
+            String ts = getServerTime();
 
-        String header = restApiHeader.getAuthorizationHeader(saAuth,"PUT", NumberProfileQuery.queryNumberProfile(saAuth.getRealm()), numberProfileUpdateRequest, ts);
+            String query = StatusQuery.queryStatus(saAuth.getRealm(), userId);
 
+            String header = RestApiHeader.getAuthorizationHeader(saAuth, Resource.METHOD_GET, query, ts);
+
+            return saExecuter.executeGetRequest(header,saBaseURL.getApplianceURL() + query, ts, BaseResponse.class);
+        }catch (Exception e){
+            throw new SARestAPIException("Exception occurred executing get user status query", e);
+        }
+
+    }
+
+    /**
+     * Method invokes a status to the user Id.
+     * @param userId The User ID that you want to change status
+     * @param status The new status [lock, unlock, enable, disable]
+     * @return {@link BaseResponse}
+     */
+    public BaseResponse setUserStatus(String userId, String status){
+        try{
+            String ts = getServerTime();
+
+            String query = StatusQuery.queryStatus(saAuth.getRealm(), userId);
+
+            //payload
+            StatusRequest statusRequestPayload = new StatusRequest(status);
+
+            String header = RestApiHeader.getAuthorizationHeader(saAuth, Resource.METHOD_POST, saBaseURL.getApplianceURL() + query, statusRequestPayload, ts);
+
+            return saExecuter.executePutRequest(header,saBaseURL.getApplianceURL() + query, statusRequestPayload, BaseResponse.class, ts);
+
+        }catch (Exception e){
+            throw new SARestAPIException("Exception occurred executing set user status query", e);
+        }
 
     }
 
