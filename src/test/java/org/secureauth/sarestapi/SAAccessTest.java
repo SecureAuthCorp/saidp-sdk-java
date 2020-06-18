@@ -7,10 +7,14 @@ import org.junit.runner.RunWith;
 
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.secureauth.sarestapi.data.Requests.StatusRequest;
 import org.secureauth.sarestapi.data.Response.BaseResponse;
+import org.secureauth.sarestapi.data.Response.GroupAssociationResponse;
+import org.secureauth.sarestapi.data.Response.ResponseObject;
 import org.secureauth.sarestapi.data.SAAuth;
 import org.secureauth.sarestapi.data.SABaseURL;
+import org.secureauth.sarestapi.data.UserProfile.UserToGroups;
+import org.secureauth.sarestapi.data.UserProfile.UsersToGroup;
+import org.secureauth.sarestapi.queries.IDMQueries;
 import org.secureauth.sarestapi.queries.StatusQuery;
 import org.secureauth.sarestapi.resources.SAExecuter;
 
@@ -34,10 +38,11 @@ public class SAAccessTest {
 	private static SAAccess saAccess;
 	private static SABaseURL saBaseURL;
 
+
 	@Before
 	public void setup() {
-		saAuth = new SAAuth(applicationID,applicationKey,realm);
-		saBaseURL = new SABaseURL(host, port,true);
+		saAuth = new SAAuth(applicationID, applicationKey, realm);
+		saBaseURL = new SABaseURL(host, port, true);
 		saAccess = new SAAccess(saBaseURL, saAuth, mockedSAExecuter);
 	}
 
@@ -46,7 +51,7 @@ public class SAAccessTest {
 
 		String query = StatusQuery.queryStatus(saAuth.getRealm(), userId);
 
-		BaseResponse invalidResponse = invalidUserResponse(userId);
+		BaseResponse invalidResponse = BaseResponseUtils.invalidUserResponse(userId);
 		//when
 		when(mockedSAExecuter.executeGetRequest(any(), eq(saBaseURL.getApplianceURL() + query), any(), any()))
 				.thenReturn(invalidResponse);
@@ -62,7 +67,7 @@ public class SAAccessTest {
 
 		String query = StatusQuery.queryStatus(saAuth.getRealm(), userId);
 
-		BaseResponse validUserResponse = validUserResponse(userId);
+		BaseResponse validUserResponse = BaseResponseUtils.validUserResponse(userId);
 		//when
 		when(mockedSAExecuter.executeGetRequest(any(), eq(saBaseURL.getApplianceURL() + query), any(), any()))
 				.thenReturn(validUserResponse);
@@ -74,45 +79,84 @@ public class SAAccessTest {
 	}
 
 	@Test
-	public void setUserStatus() throws Exception {
+	public void setUserStatusWhenValidStatus() throws Exception {
 		String query = StatusQuery.queryStatus(saAuth.getRealm(), userId);
 		String status = "new status";
 
-		BaseResponse successResponse = successResponse(userId);
-		//payload
-		StatusRequest statusRequestPayload = new StatusRequest(status);
+		BaseResponse successResponse = BaseResponseUtils.successResponse(userId);
 		//when
-		//header,saBaseURL.getApplianceURL() + query, statusRequestPayload, BaseResponse.class, ts
-		when(mockedSAExecuter.executePutRequest(any(), eq(saBaseURL.getApplianceURL() + query),
-				any(), any(), any()))
-				.thenReturn(successResponse);
+		when(mockedSAExecuter.executePostRawRequest(any(), eq(saBaseURL.getApplianceURL() + query),
+				any(), any(), any())).thenReturn(successResponse);
 
 		BaseResponse response = saAccess.setUserStatus(userId, status);
 
 		Assert.assertEquals(successResponse, response);
 	}
 
-	public BaseResponse invalidUserResponse(String userId){
-		BaseResponse invalidResponse = new BaseResponse();
-		invalidResponse.setMessage("User Id not found.");
-		invalidResponse.setUser_id(userId);
-		invalidResponse.setStatus("not_found");
-		return invalidResponse;
+	@Test
+	public void addUserToGroupWhenValid() throws Exception {
+		String groupName = "new group";
+
+		ResponseObject validResponse = BaseResponseUtils.validResponse();
+		//when
+		when(mockedSAExecuter.executeSingleUserToSingleGroup(any(),
+				eq(saBaseURL.getApplianceURL() + IDMQueries.queryUserToGroup(saAuth.getRealm(), userId, groupName)),
+				any(), eq(ResponseObject.class))).thenReturn(validResponse);
+
+		ResponseObject response = saAccess.addUserToGroup(userId, groupName);
+
+		Assert.assertEquals(validResponse, response);
 	}
 
-	public BaseResponse validUserResponse(String userId){
-		BaseResponse invalidResponse = new BaseResponse();
-		invalidResponse.setMessage("User Id not found.");
-		invalidResponse.setUser_id(userId);
-		invalidResponse.setStatus("valid");
-		return invalidResponse;
+	@Test
+	public void addUsersToGroupWhenValid() throws Exception {
+
+		String groupName = "new group", groupName2 = "other group";
+
+		GroupAssociationResponse validResponse = BaseResponseUtils.validGroupAssociationResponse();
+
+		UsersToGroup usersToGroup = new UsersToGroup(new String[]{groupName, groupName2});
+		//when
+		when(mockedSAExecuter.executeGroupToUsersRequest(any(),
+				eq(saBaseURL.getApplianceURL() + IDMQueries.queryGroupToUsers(saAuth.getRealm(), groupName)),
+				eq(usersToGroup), any(), eq(GroupAssociationResponse.class))).thenReturn(validResponse);
+
+		GroupAssociationResponse response = saAccess.addUsersToGroup(usersToGroup, groupName);
+
+		Assert.assertEquals(validResponse, response);
 	}
 
-	public BaseResponse successResponse(String userId){
-		BaseResponse invalidResponse = new BaseResponse();
-		invalidResponse.setMessage("User Status update complete");
-		invalidResponse.setUser_id(userId);
-		invalidResponse.setStatus("success");
-		return invalidResponse;
+	@Test
+	public void addGroupToUserWhenValid() throws Exception {
+		String groupName = "new group";
+
+		GroupAssociationResponse validResponse = BaseResponseUtils.validGroupAssociationResponse();
+
+		UsersToGroup usersToGroup = new UsersToGroup(new String[]{groupName});
+		//when
+		when(mockedSAExecuter.executeSingleGroupToSingleUser(any(),
+				eq(saBaseURL.getApplianceURL() + IDMQueries.queryGroupToUser(saAuth.getRealm(), userId, groupName)), any(),
+				eq(GroupAssociationResponse.class))).thenReturn(validResponse);
+
+		GroupAssociationResponse response = saAccess.addGroupToUser(groupName, userId);
+
+		Assert.assertEquals(validResponse, response);
 	}
+
+	@Test
+	public void addUserToGroupsWhenValid() throws Exception {
+		String groupName = "new group";
+
+		GroupAssociationResponse validResponse = BaseResponseUtils.validGroupAssociationResponse();
+
+		UserToGroups usersToGroup = new UserToGroups(new String[]{groupName});
+		//when
+		when(mockedSAExecuter.executeUserToGroupsRequest(any(), eq(saBaseURL.getApplianceURL() + IDMQueries.queryUserToGroups(saAuth.getRealm(),userId)),
+				eq(usersToGroup), any(), eq(GroupAssociationResponse.class))).thenReturn(validResponse);
+
+		GroupAssociationResponse response = saAccess.addUserToGroups(userId, usersToGroup);
+
+		Assert.assertEquals(validResponse, response);
+	}
+
 }

@@ -993,21 +993,19 @@ public class SAAccess {
      * <p>
      *     Associate User to Group
      * </p>
-     * @param userid the user id of the identity
+     * @param userId the user id of the identity
      * @param groupName The Name of the group to associate the user to
      * @return {@link GroupAssociationResponse}
      */
-    public ResponseObject addUserToGroup(String userid, String groupName){
-        String ts = getServerTime();
-        RestApiHeader restApiHeader = new RestApiHeader();
-        String header = restApiHeader.getAuthorizationHeader(saAuth,"POST", IDMQueries.queryUserToGroup(saAuth.getRealm(),userid,groupName),ts);
-
+    public ResponseObject addUserToGroup(String userId, String groupName){
         try{
-            return saExecuter.executeSingleUserToSingleGroup(header,saBaseURL.getApplianceURL() + IDMQueries.queryUserToGroup(saAuth.getRealm(),userid,groupName), ts, ResponseObject.class);
+            String ts = getServerTime();
+            String header = RestApiHeader.getAuthorizationHeader(saAuth,"POST", IDMQueries.queryUserToGroup(saAuth.getRealm(),userId,groupName),ts);
+
+            return saExecuter.executeSingleUserToSingleGroup(header,saBaseURL.getApplianceURL() + IDMQueries.queryUserToGroup(saAuth.getRealm(),userId,groupName), ts, ResponseObject.class);
         }catch (Exception e){
-            logger.error(new StringBuilder().append("Exception occurred executing REST query::\n").append(e.getMessage()).append("\n").toString(), e);
+            throw new SARestAPIException("Exception occurred executing REST query:\n" + e.getMessage() + "\n", e);
         }
-        return null;
     }
 
     /**
@@ -1019,16 +1017,14 @@ public class SAAccess {
      * @return {@link GroupAssociationResponse}
      */
     public GroupAssociationResponse addUsersToGroup(UsersToGroup usersToGroup, String groupName){
-        String ts = getServerTime();
-        RestApiHeader restApiHeader = new RestApiHeader();
-        String header = restApiHeader.getAuthorizationHeader(saAuth,"POST", IDMQueries.queryGroupToUsers(saAuth.getRealm(),groupName),usersToGroup,ts);
-
         try{
+            String ts = getServerTime();
+            String header = RestApiHeader.getAuthorizationHeader(saAuth, Resource.METHOD_POST, IDMQueries.queryGroupToUsers(saAuth.getRealm(),groupName),usersToGroup,ts);
+
             return saExecuter.executeGroupToUsersRequest(header,saBaseURL.getApplianceURL() + IDMQueries.queryGroupToUsers(saAuth.getRealm(),groupName), usersToGroup, ts, GroupAssociationResponse.class);
         }catch (Exception e){
-            logger.error(new StringBuilder().append("Exception occurred executing REST query::\n").append(e.getMessage()).append("\n").toString(), e);
+            throw new SARestAPIException("Exception occurred executing REST query::\n" + e.getMessage() + "\n", e);
         }
-        return null;
     }
 
 
@@ -1037,20 +1033,19 @@ public class SAAccess {
      *     Associate Group to User
      * </p>
      * @param groupName the Group Name
-     * @param userid The userId to associate to the group
+     * @param userId The userId to associate to the group
      * @return {@link GroupAssociationResponse}
      */
-    public GroupAssociationResponse addGroupToUser(String groupName, String userid){
-        String ts = getServerTime();
-        RestApiHeader restApiHeader = new RestApiHeader();
-        String header = restApiHeader.getAuthorizationHeader(saAuth,"POST", IDMQueries.queryGroupToUser(saAuth.getRealm(),userid,groupName),ts);
-
+    public GroupAssociationResponse addGroupToUser(String groupName, String userId){
         try{
-            return saExecuter.executeSingleGroupToSingleUser(header,saBaseURL.getApplianceURL() + IDMQueries.queryGroupToUser(saAuth.getRealm(),userid,groupName), ts, GroupAssociationResponse.class);
+            String ts = getServerTime();
+
+            String header = RestApiHeader.getAuthorizationHeader(saAuth,"POST", IDMQueries.queryGroupToUser(saAuth.getRealm(),userId,groupName),ts);
+
+            return saExecuter.executeSingleGroupToSingleUser(header,saBaseURL.getApplianceURL() + IDMQueries.queryGroupToUser(saAuth.getRealm(),userId,groupName), ts, GroupAssociationResponse.class);
         }catch (Exception e){
-            logger.error(new StringBuilder().append("Exception occurred executing REST query::\n").append(e.getMessage()).append("\n").toString(), e);
+            throw new SARestAPIException("Exception occurred executing REST query:\n" + e.getMessage() + "\n", e);
         }
-        return null;
     }
 
     /**
@@ -1062,16 +1057,14 @@ public class SAAccess {
      * @return {@link GroupAssociationResponse}
      */
     public GroupAssociationResponse addUserToGroups(String userId, UserToGroups userToGroups){
-        String ts = getServerTime();
-        RestApiHeader restApiHeader = new RestApiHeader();
-        String header = restApiHeader.getAuthorizationHeader(saAuth,"POST", IDMQueries.queryUserToGroups(saAuth.getRealm(),userId),userToGroups,ts);
-
         try{
+            String ts = getServerTime();
+            String header = RestApiHeader.getAuthorizationHeader(saAuth, Resource.METHOD_POST, IDMQueries.queryUserToGroups(saAuth.getRealm(),userId),userToGroups,ts);
+
             return saExecuter.executeUserToGroupsRequest(header,saBaseURL.getApplianceURL() + IDMQueries.queryUserToGroups(saAuth.getRealm(),userId), userToGroups, ts, GroupAssociationResponse.class);
         }catch (Exception e){
-            logger.error(new StringBuilder().append("Exception occurred executing REST query::\n").append(e.getMessage()).append("\n").toString(), e);
+            throw new SARestAPIException("Exception occurred executing REST query::\n" + e.getMessage() + "\n", e);
         }
-        return null;
     }
 
     /**
@@ -1083,15 +1076,13 @@ public class SAAccess {
      */
     public UserProfileResponse getUserProfile(String userid){
         String ts = getServerTime();
-        RestApiHeader restApiHeader = new RestApiHeader();
-        String header = restApiHeader.getAuthorizationHeader(saAuth,"GET",IDMQueries.queryUserProfile(saAuth.getRealm(),userid),ts);
-
+        String header = RestApiHeader.getAuthorizationHeader(saAuth,"GET",IDMQueries.queryUserProfile(saAuth.getRealm(),userid),ts);
 
         try{
             return saExecuter.executeGetRequest(header,saBaseURL.getApplianceURL() + IDMQueries.queryUserProfile(saAuth.getRealm(),userid),ts, UserProfileResponse.class);
 
         }catch (Exception e){
-            logger.error(new StringBuilder().append("Exception occurred executing REST query::\n").append(e.getMessage()).append("\n").toString(), e);
+            logger.error("Exception occurred executing REST query:\n" + e.getMessage() + "\n");
         }
         return null;
     }
@@ -1263,16 +1254,15 @@ public class SAAccess {
             //payload
             StatusRequest statusRequestPayload = new StatusRequest(status);
 
-            String header = RestApiHeader.getAuthorizationHeader(saAuth, Resource.METHOD_POST, saBaseURL.getApplianceURL() + query, statusRequestPayload, ts);
+            String header = RestApiHeader.getAuthorizationHeader(saAuth, Resource.METHOD_POST, query, statusRequestPayload, ts);
 
-            return saExecuter.executePutRequest(header,saBaseURL.getApplianceURL() + query, statusRequestPayload, BaseResponse.class, ts);
+            return saExecuter.executePostRawRequest(header,saBaseURL.getApplianceURL() + query, statusRequestPayload, BaseResponse.class, ts);
 
         }catch (Exception e){
             throw new SARestAPIException("Exception occurred executing set user status query", e);
         }
 
     }
-
 
     /**
      * End of Number Profile Methods

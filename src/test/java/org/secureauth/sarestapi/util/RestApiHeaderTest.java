@@ -30,7 +30,7 @@ class RestApiHeaderTest {
 
 		String header = RestApiHeader.getAuthorizationHeader(saAuth, Resource.METHOD_GET, query, getServerTime());
 
-		assertEquals(header, "Basic MDAwODYwYzkzMjRkNGM3OTgxN2QxZWRlZWVjY2U4ZmY6TkU0ZVJBNEYrcFErN3ViRTBLcnZpTGNIRWg5YVNiTTZPK0MrY3I4YzZLRT0=");
+		assertEquals(header, "Basic YXBwbGljYXRpb25JRDo=");
 	}
 
 	@Test
@@ -41,7 +41,7 @@ class RestApiHeaderTest {
 
 		String header = RestApiHeader.getAuthorizationHeader(saAuth, Resource.METHOD_POST, query, statusRequest, getServerTime());
 
-		assertEquals(header, "Basic MDAwODYwYzkzMjRkNGM3OTgxN2QxZWRlZWVjY2U4ZmY6VFo0eWYveS9jbVFyRFgxMms5V0swT3dTS1FtTVRlZ1hYUmhEa2t0K3ZKOD0=");
+		assertEquals(header, "Basic YXBwbGljYXRpb25JRDo=");
 	}
 
 
