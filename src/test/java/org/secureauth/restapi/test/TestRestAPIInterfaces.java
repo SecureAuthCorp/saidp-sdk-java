@@ -1,14 +1,6 @@
 package org.secureauth.restapi.test;
 
-
-import org.secureauth.restapi.test.Impl.*;
 import org.secureauth.sarestapi.SAAccess;
-import org.secureauth.sarestapi.data.Response.BaseResponse;
-import org.secureauth.sarestapi.data.Response.GroupAssociationResponse;
-import org.secureauth.sarestapi.data.Response.ResponseObject;
-import org.secureauth.sarestapi.data.Response.UserProfileResponse;
-import org.secureauth.sarestapi.data.UserProfile.UserProfile;
-import org.secureauth.sarestapi.data.UserProfile.UserToGroups;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,7 +48,6 @@ public class TestRestAPIInterfaces {
 
         //Create Instance of SAAccess Object
         SAAccess saAccess = new SAAccess(applianceHost, appliancePort, applianceSSL, selfSigned, realm, applicationID, applicationKey);
-
 
     }
 
