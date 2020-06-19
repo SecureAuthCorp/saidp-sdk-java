@@ -52,12 +52,9 @@ public class TestRestAPIInterfaces {
 
         //Create Instance of SAAccess Object
         ISAAccess saAccess = SAFactory.of(applianceHost, appliancePort, applianceSSL, selfSigned, realm, applicationID, applicationKey);
-        UsersToGroup usersToGroup = new UsersToGroup(new String[]{"user1", "user2"});
-        UserToGroups userToGroups = new UserToGroups(new String[]{"group1", "group2"});
-        saAccess.addUserToGroups("userId", userToGroups);
 
         try {
-            saAccess.addGroupToUser("groupName", "userId");
+            saAccess.getUserProfile(user);
         }catch (SARestAPIException e){
             //handle exception
         }
