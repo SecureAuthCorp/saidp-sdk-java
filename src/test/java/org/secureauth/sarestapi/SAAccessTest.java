@@ -17,6 +17,7 @@ import org.secureauth.sarestapi.data.UserProfile.UsersToGroup;
 import org.secureauth.sarestapi.queries.IDMQueries;
 import org.secureauth.sarestapi.queries.StatusQuery;
 import org.secureauth.sarestapi.resources.SAExecuter;
+import org.secureauth.sarestapi.util.SAFactory;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -35,7 +36,7 @@ public class SAAccessTest {
 	private final static String port = "443";
 	private final static String userId = "foobar";
 	private static SAAuth saAuth;
-	private static SAAccess saAccess;
+	private static ISAAccess saAccess;
 	private static SABaseURL saBaseURL;
 
 
@@ -43,7 +44,7 @@ public class SAAccessTest {
 	public void setup() {
 		saAuth = new SAAuth(applicationID, applicationKey, realm);
 		saBaseURL = new SABaseURL(host, port, true);
-		saAccess = new SAAccess(saBaseURL, saAuth, mockedSAExecuter);
+		saAccess = SAFactory.of(saBaseURL, saAuth, mockedSAExecuter);
 	}
 
 	@Test
