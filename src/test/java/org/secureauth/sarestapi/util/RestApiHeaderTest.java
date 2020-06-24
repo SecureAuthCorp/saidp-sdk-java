@@ -1,6 +1,6 @@
 package org.secureauth.sarestapi.util;
 
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.secureauth.sarestapi.data.Requests.StatusRequest;
 import org.secureauth.sarestapi.data.SAAuth;
@@ -19,7 +19,7 @@ class RestApiHeaderTest {
 	private final static String applicationKey = "applicationKey";
 	private static SAAuth saAuth;
 
-	@Before
+	@BeforeEach
 	public void setup() {
 		saAuth = new SAAuth(applicationID,applicationKey,realm);
 	}

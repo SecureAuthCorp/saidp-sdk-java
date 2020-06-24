@@ -1,17 +1,9 @@
 package org.secureauth.sarestapi.resources;
 
-
-
 import java.security.SecureRandom;
-import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
 import java.util.Optional;
 
-import javax.net.ssl.HostnameVerifier;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSession;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
+import javax.net.ssl.*;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.MediaType;
 
@@ -30,6 +22,7 @@ import org.secureauth.sarestapi.data.UserProfile.UsersToGroup;
 import org.secureauth.sarestapi.exception.SARestAPIException;
 import org.secureauth.sarestapi.filters.SACheckRequestFilter;
 import org.secureauth.sarestapi.queries.StatusQuery;
+import org.secureauth.sarestapi.ssl.SATrustManagerFactory;
 import org.secureauth.sarestapi.util.JSONUtil;
 import org.secureauth.sarestapi.util.RestApiHeader;
 import org.slf4j.Logger;
@@ -66,10 +59,10 @@ OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
 public class SAExecuter {
 
     private ClientConfig config = null;
-
     private Client client = null;
     private static Logger logger = LoggerFactory.getLogger(SAExecuter.class);
     private static final String TEN_SECONDS = "10000";
+    private static final String TLS = "TLS";
 
     private SABaseURL saBaseURL = null;
 
@@ -79,43 +72,15 @@ public class SAExecuter {
 
     //Set up our Connection
     private void createConnection() throws Exception {
-
         config = new ClientConfig();
-        SSLContext ctx = null;
-        ctx = SSLContext.getInstance("TLS");
-
-
-        TrustManager[] certs = new TrustManager[]{
-                new X509TrustManager() {
-                    @Override
-                    public X509Certificate[] getAcceptedIssuers() {
-                        return null;
-                    }
-
-                    @Override
-                    public void checkServerTrusted(X509Certificate[] chain, String authType) throws CertificateException {
-                    }
-
-                    @Override
-                    public void checkClientTrusted(X509Certificate[] chain, String authType) throws CertificateException {
-                    }
-                }
-        };
-
-        ctx.init(null, certs, new SecureRandom());
-
+        SSLContext ctx = SSLContext.getInstance( TLS );
+        ctx.init(null, SATrustManagerFactory.createTrustsManagersFor( this.saBaseURL ) , new SecureRandom());
         try {
-
             config.register(SACheckRequestFilter.class);
             client = ClientBuilder.newBuilder()
                     .withConfig(config)
                     .sslContext(ctx)
-                    .hostnameVerifier(new HostnameVerifier() {
-                        @Override
-                        public boolean verify(String s, SSLSession sslSession) {
-                            return saBaseURL.isSelfSigned();
-                        }
-                    })
+                    .hostnameVerifier( (s, sslSession) -> saBaseURL.isSelfSigned() )
                     .build();
             int timeoutSeconds = Integer.parseInt(Optional.ofNullable(System.getProperty("rest.api.timeout")).orElse(TEN_SECONDS));
             client.property(ClientProperties.CONNECT_TIMEOUT, timeoutSeconds);
@@ -123,9 +88,9 @@ public class SAExecuter {
         } catch (Exception e) {
             logger.error("Exception occurred while attempting to associating our SSL cert to the session.", e);
         }
-
-        if (client == null)
+        if (client == null) {
             throw new Exception("Unable to create connection object, creation attempt returned NULL.");
+        }
     }
 
     //Get Factors for the user requested
@@ -164,33 +129,30 @@ public class SAExecuter {
     }
 
     // post request
-    public <T> T executePostRequest(String auth,String query, AuthRequest authRequest,String ts, Class<T> valueType)throws Exception{
+    public <T> T executePostRequest(String auth,String query, AuthRequest authRequest,String ts, Class<T> valueType)throws Exception {
 
-        if(client == null) {
+        if (client == null) {
             createConnection();
         }
-
-        WebTarget target = null;
-        Response response = null;
-        T responseObject =null;
-        try{
+        try {
+            WebTarget target = null;
+            Response response = null;
+            T responseObject = null;
 
             target = client.target(query);
             response = target.request().
                     accept(MediaType.APPLICATION_JSON).
                     header("Authorization", auth).
                     header("X-SA-Ext-Date", ts).
-                    post(Entity.entity(JSONUtil.convertObjectToJSON(authRequest),MediaType.APPLICATION_JSON));
+                    post(Entity.entity(JSONUtil.convertObjectToJSON(authRequest), MediaType.APPLICATION_JSON));
 
-            responseObject=response.readEntity(valueType);
+            responseObject = response.readEntity(valueType);
             response.close();
-        }catch(Exception e){
-            logger.error(new StringBuilder().append("Exception Delivering OTP by Push: \nQuery:\n\t")
-                    .append(query).append("\nError:").append(e.getMessage()).toString(), e);
+            return responseObject;
+        } catch (Exception e) {
+            throw new SARestAPIException("Exception Delivering OTP by Push: \nQuery:\n\t" +
+                    query + "\nError:" + e.getMessage(), e);
         }
-
-        return responseObject;
-
     }
 
     public <T> T executePutRequest(String auth, String query, Object payloadRequest, Class<T> responseValueType, String ts)throws Exception {
@@ -212,12 +174,10 @@ public class SAExecuter {
             //consider using response.ok(valueType).build(); instead.
             genericResponse = response.readEntity(responseValueType);
             response.close();
+            return genericResponse;
         }catch(Exception e){
-            logger.error("Exception Put Request: \nQuery:\n\t" + query + "\nError:" + e.getMessage());
+            throw new SARestAPIException("Exception Put Request: \nQuery:\n\t" + query + "\nError:" + e.getMessage());
         }
-
-        return genericResponse;
-
     }
 
     public <T> T executePostRawRequest(String auth,String query, Object authRequest, Class<T> valueType, String ts)throws Exception{
@@ -225,11 +185,10 @@ public class SAExecuter {
         if(client == null) {
             createConnection();
         }
-
-        WebTarget target = null;
-        Response response = null;
-        T responseObject = null;
         try{
+            WebTarget target = null;
+            Response response = null;
+            T responseObject = null;
 
             target = client.target(query);
             response = target.request().
@@ -237,15 +196,12 @@ public class SAExecuter {
                     header("Authorization", auth).
                     header("X-SA-Ext-Date", ts).
                     post(Entity.entity(JSONUtil.convertObjectToJSON(authRequest),MediaType.APPLICATION_JSON));
-
             responseObject = response.readEntity(valueType);
             response.close();
+            return responseObject;
         }catch(Exception e){
-            logger.error("Exception Post Request: \nQuery:\n\t" + query + "\nError:" + e.getMessage());
+            throw new SARestAPIException("Exception Post Request: \nQuery:\n\t" + query + "\nError:" + e.getMessage());
         }
-
-        return responseObject;
-
     }
 
     public <T> T executePostRawRequestWithoutPayload(String auth,String query, Class<T> valueType, String ts)throws Exception{
@@ -265,15 +221,12 @@ public class SAExecuter {
                     header("Authorization", auth).
                     header("X-SA-Ext-Date", ts).
                     post(Entity.entity("",MediaType.APPLICATION_JSON));
-
             responseObject = response.readEntity(valueType);
             response.close();
+            return responseObject;
         }catch(Exception e){
-            logger.error("Exception Post Request: \nQuery:\n\t" + query + "\nError:" + e.getMessage());
+            throw new SARestAPIException("Exception Post Request: \nQuery:\n\t" + query + "\nError:" + e.getMessage());
         }
-
-        return responseObject;
-
     }
 
     public String executeRawGetRequest(String auth, String query,String ts)throws Exception {
@@ -294,8 +247,8 @@ public class SAExecuter {
                     get(Response.class);
             return response.readEntity(String.class);
         }catch(Exception e){
-            logger.error(new StringBuilder().append("Exception getting User Factors: \nQuery:\n\t")
-                    .append(query).append("\nError:").append(e.getMessage()).append(".\nResponse code is ").append(response).toString()
+            logger.error("Exception getting User Factors: \nQuery:\n\t" +
+                    query + "\nError:" + e.getMessage() + ".\nResponse code is " + response
                     + "; Raw response:" + factors, e);
         }
         return null;
