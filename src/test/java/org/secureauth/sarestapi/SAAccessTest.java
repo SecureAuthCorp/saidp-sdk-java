@@ -21,6 +21,7 @@ import org.secureauth.sarestapi.queries.StatusQuery;
 import org.secureauth.sarestapi.resources.SAExecuter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.secureauth.sarestapi.util.SAFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -61,7 +62,7 @@ public class SAAccessTest {
 	private final static String userId = "foobar";
 	private final static String passCode = "foobar";
 	private static SAAuth saAuth;
-	private static SAAccess saAccess;
+	private static ISAAccess saAccess;
 	private static SABaseURL saBaseURL;
 
 
@@ -69,7 +70,7 @@ public class SAAccessTest {
 	public void setup() {
 		saAuth = new SAAuth(applicationID, applicationKey, realm);
 		saBaseURL = new SABaseURL(host, port, true);
-		saAccess = new SAAccess(saBaseURL, saAuth, mockedSAExecuter);
+		saAccess = SAFactory.of(saBaseURL, saAuth, mockedSAExecuter);
 
 		Properties properties = new Properties();
 		try (InputStream inputStream = SAAccessTest.class.getClassLoader().getResourceAsStream(PROPERTIES_FILE_PATH)) {
