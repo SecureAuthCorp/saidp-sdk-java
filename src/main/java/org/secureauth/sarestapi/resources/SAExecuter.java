@@ -164,33 +164,30 @@ public class SAExecuter {
     }
 
     // post request
-    public <T> T executePostRequest(String auth,String query, AuthRequest authRequest,String ts, Class<T> valueType)throws Exception{
+    public <T> T executePostRequest(String auth,String query, AuthRequest authRequest,String ts, Class<T> valueType)throws Exception {
 
-        if(client == null) {
+        if (client == null) {
             createConnection();
         }
-
-        WebTarget target = null;
-        Response response = null;
-        T responseObject =null;
-        try{
+        try {
+            WebTarget target = null;
+            Response response = null;
+            T responseObject = null;
 
             target = client.target(query);
             response = target.request().
                     accept(MediaType.APPLICATION_JSON).
                     header("Authorization", auth).
                     header("X-SA-Ext-Date", ts).
-                    post(Entity.entity(JSONUtil.convertObjectToJSON(authRequest),MediaType.APPLICATION_JSON));
+                    post(Entity.entity(JSONUtil.convertObjectToJSON(authRequest), MediaType.APPLICATION_JSON));
 
-            responseObject=response.readEntity(valueType);
+            responseObject = response.readEntity(valueType);
             response.close();
-        }catch(Exception e){
-            logger.error(new StringBuilder().append("Exception Delivering OTP by Push: \nQuery:\n\t")
-                    .append(query).append("\nError:").append(e.getMessage()).toString(), e);
+            return responseObject;
+        } catch (Exception e) {
+            throw new SARestAPIException("Exception Delivering OTP by Push: \nQuery:\n\t" +
+                    query + "\nError:" + e.getMessage(), e);
         }
-
-        return responseObject;
-
     }
 
     public <T> T executePutRequest(String auth, String query, Object payloadRequest, Class<T> responseValueType, String ts)throws Exception {
@@ -212,12 +209,10 @@ public class SAExecuter {
             //consider using response.ok(valueType).build(); instead.
             genericResponse = response.readEntity(responseValueType);
             response.close();
+            return genericResponse;
         }catch(Exception e){
-            logger.error("Exception Put Request: \nQuery:\n\t" + query + "\nError:" + e.getMessage());
+            throw new SARestAPIException("Exception Put Request: \nQuery:\n\t" + query + "\nError:" + e.getMessage());
         }
-
-        return genericResponse;
-
     }
 
     public <T> T executePostRawRequest(String auth,String query, Object authRequest, Class<T> valueType, String ts)throws Exception{
@@ -225,11 +220,10 @@ public class SAExecuter {
         if(client == null) {
             createConnection();
         }
-
-        WebTarget target = null;
-        Response response = null;
-        T responseObject = null;
         try{
+            WebTarget target = null;
+            Response response = null;
+            T responseObject = null;
 
             target = client.target(query);
             response = target.request().
@@ -237,15 +231,12 @@ public class SAExecuter {
                     header("Authorization", auth).
                     header("X-SA-Ext-Date", ts).
                     post(Entity.entity(JSONUtil.convertObjectToJSON(authRequest),MediaType.APPLICATION_JSON));
-
             responseObject = response.readEntity(valueType);
             response.close();
+            return responseObject;
         }catch(Exception e){
-            logger.error("Exception Post Request: \nQuery:\n\t" + query + "\nError:" + e.getMessage());
+            throw new SARestAPIException("Exception Post Request: \nQuery:\n\t" + query + "\nError:" + e.getMessage());
         }
-
-        return responseObject;
-
     }
 
     public <T> T executePostRawRequestWithoutPayload(String auth,String query, Class<T> valueType, String ts)throws Exception{
@@ -265,15 +256,12 @@ public class SAExecuter {
                     header("Authorization", auth).
                     header("X-SA-Ext-Date", ts).
                     post(Entity.entity("",MediaType.APPLICATION_JSON));
-
             responseObject = response.readEntity(valueType);
             response.close();
+            return responseObject;
         }catch(Exception e){
-            logger.error("Exception Post Request: \nQuery:\n\t" + query + "\nError:" + e.getMessage());
+            throw new SARestAPIException("Exception Post Request: \nQuery:\n\t" + query + "\nError:" + e.getMessage());
         }
-
-        return responseObject;
-
     }
 
     public String executeRawGetRequest(String auth, String query,String ts)throws Exception {
@@ -294,8 +282,8 @@ public class SAExecuter {
                     get(Response.class);
             return response.readEntity(String.class);
         }catch(Exception e){
-            logger.error(new StringBuilder().append("Exception getting User Factors: \nQuery:\n\t")
-                    .append(query).append("\nError:").append(e.getMessage()).append(".\nResponse code is ").append(response).toString()
+            logger.error("Exception getting User Factors: \nQuery:\n\t" +
+                    query + "\nError:" + e.getMessage() + ".\nResponse code is " + response
                     + "; Raw response:" + factors, e);
         }
         return null;
