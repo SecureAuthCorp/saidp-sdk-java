@@ -21,7 +21,6 @@ import org.secureauth.sarestapi.queries.StatusQuery;
 import org.secureauth.sarestapi.resources.SAExecuter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.secureauth.sarestapi.util.SAFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -70,7 +69,7 @@ public class SAAccessTest {
 	public void setup() {
 		saAuth = new SAAuth(applicationID, applicationKey, realm);
 		saBaseURL = new SABaseURL(host, port, true);
-		saAccess = SAFactory.of(saBaseURL, saAuth, mockedSAExecuter);
+		saAccess = new SAAccess(saBaseURL, saAuth, mockedSAExecuter);
 
 		Properties properties = new Properties();
 		try (InputStream inputStream = SAAccessTest.class.getClassLoader().getResourceAsStream(PROPERTIES_FILE_PATH)) {
@@ -509,6 +508,7 @@ public class SAAccessTest {
 		assertEquals(response.getStatus(), NOT_FOUND_MESSAGE);
 		assertEquals(response.getMessage(), "User Id was not found.");
 	}
+
 	@Test
 	public void testValidateUserWithInvalidKey() throws Exception{
 		/*
@@ -561,6 +561,7 @@ public class SAAccessTest {
 		assertNull("Invalid host returns null response", response);
 	}
 
+	@Test
 	public void addUserToGroupWhenValid() throws Exception {
 		String groupName = "new group";
 
