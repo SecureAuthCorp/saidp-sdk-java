@@ -1,17 +1,9 @@
 package org.secureauth.sarestapi.resources;
 
-
-
 import java.security.SecureRandom;
-import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
 import java.util.Optional;
 
-import javax.net.ssl.HostnameVerifier;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSession;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
+import javax.net.ssl.*;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.MediaType;
 
@@ -30,6 +22,7 @@ import org.secureauth.sarestapi.data.UserProfile.UsersToGroup;
 import org.secureauth.sarestapi.exception.SARestAPIException;
 import org.secureauth.sarestapi.filters.SACheckRequestFilter;
 import org.secureauth.sarestapi.queries.StatusQuery;
+import org.secureauth.sarestapi.ssl.SATrustManagerFactory;
 import org.secureauth.sarestapi.util.JSONUtil;
 import org.secureauth.sarestapi.util.RestApiHeader;
 import org.slf4j.Logger;
@@ -66,10 +59,10 @@ OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
 public class SAExecuter {
 
     private ClientConfig config = null;
-
     private Client client = null;
     private static Logger logger = LoggerFactory.getLogger(SAExecuter.class);
     private static final String TEN_SECONDS = "10000";
+    private static final String TLS = "TLS";
 
     private SABaseURL saBaseURL = null;
 
@@ -79,43 +72,15 @@ public class SAExecuter {
 
     //Set up our Connection
     private void createConnection() throws Exception {
-
         config = new ClientConfig();
-        SSLContext ctx = null;
-        ctx = SSLContext.getInstance("TLS");
-
-
-        TrustManager[] certs = new TrustManager[]{
-                new X509TrustManager() {
-                    @Override
-                    public X509Certificate[] getAcceptedIssuers() {
-                        return null;
-                    }
-
-                    @Override
-                    public void checkServerTrusted(X509Certificate[] chain, String authType) throws CertificateException {
-                    }
-
-                    @Override
-                    public void checkClientTrusted(X509Certificate[] chain, String authType) throws CertificateException {
-                    }
-                }
-        };
-
-        ctx.init(null, certs, new SecureRandom());
-
+        SSLContext ctx = SSLContext.getInstance( TLS );
+        ctx.init(null, SATrustManagerFactory.createTrustsManagersFor( this.saBaseURL ) , new SecureRandom());
         try {
-
             config.register(SACheckRequestFilter.class);
             client = ClientBuilder.newBuilder()
                     .withConfig(config)
                     .sslContext(ctx)
-                    .hostnameVerifier(new HostnameVerifier() {
-                        @Override
-                        public boolean verify(String s, SSLSession sslSession) {
-                            return saBaseURL.isSelfSigned();
-                        }
-                    })
+                    .hostnameVerifier( (s, sslSession) -> saBaseURL.isSelfSigned() )
                     .build();
             int timeoutSeconds = Integer.parseInt(Optional.ofNullable(System.getProperty("rest.api.timeout")).orElse(TEN_SECONDS));
             client.property(ClientProperties.CONNECT_TIMEOUT, timeoutSeconds);
@@ -123,9 +88,9 @@ public class SAExecuter {
         } catch (Exception e) {
             logger.error("Exception occurred while attempting to associating our SSL cert to the session.", e);
         }
-
-        if (client == null)
+        if (client == null) {
             throw new Exception("Unable to create connection object, creation attempt returned NULL.");
+        }
     }
 
     //Get Factors for the user requested
