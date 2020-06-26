@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Properties;
 
 public class RetrievePropertiesUtils {
@@ -35,7 +36,7 @@ public class RetrievePropertiesUtils {
 	}
 
 	public String getValueFromProperty(Property property){
-		return propertiesMap.get(property.getValue());
+		return Optional.ofNullable(propertiesMap.get(property.getValue())).orElse("");
 	}
 
 	public void getAndFieldProperties(String path){

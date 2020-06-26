@@ -1,5 +1,6 @@
 package org.secureauth.restapi.test;
 
+import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Test;
 import org.secureauth.sarestapi.ISAAccess;
@@ -52,9 +53,12 @@ public class SAAccessTDD {
 	private static String validUserOtp;
 	private static RetrievePropertiesUtils retrievePropertiesUtils;
 
+	private static Boolean assumeTest;
+
 	@Before
 	public void setup() {
 		setupStrings();
+		Assume.assumeTrue(assumeTest);
 		saAuth = new SAAuth(apiApplicationId, apiApplicationKey, realm);
 		saBaseURL = new SABaseURL(host, port, ssl);
 		saExecuter = new SAExecuter(saBaseURL);
@@ -75,6 +79,7 @@ public class SAAccessTDD {
 		validPassword = getValue(Property.VALID_PASSWORD);
 		validFactorIdForOathOtp = getValue(Property.VALID_FACTOR_ID_FOR_OATH_OTP);
 		validUserOtp = getValue(Property.VALID_OTP_CODE);
+		assumeTest = Boolean.valueOf(getValue(Property.ASSUME_TEST));
 
 	}
 
@@ -91,7 +96,6 @@ public class SAAccessTDD {
 			  "message" : ""
 			}
 		 */
-
 		BaseResponse response = saAccess.validateUserPin(validUsername, validPin);
 		assertNotNull(response);
 		assertEquals("valid", response.getStatus());
