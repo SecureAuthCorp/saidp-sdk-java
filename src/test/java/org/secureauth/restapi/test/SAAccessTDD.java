@@ -210,6 +210,7 @@ public class SAAccessTDD {
 		assertEquals(response.getMessage(), "OTP is invalid.");
 	}
 
+
 	@Test
 	public void testValidatePasswordWithValidCredentials() throws Exception {
 		/*
