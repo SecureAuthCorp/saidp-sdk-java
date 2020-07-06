@@ -4,6 +4,7 @@ import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Test;
 import org.secureauth.sarestapi.ISAAccess;
+import org.secureauth.sarestapi.SAAccess;
 import org.secureauth.sarestapi.data.Response.BaseResponse;
 import org.secureauth.sarestapi.data.Response.FactorsResponse;
 import org.secureauth.sarestapi.data.Response.UserProfileResponse;
@@ -51,6 +52,7 @@ public class SAAccessTDD {
 	//User OATH-OTP
 	private static String validFactorIdForOathOtp;
 	private static String validUserOtp;
+	private static String validUserOtpOath;
 	private static RetrievePropertiesUtils retrievePropertiesUtils;
 
 	private static Boolean assumeTest;
@@ -60,7 +62,7 @@ public class SAAccessTDD {
 		setupStrings();
 		Assume.assumeTrue(assumeTest);
 		saAuth = new SAAuth(apiApplicationId, apiApplicationKey, realm);
-		saBaseURL = new SABaseURL(host, port, ssl);
+		saBaseURL = new SABaseURL(host, port, ssl, true);
 		saExecuter = new SAExecuter(saBaseURL);
 		saAccess = SAFactory.of(saBaseURL, saAuth, saExecuter);
 	}
@@ -78,8 +80,9 @@ public class SAAccessTDD {
 		validPin = getValue(Property.VALID_PIN);
 		validPassword = getValue(Property.VALID_PASSWORD);
 		validFactorIdForOathOtp = getValue(Property.VALID_FACTOR_ID_FOR_OATH_OTP);
-		validUserOtp = getValue(Property.VALID_OTP_CODE);
-		assumeTest = Boolean.valueOf(getValue(Property.ASSUME_TEST));
+		validUserOtp = getValue(Property.VALID_OTP_PIN_CODE);
+		validUserOtpOath = getValue(Property.VALID_OTP_OATH_CODE);
+ 		assumeTest = Boolean.valueOf(getValue(Property.ASSUME_TEST));
 
 	}
 
@@ -139,7 +142,7 @@ public class SAAccessTDD {
 
 		UserProfileResponse response = saAccess.getUserProfile(validUsername);
 		assertNotNull(response);
-		assertEquals(response.getStatus(), FOUND_MESSAGE);
+		assertEquals(FOUND_MESSAGE, response.getStatus());
 		assertTrue(response.getMessage().isEmpty());
 	}
 
@@ -174,9 +177,9 @@ public class SAAccessTDD {
 			}
 		 */
 
-		BaseResponse response = saAccess.validateOath(validUsername, validUserOtp, validFactorIdForOathOtp);
+		BaseResponse response = saAccess.validateOath(validUsername, validUserOtpOath, validFactorIdForOathOtp);
 		assertNotNull(response);
-		assertEquals(response.getStatus(), "valid");
+		assertEquals("valid", response.getStatus());
 		assertTrue(response.getMessage().isEmpty());
 	}
 
@@ -190,7 +193,7 @@ public class SAAccessTDD {
 			}
 		 */
 
-		String invalidFactorId = "";
+		String invalidFactorId = "zzzz0000z0000a00zzzz000z0zz0z00z";
 
 		BaseResponse response = saAccess.validateOath(validUsername, validUserOtp, invalidFactorId);
 		assertNotNull(response);
@@ -371,7 +374,9 @@ public class SAAccessTDD {
 			}
 		 */
 
-		BaseResponse response = saAccess.validateUser(validUsername);
+		SAAuth invalidAuth = new SAAuth(apiApplicationId, "de141d3f532be6035c3206083df96c8d1b645220094705aaa3ff9765b0a1a81e", realm);
+		SAAccess invalidAuthAccess = new SAAccess(saBaseURL, invalidAuth, saExecuter);
+		BaseResponse response = invalidAuthAccess.validateUser(validUsername);
 		assertNotNull(response);
 		assertEquals("invalid", response.getStatus());
 		assertTrue(response.getMessage().contains("Invalid credentials."));
@@ -387,7 +392,9 @@ public class SAAccessTDD {
 			}
 		 */
 
-		BaseResponse response = saAccess.validateUser(validUsername);
+		SAAuth invalidAuth = new SAAuth("invalidID", apiApplicationKey, realm);
+		SAAccess invalidAuthAccess = new SAAccess(saBaseURL, invalidAuth, saExecuter);
+		BaseResponse response = invalidAuthAccess.validateUser(validUsername);
 		assertNotNull(response);
 		assertEquals("invalid", response.getStatus());
 		assertTrue(response.getMessage().contains("AppId is unknown."));
@@ -396,9 +403,10 @@ public class SAAccessTDD {
 	@Test
 	//@Ignore("Slow test")
 	public void testValidateUserWithInvalidHost() throws Exception  {
-
-		BaseResponse response = saAccess.validateUser(validUsername);
-		assertNull("Invalid host returns null response", response);
+		SABaseURL invalidBase = new SABaseURL("invalidHost", port, ssl, true);
+		SAAccess invalidAuthAccess = new SAAccess(invalidBase, saAuth, saExecuter);
+		BaseResponse response = invalidAuthAccess.validateUser(validUsername);
+		assertNull("Already connected", response);
 	}
 
 	@Test
