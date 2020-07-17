@@ -194,9 +194,8 @@ public class SAAccessTDD {
 			}
 		 */
 
-		// String passcode = generateValidTOTP();
-		// BaseResponse response = saAccess.validateOath(validUsername, passcode, validFactorIdForOathOtp);
-		BaseResponse response = saAccess.validateOath(validUsername, validUserOtpOath, validFactorIdForOathOtp);
+		String passcode = generateValidTOTP();
+		BaseResponse response = saAccess.validateOath(validUsername, passcode, validFactorIdForOathOtp);
 		assertNotNull(response);
 		assertEquals("valid", response.getStatus());
 		assertTrue(response.getMessage().isEmpty());
@@ -230,12 +229,10 @@ public class SAAccessTDD {
 			}
 		 */
 
-		// TODO: Check where is the invalidID beign defined.
-		String messageResponse = "Request validation failed with: A 'token' value is required for types: password, kba, oath, pin, yubikey., A 'factor_id' value is required for types: sms, call, email, kba, help_desk, oath, push, push_accept.";
 		BaseResponse response = saAccess.validateOath(validUsername, validUserOtp, validFactorIdForOathOtp);
 		assertNotNull(response);
 		assertEquals("invalid", response.getStatus());
-		assertEquals(messageResponse, response.getMessage());
+		assertEquals("OTP is invalid.", response.getMessage());
 	}
 
 
@@ -455,6 +452,21 @@ public class SAAccessTDD {
 		 */
 
 		BaseResponse response = saAccess.getUserProfile(validUsername + "&&");
+		assertNotNull(response);
+		assertEquals("not_found", response.getStatus());
+		assertEquals("User Id was not found.", response.getMessage());
+	}
+
+	@Test
+	public void testWrongRealm() {
+		/*
+			When we send the user with && at the end it takes it as valid.
+			Response should be the same as an invalid username.
+		 */
+		SAAuth badSAAuth = new SAAuth(apiApplicationId, apiApplicationKey, "FakeRealm123");
+		ISAAccess badSAAccess = new SAAccess(saBaseURL, badSAAuth, saExecuter);
+
+		BaseResponse response = badSAAccess.factorsByUser(validUsername);
 		assertNotNull(response);
 		assertEquals("not_found", response.getStatus());
 		assertEquals("User Id was not found.", response.getMessage());
