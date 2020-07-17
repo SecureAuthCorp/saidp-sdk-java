@@ -16,6 +16,7 @@ import org.secureauth.sarestapi.data.Response.*;
 import org.secureauth.sarestapi.data.Requests.*;
 import org.secureauth.sarestapi.data.Requests.UserPasswordRequest;
 import org.secureauth.sarestapi.data.UserProfile.NewUserProfile;
+import org.secureauth.sarestapi.resources.SAGenericExecuter;
 
 import org.secureauth.sarestapi.data.UserProfile.UserToGroups;
 import org.secureauth.sarestapi.data.UserProfile.UsersToGroup;
@@ -69,6 +70,7 @@ public class SAExecuter {
     public SAExecuter(SABaseURL saBaseURL) {
         this.saBaseURL = saBaseURL;
     }
+    private final SAGenericExecuter saGenericExecuter = new SAGenericExecuter(saBaseURL);
 
     //Set up our Connection
     private void createConnection() throws Exception {
@@ -94,31 +96,9 @@ public class SAExecuter {
     }
 
     //Get Factors for the user requested
-    public <T> T executeGetRequest(String auth, String query, String ts, Class<T> valueType) throws Exception {
-        if (client == null) {
-            createConnection();
-        }
-
-        WebTarget target = null;
-        Response response = null;
-        T genericResponse = null;
-        try {
-
-            target = client.target(query);
-            response = target.request().
-                    accept(MediaType.APPLICATION_JSON).
-                    header("Authorization", auth).
-                    header("X-SA-Ext-Date", ts).
-                    get();
-            //consider using response.ok(valueType).build(); instead.
-            genericResponse = response.readEntity(valueType);
-            response.close();
-        } catch (Exception e) {
-            logger.error("Exception Get Request: \nQuery:\n\t" + query + "\nError:" + e.getMessage());
-        }
-
-        return genericResponse;
-
+    public <T> T executeGetRequest(String auth, String query, String ts, Class<T> valueType) {
+        // USE executeGenericGetRequest NEXT TIME
+        return saGenericExecuter.executeGenericGetRequest(auth, query, ts, valueType);
     }
 
     public <T> T executeGetRequest(SAAuth saAuth, String baseUrl, String query, String ts, Class<T> valueType) throws Exception {
@@ -129,30 +109,8 @@ public class SAExecuter {
     }
 
     // post request
-    public <T> T executePostRequest(String auth,String query, AuthRequest authRequest,String ts, Class<T> valueType)throws Exception {
-
-        if (client == null) {
-            createConnection();
-        }
-        try {
-            WebTarget target = null;
-            Response response = null;
-            T responseObject = null;
-
-            target = client.target(query);
-            response = target.request().
-                    accept(MediaType.APPLICATION_JSON).
-                    header("Authorization", auth).
-                    header("X-SA-Ext-Date", ts).
-                    post(Entity.entity(JSONUtil.convertObjectToJSON(authRequest), MediaType.APPLICATION_JSON));
-
-            responseObject = response.readEntity(valueType);
-            response.close();
-            return responseObject;
-        } catch (Exception e) {
-            throw new SARestAPIException("Exception Delivering OTP by Push: \nQuery:\n\t" +
-                    query + "\nError:" + e.getMessage(), e);
-        }
+    public <T> T executePostRequest(String auth,String query, AuthRequest authRequest,String ts, Class<T> valueType) {
+        return saGenericExecuter.executeGenericPostRequest(auth, query, authRequest, ts, valueType);
     }
 
     public <T> T executePutRequest(String auth, String query, Object payloadRequest, Class<T> responseValueType, String ts)throws Exception {

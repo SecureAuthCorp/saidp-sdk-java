@@ -39,6 +39,13 @@ public class BaseResponse {
         this.user_id = user_id;
     }
 
+    public BaseResponse notFoundResponse(String message, String user_id) {
+        this.status = "not_found";
+        this.message = message;
+        this.user_id = user_id;
+        return this;
+    }
+
     @Override
     public String toString(){
         return JSONUtil.convertObjectToJSON(this);

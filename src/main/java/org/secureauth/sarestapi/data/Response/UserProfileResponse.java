@@ -63,6 +63,12 @@ public class UserProfileResponse extends BaseResponse{
     }
 
     @Override
+    public UserProfileResponse notFoundResponse(String message, String user_id) {
+        super.notFoundResponse(message, user_id);
+        return this;
+    }
+
+    @Override
     public String toString(){
         return JSONUtil.convertObjectToJSON(this);
     }

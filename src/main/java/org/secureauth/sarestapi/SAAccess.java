@@ -28,6 +28,8 @@ import org.secureauth.sarestapi.util.RestApiHeader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.ws.rs.core.Response;
+
 /**
  * @author rrowcliffe@secureauth.com
  * <p>
@@ -149,7 +151,8 @@ public class SAAccess implements ISAAccess{
         }catch (Exception e){
             logger.error(new StringBuilder().append("Exception occurred executing REST query::\n").append(e.getMessage()).append("\n").toString(), e);
         }
-        return null;
+        // TODO: We could build something like this but elegant.
+        return new FactorsResponse().notFoundResponse("User Id was not found.", userId);
     }
 
     /**
@@ -1078,7 +1081,8 @@ public class SAAccess implements ISAAccess{
         }catch (Exception e){
             logger.error("Exception occurred executing REST query:\n" + e.getMessage() + "\n");
         }
-        return null;
+        // TODO: We could use annonymus class calls to just use one method call in BaseResponse.
+        return new UserProfileResponse().notFoundResponse("User Id was not found.", userId);
     }
 
     /**
