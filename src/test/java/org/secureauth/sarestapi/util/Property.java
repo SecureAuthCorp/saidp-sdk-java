@@ -14,7 +14,8 @@ public enum Property {
 	VALID_OATH_TOTP_SHARED_KEY("user.oath.totp.shared.key"),
 	VALID_OATH_TOTP_LENGTH("user.oath.totp.length"),
 	VALID_OATH_TOTP_INTERVAL("user.oath.totp.interval"),
-	VALID_OTP_CODE("user.otp.pin"),
+	VALID_OTP_PIN_CODE("user.otp.pin"),
+	VALID_OTP_OATH_CODE("user.otp.oath"),
 	ASSUME_TEST("assume.test");
 
 	private final String value;
