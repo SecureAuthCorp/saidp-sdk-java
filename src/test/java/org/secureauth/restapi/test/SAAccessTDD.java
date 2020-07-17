@@ -1,9 +1,11 @@
 package org.secureauth.restapi.test;
 
+import com.google.common.io.BaseEncoding;
 import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Test;
 import org.secureauth.sarestapi.ISAAccess;
+import org.secureauth.sarestapi.SAAccess;
 import org.secureauth.sarestapi.data.Response.BaseResponse;
 import org.secureauth.sarestapi.data.Response.FactorsResponse;
 import org.secureauth.sarestapi.data.Response.UserProfileResponse;
@@ -13,9 +15,12 @@ import org.secureauth.sarestapi.resources.SAExecuter;
 import org.secureauth.sarestapi.util.Property;
 import org.secureauth.sarestapi.util.RetrievePropertiesUtils;
 import org.secureauth.sarestapi.util.SAFactory;
+import com.lochbridge.oath.otp.TOTP;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+
+import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -50,6 +55,9 @@ public class SAAccessTDD {
 
 	//User OATH-OTP
 	private static String validFactorIdForOathOtp;
+	private static String validOathTotpSharedKey;
+	private static String validOathTotpLength;
+	private static String validOathTotpInterval;
 	private static String validUserOtp;
 	private static RetrievePropertiesUtils retrievePropertiesUtils;
 
@@ -78,9 +86,19 @@ public class SAAccessTDD {
 		validPin = getValue(Property.VALID_PIN);
 		validPassword = getValue(Property.VALID_PASSWORD);
 		validFactorIdForOathOtp = getValue(Property.VALID_FACTOR_ID_FOR_OATH_OTP);
+		validOathTotpSharedKey = getValue(Property.VALID_OATH_TOTP_SHARED_KEY);
+		validOathTotpLength = getValue(Property.VALID_OATH_TOTP_LENGTH);
+		validOathTotpInterval = getValue(Property.VALID_OATH_TOTP_INTERVAL);
 		validUserOtp = getValue(Property.VALID_OTP_CODE);
 		assumeTest = Boolean.valueOf(getValue(Property.ASSUME_TEST));
 
+	}
+
+	private String generateValidTOTP(){
+		byte[] key = BaseEncoding.base32().decode(validOathTotpSharedKey);
+		TOTP totp = TOTP.key(key).timeStep(TimeUnit.SECONDS.toMillis(Long.parseLong(validOathTotpInterval)))
+												.digits(Integer.parseInt(validOathTotpLength)).hmacSha1().build();
+		return totp.value();
 	}
 
 	private String getValue(Property property){
@@ -157,7 +175,6 @@ public class SAAccessTDD {
 			  "accessHistories" : [ ]
 			}
 		 */
-
 		UserProfileResponse response = saAccess.getUserProfile(UNEXISTING_USERNAME);
 		assertNotNull(response);
 		assertEquals(response.getStatus(), NOT_FOUND_MESSAGE);
@@ -174,7 +191,8 @@ public class SAAccessTDD {
 			}
 		 */
 
-		BaseResponse response = saAccess.validateOath(validUsername, validUserOtp, validFactorIdForOathOtp);
+		String passcode = generateValidTOTP();
+		BaseResponse response = saAccess.validateOath(validUsername, passcode, validFactorIdForOathOtp);
 		assertNotNull(response);
 		assertEquals(response.getStatus(), "valid");
 		assertTrue(response.getMessage().isEmpty());
@@ -190,12 +208,12 @@ public class SAAccessTDD {
 			}
 		 */
 
-		String invalidFactorId = "";
+		String invalidFactorId = "invalidFactorId";
 
 		BaseResponse response = saAccess.validateOath(validUsername, validUserOtp, invalidFactorId);
 		assertNotNull(response);
-		assertEquals(response.getStatus(), "invalid");
-		assertEquals(response.getMessage(), "Request validation failed with: Unknown factor id 'zzzz0000z0000a00zzzz000z0zz0z00z'.");
+		assertEquals("invalid", response.getStatus());
+		assertEquals("Request validation failed with: Unknown factor id 'invalidFactorId'.", response.getMessage());
 	}
 
 	@Test
@@ -208,10 +226,12 @@ public class SAAccessTDD {
 			}
 		 */
 
+		// TODO: Check where is the invalidID beign defined.
+		String messageResponse = "Request validation failed with: A 'token' value is required for types: password, kba, oath, pin, yubikey., A 'factor_id' value is required for types: sms, call, email, kba, help_desk, oath, push, push_accept.";
 		BaseResponse response = saAccess.validateOath(validUsername, validUserOtp, validFactorIdForOathOtp);
 		assertNotNull(response);
-		assertEquals(response.getStatus(), "invalid");
-		assertEquals(response.getMessage(), "OTP is invalid.");
+		assertEquals("invalid", response.getStatus());
+		assertEquals(messageResponse, response.getMessage());
 	}
 
 
@@ -294,7 +314,7 @@ public class SAAccessTDD {
 	}
 
 	@Test
-	public void testGetFactorsFromUnexistingUser() throws Exception {
+	public void testGetFactorsFromUnexistingUser() {
 		/*
 		 * Response would return:
 			{
@@ -371,6 +391,7 @@ public class SAAccessTDD {
 			}
 		 */
 
+		// TODO: Check where is the invalidID beign defined.
 		BaseResponse response = saAccess.validateUser(validUsername);
 		assertNotNull(response);
 		assertEquals("invalid", response.getStatus());
@@ -387,6 +408,7 @@ public class SAAccessTDD {
 			}
 		 */
 
+		// TODO: Check where is the invalidID beign defined.
 		BaseResponse response = saAccess.validateUser(validUsername);
 		assertNotNull(response);
 		assertEquals("invalid", response.getStatus());
@@ -397,6 +419,7 @@ public class SAAccessTDD {
 	//@Ignore("Slow test")
 	public void testValidateUserWithInvalidHost() throws Exception  {
 
+		// TODO: Check where is the invalidID beign defined.
 		BaseResponse response = saAccess.validateUser(validUsername);
 		assertNull("Invalid host returns null response", response);
 	}
@@ -418,4 +441,16 @@ public class SAAccessTDD {
 		assertTrue(response.getMessage().contains("PIN is invalid."));
 	}
 
+	@Test
+	public void testUserWithSymbolsAtTheEnd() {
+		/*
+			When we send the user with && at the end it takes it as valid.
+			Response should be the same as an invalid username.
+		 */
+
+		BaseResponse response = saAccess.getUserProfile(validUsername + "&&");
+		assertNotNull(response);
+		assertEquals("not_found", response.getStatus());
+		assertEquals("User Id was not found.", response.getMessage());
+	}
 }

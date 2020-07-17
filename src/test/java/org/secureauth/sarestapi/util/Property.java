@@ -13,6 +13,7 @@ public enum Property {
 	VALID_FACTOR_ID_FOR_OATH_OTP("user.oath.totp.factor.id"),
 	VALID_OATH_TOTP_SHARED_KEY("user.oath.totp.shared.key"),
 	VALID_OATH_TOTP_LENGTH("user.oath.totp.length"),
+	VALID_OATH_TOTP_INTERVAL("user.oath.totp.interval"),
 	VALID_OTP_CODE("user.otp.pin"),
 	ASSUME_TEST("assume.test");
 
