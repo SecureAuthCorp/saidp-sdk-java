@@ -429,18 +429,24 @@ public class SAAccessTDD {
 	@Test
 	public void testNotifySuccessAuthenticatedResult() {
 		BaseResponse response = saAccess.notifyAuthenticationResult( validUsername, "success" );
-		assertEquals( response.getMessage(), "Request has been processed." );
+		assertEquals( "Request has been processed.", response.getMessage() );
 	}
 
 	@Test
 	public void testNotifyAbortedAuthenticatedResult() {
 		BaseResponse response = saAccess.notifyAuthenticationResult( validUsername, "aborted" );
-		assertEquals( response.getMessage(), "Request has been processed." );
+		assertEquals( "Request has been processed.", response.getMessage() );
 	}
 
 	@Test
-	public void testNotifyCanceledAuthenticatedResult() {
+	public void testNotifyCancelledAuthenticatedResult() {
 		BaseResponse response = saAccess.notifyAuthenticationResult( validUsername, "cancelled" );
-		assertEquals( response.getMessage(), "Request has been processed." );
+		assertEquals( "Request has been processed.", response.getMessage() );
+	}
+
+	@Test
+	public void testWhenUserIdIsNotValidThenNotifyAuthenticatedResultFail() {
+		BaseResponse response = saAccess.notifyAuthenticationResult( UNEXISTING_USERNAME, "success" );
+		assertEquals( "User Id was not found.", response.getMessage() );
 	}
 }
