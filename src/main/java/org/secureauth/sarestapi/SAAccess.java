@@ -3,8 +3,10 @@ package org.secureauth.sarestapi;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Locale;
+import java.util.Map;
 import java.util.TimeZone;
 
+import com.google.common.collect.Maps;
 import org.secureauth.sarestapi.data.*;
 import org.secureauth.sarestapi.data.BehavioralBio.BehaveBioRequest;
 import org.secureauth.sarestapi.data.DFP.DFP;
@@ -1136,6 +1138,40 @@ public class SAAccess implements ISAAccess{
     /**
      * End of IDM Methods
      */
+
+    @Override
+    public BaseResponse notifyAuthenticationResult(String userId, String result) {
+        String url = saAuth.getRealm() + Resource.APPLIANCE_AUTHENTICATED;
+        String serverTime = this.getServerTime();
+        Map<String, String> body = Maps.newHashMap();
+        body.put( "user_id", userId );
+        body.put( "authenticated", result );
+        String authorization = RestApiHeader.getAuthorizationHeader(
+                this.saAuth,
+                "POST",
+                url,
+                body,
+                serverTime );
+        BaseResponse response;
+        try {
+            response = saExecuter.executePostRawRequest(
+                    authorization,
+                    saBaseURL.getApplianceURL() + url,
+                    body,
+                    BaseResponse.class,
+                    serverTime
+            );
+            logger.info( "Authenticated notification for user with id [" + userId + "] and result [" + result + "] " +
+                    "has been sent to IdP : " + response.getMessage() );
+        }catch (Exception e){
+            response = new BaseResponse();
+            response.setMessage( e.getMessage() );
+            response.setStatus( "invalid" );
+            logger.error( "Unable to send the authenticated notification for user with id [" + userId + "] " +
+                    "and result [" + result + "] to IdP : " + e.getMessage(), e);
+        }
+        return response;
+    }
 
     /**
      * Start of  Phone Number Profile Methods

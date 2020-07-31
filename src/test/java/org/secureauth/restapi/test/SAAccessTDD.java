@@ -426,4 +426,21 @@ public class SAAccessTDD {
 		assertTrue(response.getMessage().contains("PIN is invalid."));
 	}
 
+	@Test
+	public void testNotifySuccessAuthenticatedResult() {
+		BaseResponse response = saAccess.notifyAuthenticationResult( validUsername, "success" );
+		assertEquals( response.getMessage(), "Request has been processed." );
+	}
+
+	@Test
+	public void testNotifyAbortedAuthenticatedResult() {
+		BaseResponse response = saAccess.notifyAuthenticationResult( validUsername, "aborted" );
+		assertEquals( response.getMessage(), "Request has been processed." );
+	}
+
+	@Test
+	public void testNotifyCanceledAuthenticatedResult() {
+		BaseResponse response = saAccess.notifyAuthenticationResult( validUsername, "cancelled" );
+		assertEquals( response.getMessage(), "Request has been processed." );
+	}
 }
