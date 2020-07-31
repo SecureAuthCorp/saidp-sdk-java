@@ -463,4 +463,12 @@ public interface ISAAccess {
 	 */
 	BaseResponse setUserStatus(String userId, String status);
 
+	/**
+	 * This method will send a authenticated transaction result to Idp for the specified userId.
+	 * @param userId The user Id.
+	 * @param result Final result of the authenticated flow (success, aborted, canceled)
+	 * @return {@link BaseResponse}
+	 */
+	BaseResponse notifyAuthenticationResult(String userId, String result);
+
 }
