@@ -60,7 +60,7 @@ public class SAAccessTDD {
 	@Before
 	public void setup() {
 		setupStrings();
-		//Assume.assumeTrue(assumeTest);
+		Assume.assumeTrue(assumeTest);
 		saAuth = new SAAuth(apiApplicationId, apiApplicationKey, realm);
 		saBaseURL = new SABaseURL(host, port, ssl, true);
 		saExecuter = new SAExecuter(saBaseURL);
