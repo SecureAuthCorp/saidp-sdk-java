@@ -1145,7 +1145,7 @@ public class SAAccess implements ISAAccess{
         Map<String, String> body = Maps.newHashMap();
         body.put( "user_id", userId );
         body.put( "authenticated", result );
-        body.put( "mfa", mfa );
+        body.put( "authregmethod", mfa );
         String authorization = RestApiHeader.getAuthorizationHeader(
                 this.saAuth,
                 "POST",

@@ -467,7 +467,26 @@ public interface ISAAccess {
 	 * This method will send a authenticated transaction result to Idp for the specified userId.
 	 * @param userId The user Id.
 	 * @param result Final result of the authenticated flow (success, aborted, canceled)
-	 * @param mfa The multi-factor authentication method used.
+	 * @param mfa The multi-factor authentication method used. Allowed values are :
+	 * NONE
+	 * KBA
+	 * EMAIL
+	 * PHONE
+	 * SMS
+	 * HELP
+	 * PIN
+	 * OATH
+	 * PUSHNOTIFICATION
+	 * VIPCREDENTIAL
+	 * PUSHACCEPT
+	 * YUBIKEY
+	 * EMAILLINK
+	 * SMSLINK
+	 * VALIDATEOTP
+	 * SYMBOL2ACCEPT
+	 * BIOMETRIC2ACCEPT
+	 * FIDO2
+	 * OTHER
 	 * @return {@link BaseResponse}
 	 */
 	BaseResponse notifyAuthenticated(String userId, String result, String mfa);
