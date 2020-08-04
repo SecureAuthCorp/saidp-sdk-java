@@ -18,7 +18,6 @@ import org.secureauth.sarestapi.data.Response.*;
 import org.secureauth.sarestapi.data.Requests.UserPasswordRequest;
 import org.secureauth.sarestapi.data.Response.UserProfileResponse;
 import org.secureauth.sarestapi.data.UserProfile.NewUserProfile;
-import org.secureauth.sarestapi.data.UserProfile.UserProfile;
 import org.secureauth.sarestapi.data.UserProfile.UserToGroups;
 import org.secureauth.sarestapi.data.UserProfile.UsersToGroup;
 import org.secureauth.sarestapi.exception.SARestAPIException;
@@ -1140,12 +1139,13 @@ public class SAAccess implements ISAAccess{
      */
 
     @Override
-    public BaseResponse notifyAuthenticationResult(String userId, String result) {
+    public BaseResponse notifyAuthenticated(String userId, String result, String mfa) {
         String url = saAuth.getRealm() + Resource.APPLIANCE_AUTHENTICATED;
         String serverTime = this.getServerTime();
         Map<String, String> body = Maps.newHashMap();
         body.put( "user_id", userId );
         body.put( "authenticated", result );
+        body.put( "authregmethod", mfa );
         String authorization = RestApiHeader.getAuthorizationHeader(
                 this.saAuth,
                 "POST",
