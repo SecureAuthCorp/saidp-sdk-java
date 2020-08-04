@@ -445,6 +445,12 @@ public class SAAccessTDD {
 	}
 
 	@Test
+	public void testNotifyWrongAuthenticatedResult() {
+		BaseResponse response = saAccess.notifyAuthenticated( validUsername, "wrong", "NONE" );
+		assertEquals( "Request has been processed.", response.getMessage() );
+	}
+
+	@Test
 	public void testWhenUserIdIsNotValidThenNotifyAuthenticatedResultFail() {
 		BaseResponse response = saAccess.notifyAuthenticated( UNEXISTING_USERNAME, "success", "NONE" );
 		assertEquals( "User Id was not found.", response.getMessage() );

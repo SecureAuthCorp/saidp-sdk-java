@@ -466,7 +466,19 @@ public interface ISAAccess {
 	/**
 	 * This method will send a authenticated transaction result to Idp for the specified userId.
 	 * @param userId The user Id.
-	 * @param result Final result of the authenticated flow (success, aborted, canceled)
+	 * @param result Final result of the authenticated flow
+	 *
+	 * success: The authentication transaction was successfully completed.
+	 *
+	 * aborted: The authentication transaction started, but could not be successfully completed.
+	 *          For example, this status can occur if a user's session times out.
+	 *
+	 * canceled: The authentication transaction started, but could not be successfully completed.
+	 *           For example, this status can occur if a user cancels an authentication attempt.
+	 *
+	 * wrong: The authentication transaction started, but could not be successfully completed.
+	 *        For example, this status can occur if a user enters bad credentials.
+	 *                  
 	 * @param mfa The multi-factor authentication method used. Allowed values are :
 	 * NONE
 	 * KBA
