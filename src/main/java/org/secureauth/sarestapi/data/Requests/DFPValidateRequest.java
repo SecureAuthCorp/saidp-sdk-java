@@ -1,6 +1,7 @@
 package org.secureauth.sarestapi.data.Requests;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import org.secureauth.sarestapi.data.DFP.DFP;
 import org.secureauth.sarestapi.util.JSONUtil;
 
 import javax.xml.bind.annotation.XmlRootElement;
@@ -32,6 +33,14 @@ public class DFPValidateRequest {
     private String user_id;
     private String host_address;
     private org.secureauth.sarestapi.data.DFP.DFP fingerprint = new org.secureauth.sarestapi.data.DFP.DFP();
+
+    public DFPValidateRequest(){}
+
+    public DFPValidateRequest(String user_id, String host_address, DFP fingerprint) {
+        this.user_id = user_id;
+        this.host_address = host_address;
+        this.fingerprint = fingerprint;
+    }
 
     public String getUser_id() {
         return user_id;

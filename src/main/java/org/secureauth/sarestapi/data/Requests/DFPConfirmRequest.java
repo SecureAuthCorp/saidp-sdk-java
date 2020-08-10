@@ -33,7 +33,12 @@ public class DFPConfirmRequest {
     private String user_id;
     private String fingerprint_id;
 
+    public DFPConfirmRequest(){}
 
+    public DFPConfirmRequest(String user_id, String fingerprint_id) {
+        this.user_id = user_id;
+        this.fingerprint_id = fingerprint_id;
+    }
 
     public String getUser_id() {
         return user_id;

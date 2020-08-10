@@ -803,6 +803,25 @@ public class SAAccess implements ISAAccess{
         return null;
     }
 
+
+    @Override
+    public DFPConfirmResponse DFPScoreFingerprint(String userId, String hostAddress, String fingerprintId, String fingerPrintJSON) {
+        try{
+            String ts = getServerTime();
+            DFPConfirmRequest dfpConfirmRequest =new DFPConfirmRequest(userId, fingerprintId);
+            DFP dfp = JSONUtil.getDFPFromJSONString(fingerPrintJSON);
+            DFPValidateRequest dfpValidateRequest = new DFPValidateRequest(userId, hostAddress, dfp);
+
+            DFPScoreRequest dfpScoreRequest = new DFPScoreRequest(dfpConfirmRequest, dfpValidateRequest);
+
+            String header = RestApiHeader.getAuthorizationHeader(saAuth, Resource.METHOD_POST, DFPQuery.queryDFPValidate(saAuth.getRealm()), dfpScoreRequest, ts);
+            return saExecuter.executeDFPScore(header,saBaseURL.getApplianceURL() + DFPQuery.queryDFPScore(saAuth.getRealm()), dfpScoreRequest, ts);
+
+        }catch (Exception e){
+            throw new SARestAPIException("Exception occurred executing score fingerprint", e);
+        }
+    }
+
     /**
      * <p>
      *     Returns the url for the JavaScript Source for DFP

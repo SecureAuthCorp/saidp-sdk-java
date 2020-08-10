@@ -3,6 +3,7 @@ package org.secureauth.sarestapi;
 import org.secureauth.sarestapi.data.IPEval;
 import org.secureauth.sarestapi.data.PushAcceptStatus;
 import org.secureauth.sarestapi.data.Requests.AccessHistoryRequest;
+import org.secureauth.sarestapi.data.Requests.DFPScoreRequest;
 import org.secureauth.sarestapi.data.Response.AdaptiveAuthResponse;
 import org.secureauth.sarestapi.data.Response.BaseResponse;
 import org.secureauth.sarestapi.data.Response.BehaveBioResponse;
@@ -462,5 +463,15 @@ public interface ISAAccess {
 	 * @return {@link BaseResponse}
 	 */
 	BaseResponse setUserStatus(String userId, String status);
+
+	/**
+	 * Retrieves score from fingerprint, user and host.
+	 * @param userId User ID provided
+	 * @param hostAddress host
+	 * @param fingerprintId GUID of the profile
+	 * @param fingerPrintJSON Descriptive name derived from the user_agent string
+	 * @return {@link DFPConfirmResponse}
+	 */
+	DFPConfirmResponse DFPScoreFingerprint(String userId, String hostAddress, String fingerprintId, String fingerPrintJSON);
 
 }
