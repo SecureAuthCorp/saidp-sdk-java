@@ -478,7 +478,7 @@ public interface ISAAccess {
 	 *
 	 * wrong: The authentication transaction started, but could not be successfully completed.
 	 *        For example, this status can occur if a user enters bad credentials.
-	 *                  
+	 *
 	 * @param mfa The multi-factor authentication method used. Allowed values are :
 	 * NONE
 	 * KBA

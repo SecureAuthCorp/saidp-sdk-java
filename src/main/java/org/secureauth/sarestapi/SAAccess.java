@@ -1161,14 +1161,15 @@ public class SAAccess implements ISAAccess{
                     BaseResponse.class,
                     serverTime
             );
-            logger.info( "Authenticated notification for user with id [" + userId + "] and result [" + result + "] " +
+            logger.debug( "Authenticated notification for user with id [" + userId + "], " +
+                    "result [" + result + "] and mfa [" + mfa + "] " +
                     "has been sent to IdP : " + response.getMessage() );
         }catch (Exception e){
             response = new BaseResponse();
             response.setMessage( e.getMessage() );
             response.setStatus( "invalid" );
             logger.error( "Unable to send the authenticated notification for user with id [" + userId + "] " +
-                    "and result [" + result + "] to IdP : " + e.getMessage(), e);
+                    ", result [" + result + "] and mfa [" + mfa + "] to IdP : " + e.getMessage(), e);
         }
         return response;
     }
