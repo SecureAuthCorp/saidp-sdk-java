@@ -833,7 +833,7 @@ public class SAAccess implements ISAAccess{
 
             DFPScoreRequest dfpScoreRequest = new DFPScoreRequest(dfpConfirmRequest, dfpValidateRequest);
 
-            String query = saBaseURL.getApplianceURL() + DFPQuery.queryDFPSave(saAuth.getRealm());
+            String query = DFPQuery.queryDFPSave(saAuth.getRealm());
             String header = RestApiHeader.getAuthorizationHeader(saAuth, Resource.METHOD_POST, query, dfpScoreRequest, ts);
             return saExecuter.executePostRawRequest(header,saBaseURL.getApplianceURL() + query, dfpScoreRequest, DFPValidateResponse.class, ts);
 
