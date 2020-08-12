@@ -824,7 +824,7 @@ public class SAAccess implements ISAAccess{
     }
 
     @Override
-    public DFPConfirmResponse DFPSaveFingerprint(String userId, String hostAddress, String fingerprintId, String fingerPrintJSON) {
+    public DFPValidateResponse DFPSaveFingerprint(String userId, String hostAddress, String fingerprintId, String fingerPrintJSON) {
         try{
             String ts = getServerTime();
             DFPConfirmRequest dfpConfirmRequest =new DFPConfirmRequest(userId, fingerprintId);
@@ -835,7 +835,7 @@ public class SAAccess implements ISAAccess{
 
             String query = saBaseURL.getApplianceURL() + DFPQuery.queryDFPSave(saAuth.getRealm());
             String header = RestApiHeader.getAuthorizationHeader(saAuth, Resource.METHOD_POST, query, dfpScoreRequest, ts);
-            return saExecuter.executePostRawRequest(header,saBaseURL.getApplianceURL() + query, dfpScoreRequest, DFPConfirmResponse.class, ts);
+            return saExecuter.executePostRawRequest(header,saBaseURL.getApplianceURL() + query, dfpScoreRequest, DFPValidateResponse.class, ts);
 
         }catch (Exception e){
             throw new SARestAPIException("Exception occurred executing save fingerprint", e);

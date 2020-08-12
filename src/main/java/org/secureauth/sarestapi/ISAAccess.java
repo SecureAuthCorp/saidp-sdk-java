@@ -482,6 +482,6 @@ public interface ISAAccess {
 	 * @param fingerPrintJSON Descriptive name derived from the user_agent string
 	 * @return {@link DFPConfirmResponse}
 	 */
-	DFPConfirmResponse DFPSaveFingerprint(String userId, String hostAddress, String fingerprintId, String fingerPrintJSON);
+	DFPValidateResponse DFPSaveFingerprint(String userId, String hostAddress, String fingerprintId, String fingerPrintJSON);
 
 }
