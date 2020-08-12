@@ -805,7 +805,7 @@ public class SAAccess implements ISAAccess{
 
 
     @Override
-    public DFPConfirmResponse DFPScoreFingerprint(String userId, String hostAddress, String fingerprintId, String fingerPrintJSON) {
+    public DFPValidateResponse DFPScoreFingerprint(String userId, String hostAddress, String fingerprintId, String fingerPrintJSON) {
         try{
             String ts = getServerTime();
             DFPConfirmRequest dfpConfirmRequest =new DFPConfirmRequest(userId, fingerprintId);
@@ -814,11 +814,31 @@ public class SAAccess implements ISAAccess{
 
             DFPScoreRequest dfpScoreRequest = new DFPScoreRequest(dfpConfirmRequest, dfpValidateRequest);
 
-            String header = RestApiHeader.getAuthorizationHeader(saAuth, Resource.METHOD_POST, DFPQuery.queryDFPValidate(saAuth.getRealm()), dfpScoreRequest, ts);
-            return saExecuter.executeDFPScore(header,saBaseURL.getApplianceURL() + DFPQuery.queryDFPScore(saAuth.getRealm()), dfpScoreRequest, ts);
+            String query = DFPQuery.queryDFPScore(saAuth.getRealm());
+            String header = RestApiHeader.getAuthorizationHeader(saAuth, Resource.METHOD_POST, query, dfpScoreRequest, ts);
+            return saExecuter.executePostRawRequest(header,saBaseURL.getApplianceURL() +  query, dfpScoreRequest, DFPValidateResponse.class, ts);
 
         }catch (Exception e){
             throw new SARestAPIException("Exception occurred executing score fingerprint", e);
+        }
+    }
+
+    @Override
+    public DFPConfirmResponse DFPSaveFingerprint(String userId, String hostAddress, String fingerprintId, String fingerPrintJSON) {
+        try{
+            String ts = getServerTime();
+            DFPConfirmRequest dfpConfirmRequest =new DFPConfirmRequest(userId, fingerprintId);
+            DFP dfp = JSONUtil.getDFPFromJSONString(fingerPrintJSON);
+            DFPValidateRequest dfpValidateRequest = new DFPValidateRequest(userId, hostAddress, dfp);
+
+            DFPScoreRequest dfpScoreRequest = new DFPScoreRequest(dfpConfirmRequest, dfpValidateRequest);
+
+            String query = saBaseURL.getApplianceURL() + DFPQuery.queryDFPSave(saAuth.getRealm());
+            String header = RestApiHeader.getAuthorizationHeader(saAuth, Resource.METHOD_POST, query, dfpScoreRequest, ts);
+            return saExecuter.executePostRawRequest(header,saBaseURL.getApplianceURL() + query, dfpScoreRequest, DFPConfirmResponse.class, ts);
+
+        }catch (Exception e){
+            throw new SARestAPIException("Exception occurred executing save fingerprint", e);
         }
     }
 

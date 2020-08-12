@@ -658,22 +658,6 @@ public class SAExecuter {
 
     }
 
-    public DFPConfirmResponse executeDFPScore(String auth, String query, DFPScoreRequest dfpScoreRequest, String ts)throws Exception{
-
-        if(client == null) {
-            createConnection();
-        }
-
-            return executePostRawRequest()
-        }catch(Exception e){
-            logger.error(new StringBuilder().append("Exception Running Access History POST: \nQuery:\n\t")
-                    .append(query).append("\nError:").append(e.getMessage()).toString(), e);
-        }
-
-        return dfpValidateResponse;
-
-    }
-
     // Run DFP Confirm
     public DFPConfirmResponse executeDFPConfirm(String auth, String query, DFPConfirmRequest dfpConfirmRequest, String ts)throws Exception{
 

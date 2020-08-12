@@ -6,14 +6,17 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class DFPScoreRequest {
+public class DFPScoreRequest extends DFPValidateRequest {
 
 	private DFPConfirmRequest dfpConfirmRequest;
-	private DFPValidateRequest dfpValidateRequest;
+	private String fingerprintId;
 
 	public DFPScoreRequest(DFPConfirmRequest dfpConfirmRequest, DFPValidateRequest dfpValidateRequest) {
 		this.dfpConfirmRequest = dfpConfirmRequest;
-		this.dfpValidateRequest = dfpValidateRequest;
+		this.setUser_id(dfpValidateRequest.getUser_id());
+		this.setHost_address(dfpValidateRequest.getHost_address());
+		this.setFingerprint(dfpValidateRequest.getFingerprint());
+		this.setFingerprintId(dfpConfirmRequest.getFingerprint_id());
 	}
 
 	public DFPScoreRequest() {
@@ -27,11 +30,12 @@ public class DFPScoreRequest {
 		this.dfpConfirmRequest = dfpConfirmRequest;
 	}
 
-	public DFPValidateRequest getDfpValidateRequest() {
-		return dfpValidateRequest;
+
+	public String getFingerprintId() {
+		return fingerprintId;
 	}
 
-	public void setDfpValidateRequest(DFPValidateRequest dfpValidateRequest) {
-		this.dfpValidateRequest = dfpValidateRequest;
+	public void setFingerprintId(String fingerprintId) {
+		this.fingerprintId = fingerprintId;
 	}
 }

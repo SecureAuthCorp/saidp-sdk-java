@@ -1,6 +1,7 @@
 package org.secureauth.sarestapi.data.Response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.secureauth.sarestapi.util.JSONUtil;
 
 
@@ -29,8 +30,9 @@ OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
 @XmlRootElement
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class DFPConfirmResponse extends BaseResponse{
-
+    @JsonProperty("fingerprint_id")
     private String fingerprintId;
+    @JsonProperty("fingerprint_name")
     private String fingerprintName;
 
     public String getFingerprintId() {

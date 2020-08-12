@@ -470,8 +470,18 @@ public interface ISAAccess {
 	 * @param hostAddress host
 	 * @param fingerprintId GUID of the profile
 	 * @param fingerPrintJSON Descriptive name derived from the user_agent string
+	 * @return {@link DFPValidateResponse}
+	 */
+	DFPValidateResponse DFPScoreFingerprint(String userId, String hostAddress, String fingerprintId, String fingerPrintJSON);
+
+	/**
+	 * Method to complete the user account profile in the directory
+	 * @param userId User ID provided
+	 * @param hostAddress host
+	 * @param fingerprintId GUID of the profile
+	 * @param fingerPrintJSON Descriptive name derived from the user_agent string
 	 * @return {@link DFPConfirmResponse}
 	 */
-	DFPConfirmResponse DFPScoreFingerprint(String userId, String hostAddress, String fingerprintId, String fingerPrintJSON);
+	DFPConfirmResponse DFPSaveFingerprint(String userId, String hostAddress, String fingerprintId, String fingerPrintJSON);
 
 }
