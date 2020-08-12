@@ -3,8 +3,10 @@ package org.secureauth.sarestapi;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Locale;
+import java.util.Map;
 import java.util.TimeZone;
 
+import com.google.common.collect.Maps;
 import org.secureauth.sarestapi.data.*;
 import org.secureauth.sarestapi.data.BehavioralBio.BehaveBioRequest;
 import org.secureauth.sarestapi.data.DFP.DFP;
@@ -16,7 +18,6 @@ import org.secureauth.sarestapi.data.Response.*;
 import org.secureauth.sarestapi.data.Requests.UserPasswordRequest;
 import org.secureauth.sarestapi.data.Response.UserProfileResponse;
 import org.secureauth.sarestapi.data.UserProfile.NewUserProfile;
-import org.secureauth.sarestapi.data.UserProfile.UserProfile;
 import org.secureauth.sarestapi.data.UserProfile.UserToGroups;
 import org.secureauth.sarestapi.data.UserProfile.UsersToGroup;
 import org.secureauth.sarestapi.exception.SARestAPIException;
@@ -1136,6 +1137,42 @@ public class SAAccess implements ISAAccess{
     /**
      * End of IDM Methods
      */
+
+    @Override
+    public BaseResponse notifyAuthenticated(String userId, String result, String mfa) {
+        String url = saAuth.getRealm() + Resource.APPLIANCE_AUTHENTICATED;
+        String serverTime = this.getServerTime();
+        Map<String, String> body = Maps.newHashMap();
+        body.put( "user_id", userId );
+        body.put( "authenticated", result );
+        body.put( "authregmethod", mfa );
+        String authorization = RestApiHeader.getAuthorizationHeader(
+                this.saAuth,
+                "POST",
+                url,
+                body,
+                serverTime );
+        BaseResponse response;
+        try {
+            response = saExecuter.executePostRawRequest(
+                    authorization,
+                    saBaseURL.getApplianceURL() + url,
+                    body,
+                    BaseResponse.class,
+                    serverTime
+            );
+            logger.debug( "Authenticated notification for user with id [" + userId + "], " +
+                    "result [" + result + "] and mfa [" + mfa + "] " +
+                    "has been sent to IdP : " + response.getMessage() );
+        }catch (Exception e){
+            response = new BaseResponse();
+            response.setMessage( e.getMessage() );
+            response.setStatus( "invalid" );
+            logger.error( "Unable to send the authenticated notification for user with id [" + userId + "] " +
+                    ", result [" + result + "] and mfa [" + mfa + "] to IdP : " + e.getMessage(), e);
+        }
+        return response;
+    }
 
     /**
      * Start of  Phone Number Profile Methods
