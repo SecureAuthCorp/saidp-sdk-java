@@ -32,7 +32,7 @@ public class DFPValidateRequest {
 
     private String user_id;
     private String host_address;
-    private org.secureauth.sarestapi.data.DFP.DFP fingerprint = new org.secureauth.sarestapi.data.DFP.DFP();
+    private DFP fingerprint = new DFP();
 
     public DFPValidateRequest(){}
 
