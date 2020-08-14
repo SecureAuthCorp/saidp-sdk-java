@@ -6,6 +6,7 @@ import org.junit.Test;
 import org.secureauth.sarestapi.ISAAccess;
 import org.secureauth.sarestapi.SAAccess;
 import org.secureauth.sarestapi.data.Response.BaseResponse;
+import org.secureauth.sarestapi.data.Response.DFPValidateResponse;
 import org.secureauth.sarestapi.data.Response.FactorsResponse;
 import org.secureauth.sarestapi.data.Response.UserProfileResponse;
 import org.secureauth.sarestapi.data.SAAuth;
@@ -45,6 +46,11 @@ public class SAAccessTDD {
 	private static String validPassword;
 	private final static String UNEXISTING_USERNAME = "unexisting-user";
 
+	//DFP
+	private static String validFingerprintId;
+	private static String validHostAddress;
+
+
 	//Response messages
 	private static final String FOUND_MESSAGE = "found";
 	private static final String NOT_FOUND_MESSAGE = "not_found";
@@ -82,6 +88,9 @@ public class SAAccessTDD {
 		validFactorIdForOathOtp = getValue(Property.VALID_FACTOR_ID_FOR_OATH_OTP);
 		validUserOtp = getValue(Property.VALID_OTP_PIN_CODE);
 		validUserOtpOath = getValue(Property.VALID_OTP_OATH_CODE);
+		validHostAddress = getValue(Property.VALID_HOST_ADDRESS);
+		validHostAddress = getValue(Property.VALID_HOST_ADDRESS);
+		validFingerprintId = getValue(Property.VALID_FINGERPRINT_ID);
  		assumeTest = Boolean.valueOf(getValue(Property.ASSUME_TEST));
 
 	}
@@ -383,7 +392,7 @@ public class SAAccessTDD {
 	}
 
 	@Test
-	public void testValidateUserWithInvalidID() throws Exception {
+	public void testValidateUserWithValidID() throws Exception {
 		/*
 		 * Response would return:
 			{
@@ -424,6 +433,54 @@ public class SAAccessTDD {
 		assertNotNull(response);
 		assertEquals(response.getStatus(), invalidStringForPin);
 		assertTrue(response.getMessage().contains("PIN is invalid."));
+	}
+
+	@Test
+	public void testDFPScoreWithValidNotFound() throws Exception {
+		/*
+		 * Response would return:
+			{
+			    "fingerprint_id": "",
+			    "fingerprint_name": "",
+			    "score": "0.00",
+			    "match_score": "0.00",
+			    "update_score": "0.00",
+			    "status": "not_found",
+			    "message": ""
+			 }
+		 */
+		String emptyFingerprintJSON = "{}";
+
+		DFPValidateResponse response = saAccess.DFPScoreFingerprint(validUsername, validHostAddress, validFingerprintId, emptyFingerprintJSON);
+		assertNotNull(response);
+		assertEquals("not_found", response.getStatus());
+		assertEquals(0.0, response.getScore(), 0.1);
+		assertEquals(0.0, response.getUpdate_score(), 0.1);
+	}
+
+	@Test
+	public void testDFPSaveWithValidNotFound() throws Exception {
+		/*
+		 * Response would return:
+			{
+			    "fingerprint_id": "",
+			    "fingerprint_name": "",
+			    "score": "0.00",
+			    "match_score": "0.00",
+			    "update_score": "0.00",
+			    "status": "not_found",
+			    "message": ""
+			 }
+		 */
+		String emptyFingerprintJSON = "{}";
+
+		DFPValidateResponse response = saAccess.DFPSaveFingerprint(validUsername, validHostAddress, validFingerprintId, emptyFingerprintJSON);
+		assertNotNull(response);
+		assertEquals("not_found", response.getStatus());
+		assertEquals(0.0, response.getScore(), 0.1);
+		assertEquals(0.0, response.getUpdate_score(), 0.1);
+		assertEquals("", response.getFingerprintId());
+		assertEquals("", response.getFingerprintName());
 	}
 
 	@Test

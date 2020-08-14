@@ -480,7 +480,7 @@ public interface ISAAccess {
 	 * @param hostAddress host
 	 * @param fingerprintId GUID of the profile
 	 * @param fingerPrintJSON Descriptive name derived from the user_agent string
-	 * @return {@link DFPConfirmResponse}
+	 * @return {@link DFPValidateResponse}
 	 */
 	DFPValidateResponse DFPSaveFingerprint(String userId, String hostAddress, String fingerprintId, String fingerPrintJSON);
 
