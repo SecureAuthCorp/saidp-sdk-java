@@ -150,8 +150,8 @@ public class SAAccess implements ISAAccess{
 
         }catch (Exception e){
             logger.error(new StringBuilder().append("Exception occurred executing REST query::\n").append(e.getMessage()).append("\n").toString(), e);
-        }
-        return new FactorsResponse().notFoundResponse("User Id was not found.", userId);
+            return new FactorsResponse().notFoundResponse("User Id was not found.", userId);
+	}
     }
 
     /**
@@ -1079,8 +1079,8 @@ public class SAAccess implements ISAAccess{
 
         }catch (Exception e){
             logger.error("Exception occurred executing REST query:\n" + e.getMessage() + "\n");
-        }
-        return new UserProfileResponse().notFoundResponse("User Id was not found.", userId);
+            return new UserProfileResponse().notFoundResponse("User Id was not found.", userId);
+	}
     }
 
     /**
