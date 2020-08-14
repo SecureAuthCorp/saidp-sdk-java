@@ -44,6 +44,8 @@ public class Resource {
     public static final String APPLIANCE_DFP_JS=APPLIANCE_DFP + "/js";
     public static final String APPLIANCE_DFP_VALIDATE=APPLIANCE_DFP + "/validate";
     public static final String APPLIANCE_DFP_CONFIRM=APPLIANCE_DFP + "/confirm";
+    public static final String APPLIANCE_DFP_SCORE = APPLIANCE_DFP + "/score";
+    public static final String APPLIANCE_DFP_SAVE = APPLIANCE_DFP + "/save";
     public static final String APPLIANCE_ACCESSHISTORY="/api/" + API_VERSION + "/accesshistory";
     public static final String APPLIANCE_BEHAVEBIO="/api/" + API_VERSION + "/behavebio";
     public static final String APPLIANCE_BEHAVEBIO_JS=APPLIANCE_BEHAVEBIO + "/js";

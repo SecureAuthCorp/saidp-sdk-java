@@ -15,6 +15,8 @@ public enum Property {
 	VALID_OATH_TOTP_LENGTH("user.oath.totp.length"),
 	VALID_OTP_PIN_CODE("user.otp.pin"),
 	VALID_OTP_OATH_CODE("user.otp.oath"),
+	VALID_HOST_ADDRESS("valid.host.address"),
+	VALID_FINGERPRINT_ID("valid.fingerprint.id"),
 	ASSUME_TEST("assume.test");
 
 	private final String value;
