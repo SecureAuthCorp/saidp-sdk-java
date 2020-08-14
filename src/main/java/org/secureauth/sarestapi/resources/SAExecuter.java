@@ -63,11 +63,20 @@ public class SAExecuter {
     private static Logger logger = LoggerFactory.getLogger(SAExecuter.class);
     private static final String TEN_SECONDS = "10000";
     private static final String TLS = "TLS";
+    private Integer idpApiTimeout;
 
     private SABaseURL saBaseURL = null;
 
     public SAExecuter(SABaseURL saBaseURL) {
         this.saBaseURL = saBaseURL;
+        this.idpApiTimeout = Integer.parseInt(Optional.ofNullable(System.getProperty("rest.api.timeout")).orElse(TEN_SECONDS) );
+    }
+
+    public void setTimeout(int timeoutInMillis) {
+        if( timeoutInMillis < 0 ) {
+            throw new IllegalArgumentException( "Timeout must be a positive integer value." );
+        }
+        this.idpApiTimeout = timeoutInMillis;
     }
 
     //Set up our Connection
@@ -82,9 +91,8 @@ public class SAExecuter {
                     .sslContext(ctx)
                     .hostnameVerifier( (s, sslSession) -> saBaseURL.isSelfSigned() )
                     .build();
-            int timeoutSeconds = Integer.parseInt(Optional.ofNullable(System.getProperty("rest.api.timeout")).orElse(TEN_SECONDS));
-            client.property(ClientProperties.CONNECT_TIMEOUT, timeoutSeconds);
-            client.property(ClientProperties.READ_TIMEOUT, timeoutSeconds);
+            client.property( ClientProperties.CONNECT_TIMEOUT, this.idpApiTimeout );
+            client.property( ClientProperties.READ_TIMEOUT, this.idpApiTimeout );
         } catch (Exception e) {
             logger.error("Exception occurred while attempting to associating our SSL cert to the session.", e);
         }
