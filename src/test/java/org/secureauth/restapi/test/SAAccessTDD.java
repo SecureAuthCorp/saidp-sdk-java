@@ -7,9 +7,12 @@ import org.secureauth.sarestapi.ISAAccess;
 import org.secureauth.sarestapi.SAAccess;
 import org.secureauth.sarestapi.data.Response.BaseResponse;
 import org.secureauth.sarestapi.data.Response.FactorsResponse;
+import org.secureauth.sarestapi.data.Response.ResponseObject;
 import org.secureauth.sarestapi.data.Response.UserProfileResponse;
 import org.secureauth.sarestapi.data.SAAuth;
 import org.secureauth.sarestapi.data.SABaseURL;
+import org.secureauth.sarestapi.data.UserProfile.NewUserProfile;
+import org.secureauth.sarestapi.data.UserProfile.UserProfileKB;
 import org.secureauth.sarestapi.resources.SAExecuter;
 import org.secureauth.sarestapi.util.Property;
 import org.secureauth.sarestapi.util.RetrievePropertiesUtils;
@@ -424,6 +427,26 @@ public class SAAccessTDD {
 		assertNotNull(response);
 		assertEquals(response.getStatus(), invalidStringForPin);
 		assertTrue(response.getMessage().contains("PIN is invalid."));
+	}
+
+	@Test
+	public void testUpdateUserProfileKBQKBAOrderedValid() throws Exception {
+
+		UserProfileResponse response = saAccess.getUserProfile("rtest50");
+
+		FactorsResponse factorsResponse = saAccess.factorsByUser("rtest50");
+
+		NewUserProfile newUserProfile = new NewUserProfile();
+		newUserProfile.getKnowledgeBase().put("kbq1", new UserProfileKB("kbq1", "kba1"));
+		newUserProfile.getKnowledgeBase().put("kbq2", new UserProfileKB("kbq2", "kba2"));
+		newUserProfile.getKnowledgeBase().put("kbq3", new UserProfileKB("kbq3", "kba3"));
+
+		ResponseObject responseObj = saAccess.updateUser(validUsername, newUserProfile);
+		System.out.println(responseObj);
+
+		UserProfileResponse response2 = saAccess.getUserProfile("rtest50");
+
+
 	}
 
 	@Test
