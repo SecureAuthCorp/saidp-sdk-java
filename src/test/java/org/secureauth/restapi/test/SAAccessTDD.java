@@ -299,9 +299,9 @@ public class SAAccessTDD {
 			}
 		 */
 
-		FactorsResponse response = saAccess.factorsByUser(validUsername);
+		FactorsResponse response = saAccess.factorsByUserSpecial(validUsername);
 		assertNotNull(response);
-		assertEquals(response.getStatus(), FOUND_MESSAGE);
+		assertEquals(FOUND_MESSAGE, response.getStatus());
 		assertTrue(response.getMessage().isEmpty());
 	}
 

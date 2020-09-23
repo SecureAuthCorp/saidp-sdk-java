@@ -155,6 +155,26 @@ public class SAAccess implements ISAAccess{
 
     /**
      * <p>
+     *     Returns the list of Factors available for the specified user supporting special characters
+     * </p>
+     * @param userId the userid of the identity you wish to have a list of possible second factors
+     * @return {@link FactorsResponse}
+     */
+    public FactorsResponse factorsByUserSpecial(String userId) {
+        String ts = getServerTime();
+        String header = RestApiHeader.getAuthorizationHeader(saAuth, Resource.METHOD_GET, FactorsQuery.queryFactorsSpecial(saAuth.getRealm()), ts);
+
+        try{
+            return saExecuter.executeGetRequestSpecial(header,saBaseURL.getApplianceURL() + FactorsQuery.queryFactorsSpecial(saAuth.getRealm()), userId, ts, FactorsResponse.class);
+
+        }catch (Exception e){
+            logger.error(new StringBuilder().append("Exception occurred executing REST query::\n").append(e.getMessage()).append("\n").toString(), e);
+        }
+        return null;
+    }
+
+    /**
+     * <p>
      *     Send push to accept request asynchronously
      * </p>
      *

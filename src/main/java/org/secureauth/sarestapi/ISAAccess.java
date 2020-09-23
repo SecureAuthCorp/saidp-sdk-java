@@ -45,6 +45,15 @@ public interface ISAAccess {
 
 	/**
 	 * <p>
+	 *     Returns the list of Factors available for the specified user
+	 * </p>
+	 * @param userId the userid of the identity you wish to have a list of possible second factors using special characters
+	 * @return {@link FactorsResponse}
+	 */
+	FactorsResponse factorsByUserSpecial(String userId);
+
+	/**
+	 * <p>
 	 *     Send push to accept request asynchronously
 	 * </p>
 	 *

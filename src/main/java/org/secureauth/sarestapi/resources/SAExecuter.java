@@ -1,5 +1,10 @@
 package org.secureauth.sarestapi.resources;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URI;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
 import java.util.Optional;
 
@@ -127,6 +132,40 @@ public class SAExecuter {
 
         return genericResponse;
 
+    }
+
+    public <T> T executeGetRequestSpecial (String auth, String query, String userId,String ts, Class<T> valueType) throws Exception {
+        if (client == null) {
+            createConnection();
+        }
+
+        WebTarget target;
+        Response response;
+        T genericResponse = null;
+        URI uri;
+        String encodedUser = encodedValue(userId);
+        try {
+
+            uri = URI.create(query);
+            target = client.target(uri);
+            target = target.queryParam("username", encodedUser);
+            response = target.request()
+                .accept(MediaType.APPLICATION_JSON)
+                .header("Authorization", auth)
+                .header("X-SA-Ext-Date", ts)
+                .get();
+            //consider using response.ok(valueType).build(); instead.
+            genericResponse = response.readEntity(valueType);
+            response.close();
+        } catch (Exception e) {
+            logger.error("Exception Get Request: \nQuery:\n\t" + query + "\nError:" + e.getMessage());
+        }
+
+        return genericResponse;
+    }
+
+    private String encodedValue(String value) throws UnsupportedEncodingException {
+        return URLEncoder.encode(value, StandardCharsets.UTF_8.toString());
     }
 
     public <T> T executeGetRequest(SAAuth saAuth, String baseUrl, String query, String ts, Class<T> valueType) throws Exception {
@@ -994,8 +1033,8 @@ public class SAExecuter {
 
     }
 
-    public BaseResponse getUserStatus(String userId, String ts, SAAuth saAuth){
-        try{
+    public BaseResponse getUserStatus(String userId, String ts, SAAuth saAuth) {
+        try {
 
             RestApiHeader restApiHeader = new RestApiHeader();
 
@@ -1003,13 +1042,12 @@ public class SAExecuter {
 
             String header = restApiHeader.getAuthorizationHeader(saAuth, Resource.METHOD_GET, query, ts);
 
-            return executeGetRequest(header,saBaseURL.getApplianceURL() + query, ts, BaseResponse.class);
+            return executeGetRequest(header, saBaseURL.getApplianceURL() + query, ts, BaseResponse.class);
 
-        }catch (Exception e){
+        } catch (Exception e) {
             throw new SARestAPIException("Exception occurred executing get user status query", e);
         }
 
     }
-
 
 }
