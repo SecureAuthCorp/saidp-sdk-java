@@ -996,7 +996,7 @@ public class SAAccess implements ISAAccess{
     }
 
     /**
-     * At a minimum creating a user requires UserId and Passowrd
+     * Check mandatory fields for creating a user.
      *
      * @param newUserProfile
      * @return
@@ -1006,6 +1006,11 @@ public class SAAccess implements ISAAccess{
                 newUserProfile.getPassword() != null && !newUserProfile.getPassword().isEmpty();
     }
 
+    /**
+     * Force to update the key values from the map with the 'kbq#' format.
+     * @param newUserProfile
+     * @return
+     */
     private NewUserProfile orderedAndFormattedKBQKBA(NewUserProfile newUserProfile){
         AtomicInteger i = new AtomicInteger(1);
         Map<String, UserProfileKB> formattedMap = newUserProfile.getKnowledgeBase()
