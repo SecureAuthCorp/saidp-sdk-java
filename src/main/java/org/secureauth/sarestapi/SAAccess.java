@@ -1014,7 +1014,7 @@ public class SAAccess implements ISAAccess{
     private NewUserProfile orderedAndFormattedKBQKBA(NewUserProfile newUserProfile){
         AtomicInteger i = new AtomicInteger(1);
         Map<String, UserProfileKB> formattedMap = newUserProfile.getKnowledgeBase()
-                .entrySet().stream().collect(Collectors.toMap(key -> getNextKeyFormat(i.getAndIncrement()), Map.Entry::getValue)) ;
+                .entrySet().stream().collect(Collectors.toMap(key -> getNextKeyFormat(i.getAndIncrement()), Map.Entry::getValue));
 
         newUserProfile.setKnowledgeBase(formattedMap);
         return newUserProfile;
