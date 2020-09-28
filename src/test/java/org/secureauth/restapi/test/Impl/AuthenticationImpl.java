@@ -7,16 +7,17 @@ import org.secureauth.sarestapi.data.Response.FactorsResponse;
 import org.secureauth.sarestapi.data.Response.ResponseObject;
 import org.secureauth.sarestapi.data.Response.ThrottleResponse;
 import org.secureauth.sarestapi.data.Response.ValidateOTPResponse;
+import org.secureauth.sarestapi.interfaces.AuthenticationInterface;
 import org.secureauth.sarestapi.resources.Resource;
 
 /**
  * Created by rrowcliffe on 5/14/16.
  */
-public class AuthenticationImpl {
+public class AuthenticationImpl implements AuthenticationInterface{
 
     public AuthenticationImpl(){}
 
-
+    @Override
     public BaseResponse validateUser(SAAccess saAccess, String userId) {
         //Validate the User Exists
         BaseResponse responseObject = saAccess.validateUser(userId);
@@ -37,7 +38,7 @@ public class AuthenticationImpl {
         return responseObject;
     }
 
-
+    @Override
     public BaseResponse validatePassword(SAAccess saAccess, String userid, String password) {
         BaseResponse passObject = saAccess.validateUserPassword(userid, password);
         if (passObject != null) {
@@ -49,7 +50,7 @@ public class AuthenticationImpl {
         return passObject;
     }
 
-
+    @Override
     public FactorsResponse getFactorsForUser(SAAccess saAccess, String userid) {
         //Return Factors
         FactorsResponse factorsResponse = saAccess.factorsByUser(userid);
@@ -61,6 +62,7 @@ public class AuthenticationImpl {
         return factorsResponse;
     }
 
+    @Override
     public BaseResponse validateOath(SAAccess saAccess, String user, String otp, String factorId) {
         BaseResponse responseObject = saAccess.validateOath(user, otp, factorId);
         System.out.println("Start OATH Test+++++++++++++++");
@@ -69,7 +71,7 @@ public class AuthenticationImpl {
         return responseObject;
     }
 
-
+    @Override
     public ResponseObject validatePushOTP(SAAccess saAccess, String user, String factorId) {
         ResponseObject responseObject = saAccess.deliverOTPByPush(user, factorId);
         System.out.println("Start Push Notification +++++++++++++++++");
@@ -78,35 +80,35 @@ public class AuthenticationImpl {
         return responseObject;
     }
 
-
+    @Override
     public ResponseObject sendSmsOTP(SAAccess saAccess, String userid, String factorId) {
         ResponseObject smsOTP = saAccess.deliverOTPBySMS(userid, factorId);
         System.out.println("SMS OTP is: " + smsOTP.getOtp());
         return smsOTP;
     }
 
-
+    @Override
     public ResponseObject sendPhoneOTP(SAAccess saAccess, String userid, String factorId) {
         ResponseObject phoneOTP = saAccess.deliverOTPByPhone(userid, factorId);
         System.out.println("PHONE OTP is: " + phoneOTP.getOtp());
         return phoneOTP;
     }
 
-
+    @Override
     public ResponseObject sendHelpDeskOTP(SAAccess saAccess, String userid, String factorId) {
         ResponseObject helpDeskOTP = saAccess.deliverOTPByHelpDesk(userid, factorId);
         System.out.println("Help Desk OTP is: " + helpDeskOTP.getOtp());
         return helpDeskOTP;
     }
 
-
+    @Override
     public ResponseObject sendEmailOTP(SAAccess saAccess, String userid, String factorId) {
         ResponseObject emailOTP = saAccess.deliverOTPByEmail(userid, factorId);
         System.out.println("Email OTP is: " + emailOTP.getOtp());
         return emailOTP;
     }
 
-
+    @Override
     public BaseResponse validateKBQ(SAAccess saAccess, String userid, String answer, String factorId) {
         System.out.println("TEST KBQ:  " + factorId);
         BaseResponse kba = saAccess.validateKba(userid, answer, factorId);
@@ -116,7 +118,7 @@ public class AuthenticationImpl {
         return kba;
     }
 
-
+    @Override
     public BaseResponse validatePin(SAAccess saAccess, String userId, String pin) {
         System.out.println("TEST Pin Validation  " );
         BaseResponse pinResponse = saAccess.validateUserPin(userId, pin);
@@ -126,8 +128,7 @@ public class AuthenticationImpl {
         return pinResponse;
     }
 
-
-
+    @Override
     public void PushToAccept(SAAccess saAccess, String user, String factorID, String ipAddress) throws InterruptedException {
         System.out.println("Start Push 2 Accept Test ++++++++++++++++++");
         ResponseObject ro = saAccess.sendPushToAcceptReq(user, factorID, ipAddress, null, null);
@@ -143,7 +144,7 @@ public class AuthenticationImpl {
         System.out.println("END Push 2 Accept Test+++++++++++++++++++");
     }
 
-
+    @Override
     public ValidateOTPResponse validateOTP(SAAccess saAccess, String user, String otp) {
         System.out.println("Start Validate OTP EndPoint");
         ValidateOTPResponse validateOTPResponse = saAccess.validateOTP(user,otp);
@@ -151,6 +152,7 @@ public class AuthenticationImpl {
         return validateOTPResponse;
     }
 
+    @Override
     public ThrottleResponse sendResetThrottleReq(SAAccess saAccess, String userid) {
         System.out.println("TEST Reset Throttle");
         ThrottleResponse throttleResponse = saAccess.resetThrottleReq(userid);
