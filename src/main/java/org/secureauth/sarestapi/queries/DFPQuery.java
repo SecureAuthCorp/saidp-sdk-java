@@ -26,20 +26,22 @@ public class DFPQuery {
 
 
     public static String queryDFPjs(String realm){
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(realm).append(Resource.APPLIANCE_DFP_JS);
-        return stringBuilder.toString();
+        return realm + Resource.APPLIANCE_DFP_JS;
     }
     
     public static String queryDFPValidate(String realm){
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(realm).append(Resource.APPLIANCE_DFP_VALIDATE);
-        return stringBuilder.toString();
+        return realm + Resource.APPLIANCE_DFP_VALIDATE;
     }
 
     public static String queryDFPConfirm(String realm){
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(realm).append(Resource.APPLIANCE_DFP_CONFIRM);
-        return stringBuilder.toString();
+        return realm + Resource.APPLIANCE_DFP_CONFIRM;
+    }
+
+    public static String queryDFPScore(String realm){
+        return realm + Resource.APPLIANCE_DFP_SCORE;
+    }
+
+    public static String queryDFPSave(String realm){
+        return realm + Resource.APPLIANCE_DFP_SAVE;
     }
 }

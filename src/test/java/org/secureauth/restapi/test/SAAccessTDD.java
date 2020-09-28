@@ -2,17 +2,22 @@ package org.secureauth.restapi.test;
 
 import org.junit.Assume;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.secureauth.sarestapi.ISAAccess;
 import org.secureauth.sarestapi.SAAccess;
 import org.secureauth.sarestapi.data.Response.BaseResponse;
+import org.secureauth.sarestapi.data.Response.DFPValidateResponse;
 import org.secureauth.sarestapi.data.Response.FactorsResponse;
 import org.secureauth.sarestapi.data.Response.ResponseObject;
 import org.secureauth.sarestapi.data.Response.UserProfileResponse;
 import org.secureauth.sarestapi.data.SAAuth;
 import org.secureauth.sarestapi.data.SABaseURL;
 import org.secureauth.sarestapi.data.UserProfile.NewUserProfile;
+import org.secureauth.sarestapi.data.UserProfile.NewUserProfileProperties;
 import org.secureauth.sarestapi.data.UserProfile.UserProfileKB;
+import org.secureauth.sarestapi.exception.SARestAPIException;
 import org.secureauth.sarestapi.resources.SAExecuter;
 import org.secureauth.sarestapi.util.Property;
 import org.secureauth.sarestapi.util.RetrievePropertiesUtils;
@@ -29,6 +34,8 @@ import static org.junit.Assert.assertTrue;
 public class SAAccessTDD {
 
 	private static Logger logger = LoggerFactory.getLogger(SAAccessTDD.class);
+	@Rule
+	public ExpectedException exceptionRule = ExpectedException.none();
 
 	private static SAAuth saAuth;
 	private static ISAAccess saAccess;
@@ -47,6 +54,11 @@ public class SAAccessTDD {
 	private static String validPin;
 	private static String validPassword;
 	private final static String UNEXISTING_USERNAME = "unexisting-user";
+
+	//DFP
+	private static String validFingerprintId;
+	private static String validHostAddress;
+
 
 	//Response messages
 	private static final String FOUND_MESSAGE = "found";
@@ -85,6 +97,9 @@ public class SAAccessTDD {
 		validFactorIdForOathOtp = getValue(Property.VALID_FACTOR_ID_FOR_OATH_OTP);
 		validUserOtp = getValue(Property.VALID_OTP_PIN_CODE);
 		validUserOtpOath = getValue(Property.VALID_OTP_OATH_CODE);
+		validHostAddress = getValue(Property.VALID_HOST_ADDRESS);
+		validHostAddress = getValue(Property.VALID_HOST_ADDRESS);
+		validFingerprintId = getValue(Property.VALID_FINGERPRINT_ID);
  		assumeTest = Boolean.valueOf(getValue(Property.ASSUME_TEST));
 
 	}
@@ -386,7 +401,7 @@ public class SAAccessTDD {
 	}
 
 	@Test
-	public void testValidateUserWithInvalidID() throws Exception {
+	public void testValidateUserWithValidID() throws Exception {
 		/*
 		 * Response would return:
 			{
@@ -431,22 +446,324 @@ public class SAAccessTDD {
 
 	@Test
 	public void testUpdateUserProfileKBQKBAOrderedValid() throws Exception {
-
-		UserProfileResponse response = saAccess.getUserProfile("rtest50");
-
-		FactorsResponse factorsResponse = saAccess.factorsByUser("rtest50");
-
 		NewUserProfile newUserProfile = new NewUserProfile();
-		newUserProfile.getKnowledgeBase().put("kbq1", new UserProfileKB("kbq1", "kba1"));
-		newUserProfile.getKnowledgeBase().put("kbq2", new UserProfileKB("kbq2", "kba2"));
-		newUserProfile.getKnowledgeBase().put("kbq3", new UserProfileKB("kbq3", "kba3"));
+		newUserProfile.getKnowledgeBase().put("nonFormated1", new UserProfileKB("kbq1", "kba1"));
+		newUserProfile.getKnowledgeBase().put("nonFormated2", new UserProfileKB("kbq2", "kba2"));
+		newUserProfile.getKnowledgeBase().put("nonFormated3", new UserProfileKB("kbq3", "kba3"));
+		newUserProfile.setPassword(validPassword);
+		NewUserProfileProperties newUserProfileProperties = new NewUserProfileProperties();
+		newUserProfileProperties.setEmail4("email@email.com");
+		newUserProfileProperties.setAuxId10("aux10");
+		newUserProfileProperties.setPhone4("123-456-7890");
+		newUserProfile.setProperties(newUserProfileProperties);
 
 		ResponseObject responseObj = saAccess.updateUser(validUsername, newUserProfile);
-		System.out.println(responseObj);
 
-		UserProfileResponse response2 = saAccess.getUserProfile("rtest50");
+		assertNotNull(responseObj);
+		assertEquals("success", responseObj.getStatus());
+		assertEquals("", responseObj.getMessage());
+	}
 
+	@Test
+	public void testCreateUserProfileKBQKBAOrderedValid() throws Exception {
 
+		NewUserProfile newUserProfile = new NewUserProfile();
+		newUserProfile.getKnowledgeBase().put("nonFormated1", new UserProfileKB("kbq1", "kba1"));
+		newUserProfile.getKnowledgeBase().put("nonFormated2", new UserProfileKB("kbq2", "kba2"));
+		newUserProfile.getKnowledgeBase().put("nonFormated3", new UserProfileKB("kbq3", "kba3"));
+		newUserProfile.setPassword(validPassword);
+		newUserProfile.setUserId(String.valueOf(randomNumberBetween(1, 1000)));
+		NewUserProfileProperties newUserProfileProperties = new NewUserProfileProperties();
+		newUserProfileProperties.setEmail1("email@email.com");
+		newUserProfileProperties.setAuxId10("aux10");
+		newUserProfileProperties.setPhone4("123-456-7890");
+		newUserProfileProperties.setFirstName("foo");
+		newUserProfileProperties.setLastName("foo");
+		newUserProfile.setProperties(newUserProfileProperties);
+
+		ResponseObject responseObj = saAccess.createUser(newUserProfile);
+
+		assertNotNull(responseObj);
+		assertEquals("success", responseObj.getStatus());
+		assertEquals("", responseObj.getMessage());
+	}
+
+	@Test(expected = SARestAPIException.class)
+	public void testCreateUserProfileKBQKBAOrderedInValid() throws Exception {
+
+		NewUserProfile newUserProfile = new NewUserProfile();
+		newUserProfile.getKnowledgeBase().put("nonFormated1", new UserProfileKB("kbq1", "kba1"));
+		newUserProfile.getKnowledgeBase().put("nonFormated2", new UserProfileKB("kbq2", "kba2"));
+		newUserProfile.getKnowledgeBase().put("nonFormated3", new UserProfileKB("kbq3", "kba3"));
+		newUserProfile.setPassword(validPassword);
+		newUserProfile.setUserId(null);
+		NewUserProfileProperties newUserProfileProperties = new NewUserProfileProperties();
+		newUserProfileProperties.setEmail1("email@email.com");
+		newUserProfileProperties.setAuxId10("aux10");
+		newUserProfileProperties.setPhone4("123-456-7890");
+		newUserProfileProperties.setFirstName("foo");
+		newUserProfileProperties.setLastName("foo");
+		newUserProfile.setProperties(newUserProfileProperties);
+
+		ResponseObject responseObj = saAccess.createUser(newUserProfile);
+
+		exceptionRule.expect(SARestAPIException.class);
+		exceptionRule.expectMessage("Invalid user or password");
+		assertEquals(null, responseObj);
+	}
+
+	private double randomNumberBetween(int min, int max){
+		return (Math.random() * ((max - min) + 1)) + min;
+	}
+
+	@Test
+	public void testDFPScoreWithValidNotFound() throws Exception {
+		/*
+		 * Response would return:
+			{
+			    "fingerprint_id": "",
+			    "fingerprint_name": "",
+			    "score": "0.00",
+			    "match_score": "0.00",
+			    "update_score": "0.00",
+			    "status": "not_found",
+			    "message": ""
+			 }
+		 */
+		String emptyFingerprintJSON = "{}";
+
+		DFPValidateResponse response = saAccess.DFPScoreFingerprint(validUsername, validHostAddress, validFingerprintId, emptyFingerprintJSON);
+		assertNotNull(response);
+		assertEquals("not_found", response.getStatus());
+		assertEquals(0.0, response.getScore(), 0.1);
+		assertEquals(0.0, response.getUpdate_score(), 0.1);
+	}
+
+	@Test
+	public void testDFPScoreWithValidFoundData() throws Exception {
+		/*
+		 * Response would return:
+			{
+			    "fingerprint_id": "",
+			    "fingerprint_name": "",
+			    "score": "0.00",
+			    "match_score": "0.00",
+			    "update_score": "0.00",
+			    "status": "not_found",
+			    "message": ""
+			 }
+		 */
+		String fingerprintJSON = "{\n" +
+				"        \"fingerprint\" : {\"uaString\" : \"Mozilla/5.0 (Windows NT 6.3; WOW64; rv:52.0) Gecko/20100101 Firefox/52.0\",\n" +
+				"        \"uaBrowser\" : {\n" +
+				"            \"name\" : \"Firefox\",\n" +
+				"            \"version\" : \"52.0\",\n" +
+				"            \"major\" : \"52\"\n" +
+				"        },\n" +
+				"        \"uaDevice\" : {\n" +
+				"            \"model\" : \"testmodel\",\n" +
+				"            \"type\" : \"testtype\",\n" +
+				"            \"vendor\" : \"testvendor\"\n" +
+				"        },\n" +
+				"        \"uaEngine\" : {\n" +
+				"            \"name\" : \"Gecko\",\n" +
+				"            \"version\" : \"52.0\"\n" +
+				"        },\n" +
+				"        \"uaOS\" : {\n" +
+				"            \"name\" : \"Windows\",\n" +
+				"            \"version\" : \"8.1\"\n" +
+				"        },\n" +
+				"        \"uaCPU\" : {\n" +
+				"            \"architecture\" : \"amd64\"\n" +
+				"        },\n" +
+				"        \"uaPlatform\" : \"Win32\",\n" +
+				"        \"language\" : \"en-US\",\n" +
+				"        \"colorDepth\" : 24,\n" +
+				"        \"pixelRatio\" : 1.0,\n" +
+				"        \"screenResolution\" : \"2560x1440\",\n" +
+				"        \"availableScreenResolution\" : \"2560x1400\",\n" +
+				"        \"timezone\" : \"America/Los_Angeles\",\n" +
+				"        \"timezoneOffset\" : 420,\n" +
+				"        \"localStorage\" : true,\n" +
+				"        \"sessionStorage\" : true,\n" +
+				"        \"indexedDb\" : true,\n" +
+				"        \"addBehavior\" : false,\n" +
+				"        \"openDatabase\" : false,\n" +
+				"        \"cpuClass\" : null,\n" +
+				"        \"platform\" : \"Win32\",\n" +
+				"        \"doNotTrack\" : \"unspecified\",\n" +
+				"        \"plugins\" : \"\",\n" +
+				"        \"canvas\" : \"812446969\",\n" +
+				"        \"webGl\" : \"-1928114666\",\n" +
+				"        \"adBlock\" : false,\n" +
+				"        \"userTamperLanguage\" : false,\n" +
+				"        \"userTamperScreenResolution\" : false,\n" +
+				"        \"userTamperOS\" : false,\n" +
+				"        \"userTamperBrowser\" : false,\n" +
+				"        \"touchSupport\" : {\n" +
+				"            \"maxTouchPoints\" : 0,\n" +
+				"            \"touchEvent\" : false,\n" +
+				"            \"touchStart\" : false\n" +
+				"        },\n" +
+				"        \"cookieSupport\" : true,\n" +
+				"        \"fonts\" : \"Aharoni,Andalus,Angsana New,AngsanaUPC,Aparajita,Arabic Typesetting,Arial,Batang,BatangChe,Bauhaus 93,Bodoni 72,Bodoni 72 Oldstyle,Bodoni 72 Smallcaps,Bookshelf Symbol 7,Browallia New,BrowalliaUPC,Calibri,Cambria,Cambria Math,Candara,Comic Sans MS,Consolas,Constantia,Corbel,Cordia New,CordiaUPC,DaunPenh,David,DFKai-SB,DilleniaUPC,DokChampa,Dotum,DotumChe,Ebrima,English 111 Vivace BT,Estrangelo Edessa,EucrosiaUPC,Euphemia,FangSong,Franklin Gothic,FrankRuehl,FreesiaUPC,Gabriola,Gautami,Georgia,GeoSlab 703 Lt BT,GeoSlab 703 XBd BT,Gisha,Gulim,GulimChe,Gungsuh,GungsuhChe,Helvetica,Humanst 521 Cn BT,Impact,IrisUPC,Iskoola Pota,JasmineUPC,KaiTi,Kalinga,Kartika,Khmer UI,KodchiangUPC,Kokila,Lao UI,Latha,Leelawadee,Levenim MT,LilyUPC,Lucida Console,Lucida Sans Unicode,Malgun Gothic,Mangal,Marlett,Meiryo,Meiryo UI,Microsoft Himalaya,Microsoft JhengHei,Microsoft New Tai Lue,Microsoft PhagsPa,Microsoft Sans Serif,Microsoft Tai Le,Microsoft Uighur,Microsoft YaHei,Microsoft Yi Baiti,MingLiU,MingLiU_HKSCS,MingLiU_HKSCS-ExtB,MingLiU-ExtB,Miriam,Miriam Fixed,Modern No. 20,Mongolian Baiti,MoolBoran,MS Gothic,MS Mincho,MS PGothic,MS PMincho,MS Sans Serif,MS Serif,MS UI Gothic,MV Boli,Narkisim,NSimSun,Nyala,Palatino Linotype,Plantagenet Cherokee,PMingLiU,PMingLiU-ExtB,Raavi,Rod,Roman,Sakkal Majalla,Segoe Print,Segoe Script,Segoe UI,Segoe UI Symbol,Shonar Bangla,Shruti,SimHei,Simplified Arabic,Simplified Arabic Fixed,SimSun,SimSun-ExtB,Small Fonts,Sylfaen,Tahoma,Times,Times New Roman,Traditional Arabic,Trebuchet MS,Tunga,Univers CE 55 Medium,Utsaah,Vani,Verdana,Vijaya,Vrinda,Wingdings,Wingdings 2,Wingdings 3\",\n" +
+				"        \"id\" : \"a31332450f284e9bbb1572e7c1c4927a\",\n" +
+				"        \"userId\" : \"atest\",\n" +
+				"        \"displayName\" : \"Windows - 8.1 - Firefox\",\n" +
+				"        \"httpHeaders\" : {\n" +
+				"            \"Accept\" : \"text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8\",\n" +
+				"            \"AcceptCharSet\" : \"\",\n" +
+				"            \"AcceptEncoding\" : \"gzip, deflate, br\",\n" +
+				"            \"AcceptLanguage\" : \"en-US,en;q=0.5\"\n" +
+				"        },\n" +
+				"        \"hostAddress\" : \"172.16.17.171\",\n" +
+				"        \"mobileDeviceId\" : \"\",\n" +
+				"        \"mobileDeviceName\" : \"\",\n" +
+				"        \"mobileDeviceComment\" : \"\",\n" +
+				"        \"lastAccess\" : \"2017-05-08T20:28:18.4333144+00:00\",\n" +
+				"        \"createdOn\" : \"2017-05-08T20:28:18.4333144+00:00\"},\n" +
+				"        \"accept\" : \"asdasdf\",\n" +
+				"        \"acceptCharset\" : \"bbbbbb\",\n" +
+				"        \"acceptEncoding\" : \"cccc\",\n" +
+				"        \"acceptLanguage\" : \"eeee\",\n" +
+				"        \"deviceId\" : \"aaa\",\n" +
+				"        \"deviceName\" : \"asdf\",\n" +
+				"        \"deviceComment\" : \"\"\n" +
+				"    }";
+
+		DFPValidateResponse response = saAccess.DFPScoreFingerprint(validUsername, validHostAddress, validFingerprintId, fingerprintJSON);
+		assertNotNull(response);
+		assertEquals("found", response.getStatus());
+		assertEquals(100.0, response.getScore(), 1);
+		assertEquals(90.0, response.getUpdate_score(), 1);
+		assertEquals(89.0, response.getMatch_score(), 1);
+	}
+
+	@Test
+	public void testDFPSaveWithValidFound() throws Exception {
+		/*
+		 * Response would return:
+			{
+			    "fingerprint_id": "",
+			    "fingerprint_name": "",
+			    "score": "0.00",
+			    "match_score": "0.00",
+			    "update_score": "0.00",
+			    "status": "not_found",
+			    "message": ""
+			 }
+		 */
+		String fingerprintJSON = "{\n" +
+				"        \"fingerprint\" : {\"uaString\" : \"Mozilla/5.0 (Windows NT 6.3; WOW64; rv:52.0) Gecko/20100101 Firefox/52.0\",\n" +
+				"        \"uaBrowser\" : {\n" +
+				"            \"name\" : \"Firefox\",\n" +
+				"            \"version\" : \"52.0\",\n" +
+				"            \"major\" : \"52\"\n" +
+				"        },\n" +
+				"        \"uaDevice\" : {\n" +
+				"            \"model\" : \"testmodel\",\n" +
+				"            \"type\" : \"testtype\",\n" +
+				"            \"vendor\" : \"testvendor\"\n" +
+				"        },\n" +
+				"        \"uaEngine\" : {\n" +
+				"            \"name\" : \"Gecko\",\n" +
+				"            \"version\" : \"52.0\"\n" +
+				"        },\n" +
+				"        \"uaOS\" : {\n" +
+				"            \"name\" : \"Windows\",\n" +
+				"            \"version\" : \"8.1\"\n" +
+				"        },\n" +
+				"        \"uaCPU\" : {\n" +
+				"            \"architecture\" : \"amd64\"\n" +
+				"        },\n" +
+				"        \"uaPlatform\" : \"Win32\",\n" +
+				"        \"language\" : \"en-US\",\n" +
+				"        \"colorDepth\" : 24,\n" +
+				"        \"pixelRatio\" : 1.0,\n" +
+				"        \"screenResolution\" : \"2560x1440\",\n" +
+				"        \"availableScreenResolution\" : \"2560x1400\",\n" +
+				"        \"timezone\" : \"America/Los_Angeles\",\n" +
+				"        \"timezoneOffset\" : 420,\n" +
+				"        \"localStorage\" : true,\n" +
+				"        \"sessionStorage\" : true,\n" +
+				"        \"indexedDb\" : true,\n" +
+				"        \"addBehavior\" : false,\n" +
+				"        \"openDatabase\" : false,\n" +
+				"        \"cpuClass\" : null,\n" +
+				"        \"platform\" : \"Win32\",\n" +
+				"        \"doNotTrack\" : \"unspecified\",\n" +
+				"        \"plugins\" : \"\",\n" +
+				"        \"canvas\" : \"812446969\",\n" +
+				"        \"webGl\" : \"-1928114666\",\n" +
+				"        \"adBlock\" : false,\n" +
+				"        \"userTamperLanguage\" : false,\n" +
+				"        \"userTamperScreenResolution\" : false,\n" +
+				"        \"userTamperOS\" : false,\n" +
+				"        \"userTamperBrowser\" : false,\n" +
+				"        \"touchSupport\" : {\n" +
+				"            \"maxTouchPoints\" : 0,\n" +
+				"            \"touchEvent\" : false,\n" +
+				"            \"touchStart\" : false\n" +
+				"        },\n" +
+				"        \"cookieSupport\" : true,\n" +
+				"        \"fonts\" : \"Aharoni,Andalus,Angsana New,AngsanaUPC,Aparajita,Arabic Typesetting,Arial,Batang,BatangChe,Bauhaus 93,Bodoni 72,Bodoni 72 Oldstyle,Bodoni 72 Smallcaps,Bookshelf Symbol 7,Browallia New,BrowalliaUPC,Calibri,Cambria,Cambria Math,Candara,Comic Sans MS,Consolas,Constantia,Corbel,Cordia New,CordiaUPC,DaunPenh,David,DFKai-SB,DilleniaUPC,DokChampa,Dotum,DotumChe,Ebrima,English 111 Vivace BT,Estrangelo Edessa,EucrosiaUPC,Euphemia,FangSong,Franklin Gothic,FrankRuehl,FreesiaUPC,Gabriola,Gautami,Georgia,GeoSlab 703 Lt BT,GeoSlab 703 XBd BT,Gisha,Gulim,GulimChe,Gungsuh,GungsuhChe,Helvetica,Humanst 521 Cn BT,Impact,IrisUPC,Iskoola Pota,JasmineUPC,KaiTi,Kalinga,Kartika,Khmer UI,KodchiangUPC,Kokila,Lao UI,Latha,Leelawadee,Levenim MT,LilyUPC,Lucida Console,Lucida Sans Unicode,Malgun Gothic,Mangal,Marlett,Meiryo,Meiryo UI,Microsoft Himalaya,Microsoft JhengHei,Microsoft New Tai Lue,Microsoft PhagsPa,Microsoft Sans Serif,Microsoft Tai Le,Microsoft Uighur,Microsoft YaHei,Microsoft Yi Baiti,MingLiU,MingLiU_HKSCS,MingLiU_HKSCS-ExtB,MingLiU-ExtB,Miriam,Miriam Fixed,Modern No. 20,Mongolian Baiti,MoolBoran,MS Gothic,MS Mincho,MS PGothic,MS PMincho,MS Sans Serif,MS Serif,MS UI Gothic,MV Boli,Narkisim,NSimSun,Nyala,Palatino Linotype,Plantagenet Cherokee,PMingLiU,PMingLiU-ExtB,Raavi,Rod,Roman,Sakkal Majalla,Segoe Print,Segoe Script,Segoe UI,Segoe UI Symbol,Shonar Bangla,Shruti,SimHei,Simplified Arabic,Simplified Arabic Fixed,SimSun,SimSun-ExtB,Small Fonts,Sylfaen,Tahoma,Times,Times New Roman,Traditional Arabic,Trebuchet MS,Tunga,Univers CE 55 Medium,Utsaah,Vani,Verdana,Vijaya,Vrinda,Wingdings,Wingdings 2,Wingdings 3\",\n" +
+				"        \"id\" : \"a31332450f284e9bbb1572e7c1c4927a\",\n" +
+				"        \"userId\" : \"atest\",\n" +
+				"        \"displayName\" : \"Windows - 8.1 - Firefox\",\n" +
+				"        \"httpHeaders\" : {\n" +
+				"            \"Accept\" : \"text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8\",\n" +
+				"            \"AcceptCharSet\" : \"\",\n" +
+				"            \"AcceptEncoding\" : \"gzip, deflate, br\",\n" +
+				"            \"AcceptLanguage\" : \"en-US,en;q=0.5\"\n" +
+				"        },\n" +
+				"        \"hostAddress\" : \"172.16.17.171\",\n" +
+				"        \"mobileDeviceId\" : \"\",\n" +
+				"        \"mobileDeviceName\" : \"\",\n" +
+				"        \"mobileDeviceComment\" : \"\",\n" +
+				"        \"lastAccess\" : \"2017-05-08T20:28:18.4333144+00:00\",\n" +
+				"        \"createdOn\" : \"2017-05-08T20:28:18.4333144+00:00\"},\n" +
+				"        \"accept\" : \"asdasdf\",\n" +
+				"        \"acceptCharset\" : \"bbbbbb\",\n" +
+				"        \"acceptEncoding\" : \"cccc\",\n" +
+				"        \"acceptLanguage\" : \"eeee\",\n" +
+				"        \"deviceId\" : \"aaa\",\n" +
+				"        \"deviceName\" : \"asdf\",\n" +
+				"        \"deviceComment\" : \"\"\n" +
+				"    }";
+
+		DFPValidateResponse response = saAccess.DFPSaveFingerprint(validUsername, validHostAddress, validFingerprintId, fingerprintJSON);
+		assertNotNull(response);
+		assertEquals("found", response.getStatus());
+		assertEquals(100.0, response.getScore(), 1);
+		assertEquals(89.0, response.getUpdate_score(), 1);
+		assertEquals(90.0, response.getMatch_score(), 1);
+		assertEquals(validFingerprintId, response.getFingerprintId());
+		assertEquals("Windows - 8.1 - Firefox", response.getFingerprintName());
+	}
+
+	@Test
+	public void testDFPSaveWithValidNotFound() throws Exception {
+		/*
+		 * Response would return:
+			{
+			    "fingerprint_id": "",
+			    "fingerprint_name": "",
+			    "score": "0.00",
+			    "match_score": "0.00",
+			    "update_score": "0.00",
+			    "status": "not_found",
+			    "message": ""
+			 }
+		 */
+		String emptyFingerprintJSON = "{}";
+
+		DFPValidateResponse response = saAccess.DFPSaveFingerprint(validUsername, validHostAddress, validFingerprintId, emptyFingerprintJSON);
+		assertNotNull(response);
+		assertEquals("not_found", response.getStatus());
+		assertEquals(0.0, response.getScore(), 0.1);
+		assertEquals(0.0, response.getUpdate_score(), 0.1);
+		assertEquals("", response.getFingerprintId());
+		assertEquals("", response.getFingerprintName());
 	}
 
 	@Test

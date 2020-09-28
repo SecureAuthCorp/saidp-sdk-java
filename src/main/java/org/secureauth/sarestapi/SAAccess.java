@@ -5,6 +5,8 @@ import java.util.Calendar;
 import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 import com.google.common.collect.Maps;
 import org.secureauth.sarestapi.data.*;
@@ -18,6 +20,7 @@ import org.secureauth.sarestapi.data.Response.*;
 import org.secureauth.sarestapi.data.Requests.UserPasswordRequest;
 import org.secureauth.sarestapi.data.Response.UserProfileResponse;
 import org.secureauth.sarestapi.data.UserProfile.NewUserProfile;
+import org.secureauth.sarestapi.data.UserProfile.UserProfileKB;
 import org.secureauth.sarestapi.data.UserProfile.UserToGroups;
 import org.secureauth.sarestapi.data.UserProfile.UsersToGroup;
 import org.secureauth.sarestapi.exception.SARestAPIException;
@@ -804,6 +807,45 @@ public class SAAccess implements ISAAccess{
         return null;
     }
 
+
+    @Override
+    public DFPValidateResponse DFPScoreFingerprint(String userId, String hostAddress, String fingerprintId, String fingerPrintJSON) {
+        try{
+            String ts = getServerTime();
+            DFPConfirmRequest dfpConfirmRequest =new DFPConfirmRequest(userId, fingerprintId);
+            DFP dfp = JSONUtil.getDFPFromJSONString(fingerPrintJSON);
+            DFPValidateRequest dfpValidateRequest = new DFPValidateRequest(userId, hostAddress, dfp);
+
+            DFPScoreRequest dfpScoreRequest = new DFPScoreRequest(dfpConfirmRequest, dfpValidateRequest);
+
+            String query = DFPQuery.queryDFPScore(saAuth.getRealm());
+            String header = RestApiHeader.getAuthorizationHeader(saAuth, Resource.METHOD_POST, query, dfpScoreRequest, ts);
+            return saExecuter.executePostRawRequest(header,saBaseURL.getApplianceURL() +  query, dfpScoreRequest, DFPValidateResponse.class, ts);
+
+        }catch (Exception e){
+            throw new SARestAPIException("Exception occurred executing score fingerprint", e);
+        }
+    }
+
+    @Override
+    public DFPValidateResponse DFPSaveFingerprint(String userId, String hostAddress, String fingerprintId, String fingerPrintJSON) {
+        try{
+            String ts = getServerTime();
+            DFPConfirmRequest dfpConfirmRequest =new DFPConfirmRequest(userId, fingerprintId);
+            DFP dfp = JSONUtil.getDFPFromJSONString(fingerPrintJSON);
+            DFPValidateRequest dfpValidateRequest = new DFPValidateRequest(userId, hostAddress, dfp);
+
+            DFPScoreRequest dfpScoreRequest = new DFPScoreRequest(dfpConfirmRequest, dfpValidateRequest);
+
+            String query = DFPQuery.queryDFPSave(saAuth.getRealm());
+            String header = RestApiHeader.getAuthorizationHeader(saAuth, Resource.METHOD_POST, query, dfpScoreRequest, ts);
+            return saExecuter.executePostRawRequest(header,saBaseURL.getApplianceURL() + query, dfpScoreRequest, DFPValidateResponse.class, ts);
+
+        }catch (Exception e){
+            throw new SARestAPIException("Exception occurred executing save fingerprint", e);
+        }
+    }
+
     /**
      * <p>
      *     Returns the url for the JavaScript Source for DFP
@@ -938,22 +980,43 @@ public class SAAccess implements ISAAccess{
      * @return {@link ResponseObject}
      */
     public ResponseObject createUser(NewUserProfile newUserProfile){
-        String ts = getServerTime();
-        RestApiHeader restApiHeader = new RestApiHeader();
-        String header = restApiHeader.getAuthorizationHeader(saAuth,"POST",IDMQueries.queryUsers(saAuth.getRealm()),newUserProfile,ts);
+        try{
+            if(isValidUser(newUserProfile)){
+                String ts = getServerTime();
+                orderedAndFormattedKBQKBA(newUserProfile);
+                String header = RestApiHeader.getAuthorizationHeader(saAuth, Resource.METHOD_POST, IDMQueries.queryUsers(saAuth.getRealm()),newUserProfile,ts);
 
-        /*
-        At a minimum creating a user requires UserId and Passowrd
-         */
-        if(newUserProfile.getUserId() != null && !newUserProfile.getUserId().isEmpty() && newUserProfile.getPassword() != null && !newUserProfile.getPassword().isEmpty()){
-            try{
                 return saExecuter.executeUserProfileCreateRequest(header,saBaseURL.getApplianceURL() + IDMQueries.queryUsers(saAuth.getRealm()),newUserProfile,ts,ResponseObject.class);
-
-            }catch (Exception e){
-                logger.error(new StringBuilder().append("Exception occurred executing REST query::\n").append(e.getMessage()).append("\n").toString(), e);
+            }else{
+                throw new IllegalArgumentException("Invalid user or password");
             }
+        }catch (Exception e){
+            throw new SARestAPIException("Exception occurred executing REST query on createUser:\n" + e.getMessage() + "\n", e);
         }
-        return null;
+    }
+
+    /**
+     * At a minimum creating a user requires UserId and Passowrd
+     *
+     * @param newUserProfile
+     * @return
+     */
+    private boolean isValidUser(NewUserProfile newUserProfile){
+        return newUserProfile.getUserId() != null && !newUserProfile.getUserId().isEmpty() &&
+                newUserProfile.getPassword() != null && !newUserProfile.getPassword().isEmpty();
+    }
+
+    private NewUserProfile orderedAndFormattedKBQKBA(NewUserProfile newUserProfile){
+        AtomicInteger i = new AtomicInteger(1);
+        Map<String, UserProfileKB> formattedMap = newUserProfile.getKnowledgeBase()
+                .entrySet().stream().collect(Collectors.toMap(key -> getNextKeyFormat(i.getAndIncrement()), Map.Entry::getValue)) ;
+
+        newUserProfile.setKnowledgeBase(formattedMap);
+        return newUserProfile;
+    }
+
+    private String getNextKeyFormat(int n){
+        return "kbq"+n;
     }
 
     /**
@@ -965,12 +1028,11 @@ public class SAAccess implements ISAAccess{
      * @return {@link ResponseObject}
      */
     public ResponseObject updateUser(String userId, NewUserProfile userProfile){
-        String ts = getServerTime();
-        RestApiHeader restApiHeader = new RestApiHeader();
-        String header = restApiHeader.getAuthorizationHeader(saAuth,"PUT",IDMQueries.queryUserProfile(saAuth.getRealm(),userId),userProfile,ts);
-
-
         try{
+            String ts = getServerTime();
+            orderedAndFormattedKBQKBA(userProfile);
+            String header = RestApiHeader.getAuthorizationHeader(saAuth, Resource.METHOD_PUT,IDMQueries.queryUserProfile(saAuth.getRealm(),userId),userProfile,ts);
+
             return saExecuter.executeUserProfileUpdateRequest(header,
                     saBaseURL.getApplianceURL() + IDMQueries.queryUserProfile(saAuth.getRealm(),userId),
                     userProfile,
@@ -978,10 +1040,8 @@ public class SAAccess implements ISAAccess{
                     ResponseObject.class);
 
         }catch (Exception e){
-            logger.error(new StringBuilder().append("Exception occurred executing REST query::\n").append(e.getMessage()).append("\n").toString(), e);
+            throw new SARestAPIException("Exception occurred executing REST query on updateUser:\n" + e.getMessage() + "\n", e);
         }
-
-        return null;
     }
 
     /**
