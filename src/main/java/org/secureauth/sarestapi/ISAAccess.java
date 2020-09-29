@@ -114,6 +114,14 @@ public interface ISAAccess {
 	ThrottleResponse resetThrottleReq(String userId);
 
 	/**
+	 * the OTP throttling count to 0 after the end-user successfully authenticates;
+	 * the attempt count is stored in a directory attribute configured in the Web Admin
+	 * @param userId id of user
+	 * @return base answer
+	 */
+	ThrottleResponse resetThrottleReqWithSpecialCharacters(String userId);
+	
+	/**
 	 * GET the end-user's current count of OTP usage attempts
 	 * @param userId id of user
 	 * @return base answer
@@ -407,6 +415,15 @@ public interface ISAAccess {
 	 * @return {@link UserProfileResponse}
 	 */
 	UserProfileResponse getUserProfile(String userId);
+
+	/**
+	 * <p>
+	 *     Returns the UserProfile for the specified user supporting special characters
+	 * </p>
+	 * @param userId the userid of the identity you wish to have a list of possible second factors
+	 * @return {@link UserProfileResponse}
+	 */
+	UserProfileResponse getUserProfileWithSpecialCharacters(String userId);
 
 	/**
 	 * <p>

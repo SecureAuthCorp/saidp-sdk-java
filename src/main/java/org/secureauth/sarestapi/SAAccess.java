@@ -165,7 +165,7 @@ public class SAAccess implements ISAAccess{
         String header = RestApiHeader.getAuthorizationHeader(saAuth, Resource.METHOD_GET, FactorsQuery.queryFactorsSpecial(saAuth.getRealm()), ts);
 
         try{
-            return saExecuter.executeGetRequestSpecial(header,saBaseURL.getApplianceURL() + FactorsQuery.queryFactorsSpecial(saAuth.getRealm()), userId, ts, FactorsResponse.class);
+            return saExecuter.executeGetRequestWithSpecialCharacters(header,saBaseURL.getApplianceURL() + FactorsQuery.queryFactorsSpecial(saAuth.getRealm()), userId, ts, FactorsResponse.class);
 
         }catch (Exception e){
             logger.error(new StringBuilder().append("Exception occurred executing REST query::\n").append(e.getMessage()).append("\n").toString(), e);
@@ -342,6 +342,26 @@ public class SAAccess implements ISAAccess{
     }
 
     /**
+     * the OTP throttling count to 0 after the end-user successfully authenticates;
+     * the attempt count is stored in a directory attribute configured in the Web Admin
+     * @param userId id of user
+     * @return base answer
+     */
+    public ThrottleResponse resetThrottleReqWithSpecialCharacters(String userId){
+        try{
+            String ts = getServerTime();
+            AuthRequest authRequest = new AuthRequest();
+            ThrottleRequest throttleRequest = new ThrottleRequest(0);
+
+            String header = RestApiHeader.getAuthorizationHeader(saAuth, Resource.METHOD_PUT, ThrottleQuery.queryThrottlesWithSpecialCharacters(saAuth.getRealm()), throttleRequest, ts);
+
+            return saExecuter.executePutRequestWithSpecialCharacters(header,saBaseURL.getApplianceURL() + ThrottleQuery.queryThrottlesWithSpecialCharacters(saAuth.getRealm()), userId, throttleRequest,ThrottleResponse.class, ts);
+        }catch (Exception e){
+            throw new SARestAPIException("Exception occurred executing REST query:\n" + e.getMessage());
+        }
+    }
+
+    /**
      * GET the end-user's current count of OTP usage attempts
      * @param userId id of user
      * @return base answer
@@ -354,6 +374,24 @@ public class SAAccess implements ISAAccess{
             String header = RestApiHeader.getAuthorizationHeader(saAuth, Resource.METHOD_GET, ThrottleQuery.queryThrottles(saAuth.getRealm(), userId), ts);
 
             return saExecuter.executeGetRequest(header,saBaseURL.getApplianceURL() + ThrottleQuery.queryThrottles(saAuth.getRealm(), userId), ts, ThrottleResponse.class);
+        }catch (Exception e){
+            throw new SARestAPIException("Exception occurred executing REST query:\n" + e.getMessage());
+        }
+    }
+
+    /**
+     * GET the end-user's current count of OTP usage attempts
+     * @param userId id of user
+     * @return base answer
+     */
+    public ThrottleResponse getThrottleReqWithSpecialCharacters(String userId){
+        try{
+            String ts = getServerTime();
+            AuthRequest authRequest = new AuthRequest();
+
+            String header = RestApiHeader.getAuthorizationHeader(saAuth, Resource.METHOD_GET, ThrottleQuery.queryThrottlesWithSpecialCharacters(saAuth.getRealm()), ts);
+
+            return saExecuter.executeGetRequestWithSpecialCharacters(header,saBaseURL.getApplianceURL() + ThrottleQuery.queryThrottlesWithSpecialCharacters(saAuth.getRealm()), userId, ts, ThrottleResponse.class);
         }catch (Exception e){
             throw new SARestAPIException("Exception occurred executing REST query:\n" + e.getMessage());
         }
@@ -1143,12 +1181,33 @@ public class SAAccess implements ISAAccess{
 
     /**
      * <p>
+     *     Returns the UserProfile for the specified user supporting special characters
+     * </p>
+     * @param userId the userid of the identity you wish to have a list of possible second factors
+     * @return {@link UserProfileResponse}
+     */
+    public UserProfileResponse getUserProfileWithSpecialCharacters(String userId){
+        String ts = getServerTime();
+        String header = RestApiHeader.getAuthorizationHeader(saAuth,"GET",IDMQueries.queryUserProfileWithSpecialCharacters(saAuth.getRealm()),ts);
+
+        try{
+            return saExecuter.executeGetRequestWithSpecialCharacters(header,saBaseURL.getApplianceURL() + IDMQueries.queryUserProfileWithSpecialCharacters(saAuth.getRealm()), userId , ts, UserProfileResponse.class);
+
+        }catch (Exception e){
+            logger.error("Exception occurred executing REST query:\n" + e.getMessage() + "\n");
+        }
+        return null;
+    }
+
+    /**
+     * <p>
      *     Administrative Password Reset for the specified user
      * </p>
      * @param userId the userid of the identity you wish to have a list of possible second factors
      * @param password the users new password
      * @return {@link ResponseObject}
      */
+
     public ResponseObject passwordReset(String userId, String password){
         String ts = getServerTime();
         UserPasswordRequest userPasswordRequest = new UserPasswordRequest();

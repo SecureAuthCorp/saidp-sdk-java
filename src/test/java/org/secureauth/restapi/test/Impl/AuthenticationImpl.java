@@ -154,9 +154,19 @@ public class AuthenticationImpl implements AuthenticationInterface {
     }
 
     @Override
-    public ThrottleResponse sendResetThrottleReq(SAAccess saAccess, String userid) {
+    public ThrottleResponse sendResetThrottleReq(SAAccess saAccess, String userId) {
         System.out.println("TEST Reset Throttle");
-        ThrottleResponse throttleResponse = saAccess.resetThrottleReq(userid);
+        ThrottleResponse throttleResponse = saAccess.resetThrottleReq(userId);
+        System.out.println(throttleResponse.toString());
+        System.out.println("END Reset Throttle +++++++++++");
+
+        return throttleResponse;
+    }
+
+    @Override
+    public ThrottleResponse sendResetThrottleReqWithSpecialCharacters(SAAccess saAccess, String userId) {
+        System.out.println("TEST Reset Throttle");
+        ThrottleResponse throttleResponse = saAccess.resetThrottleReqWithSpecialCharacters(userId);
         System.out.println(throttleResponse.toString());
         System.out.println("END Reset Throttle +++++++++++");
 
