@@ -981,15 +981,13 @@ public class SAAccess implements ISAAccess{
      */
     public ResponseObject createUser(NewUserProfile newUserProfile){
         try{
-            if(isValidUser(newUserProfile)){
-                String ts = getServerTime();
-                orderedAndFormattedKBQKBA(newUserProfile);
-                String header = RestApiHeader.getAuthorizationHeader(saAuth, Resource.METHOD_POST, IDMQueries.queryUsers(saAuth.getRealm()),newUserProfile,ts);
+            validateUser(newUserProfile);
+            String ts = getServerTime();
+            orderedAndFormattedKBQKBA(newUserProfile);
+            String header = RestApiHeader.getAuthorizationHeader(saAuth, Resource.METHOD_POST, IDMQueries.queryUsers(saAuth.getRealm()),newUserProfile,ts);
 
-                return saExecuter.executeUserProfileCreateRequest(header,saBaseURL.getApplianceURL() + IDMQueries.queryUsers(saAuth.getRealm()),newUserProfile,ts,ResponseObject.class);
-            }else{
-                throw new IllegalArgumentException("Invalid user or password");
-            }
+            return saExecuter.executeUserProfileCreateRequest(header,saBaseURL.getApplianceURL() + IDMQueries.queryUsers(saAuth.getRealm()),newUserProfile,ts,ResponseObject.class);
+
         }catch (Exception e){
             throw new SARestAPIException("Exception occurred executing REST query on createUser:\n" + e.getMessage() + "\n", e);
         }
@@ -1001,9 +999,12 @@ public class SAAccess implements ISAAccess{
      * @param newUserProfile
      * @return
      */
-    private boolean isValidUser(NewUserProfile newUserProfile){
-        return newUserProfile.getUserId() != null && !newUserProfile.getUserId().isEmpty() &&
-                newUserProfile.getPassword() != null && !newUserProfile.getPassword().isEmpty();
+    private void validateUser(NewUserProfile newUserProfile){
+        if(newUserProfile.getUserId() == null || !newUserProfile.getUserId().isEmpty() ||
+                newUserProfile.getPassword() == null && !newUserProfile.getPassword().isEmpty()) {
+            throw new IllegalArgumentException("User and password are required to create a new user");
+        }
+        return;
     }
 
     /**
@@ -1036,7 +1037,7 @@ public class SAAccess implements ISAAccess{
         try{
             String ts = getServerTime();
             orderedAndFormattedKBQKBA(userProfile);
-            String header = RestApiHeader.getAuthorizationHeader(saAuth, Resource.METHOD_PUT,IDMQueries.queryUserProfile(saAuth.getRealm(),userId),userProfile,ts);
+            String header = RestApiHeader.getAuthorizationHeader(saAuth, Resource.METHOD_PUT, IDMQueries.queryUserProfile(saAuth.getRealm(),userId),userProfile,ts);
 
             return saExecuter.executeUserProfileUpdateRequest(header,
                     saBaseURL.getApplianceURL() + IDMQueries.queryUserProfile(saAuth.getRealm(),userId),
