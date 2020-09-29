@@ -45,6 +45,15 @@ public class IDMQueries {
     }
 
     /*
+    Users Profile with special characters
+    */
+    public static String queryUserProfileWithSpecialCharacters(String realm){
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append(realm).append(Resource.APPLIANCE_USERS_WITH_SPECIAL_CHARACTERS);
+        return stringBuilder.toString();
+    }
+
+    /*
     Reset User Password
      */
     public static String queryUserResetPwd(String realm, String userName){
