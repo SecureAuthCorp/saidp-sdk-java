@@ -2,6 +2,8 @@ package org.secureauth.sarestapi;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;
@@ -983,7 +985,7 @@ public class SAAccess implements ISAAccess{
         try{
             validateUser(newUserProfile);
             String ts = getServerTime();
-            orderedAndFormattedKBQKBA(newUserProfile);
+            sortKBQKBAbyKey(newUserProfile);
             String header = RestApiHeader.getAuthorizationHeader(saAuth, Resource.METHOD_POST, IDMQueries.queryUsers(saAuth.getRealm()),newUserProfile,ts);
 
             return saExecuter.executeUserProfileCreateRequest(header,saBaseURL.getApplianceURL() + IDMQueries.queryUsers(saAuth.getRealm()),newUserProfile,ts,ResponseObject.class);
@@ -1008,24 +1010,6 @@ public class SAAccess implements ISAAccess{
     }
 
     /**
-     * Force to update the key values from the map with the 'kbq#' format.
-     * @param newUserProfile
-     * @return
-     */
-    private NewUserProfile orderedAndFormattedKBQKBA(NewUserProfile newUserProfile){
-        AtomicInteger i = new AtomicInteger(1);
-        Map<String, UserProfileKB> formattedMap = newUserProfile.getKnowledgeBase()
-                .entrySet().stream().collect(Collectors.toMap(key -> getNextKeyFormat(i.getAndIncrement()), Map.Entry::getValue));
-
-        newUserProfile.setKnowledgeBase(formattedMap);
-        return newUserProfile;
-    }
-
-    private String getNextKeyFormat(int n){
-        return "kbq"+n;
-    }
-
-    /**
      * <p>
      *     Update User / Profile
      * </p>
@@ -1036,7 +1020,7 @@ public class SAAccess implements ISAAccess{
     public ResponseObject updateUser(String userId, NewUserProfile userProfile){
         try{
             String ts = getServerTime();
-            orderedAndFormattedKBQKBA(userProfile);
+            sortKBQKBAbyKey(userProfile);
             String header = RestApiHeader.getAuthorizationHeader(saAuth, Resource.METHOD_PUT, IDMQueries.queryUserProfile(saAuth.getRealm(),userId),userProfile,ts);
 
             return saExecuter.executeUserProfileUpdateRequest(header,
@@ -1048,6 +1032,14 @@ public class SAAccess implements ISAAccess{
         }catch (Exception e){
             throw new SARestAPIException("Exception occurred executing REST query on updateUser:\n" + e.getMessage() + "\n", e);
         }
+    }
+
+    private void sortKBQKBAbyKey(NewUserProfile userProfile){
+        List<Map.Entry<String, UserProfileKB>> userProfileList = userProfile.getKnowledgeBase().entrySet().stream().sorted(Map.Entry.comparingByKey()).collect(Collectors.toList());
+        userProfile.setKnowledgeBase(userProfileList.stream()
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue,
+                        (v1,v2)->v1,
+                        LinkedHashMap::new)));
     }
 
     /**

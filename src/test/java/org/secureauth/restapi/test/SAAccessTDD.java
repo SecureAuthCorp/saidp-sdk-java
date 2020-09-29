@@ -448,8 +448,8 @@ public class SAAccessTDD {
 	public void testUpdateUserProfileKBQKBAOrderedValid() throws Exception {
 		NewUserProfile newUserProfile = new NewUserProfile();
 		newUserProfile.getKnowledgeBase().put("nonFormated1", new UserProfileKB("kbq1", "kba1"));
-		newUserProfile.getKnowledgeBase().put("nonFormated2", new UserProfileKB("kbq2", "kba2"));
 		newUserProfile.getKnowledgeBase().put("nonFormated3", new UserProfileKB("kbq3", "kba3"));
+		newUserProfile.getKnowledgeBase().put("nonFormated2", new UserProfileKB("kbq2", "kba2"));
 		newUserProfile.setPassword(validPassword);
 		NewUserProfileProperties newUserProfileProperties = new NewUserProfileProperties();
 		newUserProfileProperties.setEmail4("email@email.com");
