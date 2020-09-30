@@ -8,6 +8,7 @@ public class ThrottleQuery {
 		return realm + Resource.APPLIANCE_USERS + userName + Resource.APPLIANCE_THROTTLE;
 	}
 
+// This method supports special characters.
 	public static String queryThrottlesWithSpecialCharacters(String realm){
 		return realm + Resource.APPLIANCE_USERS_WITH_SPECIAL_CHARACTERS +  Resource.APPLIANCE_THROTTLE;
 	}

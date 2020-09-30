@@ -396,7 +396,7 @@ public class SAAccessTDD {
 			}
 		 */
 
-		FactorsResponse response = saAccess.factorsByUserSpecial(validUsername);
+		FactorsResponse response = saAccess.factorsByUserWithSpecialCharacters(validUsername);
 		assertNotNull(response);
 		assertEquals(FOUND_MESSAGE, response.getStatus());
 		assertTrue(response.getMessage().isEmpty());
@@ -432,7 +432,7 @@ public class SAAccessTDD {
 			}
 		 */
 
-		FactorsResponse response = saAccess.factorsByUserSpecial(UNEXISTING_USERNAME + "!@#$%^&*(");
+		FactorsResponse response = saAccess.factorsByUserWithSpecialCharacters(UNEXISTING_USERNAME + "!@#$%^&*(");
 		assertNotNull(response);
 		assertEquals(NOT_FOUND_MESSAGE, response.getStatus());
 		assertEquals("User Id was not found.", response.getMessage());

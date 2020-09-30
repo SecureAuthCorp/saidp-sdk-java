@@ -45,7 +45,7 @@ public class IDMQueries {
     }
 
     /*
-    Users Profile with special characters
+    Users Profile. This method supports special characters.
     */
     public static String queryUserProfileWithSpecialCharacters(String realm){
         StringBuilder stringBuilder = new StringBuilder();
@@ -63,7 +63,7 @@ public class IDMQueries {
     }
 
     /*
-    Reset User Password
+    Reset User Password. This method supports special characters.
      */
     public static String queryUserResetPwdWithSpecialCharacters(String realm){
         StringBuilder stringBuilder = new StringBuilder();
@@ -81,7 +81,7 @@ public class IDMQueries {
     }
 
     /*
-    User Self-Service Change Password
+    User Self-Service Change Password. This method supports special characters.
      */
     public static String queryUserChangePwdWithSpecialCharacters(String realm){
         StringBuilder stringBuilder = new StringBuilder();

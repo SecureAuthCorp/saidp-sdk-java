@@ -11,6 +11,7 @@ public class StatusQuery {
 		return realm + Resource.APPLIANCE_USERS + userName + Resource.APPLIANCE_STATUS;
 	}
 
+//	This method supports special characters.
 	public static String queryStatusWithSpecialCharacters(String realm){
 		return realm + Resource.APPLIANCE_USERS + Resource.APPLIANCE_STATUS;
 	}
