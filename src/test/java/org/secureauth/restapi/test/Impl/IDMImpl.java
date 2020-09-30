@@ -133,7 +133,6 @@ public class IDMImpl implements IDMInterface {
             System.out.println("Null Object you messed up");
         }
         System.out.println("END Get User Profile for " + userId + " Request ++++++++");
-        return null;
     }
 
     @Override
@@ -146,6 +145,7 @@ public class IDMImpl implements IDMInterface {
             System.out.println("Failed");
         }
         System.out.println("END Password Reset " + userId + " Request ++++++++");
+
         return null;
     }
 
@@ -187,5 +187,4 @@ public class IDMImpl implements IDMInterface {
         System.out.println("END Password Change " + userId + " Request ++++++++");
         return null;
     }
-
 }
