@@ -1227,6 +1227,32 @@ public class SAAccess implements ISAAccess{
 
     /**
      * <p>
+     *     Administrative Password Reset for the specified user
+     * </p>
+     * @param userId the userid of the identity you wish to have a list of possible second factors
+     * @param password the users new password
+     * @return {@link ResponseObject}
+     */
+
+    public ResponseObject passwordResetWithSpecialCharacters(String userId, String password){
+        String ts = getServerTime();
+        UserPasswordRequest userPasswordRequest = new UserPasswordRequest();
+        userPasswordRequest.setPassword(password);
+        RestApiHeader restApiHeader = new RestApiHeader();
+        String header = restApiHeader.getAuthorizationHeader(saAuth,"POST",IDMQueries.queryUserResetPwdWithSpecialCharacters(saAuth.getRealm()),userPasswordRequest,ts);
+
+
+        try{
+            return saExecuter.executeUserPasswordResetWithSpecialCharacters(header,saBaseURL.getApplianceURL() + IDMQueries.queryUserResetPwdWithSpecialCharacters(saAuth.getRealm()), userId,userPasswordRequest,ts);
+
+        }catch (Exception e){
+            logger.error(new StringBuilder().append("Exception occurred executing REST query::\n").append(e.getMessage()).append("\n").toString(), e);
+        }
+        return null;
+    }
+
+    /**
+     * <p>
      *     Self Service Password Reset for the specified user
      * </p>
      * @param userId the userid of the identity you wish to have a list of possible second factors
@@ -1245,6 +1271,33 @@ public class SAAccess implements ISAAccess{
 
         try{
             return saExecuter.executeUserPasswordChange(header,saBaseURL.getApplianceURL() + IDMQueries.queryUserChangePwd(saAuth.getRealm(), userId),userPasswordRequest,ts);
+
+        }catch (Exception e){
+            logger.error(new StringBuilder().append("Exception occurred executing REST query::\n").append(e.getMessage()).append("\n").toString(), e);
+        }
+        return null;
+    }
+
+    /**
+     * <p>
+     *     Self Service Password Reset for the specified user
+     * </p>
+     * @param userId the userid of the identity you wish to have a list of possible second factors
+     * @param currentPassword the users Current password
+     * @param newPassword the users new Password
+     * @return {@link ResponseObject}
+     */
+    public ResponseObject passwordChangeWithSpecialCharacters(String userId, String currentPassword, String newPassword){
+        String ts = getServerTime();
+        UserPasswordRequest userPasswordRequest = new UserPasswordRequest();
+        userPasswordRequest.setCurrentPassword(currentPassword);
+        userPasswordRequest.setNewPassword(newPassword);
+        RestApiHeader restApiHeader = new RestApiHeader();
+        String header = restApiHeader.getAuthorizationHeader(saAuth,"POST",IDMQueries.queryUserChangePwdWithSpecialCharacters(saAuth.getRealm()),userPasswordRequest,ts);
+
+
+        try{
+            return saExecuter.executeUserPasswordChangeWithSpecialCharacters(header,saBaseURL.getApplianceURL() + IDMQueries.queryUserChangePwdWithSpecialCharacters(saAuth.getRealm()), userId, userPasswordRequest, ts);
 
         }catch (Exception e){
             logger.error(new StringBuilder().append("Exception occurred executing REST query::\n").append(e.getMessage()).append("\n").toString(), e);
@@ -1389,6 +1442,26 @@ public class SAAccess implements ISAAccess{
     }
 
     /**
+     * Retrieves the user's status from the username in the endpoint URL and returns a response.
+     * @param userId The User ID that you want to validate
+     * @return {@link BaseResponse}
+     */
+    public BaseResponse getUserStatusWithSpecialCharacters(String userId){
+        try{
+            String ts = getServerTime();
+
+            String query = StatusQuery.queryStatusWithSpecialCharacters(saAuth.getRealm());
+
+            String header = RestApiHeader.getAuthorizationHeader(saAuth, Resource.METHOD_GET, query, ts);
+
+            return saExecuter.executeGetRequestWithSpecialCharacters(header,saBaseURL.getApplianceURL() + query, userId, ts, BaseResponse.class);
+        }catch (Exception e){
+            throw new SARestAPIException("Exception occurred executing get user status query", e);
+        }
+
+    }
+
+    /**
      * Method invokes a status to the user Id.
      * @param userId The User ID that you want to change status
      * @param status The new status [lock, unlock, enable, disable]
@@ -1406,6 +1479,31 @@ public class SAAccess implements ISAAccess{
             String header = RestApiHeader.getAuthorizationHeader(saAuth, Resource.METHOD_POST, query, statusRequestPayload, ts);
 
             return saExecuter.executePostRawRequest(header,saBaseURL.getApplianceURL() + query, statusRequestPayload, BaseResponse.class, ts);
+
+        }catch (Exception e){
+            throw new SARestAPIException("Exception occurred executing set user status query", e);
+        }
+
+    }
+
+    /**
+     * Method invokes a status to the user Id.
+     * @param userId The User ID that you want to change status
+     * @param status The new status [lock, unlock, enable, disable]
+     * @return {@link BaseResponse}
+     */
+    public BaseResponse setUserStatusWithSpecialCharacters(String userId, String status){
+        try{
+            String ts = getServerTime();
+
+            String query = StatusQuery.queryStatusWithSpecialCharacters(saAuth.getRealm());
+
+            //payload
+            StatusRequest statusRequestPayload = new StatusRequest(status);
+
+            String header = RestApiHeader.getAuthorizationHeader(saAuth, Resource.METHOD_POST, query, statusRequestPayload, ts);
+
+            return saExecuter.executePostRawRequestWithSpecialCharacters(header,saBaseURL.getApplianceURL() + query, userId, statusRequestPayload, BaseResponse.class, ts);
 
         }catch (Exception e){
             throw new SARestAPIException("Exception occurred executing set user status query", e);

@@ -120,7 +120,7 @@ public interface ISAAccess {
 	 * @return base answer
 	 */
 	ThrottleResponse resetThrottleReqWithSpecialCharacters(String userId);
-	
+
 	/**
 	 * GET the end-user's current count of OTP usage attempts
 	 * @param userId id of user
@@ -437,6 +437,16 @@ public interface ISAAccess {
 
 	/**
 	 * <p>
+	 *     Administrative Password Reset for the specified user
+	 * </p>
+	 * @param userId the userid of the identity you wish to have a list of possible second factors
+	 * @param password the users new password
+	 * @return {@link ResponseObject}
+	 */
+	ResponseObject passwordResetWithSpecialCharacters(String userId, String password);
+
+	/**
+	 * <p>
 	 *     Self Service Password Reset for the specified user
 	 * </p>
 	 * @param userId the userid of the identity you wish to have a list of possible second factors
@@ -445,6 +455,17 @@ public interface ISAAccess {
 	 * @return {@link ResponseObject}
 	 */
 	ResponseObject passwordChange(String userId, String currentPassword, String newPassword);
+
+	/**
+	 * <p>
+	 *     Self Service Password Reset for the specified user
+	 * </p>
+	 * @param userId the userid of the identity you wish to have a list of possible second factors
+	 * @param currentPassword the users Current password
+	 * @param newPassword the users new Password
+	 * @return {@link ResponseObject}
+	 */
+	ResponseObject passwordChangeWithSpecialCharacters(String userId, String currentPassword, String newPassword);
 
 	/**
 	 * <p>
@@ -483,12 +504,27 @@ public interface ISAAccess {
 	BaseResponse getUserStatus(String userId);
 
 	/**
+	 * Retrieves the user's status from the username in the endpoint URL and returns a response.
+	 * @param userId The User ID that you want to validate
+	 * @return {@link BaseResponse}
+	 */
+	BaseResponse getUserStatusWithSpecialCharacters(String userId);
+
+	/**
 	 * Method invokes a status to the user Id.
 	 * @param userId The User ID that you want to change status
 	 * @param status The new status [lock, unlock, enable, disable]
 	 * @return {@link BaseResponse}
 	 */
 	BaseResponse setUserStatus(String userId, String status);
+
+	/**
+	 * Method invokes a status to the user Id.
+	 * @param userId The User ID that you want to change status
+	 * @param status The new status [lock, unlock, enable, disable]
+	 * @return {@link BaseResponse}
+	 */
+	BaseResponse setUserStatusWithSpecialCharacters(String userId, String status);
 
 	/**
 	 * Retrieves score from fingerprint, user and host.

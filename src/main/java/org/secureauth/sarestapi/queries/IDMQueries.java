@@ -63,11 +63,29 @@ public class IDMQueries {
     }
 
     /*
+    Reset User Password
+     */
+    public static String queryUserResetPwdWithSpecialCharacters(String realm){
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append(realm).append(Resource.APPLIANCE_IDM_USERS_PASSWD_RESET).append(Resource.APPLIANCE_USERS_WITH_SPECIAL_CHARACTERS);
+        return stringBuilder.toString();
+    }
+
+    /*
     User Self-Service Change Password
      */
     public static String queryUserChangePwd(String realm, String userName){
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append(realm).append(Resource.APPLIANCE_USERS).append(userName).append(Resource.APPLIANCE_IDM_USERS_PASSWD_CHANGE);
+        return stringBuilder.toString();
+    }
+
+    /*
+    User Self-Service Change Password
+     */
+    public static String queryUserChangePwdWithSpecialCharacters(String realm){
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append(realm).append(Resource.APPLIANCE_IDM_USERS_PASSWD_CHANGE).append(Resource.APPLIANCE_USERS_WITH_SPECIAL_CHARACTERS);
         return stringBuilder.toString();
     }
 

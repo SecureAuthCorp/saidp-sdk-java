@@ -41,7 +41,6 @@ import org.glassfish.jersey.client.ClientConfig;
 import javax.ws.rs.core.Response;
 
 
-
 /**
  * @author rrowcliffe@secureauth.com
  *
@@ -145,10 +144,7 @@ public class SAExecuter {
         URI uri;
         try {
 
-            String encodedUser = encodedValue(userId);
-            uri = URI.create(query);
-            target = client.target(uri);
-            target = target.queryParam("username", encodedUser);
+            target = encodeQueryUser(query, userId);
             response = target.request()
                 .accept(MediaType.APPLICATION_JSON)
                 .header("Authorization", auth)
@@ -238,10 +234,7 @@ public class SAExecuter {
         URI uri;
         try{
 
-            String encodedUser = encodedValue(userId);
-            uri = URI.create(query);
-            target = client.target(uri);
-            target = target.queryParam("username", encodedUser);
+            target = encodeQueryUser(query, userId);
             response = target.request()
                     .accept(MediaType.APPLICATION_JSON)
                     .header("Authorization", auth)
@@ -272,6 +265,31 @@ public class SAExecuter {
                     header("Authorization", auth).
                     header("X-SA-Ext-Date", ts).
                     post(Entity.entity(JSONUtil.convertObjectToJSON(authRequest),MediaType.APPLICATION_JSON));
+            responseObject = response.readEntity(valueType);
+            response.close();
+            return responseObject;
+        }catch(Exception e){
+            throw new SARestAPIException("Exception Post Request: \nQuery:\n\t" + query + "\nError:" + e.getMessage());
+        }
+    }
+
+
+    public <T> T executePostRawRequestWithSpecialCharacters(String auth,String query, String userId, Object authRequest, Class<T> valueType, String ts)throws Exception{
+
+        if(client == null) {
+            createConnection();
+        }
+        WebTarget target = null;
+        Response response = null;
+        T responseObject = null;
+
+        try{
+            target = encodeQueryUser(query, userId);
+            response = target.request()
+                            .accept(MediaType.APPLICATION_JSON)
+                            .header("Authorization", auth)
+                            .header("X-SA-Ext-Date", ts)
+                            .post(Entity.entity(JSONUtil.convertObjectToJSON(authRequest),MediaType.APPLICATION_JSON));
             responseObject = response.readEntity(valueType);
             response.close();
             return responseObject;
@@ -887,6 +905,36 @@ public class SAExecuter {
 
     }
 
+    //Run Password Reset (Admin level reset)
+    public ResponseObject executeUserPasswordResetWithSpecialCharacters(String auth, String query, String userId, UserPasswordRequest userPasswordRequest, String ts)throws Exception{
+
+        if(client == null) {
+            createConnection();
+        }
+
+        WebTarget target = null;
+        Response response = null;
+        ResponseObject passwordResetResponse =null;
+        try{
+            target = encodeQueryUser(query, userId);
+            response = target.request()
+                            .accept(MediaType.APPLICATION_JSON)
+                            .header("Authorization", auth)
+                            .header("X-SA-Ext-Date", ts)
+                            .post(Entity.entity(JSONUtil.convertObjectToJSON(userPasswordRequest),MediaType.APPLICATION_JSON));
+
+            passwordResetResponse = response.readEntity(ResponseObject.class);
+
+            response.close();
+        }catch(Exception e){
+            logger.error(new StringBuilder().append("Exception Running Password Reset POST: \nQuery:\n\t")
+                                 .append(query).append("\nError:").append(e.getMessage()).toString(), e);
+        }
+
+        return passwordResetResponse;
+
+    }
+
     //Run Change Password (Self Service)
     public ResponseObject executeUserPasswordChange(String auth, String query, UserPasswordRequest userPasswordRequest, String ts)throws Exception{
 
@@ -912,6 +960,38 @@ public class SAExecuter {
         }catch(Exception e){
             logger.error(new StringBuilder().append("Exception Running Password Reset POST: \nQuery:\n\t")
                     .append(query).append("\nError:").append(e.getMessage()).toString(), e);
+        }
+
+        return passwordChangeResponse;
+
+    }
+
+    //Run Change Password (Self Service)
+    public ResponseObject executeUserPasswordChangeWithSpecialCharacters(String auth, String query, String userId, UserPasswordRequest userPasswordRequest, String ts)throws Exception{
+
+        if(client == null) {
+            createConnection();
+        }
+
+        WebTarget target = null;
+        Response response = null;
+        ResponseObject passwordChangeResponse =null;
+        URI uri;
+        try{
+
+            target = encodeQueryUser(query, userId);
+            response = target.request()
+                            .accept(MediaType.APPLICATION_JSON)
+                            .header("Authorization", auth)
+                            .header("X-SA-Ext-Date", ts)
+                            .post(Entity.entity(JSONUtil.convertObjectToJSON(userPasswordRequest),MediaType.APPLICATION_JSON));
+
+            passwordChangeResponse = response.readEntity(ResponseObject.class);
+
+            response.close();
+        }catch(Exception e){
+            logger.error(new StringBuilder().append("Exception Running Password Reset POST: \nQuery:\n\t")
+                                 .append(query).append("\nError:").append(e.getMessage()).toString(), e);
         }
 
         return passwordChangeResponse;
@@ -1077,6 +1157,15 @@ public class SAExecuter {
             throw new SARestAPIException("Exception occurred executing get user status query", e);
         }
 
+    }
+
+    // Helper function for encoding users with special characters
+    private WebTarget encodeQueryUser (String query, String userId) throws Exception{
+
+        String encodedUser = encodedValue(userId);
+        URI uri = URI.create(query);
+        WebTarget target = client.target(uri);
+        return target.queryParam("username", encodedUser);
     }
 
 }

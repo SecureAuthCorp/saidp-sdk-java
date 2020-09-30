@@ -83,6 +83,22 @@ public class SAAccessTest {
 	}
 
 	@Test
+	public void getUserStatusWhenValidUserWithSpecialCharacters() throws Exception {
+
+		String query = StatusQuery.queryStatusWithSpecialCharacters(saAuth.getRealm());
+
+		BaseResponse validUserResponse = BaseResponseUtils.validUserResponse(userId);
+		//when
+		when(mockedSAExecuter.executeGetRequestWithSpecialCharacters(any(), eq(saBaseURL.getApplianceURL() + query), any(), any(), any()))
+						.thenReturn(validUserResponse);
+
+		BaseResponse response = saAccess.getUserStatusWithSpecialCharacters(userId);
+
+		Assert.assertEquals(validUserResponse, response);
+
+	}
+
+	@Test
 	public void setUserStatusWhenValidStatus() throws Exception {
 		String query = StatusQuery.queryStatus(saAuth.getRealm(), userId);
 		String status = "new status";
@@ -91,6 +107,21 @@ public class SAAccessTest {
 		//when
 		when(mockedSAExecuter.executePostRawRequest(any(), eq(saBaseURL.getApplianceURL() + query),
 				any(), any(), any())).thenReturn(successResponse);
+
+		BaseResponse response = saAccess.setUserStatus(userId, status);
+
+		Assert.assertEquals(successResponse, response);
+	}
+
+	@Test
+	public void setUserStatusWhenValidStatusWithSpecialCharacters() throws Exception {
+		String query = StatusQuery.queryStatusWithSpecialCharacters(saAuth.getRealm());
+		String status = "new status";
+
+		BaseResponse successResponse = BaseResponseUtils.successResponse(userId);
+		//when
+		when(mockedSAExecuter.executePostRawRequestWithSpecialCharacters(any(), eq(saBaseURL.getApplianceURL() + query), userId,
+						any(), any(), any())).thenReturn(successResponse);
 
 		BaseResponse response = saAccess.setUserStatus(userId, status);
 
