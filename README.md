@@ -55,21 +55,22 @@ String applicationKey = ".........";
  /*
  This will create the instance of the SAAccess which is able to execute REST calls.
  */
-SAAccess saAccess=new SAAccess(applianceHost, appliancePort, applianceSSL, selfSigned, realm, applicationID, applicationKey);
+ISAAccess saAccess = SAFactory.of(applianceHost, appliancePort, applianceSSL, selfSigned, realm, applicationID, applicationKey);
 
+try {
+  // To validate a user exists in your data store all you need to run the following.
+  System.out.println(saAccess.validateUser("USERNAME").toString());
 
-// To validate a user exists in your data store all you need to run the following.
-
-System.out.println(saAccess.validateUser("USERNAME").toString());
-
-ResponseObject validUser = saAccess.validateUser("USERNAME")
-if(validUser != null){
-            if(validUser.getStatus().equalsIgnoreCase("found")){
-                System.out.println("Matched User")
-            }
-            if(validUser.getStatus().equalsIgnoreCase("not_found")){
-                System.out.println("User was not found in DataStore!")
-            }
+  ResponseObject validUser = saAccess.validateUser("USERNAME")
+  if(validUser != null){
+     if(validUser.getStatus().equalsIgnoreCase("found")){
+         System.out.println("Matched User")
+     }
+  if(validUser.getStatus().equalsIgnoreCase("not_found")){
+      System.out.println("User was not found in DataStore!")
+  }
+}catch (SARestAPIException e){
+    //handle exception
 }
 
 ```
