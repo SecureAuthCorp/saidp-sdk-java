@@ -1002,8 +1002,8 @@ public class SAAccess implements ISAAccess{
      * @return
      */
     private void validateUser(NewUserProfile newUserProfile){
-        if(newUserProfile.getUserId() == null || !newUserProfile.getUserId().isEmpty() ||
-                newUserProfile.getPassword() == null && !newUserProfile.getPassword().isEmpty()) {
+        if(newUserProfile.getUserId() == null || newUserProfile.getUserId().isEmpty() ||
+                newUserProfile.getPassword() == null || newUserProfile.getPassword().isEmpty()) {
             throw new IllegalArgumentException("User and password are required to create a new user");
         }
         return;
@@ -1035,7 +1035,9 @@ public class SAAccess implements ISAAccess{
     }
 
     private void sortKBQKBAbyKey(NewUserProfile userProfile){
-        List<Map.Entry<String, UserProfileKB>> userProfileList = userProfile.getKnowledgeBase().entrySet().stream().sorted(Map.Entry.comparingByKey()).collect(Collectors.toList());
+        List<Map.Entry<String, UserProfileKB>> userProfileList = userProfile.getKnowledgeBase().entrySet().stream()
+                .sorted(Map.Entry.comparingByKey(String::compareToIgnoreCase))
+                .collect(Collectors.toList());
         userProfile.setKnowledgeBase(userProfileList.stream()
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue,
                         (v1,v2)->v1,

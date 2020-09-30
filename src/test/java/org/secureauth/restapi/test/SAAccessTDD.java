@@ -495,8 +495,8 @@ public class SAAccessTDD {
 		newUserProfile.getKnowledgeBase().put("nonFormated1", new UserProfileKB("kbq1", "kba1"));
 		newUserProfile.getKnowledgeBase().put("nonFormated2", new UserProfileKB("kbq2", "kba2"));
 		newUserProfile.getKnowledgeBase().put("nonFormated3", new UserProfileKB("kbq3", "kba3"));
-		newUserProfile.setPassword(validPassword);
-		newUserProfile.setUserId(null);
+		newUserProfile.setPassword("");
+		newUserProfile.setUserId("");
 		NewUserProfileProperties newUserProfileProperties = new NewUserProfileProperties();
 		newUserProfileProperties.setEmail1("email@email.com");
 		newUserProfileProperties.setAuxId10("aux10");
@@ -508,7 +508,7 @@ public class SAAccessTDD {
 		ResponseObject responseObj = saAccess.createUser(newUserProfile);
 
 		exceptionRule.expect(SARestAPIException.class);
-		exceptionRule.expectMessage("Invalid user or password");
+		exceptionRule.expectMessage("User and password are required to create a new user");
 		assertEquals(null, responseObj);
 	}
 
