@@ -18,6 +18,8 @@ public interface IDMInterface {
 
     ResponseObject updateUser(SAAccess saAccess, String userId, NewUserProfile newUserProfile);
 
+    ResponseObject updateUserQP(SAAccess saAccess, String userId, NewUserProfile newUserProfile);
+
     ResponseObject addUserToGroup(SAAccess saAccess, String userId, String groupName);
 
     GroupAssociationResponse addUsersToGroup(SAAccess saAccess, UsersToGroup usersToGroup, String groupName);

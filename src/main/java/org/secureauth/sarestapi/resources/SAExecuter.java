@@ -890,6 +890,10 @@ public class SAExecuter {
 
     //Update User Profile
     public <T> T executeUserProfileUpdateRequest(String auth, String query,NewUserProfile userProfile, String ts, Class<T> valueType)throws Exception{
+        return executeUserProfileUpdateRequest(auth, query, "", userProfile, ts, valueType);
+    }
+
+    public <T> T executeUserProfileUpdateRequest(String auth, String query, String userId, NewUserProfile userProfile, String ts, Class<T> valueType)throws Exception{
 
         if(client == null) {
             createConnection();
@@ -900,7 +904,12 @@ public class SAExecuter {
         T responseObject =null;
         try{
 
-            target = client.target(query);
+            if (!userId.isBlank()) {
+                target = encodeQueryUser(query, userId);
+            }
+            else{
+                target = client.target(query);
+            }
             response = target.request().
                     accept(MediaType.APPLICATION_JSON).
                     header("Authorization", auth).
