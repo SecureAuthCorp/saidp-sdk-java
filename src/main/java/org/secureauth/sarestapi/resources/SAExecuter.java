@@ -840,7 +840,7 @@ public class SAExecuter {
 
     }
 
-    //Run Password Reset (Admin level reset). This method supports special characters for userId since it uses QP (Query Params) in order to create the request.
+    //Run Password Reset (Admin level reset). Fill userId string when you want to encode and send userId through Query Params.
     public ResponseObject executeUserPasswordReset(String auth, String query, UserPasswordRequest userPasswordRequest, String ts)throws Exception{
         return executeUserPasswordReset(auth, query, "", userPasswordRequest, ts);
     }
@@ -849,7 +849,7 @@ public class SAExecuter {
         return executePostRawRequest(auth, query, userId, "", userPasswordRequest, ResponseObject.class,  ts);
     }
 
-    //Run Change Password (Self Service). This method supports special characters for userId since it uses QP (Query Params) in order to create the request.
+    //Run Change Password (Self Service). Fill userId string when you want to encode and send userId through Query Params.
     public ResponseObject executeUserPasswordChange(String auth, String query, UserPasswordRequest userPasswordRequest, String ts)throws Exception{
         return executeUserPasswordChange(auth, query, "", userPasswordRequest, ts);
     }
