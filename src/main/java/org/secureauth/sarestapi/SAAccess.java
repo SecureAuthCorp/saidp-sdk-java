@@ -157,15 +157,15 @@ public class SAAccess implements ISAAccess{
      * <p>
      *     Returns the list of Factors available for the specified user supporting special characters
      * </p>
-     * @param userId the userid of the identity you wish to have a list of possible second factors. This method supports special characters for userId.
+     * @param userId the userid of the identity you wish to have a list of possible second factors. This method supports special characters for userId since it uses QP (Query Params) in order to create the request.
      * @return {@link FactorsResponse}
      */
-    public FactorsResponse factorsByUserWithSpecialCharacters(String userId) {
+    public FactorsResponse factorsByUserQP(String userId) {
         String ts = getServerTime();
-        String header = RestApiHeader.getAuthorizationHeader(saAuth, Resource.METHOD_GET, FactorsQuery.queryFactorsWithSpecialCharacters(saAuth.getRealm()), ts);
+        String header = RestApiHeader.getAuthorizationHeader(saAuth, Resource.METHOD_GET, FactorsQuery.queryFactorsQP(saAuth.getRealm()), ts);
 
         try{
-            return saExecuter.executeGetRequestWithSpecialCharacters(header,saBaseURL.getApplianceURL() + FactorsQuery.queryFactorsWithSpecialCharacters(saAuth.getRealm()), userId, ts, FactorsResponse.class);
+            return saExecuter.executeGetRequestQP(header,saBaseURL.getApplianceURL() + FactorsQuery.queryFactorsQP(saAuth.getRealm()), userId, ts, FactorsResponse.class);
 
         }catch (Exception e){
             logger.error(new StringBuilder().append("Exception occurred executing REST query::\n").append(e.getMessage()).append("\n").toString(), e);
@@ -344,18 +344,18 @@ public class SAAccess implements ISAAccess{
     /**
      * the OTP throttling count to 0 after the end-user successfully authenticates;
      * the attempt count is stored in a directory attribute configured in the Web Admin
-     * @param userId id of user. This method supports special characters for userId.
+     * @param userId id of user. This method supports special characters for userId since it uses QP (Query Params) in order to create the request.
      * @return base answer
      */
-    public ThrottleResponse resetThrottleReqWithSpecialCharacters(String userId){
+    public ThrottleResponse resetThrottleReqQP(String userId){
         try{
             String ts = getServerTime();
             AuthRequest authRequest = new AuthRequest();
             ThrottleRequest throttleRequest = new ThrottleRequest(0);
 
-            String header = RestApiHeader.getAuthorizationHeader(saAuth, Resource.METHOD_PUT, ThrottleQuery.queryThrottlesWithSpecialCharacters(saAuth.getRealm()), throttleRequest, ts);
+            String header = RestApiHeader.getAuthorizationHeader(saAuth, Resource.METHOD_PUT, ThrottleQuery.queryThrottlesQP(saAuth.getRealm()), throttleRequest, ts);
 
-            return saExecuter.executePutRequestWithSpecialCharacters(header,saBaseURL.getApplianceURL() + ThrottleQuery.queryThrottlesWithSpecialCharacters(saAuth.getRealm()), userId, throttleRequest,ThrottleResponse.class, ts);
+            return saExecuter.executePutRequestQP(header,saBaseURL.getApplianceURL() + ThrottleQuery.queryThrottlesQP(saAuth.getRealm()), userId, throttleRequest,ThrottleResponse.class, ts);
         }catch (Exception e){
             throw new SARestAPIException("Exception occurred executing REST query:\n" + e.getMessage());
         }
@@ -381,17 +381,17 @@ public class SAAccess implements ISAAccess{
 
     /**
      * GET the end-user's current count of OTP usage attempts
-     * @param userId id of user. This method supports special characters for userId.
+     * @param userId id of user. This method supports special characters for userId since it uses QP (Query Params) in order to create the request.
      * @return base answer
      */
-    public ThrottleResponse getThrottleReqWithSpecialCharacters(String userId){
+    public ThrottleResponse getThrottleReqQP(String userId){
         try{
             String ts = getServerTime();
             AuthRequest authRequest = new AuthRequest();
 
-            String header = RestApiHeader.getAuthorizationHeader(saAuth, Resource.METHOD_GET, ThrottleQuery.queryThrottlesWithSpecialCharacters(saAuth.getRealm()), ts);
+            String header = RestApiHeader.getAuthorizationHeader(saAuth, Resource.METHOD_GET, ThrottleQuery.queryThrottlesQP(saAuth.getRealm()), ts);
 
-            return saExecuter.executeGetRequestWithSpecialCharacters(header,saBaseURL.getApplianceURL() + ThrottleQuery.queryThrottlesWithSpecialCharacters(saAuth.getRealm()), userId, ts, ThrottleResponse.class);
+            return saExecuter.executeGetRequestQP(header,saBaseURL.getApplianceURL() + ThrottleQuery.queryThrottlesQP(saAuth.getRealm()), userId, ts, ThrottleResponse.class);
         }catch (Exception e){
             throw new SARestAPIException("Exception occurred executing REST query:\n" + e.getMessage());
         }
@@ -1183,15 +1183,15 @@ public class SAAccess implements ISAAccess{
      * <p>
      *     Returns the UserProfile for the specified user supporting special characters
      * </p>
-     * @param userId the userid of the identity you wish to have a list of possible second factors. This method supports special characters for userId.
+     * @param userId the userid of the identity you wish to have a list of possible second factors. This method supports special characters for userId since it uses QP (Query Params) in order to create the request.
      * @return {@link UserProfileResponse}
      */
-    public UserProfileResponse getUserProfileWithSpecialCharacters(String userId){
+    public UserProfileResponse getUserProfileQP(String userId){
         String ts = getServerTime();
-        String header = RestApiHeader.getAuthorizationHeader(saAuth,"GET",IDMQueries.queryUserProfileWithSpecialCharacters(saAuth.getRealm()),ts);
+        String header = RestApiHeader.getAuthorizationHeader(saAuth,"GET",IDMQueries.queryUserProfileQP(saAuth.getRealm()),ts);
 
         try{
-            return saExecuter.executeGetRequestWithSpecialCharacters(header,saBaseURL.getApplianceURL() + IDMQueries.queryUserProfileWithSpecialCharacters(saAuth.getRealm()), userId , ts, UserProfileResponse.class);
+            return saExecuter.executeGetRequestQP(header,saBaseURL.getApplianceURL() + IDMQueries.queryUserProfileQP(saAuth.getRealm()), userId , ts, UserProfileResponse.class);
 
         }catch (Exception e){
             logger.error("Exception occurred executing REST query:\n" + e.getMessage() + "\n");
@@ -1229,21 +1229,21 @@ public class SAAccess implements ISAAccess{
      * <p>
      *     Administrative Password Reset for the specified user
      * </p>
-     * @param userId the userid of the identity you wish to have a list of possible second factors. This method supports special characters for userId.
+     * @param userId the userid of the identity you wish to have a list of possible second factors. This method supports special characters for userId since it uses QP (Query Params) in order to create the request.
      * @param password the users new password
      * @return {@link ResponseObject}
      */
 
-    public ResponseObject passwordResetWithSpecialCharacters(String userId, String password){
+    public ResponseObject passwordResetQP(String userId, String password){
         String ts = getServerTime();
         UserPasswordRequest userPasswordRequest = new UserPasswordRequest();
         userPasswordRequest.setPassword(password);
         RestApiHeader restApiHeader = new RestApiHeader();
-        String header = restApiHeader.getAuthorizationHeader(saAuth,"POST",IDMQueries.queryUserResetPwdWithSpecialCharacters(saAuth.getRealm()),userPasswordRequest,ts);
+        String header = restApiHeader.getAuthorizationHeader(saAuth,"POST",IDMQueries.queryUserResetPwdQP(saAuth.getRealm()),userPasswordRequest,ts);
 
 
         try{
-            return saExecuter.executeUserPasswordResetWithSpecialCharacters(header,saBaseURL.getApplianceURL() + IDMQueries.queryUserResetPwdWithSpecialCharacters(saAuth.getRealm()), userId,userPasswordRequest,ts);
+            return saExecuter.executeUserPasswordResetQP(header,saBaseURL.getApplianceURL() + IDMQueries.queryUserResetPwdQP(saAuth.getRealm()), userId,userPasswordRequest,ts);
 
         }catch (Exception e){
             logger.error(new StringBuilder().append("Exception occurred executing REST query::\n").append(e.getMessage()).append("\n").toString(), e);
@@ -1282,22 +1282,22 @@ public class SAAccess implements ISAAccess{
      * <p>
      *     Self Service Password Reset for the specified user
      * </p>
-     * @param userId the userid of the identity you wish to have a list of possible second factors. This method supports special characters for userId.
+     * @param userId the userid of the identity you wish to have a list of possible second factors. This method supports special characters for userId since it uses QP (Query Params) in order to create the request.
      * @param currentPassword the users Current password
      * @param newPassword the users new Password
      * @return {@link ResponseObject}
      */
-    public ResponseObject passwordChangeWithSpecialCharacters(String userId, String currentPassword, String newPassword){
+    public ResponseObject passwordChangeQP(String userId, String currentPassword, String newPassword){
         String ts = getServerTime();
         UserPasswordRequest userPasswordRequest = new UserPasswordRequest();
         userPasswordRequest.setCurrentPassword(currentPassword);
         userPasswordRequest.setNewPassword(newPassword);
         RestApiHeader restApiHeader = new RestApiHeader();
-        String header = restApiHeader.getAuthorizationHeader(saAuth,"POST",IDMQueries.queryUserChangePwdWithSpecialCharacters(saAuth.getRealm()),userPasswordRequest,ts);
+        String header = restApiHeader.getAuthorizationHeader(saAuth,"POST",IDMQueries.queryUserChangePwdQP(saAuth.getRealm()),userPasswordRequest,ts);
 
 
         try{
-            return saExecuter.executeUserPasswordChangeWithSpecialCharacters(header,saBaseURL.getApplianceURL() + IDMQueries.queryUserChangePwdWithSpecialCharacters(saAuth.getRealm()), userId, userPasswordRequest, ts);
+            return saExecuter.executeUserPasswordChangeQP(header,saBaseURL.getApplianceURL() + IDMQueries.queryUserChangePwdQP(saAuth.getRealm()), userId, userPasswordRequest, ts);
 
         }catch (Exception e){
             logger.error(new StringBuilder().append("Exception occurred executing REST query::\n").append(e.getMessage()).append("\n").toString(), e);
@@ -1443,18 +1443,18 @@ public class SAAccess implements ISAAccess{
 
     /**
      * Retrieves the user's status from the username in the endpoint URL and returns a response.
-     * @param userId The User ID that you want to validate. This method supports special characters for userId.
+     * @param userId The User ID that you want to validate. This method supports special characters for userId since it uses QP (Query Params) in order to create the request.
      * @return {@link BaseResponse}
      */
-    public BaseResponse getUserStatusWithSpecialCharacters(String userId){
+    public BaseResponse getUserStatusQP(String userId){
         try{
             String ts = getServerTime();
 
-            String query = StatusQuery.queryStatusWithSpecialCharacters(saAuth.getRealm());
+            String query = StatusQuery.queryStatusQP(saAuth.getRealm());
 
             String header = RestApiHeader.getAuthorizationHeader(saAuth, Resource.METHOD_GET, query, ts);
 
-            return saExecuter.executeGetRequestWithSpecialCharacters(header,saBaseURL.getApplianceURL() + query, userId, ts, BaseResponse.class);
+            return saExecuter.executeGetRequestQP(header,saBaseURL.getApplianceURL() + query, userId, ts, BaseResponse.class);
         }catch (Exception e){
             throw new SARestAPIException("Exception occurred executing get user status query", e);
         }
@@ -1488,22 +1488,22 @@ public class SAAccess implements ISAAccess{
 
     /**
      * Method invokes a status to the user Id.
-     * @param userId The User ID that you want to change status. This method supports special characters for userId.
+     * @param userId The User ID that you want to change status. This method supports special characters for userId since it uses QP (Query Params) in order to create the request.
      * @param status The new status [lock, unlock, enable, disable]
      * @return {@link BaseResponse}
      */
-    public BaseResponse setUserStatusWithSpecialCharacters(String userId, String status){
+    public BaseResponse setUserStatusQP(String userId, String status){
         try{
             String ts = getServerTime();
 
-            String query = StatusQuery.queryStatusWithSpecialCharacters(saAuth.getRealm());
+            String query = StatusQuery.queryStatusQP(saAuth.getRealm());
 
             //payload
             StatusRequest statusRequestPayload = new StatusRequest(status);
 
             String header = RestApiHeader.getAuthorizationHeader(saAuth, Resource.METHOD_POST, query, statusRequestPayload, ts);
 
-            return saExecuter.executePostRawRequestWithSpecialCharacters(header,saBaseURL.getApplianceURL() + query, userId, statusRequestPayload, BaseResponse.class, ts);
+            return saExecuter.executePostRawRequestQP(header,saBaseURL.getApplianceURL() + query, userId, statusRequestPayload, BaseResponse.class, ts);
 
         }catch (Exception e){
             throw new SARestAPIException("Exception occurred executing set user status query", e);

@@ -156,7 +156,7 @@ public class SAAccessTDD {
 	}
 
 	@Test
-	public void testGetPropertiesWithValidUserWithSpecialCharacters() throws Exception {
+	public void testGetPropertiesWithValidUserQP() throws Exception {
 		/*
 		 * Response would return:
 			{
@@ -189,7 +189,7 @@ public class SAAccessTDD {
 			}
 		 */
 
-		UserProfileResponse response = saAccess.getUserProfileWithSpecialCharacters(validUsername);
+		UserProfileResponse response = saAccess.getUserProfileQP(validUsername);
 		assertNotNull(response);
 		assertEquals(FOUND_MESSAGE, response.getStatus());
 		assertTrue(response.getMessage().isEmpty());
@@ -217,7 +217,7 @@ public class SAAccessTDD {
 	}
 
 	@Test
-	public void testGetPropertiesWithUnexistingUserWithSpecialCharacters() throws Exception {
+	public void testGetPropertiesWithUnexistingUserQP() throws Exception {
 		/*
 		 * Response would return:
 			{
@@ -231,7 +231,7 @@ public class SAAccessTDD {
 			}
 		 */
 
-		UserProfileResponse response = saAccess.getUserProfileWithSpecialCharacters(UNEXISTING_USERNAME + "!@#$%^&*(");
+		UserProfileResponse response = saAccess.getUserProfileQP(UNEXISTING_USERNAME + "!@#$%^&*(");
 		assertNotNull(response);
 		// If the special characters are not being recognised then we should get some sort of reject instead of a NOT_FOUND_MESSAGE here
 		assertEquals(NOT_FOUND_MESSAGE, response.getStatus());
@@ -368,7 +368,7 @@ public class SAAccessTDD {
 	}
 
 	@Test
-	public void testGetFactorsFromValidUserWithSpecialCharacters() throws Exception {
+	public void testGetFactorsFromValidUserQP() throws Exception {
 		/*
 		 * Response would return:
 			{
@@ -396,7 +396,7 @@ public class SAAccessTDD {
 			}
 		 */
 
-		FactorsResponse response = saAccess.factorsByUserWithSpecialCharacters(validUsername);
+		FactorsResponse response = saAccess.factorsByUserQP(validUsername);
 		assertNotNull(response);
 		assertEquals(FOUND_MESSAGE, response.getStatus());
 		assertTrue(response.getMessage().isEmpty());
@@ -421,7 +421,7 @@ public class SAAccessTDD {
 	}
 
 	@Test
-	public void testGetFactorsFromUnexistingUserWithSpecialCharacters() throws Exception {
+	public void testGetFactorsFromUnexistingUserQP() throws Exception {
 		/*
 		 * Response would return:
 			{
@@ -432,7 +432,7 @@ public class SAAccessTDD {
 			}
 		 */
 
-		FactorsResponse response = saAccess.factorsByUserWithSpecialCharacters(UNEXISTING_USERNAME + "!@#$%^&*(");
+		FactorsResponse response = saAccess.factorsByUserQP(UNEXISTING_USERNAME + "!@#$%^&*(");
 		assertNotNull(response);
 		assertEquals(NOT_FOUND_MESSAGE, response.getStatus());
 		assertEquals("User Id was not found.", response.getMessage());

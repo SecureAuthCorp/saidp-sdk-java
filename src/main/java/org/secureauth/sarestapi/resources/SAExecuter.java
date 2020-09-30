@@ -133,7 +133,7 @@ public class SAExecuter {
 
     }
 
-    public <T> T executeGetRequestWithSpecialCharacters(String auth, String query, String userId, String ts, Class<T> valueType) throws Exception {
+    public <T> T executeGetRequestQP(String auth, String query, String userId, String ts, Class<T> valueType) throws Exception {
         if (client == null) {
             createConnection();
         }
@@ -222,7 +222,7 @@ public class SAExecuter {
         }
     }
 
-    public <T> T executePutRequestWithSpecialCharacters(String auth, String query, String userId, Object payloadRequest, Class<T> responseValueType, String ts)throws Exception {
+    public <T> T executePutRequestQP(String auth, String query, String userId, Object payloadRequest, Class<T> responseValueType, String ts)throws Exception {
         if(client == null) {
             createConnection();
         }
@@ -272,7 +272,7 @@ public class SAExecuter {
     }
 
 
-    public <T> T executePostRawRequestWithSpecialCharacters(String auth,String query, String userId, Object authRequest, Class<T> valueType, String ts)throws Exception{
+    public <T> T executePostRawRequestQP(String auth,String query, String userId, Object authRequest, Class<T> valueType, String ts)throws Exception{
 
         if(client == null) {
             createConnection();
@@ -903,8 +903,8 @@ public class SAExecuter {
 
     }
 
-    //Run Password Reset (Admin level reset). This method supports special characters for userId.
-    public ResponseObject executeUserPasswordResetWithSpecialCharacters(String auth, String query, String userId, UserPasswordRequest userPasswordRequest, String ts)throws Exception{
+    //Run Password Reset (Admin level reset). This method supports special characters for userId since it uses QP (Query Params) in order to create the request.
+    public ResponseObject executeUserPasswordResetQP(String auth, String query, String userId, UserPasswordRequest userPasswordRequest, String ts)throws Exception{
 
         if(client == null) {
             createConnection();
@@ -964,8 +964,8 @@ public class SAExecuter {
 
     }
 
-    //Run Change Password (Self Service). This method supports special characters for userId.
-    public ResponseObject executeUserPasswordChangeWithSpecialCharacters(String auth, String query, String userId, UserPasswordRequest userPasswordRequest, String ts)throws Exception{
+    //Run Change Password (Self Service). This method supports special characters for userId since it uses QP (Query Params) in order to create the request.
+    public ResponseObject executeUserPasswordChangeQP(String auth, String query, String userId, UserPasswordRequest userPasswordRequest, String ts)throws Exception{
 
         if(client == null) {
             createConnection();

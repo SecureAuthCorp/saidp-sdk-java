@@ -135,9 +135,9 @@ public class IDMImpl implements IDMInterface {
     }
 
     @Override
-    public ResponseObject passwordResetWithSpecialCharacters(SAAccess saAccess, String userId, String password) {
+    public ResponseObject passwordResetQP(SAAccess saAccess, String userId, String password) {
         System.out.println("Start Password Reset " + userId + " Request ++++++++");
-        ResponseObject resetPassword = saAccess.passwordResetWithSpecialCharacters(userId,password);
+        ResponseObject resetPassword = saAccess.passwordResetQP(userId,password);
         if(resetPassword != null){
             System.out.println(resetPassword.toString());
         }else{
@@ -161,9 +161,9 @@ public class IDMImpl implements IDMInterface {
     }
 
     @Override
-    public ResponseObject passwordChangeWithSpecialCharacters(SAAccess saAccess, String userId, String currentPassword, String newPassword) {
+    public ResponseObject passwordChangeQP(SAAccess saAccess, String userId, String currentPassword, String newPassword) {
         System.out.println("Start Password Change " + userId + " Request ++++++++");
-        ResponseObject passwordChange = saAccess.passwordChangeWithSpecialCharacters(userId,currentPassword,newPassword);
+        ResponseObject passwordChange = saAccess.passwordChangeQP(userId,currentPassword,newPassword);
         if(passwordChange != null){
             System.out.println(passwordChange.toString());
         }else{

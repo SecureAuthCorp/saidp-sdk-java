@@ -38,7 +38,7 @@ public interface AuthenticationInterface {
 
     ThrottleResponse sendResetThrottleReq(SAAccess saAccess, String userId);
 
-    ThrottleResponse sendResetThrottleReqWithSpecialCharacters(SAAccess saAccess, String userId);
+    ThrottleResponse sendResetThrottleReqQP(SAAccess saAccess, String userId);
 
     void PushToAccept(SAAccess saAccess, String user, String factorID, String ipAddress) throws InterruptedException;
 

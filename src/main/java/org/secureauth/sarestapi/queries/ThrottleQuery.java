@@ -8,8 +8,8 @@ public class ThrottleQuery {
 		return realm + Resource.APPLIANCE_USERS + userName + Resource.APPLIANCE_THROTTLE;
 	}
 
-// This method supports special characters for userId.
-	public static String queryThrottlesWithSpecialCharacters(String realm){
+// This method supports special characters for userId since it uses QP (Query Params) in order to create the request.
+	public static String queryThrottlesQP(String realm){
 		return realm + Resource.APPLIANCE_USERS_WITH_SPECIAL_CHARACTERS +  Resource.APPLIANCE_THROTTLE;
 	}
 

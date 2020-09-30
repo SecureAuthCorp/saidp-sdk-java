@@ -83,16 +83,16 @@ public class SAAccessTest {
 	}
 
 	@Test
-	public void getUserStatusWhenValidUserWithSpecialCharacters() throws Exception {
+	public void getUserStatusWhenValidUserQP() throws Exception {
 
-		String query = StatusQuery.queryStatusWithSpecialCharacters(saAuth.getRealm());
+		String query = StatusQuery.queryStatusQP(saAuth.getRealm());
 
 		BaseResponse validUserResponse = BaseResponseUtils.validUserResponse(userId);
 		//when
-		when(mockedSAExecuter.executeGetRequestWithSpecialCharacters(any(), eq(saBaseURL.getApplianceURL() + query), any(), any(), any()))
+		when(mockedSAExecuter.executeGetRequestQP(any(), eq(saBaseURL.getApplianceURL() + query), any(), any(), any()))
 						.thenReturn(validUserResponse);
 
-		BaseResponse response = saAccess.getUserStatusWithSpecialCharacters(userId);
+		BaseResponse response = saAccess.getUserStatusQP(userId);
 
 		Assert.assertEquals(validUserResponse, response);
 
@@ -114,13 +114,13 @@ public class SAAccessTest {
 	}
 
 	@Test
-	public void setUserStatusWhenValidStatusWithSpecialCharacters() throws Exception {
-		String query = StatusQuery.queryStatusWithSpecialCharacters(saAuth.getRealm());
+	public void setUserStatusWhenValidStatusQP() throws Exception {
+		String query = StatusQuery.queryStatusQP(saAuth.getRealm());
 		String status = "new status";
 
 		BaseResponse successResponse = BaseResponseUtils.successResponse(userId);
 		//when
-		when(mockedSAExecuter.executePostRawRequestWithSpecialCharacters(any(), eq(saBaseURL.getApplianceURL() + query), userId,
+		when(mockedSAExecuter.executePostRawRequestQP(any(), eq(saBaseURL.getApplianceURL() + query), userId,
 						any(), any(), any())).thenReturn(successResponse);
 
 		BaseResponse response = saAccess.setUserStatus(userId, status);

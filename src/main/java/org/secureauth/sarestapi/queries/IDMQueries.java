@@ -45,9 +45,9 @@ public class IDMQueries {
     }
 
     /*
-    Users Profile. This method supports special characters for userId.
+    Users Profile. This method supports special characters for userId since it uses QP (Query Params) in order to create the request.
     */
-    public static String queryUserProfileWithSpecialCharacters(String realm){
+    public static String queryUserProfileQP(String realm){
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append(realm).append(Resource.APPLIANCE_USERS_WITH_SPECIAL_CHARACTERS);
         return stringBuilder.toString();
@@ -63,9 +63,9 @@ public class IDMQueries {
     }
 
     /*
-    Reset User Password. This method supports special characters for userId.
+    Reset User Password. This method supports special characters for userId since it uses QP (Query Params) in order to create the request.
      */
-    public static String queryUserResetPwdWithSpecialCharacters(String realm){
+    public static String queryUserResetPwdQP(String realm){
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append(realm).append(Resource.APPLIANCE_IDM_USERS_PASSWD_RESET).append(Resource.APPLIANCE_USERS_WITH_SPECIAL_CHARACTERS);
         return stringBuilder.toString();
@@ -81,9 +81,9 @@ public class IDMQueries {
     }
 
     /*
-    User Self-Service Change Password. This method supports special characters for userId.
+    User Self-Service Change Password. This method supports special characters for userId since it uses QP (Query Params) in order to create the request.
      */
-    public static String queryUserChangePwdWithSpecialCharacters(String realm){
+    public static String queryUserChangePwdQP(String realm){
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append(realm).append(Resource.APPLIANCE_IDM_USERS_PASSWD_CHANGE).append(Resource.APPLIANCE_USERS_WITH_SPECIAL_CHARACTERS);
         return stringBuilder.toString();

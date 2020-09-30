@@ -32,7 +32,7 @@ public class FactorsQuery {
     }
 
     //https://{domain}/{realm}/v1/users/factors?username={username}
-    public static String queryFactorsWithSpecialCharacters(String realm) {
+    public static String queryFactorsQP(String realm) {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append(realm).append(Resource.APPLIANCE_USERS_WITH_SPECIAL_CHARACTERS).append(Resource.APPLIANCE_FACTORS);
         return stringBuilder.toString();
