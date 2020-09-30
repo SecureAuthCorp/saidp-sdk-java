@@ -141,7 +141,6 @@ public class SAExecuter {
         WebTarget target;
         Response response;
         T genericResponse = null;
-        URI uri;
         try {
 
             target = encodeQueryUser(query, userId);
@@ -231,7 +230,6 @@ public class SAExecuter {
         WebTarget target = null;
         Response response = null;
         T genericResponse =null;
-        URI uri;
         try{
 
             target = encodeQueryUser(query, userId);
@@ -976,7 +974,6 @@ public class SAExecuter {
         WebTarget target = null;
         Response response = null;
         ResponseObject passwordChangeResponse =null;
-        URI uri;
         try{
 
             target = encodeQueryUser(query, userId);
