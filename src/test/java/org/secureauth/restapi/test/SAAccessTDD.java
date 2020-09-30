@@ -830,4 +830,3 @@ public class SAAccessTDD {
 		assertEquals( "User Id was not found.", response.getMessage() );
 	}
 }
-//TODO: Throttle, changepwd and resetpwd tests
