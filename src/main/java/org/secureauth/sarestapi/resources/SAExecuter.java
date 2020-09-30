@@ -840,20 +840,20 @@ public class SAExecuter {
 
     }
 
-    //Run Password Reset (Admin level reset). Fill userId string when you want to encode and send userId through Query Params.
+    // Run Password Reset (Admin level reset).
     public ResponseObject executeUserPasswordReset(String auth, String query, UserPasswordRequest userPasswordRequest, String ts)throws Exception{
         return executeUserPasswordReset(auth, query, "", userPasswordRequest, ts);
     }
-
+    // Fill userId string when you want to encode and send userId through Query Params.
     public ResponseObject executeUserPasswordReset(String auth, String query, String userId, UserPasswordRequest userPasswordRequest, String ts)throws Exception{
         return executePostRawRequest(auth, query, userId, "", userPasswordRequest, ResponseObject.class,  ts);
     }
 
-    //Run Change Password (Self Service). Fill userId string when you want to encode and send userId through Query Params.
+    // Run Change Password (Self Service).
     public ResponseObject executeUserPasswordChange(String auth, String query, UserPasswordRequest userPasswordRequest, String ts)throws Exception{
         return executeUserPasswordChange(auth, query, "", userPasswordRequest, ts);
     }
-
+    // Fill userId string when you want to encode and send userId through Query Params.
     public ResponseObject executeUserPasswordChange(String auth, String query, String userId, UserPasswordRequest userPasswordRequest, String ts)throws Exception{
 
         if(client == null) {
