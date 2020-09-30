@@ -1061,7 +1061,6 @@ public class SAExecuter {
     }
 
     // Helper function for encoding users with special characters
-    // Checks for groupId null
     private WebTarget encodeQueryUser (String query, String userId) throws Exception{
         return encodeQueryUser(query, userId,"");
     }
