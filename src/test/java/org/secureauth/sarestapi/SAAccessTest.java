@@ -89,7 +89,7 @@ public class SAAccessTest {
 
 		BaseResponse validUserResponse = BaseResponseUtils.validUserResponse(userId);
 		//when
-		when(mockedSAExecuter.executeGetRequestQP(any(), eq(saBaseURL.getApplianceURL() + query), any(), any(), any()))
+		when(mockedSAExecuter.executeGetRequest(any(String.class), eq(saBaseURL.getApplianceURL() + query), eq(userId), any(), any()))
 						.thenReturn(validUserResponse);
 
 		BaseResponse response = saAccess.getUserStatusQP(userId);
@@ -120,10 +120,10 @@ public class SAAccessTest {
 
 		BaseResponse successResponse = BaseResponseUtils.successResponse(userId);
 		//when
-		when(mockedSAExecuter.executePostRawRequestQP(any(), eq(saBaseURL.getApplianceURL() + query), userId,
+		when(mockedSAExecuter.executePostRawRequest(any(), eq(saBaseURL.getApplianceURL() + query), eq(userId), any(),
 						any(), any(), any())).thenReturn(successResponse);
 
-		BaseResponse response = saAccess.setUserStatus(userId, status);
+		BaseResponse response = saAccess.setUserStatusQP(userId, status);
 
 		Assert.assertEquals(successResponse, response);
 	}

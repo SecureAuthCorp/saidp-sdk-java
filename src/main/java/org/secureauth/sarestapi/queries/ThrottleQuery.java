@@ -10,7 +10,11 @@ public class ThrottleQuery {
 
 // This method supports special characters for userId since it uses QP (Query Params) in order to create the request.
 	public static String queryThrottlesQP(String realm){
-		return realm + Resource.APPLIANCE_USERS_WITH_SPECIAL_CHARACTERS +  Resource.APPLIANCE_THROTTLE;
+		return realm + removeLastChar(Resource.APPLIANCE_USERS) +  Resource.APPLIANCE_THROTTLE;
+	}
+
+	private static String removeLastChar (String query){
+		return query.substring(0, query.length()-1);
 	}
 
 }

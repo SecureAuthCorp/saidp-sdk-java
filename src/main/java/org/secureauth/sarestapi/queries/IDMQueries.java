@@ -49,7 +49,7 @@ public class IDMQueries {
     */
     public static String queryUserProfileQP(String realm){
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(realm).append(Resource.APPLIANCE_USERS_WITH_SPECIAL_CHARACTERS);
+        stringBuilder.append(realm).append(removeLastChar(Resource.APPLIANCE_USERS));
         return stringBuilder.toString();
     }
 
@@ -67,7 +67,7 @@ public class IDMQueries {
      */
     public static String queryUserResetPwdQP(String realm){
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(realm).append(Resource.APPLIANCE_IDM_USERS_PASSWD_RESET).append(Resource.APPLIANCE_USERS_WITH_SPECIAL_CHARACTERS);
+        stringBuilder.append(realm).append(Resource.APPLIANCE_IDM_USERS_PASSWD_RESET).append(removeLastChar(Resource.APPLIANCE_USERS));
         return stringBuilder.toString();
     }
 
@@ -85,7 +85,7 @@ public class IDMQueries {
      */
     public static String queryUserChangePwdQP(String realm){
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(realm).append(Resource.APPLIANCE_IDM_USERS_PASSWD_CHANGE).append(Resource.APPLIANCE_USERS_WITH_SPECIAL_CHARACTERS);
+        stringBuilder.append(realm).append(Resource.APPLIANCE_IDM_USERS_PASSWD_CHANGE).append(removeLastChar(Resource.APPLIANCE_USERS));
         return stringBuilder.toString();
     }
 
@@ -134,5 +134,9 @@ public class IDMQueries {
             uee.printStackTrace();
         }
         return encodedGroupId;
+    }
+
+    private static String removeLastChar (String query){
+        return query.substring(0, query.length()-1);
     }
 }

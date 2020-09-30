@@ -107,6 +107,10 @@ public class SAExecuter {
 
     //Get Factors for the user requested
     public <T> T executeGetRequest(String auth, String query, String ts, Class<T> valueType) throws Exception {
+        return executeGetRequest(auth, query, "", ts, valueType);
+    }
+
+    public <T> T executeGetRequest(String auth, String query, String userId, String ts, Class<T> valueType) throws Exception {
         if (client == null) {
             createConnection();
         }
@@ -116,7 +120,12 @@ public class SAExecuter {
         T genericResponse = null;
         try {
 
-            target = client.target(query);
+            if (!userId.isBlank()) {
+                target = encodeQueryUser(query, userId);
+            }
+            else{
+                target = client.target(query);
+            }
             response = target.request().
                     accept(MediaType.APPLICATION_JSON).
                     header("Authorization", auth).
@@ -131,32 +140,6 @@ public class SAExecuter {
 
         return genericResponse;
 
-    }
-
-    public <T> T executeGetRequestQP(String auth, String query, String userId, String ts, Class<T> valueType) throws Exception {
-        if (client == null) {
-            createConnection();
-        }
-
-        WebTarget target;
-        Response response;
-        T genericResponse = null;
-        try {
-
-            target = encodeQueryUser(query, userId);
-            response = target.request()
-                .accept(MediaType.APPLICATION_JSON)
-                .header("Authorization", auth)
-                .header("X-SA-Ext-Date", ts)
-                .get();
-            //consider using response.ok(valueType).build(); instead.
-            genericResponse = response.readEntity(valueType);
-            response.close();
-        } catch (Exception e) {
-            logger.error("Exception Get Request: \nQuery:\n\t" + query + "\nError:" + e.getMessage());
-        }
-
-        return genericResponse;
     }
 
     private String encodedValue(String value) throws UnsupportedEncodingException {
@@ -248,6 +231,10 @@ public class SAExecuter {
     }
 
     public <T> T executePostRawRequest(String auth,String query, Object authRequest, Class<T> valueType, String ts)throws Exception{
+        return executePostRawRequest(auth, query, "", "", authRequest, valueType, ts);
+    }
+
+    public <T> T executePostRawRequest(String auth,String query, String userId, String groupId, Object authRequest, Class<T> valueType, String ts)throws Exception{
 
         if(client == null) {
             createConnection();
@@ -257,7 +244,12 @@ public class SAExecuter {
             Response response = null;
             T responseObject = null;
 
-            target = client.target(query);
+            if (!userId.isBlank()) {
+                target = encodeQueryUser(query, userId, groupId);
+            }
+            else{
+                target = client.target(query);
+            }
             response = target.request().
                     accept(MediaType.APPLICATION_JSON).
                     header("Authorization", auth).
@@ -271,32 +263,11 @@ public class SAExecuter {
         }
     }
 
-
-    public <T> T executePostRawRequestQP(String auth,String query, String userId, Object authRequest, Class<T> valueType, String ts)throws Exception{
-
-        if(client == null) {
-            createConnection();
-        }
-        WebTarget target = null;
-        Response response = null;
-        T responseObject = null;
-
-        try{
-            target = encodeQueryUser(query, userId);
-            response = target.request()
-                            .accept(MediaType.APPLICATION_JSON)
-                            .header("Authorization", auth)
-                            .header("X-SA-Ext-Date", ts)
-                            .post(Entity.entity(JSONUtil.convertObjectToJSON(authRequest),MediaType.APPLICATION_JSON));
-            responseObject = response.readEntity(valueType);
-            response.close();
-            return responseObject;
-        }catch(Exception e){
-            throw new SARestAPIException("Exception Post Request: \nQuery:\n\t" + query + "\nError:" + e.getMessage());
-        }
+    public <T> T executePostRawRequestWithoutPayload(String auth,String query, Class<T> valueType, String ts)throws Exception {
+        return executePostRawRequestWithoutPayload(auth, query, "", "",valueType, ts);
     }
 
-    public <T> T executePostRawRequestWithoutPayload(String auth,String query, Class<T> valueType, String ts)throws Exception{
+    public <T> T executePostRawRequestWithoutPayload(String auth,String query, String userId,String groupId, Class<T> valueType, String ts)throws Exception{
 
         if(client == null) {
             createConnection();
@@ -307,7 +278,12 @@ public class SAExecuter {
         T responseObject = null;
         try{
 
-            target = client.target(query);
+            if (!userId.isBlank()) {
+                target = encodeQueryUser(query, userId, groupId);
+            }
+            else{
+                target = client.target(query);
+            }
             response = target.request().
                     accept(MediaType.APPLICATION_JSON).
                     header("Authorization", auth).
@@ -321,7 +297,11 @@ public class SAExecuter {
         }
     }
 
-    public String executeRawGetRequest(String auth, String query,String ts)throws Exception {
+    public String executeRawGetRequest(String auth, String query, String ts) throws Exception {
+        return executeRawGetRequest(auth, query, "", ts);
+    }
+
+    public String executeRawGetRequest(String auth, String query, String userId, String ts) throws Exception {
         if(client == null) {
             createConnection();
         }
@@ -330,8 +310,12 @@ public class SAExecuter {
         Response response = null;
         String factors=null;
         try{
-
-            target = client.target(query);
+            if (!userId.isBlank()) {
+                target = encodeQueryUser(query, userId);
+            }
+            else{
+                target = client.target(query);
+            }
             response = target.request().
             		accept(MediaType.APPLICATION_JSON).
                     header("Authorization", auth).
@@ -874,63 +858,12 @@ public class SAExecuter {
 
     //Run Password Reset (Admin level reset)
     public ResponseObject executeUserPasswordReset(String auth, String query, UserPasswordRequest userPasswordRequest, String ts)throws Exception{
-
-        if(client == null) {
-            createConnection();
-        }
-
-        WebTarget target = null;
-        Response response = null;
-        ResponseObject passwordResetResponse =null;
-        try{
-            target = client.target(query);
-
-            response = target.request().
-                    accept(MediaType.APPLICATION_JSON).
-                    header("Authorization", auth).
-                    header("X-SA-Ext-Date", ts).
-                    post(Entity.entity(JSONUtil.convertObjectToJSON(userPasswordRequest),MediaType.APPLICATION_JSON));
-
-            passwordResetResponse = response.readEntity(ResponseObject.class);
-
-            response.close();
-        }catch(Exception e){
-            logger.error(new StringBuilder().append("Exception Running Password Reset POST: \nQuery:\n\t")
-                    .append(query).append("\nError:").append(e.getMessage()).toString(), e);
-        }
-
-        return passwordResetResponse;
-
+        return executePostRawRequest(auth, query, userPasswordRequest, ResponseObject.class, ts);
     }
 
     //Run Password Reset (Admin level reset). This method supports special characters for userId since it uses QP (Query Params) in order to create the request.
     public ResponseObject executeUserPasswordResetQP(String auth, String query, String userId, UserPasswordRequest userPasswordRequest, String ts)throws Exception{
-
-        if(client == null) {
-            createConnection();
-        }
-
-        WebTarget target = null;
-        Response response = null;
-        ResponseObject passwordResetResponse =null;
-        try{
-            target = encodeQueryUser(query, userId);
-            response = target.request()
-                            .accept(MediaType.APPLICATION_JSON)
-                            .header("Authorization", auth)
-                            .header("X-SA-Ext-Date", ts)
-                            .post(Entity.entity(JSONUtil.convertObjectToJSON(userPasswordRequest),MediaType.APPLICATION_JSON));
-
-            passwordResetResponse = response.readEntity(ResponseObject.class);
-
-            response.close();
-        }catch(Exception e){
-            logger.error(new StringBuilder().append("Exception Running Password Reset POST: \nQuery:\n\t")
-                                 .append(query).append("\nError:").append(e.getMessage()).toString(), e);
-        }
-
-        return passwordResetResponse;
-
+        return executePostRawRequest(auth, query, userId, "", userPasswordRequest, ResponseObject.class,  ts);
     }
 
     //Run Change Password (Self Service)
@@ -1157,11 +1090,19 @@ public class SAExecuter {
     }
 
     // Helper function for encoding users with special characters
+    // Checks for groupId null
     private WebTarget encodeQueryUser (String query, String userId) throws Exception{
+        return encodeQueryUser(query, userId,"");
+    }
 
-        String encodedUser = encodedValue(userId);
+    private WebTarget encodeQueryUser (String query, String userId, String groupId) throws Exception{
+
         URI uri = URI.create(query);
         WebTarget target = client.target(uri);
+        String encodedUser = encodedValue(userId);
+        if (!groupId.isBlank()) {
+            target.queryParam("groups", encodedValue(groupId));
+        }
         return target.queryParam("username", encodedUser);
     }
 

@@ -32,7 +32,6 @@ public class Resource {
     public static final String APPLIANCE_AUTH="/api/"+ API_VERSION +"/auth";
     public static final String APPLIANCE_AAUTH="/api/"+ API_VERSION +"/adaptauth";
     public static final String APPLIANCE_USERS="/api/"+ API_VERSION + "/users/";
-    public static final String APPLIANCE_USERS_WITH_SPECIAL_CHARACTERS="/api/"+ API_VERSION + "/users";
     public static final String APPLIANCE_AUTHENTICATED = "/api/" + API_VERSION_2 + "/authenticated";
     public static final String APPLIANCE_IDM_USERS="/users/";
     public static final String APPLIANCE_IDM_USERS_PASSWD_RESET="/resetpwd";

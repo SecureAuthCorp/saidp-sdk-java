@@ -165,7 +165,7 @@ public class SAAccess implements ISAAccess{
         String header = RestApiHeader.getAuthorizationHeader(saAuth, Resource.METHOD_GET, FactorsQuery.queryFactorsQP(saAuth.getRealm()), ts);
 
         try{
-            return saExecuter.executeGetRequestQP(header,saBaseURL.getApplianceURL() + FactorsQuery.queryFactorsQP(saAuth.getRealm()), userId, ts, FactorsResponse.class);
+            return saExecuter.executeGetRequest(header,saBaseURL.getApplianceURL() + FactorsQuery.queryFactorsQP(saAuth.getRealm()), userId, ts, FactorsResponse.class);
 
         }catch (Exception e){
             logger.error(new StringBuilder().append("Exception occurred executing REST query::\n").append(e.getMessage()).append("\n").toString(), e);
@@ -391,7 +391,7 @@ public class SAAccess implements ISAAccess{
 
             String header = RestApiHeader.getAuthorizationHeader(saAuth, Resource.METHOD_GET, ThrottleQuery.queryThrottlesQP(saAuth.getRealm()), ts);
 
-            return saExecuter.executeGetRequestQP(header,saBaseURL.getApplianceURL() + ThrottleQuery.queryThrottlesQP(saAuth.getRealm()), userId, ts, ThrottleResponse.class);
+            return saExecuter.executeGetRequest(header,saBaseURL.getApplianceURL() + ThrottleQuery.queryThrottlesQP(saAuth.getRealm()), userId, ts, ThrottleResponse.class);
         }catch (Exception e){
             throw new SARestAPIException("Exception occurred executing REST query:\n" + e.getMessage());
         }
@@ -1191,7 +1191,7 @@ public class SAAccess implements ISAAccess{
         String header = RestApiHeader.getAuthorizationHeader(saAuth,"GET",IDMQueries.queryUserProfileQP(saAuth.getRealm()),ts);
 
         try{
-            return saExecuter.executeGetRequestQP(header,saBaseURL.getApplianceURL() + IDMQueries.queryUserProfileQP(saAuth.getRealm()), userId , ts, UserProfileResponse.class);
+            return saExecuter.executeGetRequest(header,saBaseURL.getApplianceURL() + IDMQueries.queryUserProfileQP(saAuth.getRealm()), userId , ts, UserProfileResponse.class);
 
         }catch (Exception e){
             logger.error("Exception occurred executing REST query:\n" + e.getMessage() + "\n");
@@ -1454,7 +1454,7 @@ public class SAAccess implements ISAAccess{
 
             String header = RestApiHeader.getAuthorizationHeader(saAuth, Resource.METHOD_GET, query, ts);
 
-            return saExecuter.executeGetRequestQP(header,saBaseURL.getApplianceURL() + query, userId, ts, BaseResponse.class);
+            return saExecuter.executeGetRequest(header,saBaseURL.getApplianceURL() + query, userId, ts, BaseResponse.class);
         }catch (Exception e){
             throw new SARestAPIException("Exception occurred executing get user status query", e);
         }
@@ -1503,7 +1503,7 @@ public class SAAccess implements ISAAccess{
 
             String header = RestApiHeader.getAuthorizationHeader(saAuth, Resource.METHOD_POST, query, statusRequestPayload, ts);
 
-            return saExecuter.executePostRawRequestQP(header,saBaseURL.getApplianceURL() + query, userId, statusRequestPayload, BaseResponse.class, ts);
+            return saExecuter.executePostRawRequest(header,saBaseURL.getApplianceURL() + query, userId, "", statusRequestPayload, BaseResponse.class, ts);
 
         }catch (Exception e){
             throw new SARestAPIException("Exception occurred executing set user status query", e);
