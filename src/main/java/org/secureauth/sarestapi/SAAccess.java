@@ -157,15 +157,15 @@ public class SAAccess implements ISAAccess{
      * <p>
      *     Returns the list of Factors available for the specified user supporting special characters
      * </p>
-     * @param userId the userid of the identity you wish to have a list of possible second factors. This method supports special characters.
+     * @param userId the userid of the identity you wish to have a list of possible second factors. This method supports special characters for userId.
      * @return {@link FactorsResponse}
      */
     public FactorsResponse factorsByUserWithSpecialCharacters(String userId) {
         String ts = getServerTime();
-        String header = RestApiHeader.getAuthorizationHeader(saAuth, Resource.METHOD_GET, FactorsQuery.queryFactorsSpecial(saAuth.getRealm()), ts);
+        String header = RestApiHeader.getAuthorizationHeader(saAuth, Resource.METHOD_GET, FactorsQuery.queryFactorsWithSpecialCharacters(saAuth.getRealm()), ts);
 
         try{
-            return saExecuter.executeGetRequestWithSpecialCharacters(header,saBaseURL.getApplianceURL() + FactorsQuery.queryFactorsSpecial(saAuth.getRealm()), userId, ts, FactorsResponse.class);
+            return saExecuter.executeGetRequestWithSpecialCharacters(header,saBaseURL.getApplianceURL() + FactorsQuery.queryFactorsWithSpecialCharacters(saAuth.getRealm()), userId, ts, FactorsResponse.class);
 
         }catch (Exception e){
             logger.error(new StringBuilder().append("Exception occurred executing REST query::\n").append(e.getMessage()).append("\n").toString(), e);
@@ -344,7 +344,7 @@ public class SAAccess implements ISAAccess{
     /**
      * the OTP throttling count to 0 after the end-user successfully authenticates;
      * the attempt count is stored in a directory attribute configured in the Web Admin
-     * @param userId id of user. This method supports special characters.
+     * @param userId id of user. This method supports special characters for userId.
      * @return base answer
      */
     public ThrottleResponse resetThrottleReqWithSpecialCharacters(String userId){
@@ -381,7 +381,7 @@ public class SAAccess implements ISAAccess{
 
     /**
      * GET the end-user's current count of OTP usage attempts
-     * @param userId id of user. This method supports special characters.
+     * @param userId id of user. This method supports special characters for userId.
      * @return base answer
      */
     public ThrottleResponse getThrottleReqWithSpecialCharacters(String userId){
@@ -1183,7 +1183,7 @@ public class SAAccess implements ISAAccess{
      * <p>
      *     Returns the UserProfile for the specified user supporting special characters
      * </p>
-     * @param userId the userid of the identity you wish to have a list of possible second factors. This method supports special characters.
+     * @param userId the userid of the identity you wish to have a list of possible second factors. This method supports special characters for userId.
      * @return {@link UserProfileResponse}
      */
     public UserProfileResponse getUserProfileWithSpecialCharacters(String userId){
@@ -1229,7 +1229,7 @@ public class SAAccess implements ISAAccess{
      * <p>
      *     Administrative Password Reset for the specified user
      * </p>
-     * @param userId the userid of the identity you wish to have a list of possible second factors. This method supports special characters.
+     * @param userId the userid of the identity you wish to have a list of possible second factors. This method supports special characters for userId.
      * @param password the users new password
      * @return {@link ResponseObject}
      */
@@ -1282,7 +1282,7 @@ public class SAAccess implements ISAAccess{
      * <p>
      *     Self Service Password Reset for the specified user
      * </p>
-     * @param userId the userid of the identity you wish to have a list of possible second factors. This method supports special characters.
+     * @param userId the userid of the identity you wish to have a list of possible second factors. This method supports special characters for userId.
      * @param currentPassword the users Current password
      * @param newPassword the users new Password
      * @return {@link ResponseObject}
@@ -1443,7 +1443,7 @@ public class SAAccess implements ISAAccess{
 
     /**
      * Retrieves the user's status from the username in the endpoint URL and returns a response.
-     * @param userId The User ID that you want to validate. This method supports special characters.
+     * @param userId The User ID that you want to validate. This method supports special characters for userId.
      * @return {@link BaseResponse}
      */
     public BaseResponse getUserStatusWithSpecialCharacters(String userId){
@@ -1488,7 +1488,7 @@ public class SAAccess implements ISAAccess{
 
     /**
      * Method invokes a status to the user Id.
-     * @param userId The User ID that you want to change status. This method supports special characters.
+     * @param userId The User ID that you want to change status. This method supports special characters for userId.
      * @param status The new status [lock, unlock, enable, disable]
      * @return {@link BaseResponse}
      */

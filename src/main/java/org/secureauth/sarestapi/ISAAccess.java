@@ -47,7 +47,7 @@ public interface ISAAccess {
 	 * <p>
 	 *     Returns the list of Factors available for the specified user
 	 * </p>
-	 * @param userId the userid of the identity you wish to have a list of possible second factors. This method supports special characters.
+	 * @param userId the userid of the identity you wish to have a list of possible second factors. This method supports special characters for userId.
 	 * @return {@link FactorsResponse}
 	 */
 	FactorsResponse factorsByUserWithSpecialCharacters(String userId);
@@ -421,7 +421,7 @@ public interface ISAAccess {
 	 * <p>
 	 *     Returns the UserProfile for the specified user supporting special characters
 	 * </p>
-	 * @param userId the userid of the identity you wish to have a list of possible second factors. This method supports special characters.
+	 * @param userId the userid of the identity you wish to have a list of possible second factors. This method supports special characters for userId.
 	 * @return {@link UserProfileResponse}
 	 */
 	UserProfileResponse getUserProfileWithSpecialCharacters(String userId);
@@ -440,7 +440,7 @@ public interface ISAAccess {
 	 * <p>
 	 *     Administrative Password Reset for the specified user
 	 * </p>
-	 * @param userId the userid of the identity you wish to have a list of possible second factors. This method supports special characters.
+	 * @param userId the userid of the identity you wish to have a list of possible second factors. This method supports special characters for userId.
 	 * @param password the users new password
 	 * @return {@link ResponseObject}
 	 */
@@ -461,7 +461,7 @@ public interface ISAAccess {
 	 * <p>
 	 *     Self Service Password Reset for the specified user
 	 * </p>
-	 * @param userId the userid of the identity you wish to have a list of possible second factors. This method supports special characters.
+	 * @param userId the userid of the identity you wish to have a list of possible second factors. This method supports special characters for userId.
 	 * @param currentPassword the users Current password
 	 * @param newPassword the users new Password
 	 * @return {@link ResponseObject}
@@ -506,7 +506,7 @@ public interface ISAAccess {
 
 	/**
 	 * Retrieves the user's status from the username in the endpoint URL and returns a response.
-	 * @param userId The User ID that you want to validate. This method supports special characters.
+	 * @param userId The User ID that you want to validate. This method supports special characters for userId.
 	 * @return {@link BaseResponse}
 	 */
 	BaseResponse getUserStatusWithSpecialCharacters(String userId);
@@ -521,7 +521,7 @@ public interface ISAAccess {
 
 	/**
 	 * Method invokes a status to the user Id.
-	 * @param userId The User ID that you want to change status. This method supports special characters.
+	 * @param userId The User ID that you want to change status. This method supports special characters for userId.
 	 * @param status The new status [lock, unlock, enable, disable]
 	 * @return {@link BaseResponse}
 	 */

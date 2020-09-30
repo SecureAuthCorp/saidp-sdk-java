@@ -903,7 +903,7 @@ public class SAExecuter {
 
     }
 
-    //Run Password Reset (Admin level reset). This method supports special characters.
+    //Run Password Reset (Admin level reset). This method supports special characters for userId.
     public ResponseObject executeUserPasswordResetWithSpecialCharacters(String auth, String query, String userId, UserPasswordRequest userPasswordRequest, String ts)throws Exception{
 
         if(client == null) {
@@ -964,7 +964,7 @@ public class SAExecuter {
 
     }
 
-    //Run Change Password (Self Service). This method supports special characters.
+    //Run Change Password (Self Service). This method supports special characters for userId.
     public ResponseObject executeUserPasswordChangeWithSpecialCharacters(String auth, String query, String userId, UserPasswordRequest userPasswordRequest, String ts)throws Exception{
 
         if(client == null) {
