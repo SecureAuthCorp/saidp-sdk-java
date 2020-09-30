@@ -47,6 +47,21 @@ public class IDMImpl implements IDMInterface {
     }
 
     @Override
+    public ResponseObject updateUserQP(SAAccess saAccess, String userId, NewUserProfile newUserProfile) {
+        System.out.println("START Update user " + userId + " Request ++++++++");
+        ResponseObject updateUser = saAccess.updateUserQP(userId,newUserProfile);
+        if(updateUser != null){
+            System.out.println(updateUser.toString());
+            System.out.println("END Update User " + userId + " Request ++++++++");
+            return updateUser;
+        }else{
+            System.out.println("Null Object you messed up");
+        }
+        System.out.println("END Update User " + userId + " Request ++++++++");
+        return null;
+    }
+
+    @Override
     public ResponseObject addUserToGroup(SAAccess saAccess, String userId, String groupName) {
         System.out.println("START Update user " + userId + " Request ++++++++");
         ResponseObject groupAssociationResponse = saAccess.addUserToGroup(userId,groupName);
