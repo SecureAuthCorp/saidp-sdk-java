@@ -355,7 +355,7 @@ public class SAAccess implements ISAAccess{
 
             String header = RestApiHeader.getAuthorizationHeader(saAuth, Resource.METHOD_PUT, ThrottleQuery.queryThrottlesQP(saAuth.getRealm()), throttleRequest, ts);
 
-            return saExecuter.executePutRequestQP(header,saBaseURL.getApplianceURL() + ThrottleQuery.queryThrottlesQP(saAuth.getRealm()), userId, throttleRequest,ThrottleResponse.class, ts);
+            return saExecuter.executePutRequest(header,saBaseURL.getApplianceURL() + ThrottleQuery.queryThrottlesQP(saAuth.getRealm()), userId, throttleRequest,ThrottleResponse.class, ts);
         }catch (Exception e){
             throw new SARestAPIException("Exception occurred executing REST query:\n" + e.getMessage());
         }

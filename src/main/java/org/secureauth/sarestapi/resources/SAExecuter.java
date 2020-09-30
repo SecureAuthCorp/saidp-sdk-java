@@ -181,6 +181,10 @@ public class SAExecuter {
     }
 
     public <T> T executePutRequest(String auth, String query, Object payloadRequest, Class<T> responseValueType, String ts)throws Exception {
+        return executePutRequest(auth, query, "", payloadRequest, responseValueType, ts);
+    }
+
+    public <T> T executePutRequest(String auth, String query, String userId, Object payloadRequest, Class<T> responseValueType, String ts)throws Exception {
         if(client == null) {
             createConnection();
         }
@@ -190,37 +194,17 @@ public class SAExecuter {
         T genericResponse =null;
         try{
 
-            target = client.target(query);
+            if (!userId.isBlank()) {
+                target = encodeQueryUser(query, userId);
+            }
+            else{
+                target = client.target(query);
+            }
             response = target.request().
                     accept(MediaType.APPLICATION_JSON).
                     header("Authorization", auth).
                     header("X-SA-Ext-Date", ts).
                     put(Entity.entity(JSONUtil.convertObjectToJSON(payloadRequest),MediaType.APPLICATION_JSON));
-            //consider using response.ok(valueType).build(); instead.
-            genericResponse = response.readEntity(responseValueType);
-            response.close();
-            return genericResponse;
-        }catch(Exception e){
-            throw new SARestAPIException("Exception Put Request: \nQuery:\n\t" + query + "\nError:" + e.getMessage());
-        }
-    }
-
-    public <T> T executePutRequestQP(String auth, String query, String userId, Object payloadRequest, Class<T> responseValueType, String ts)throws Exception {
-        if(client == null) {
-            createConnection();
-        }
-
-        WebTarget target = null;
-        Response response = null;
-        T genericResponse =null;
-        try{
-
-            target = encodeQueryUser(query, userId);
-            response = target.request()
-                    .accept(MediaType.APPLICATION_JSON)
-                    .header("Authorization", auth)
-                    .header("X-SA-Ext-Date", ts)
-                    .put(Entity.entity(JSONUtil.convertObjectToJSON(payloadRequest),MediaType.APPLICATION_JSON));
             //consider using response.ok(valueType).build(); instead.
             genericResponse = response.readEntity(responseValueType);
             response.close();
