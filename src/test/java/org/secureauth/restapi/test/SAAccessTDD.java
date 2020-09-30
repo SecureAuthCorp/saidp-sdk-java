@@ -468,9 +468,9 @@ public class SAAccessTDD {
 	public void testCreateUserProfileKBQKBAOrderedValid() throws Exception {
 
 		NewUserProfile newUserProfile = new NewUserProfile();
-		newUserProfile.getKnowledgeBase().put("nonFormated1", new UserProfileKB("kbq1", "kba1"));
-		newUserProfile.getKnowledgeBase().put("nonFormated2", new UserProfileKB("kbq2", "kba2"));
-		newUserProfile.getKnowledgeBase().put("nonFormated3", new UserProfileKB("kbq3", "kba3"));
+		newUserProfile.getKnowledgeBase().put("NonFormated2", new UserProfileKB("Kbq2", "kba2"));
+		newUserProfile.getKnowledgeBase().put("nOnFormated3", new UserProfileKB("kbq3", "kba3"));
+		newUserProfile.getKnowledgeBase().put("nonFormated1", new UserProfileKB("kBq1", "kba1"));
 		newUserProfile.setPassword(validPassword);
 		newUserProfile.setUserId(String.valueOf(randomNumberBetween(1, 1000)));
 		NewUserProfileProperties newUserProfileProperties = new NewUserProfileProperties();
