@@ -840,18 +840,21 @@ public class SAExecuter {
 
     }
 
-    //Run Password Reset (Admin level reset)
+    //Run Password Reset (Admin level reset). This method supports special characters for userId since it uses QP (Query Params) in order to create the request.
     public ResponseObject executeUserPasswordReset(String auth, String query, UserPasswordRequest userPasswordRequest, String ts)throws Exception{
-        return executePostRawRequest(auth, query, userPasswordRequest, ResponseObject.class, ts);
+        return executeUserPasswordReset(auth, query, "", userPasswordRequest, ts);
     }
 
-    //Run Password Reset (Admin level reset). This method supports special characters for userId since it uses QP (Query Params) in order to create the request.
-    public ResponseObject executeUserPasswordResetQP(String auth, String query, String userId, UserPasswordRequest userPasswordRequest, String ts)throws Exception{
+    public ResponseObject executeUserPasswordReset(String auth, String query, String userId, UserPasswordRequest userPasswordRequest, String ts)throws Exception{
         return executePostRawRequest(auth, query, userId, "", userPasswordRequest, ResponseObject.class,  ts);
     }
 
-    //Run Change Password (Self Service)
+    //Run Change Password (Self Service). This method supports special characters for userId since it uses QP (Query Params) in order to create the request.
     public ResponseObject executeUserPasswordChange(String auth, String query, UserPasswordRequest userPasswordRequest, String ts)throws Exception{
+        return executeUserPasswordChange(auth, query, "", userPasswordRequest, ts);
+    }
+
+    public ResponseObject executeUserPasswordChange(String auth, String query, String userId, UserPasswordRequest userPasswordRequest, String ts)throws Exception{
 
         if(client == null) {
             createConnection();
@@ -861,13 +864,17 @@ public class SAExecuter {
         Response response = null;
         ResponseObject passwordChangeResponse =null;
         try{
-            target = client.target(query);
-
-            response = target.request().
-                    accept(MediaType.APPLICATION_JSON).
-                    header("Authorization", auth).
-                    header("X-SA-Ext-Date", ts).
-                    post(Entity.entity(JSONUtil.convertObjectToJSON(userPasswordRequest),MediaType.APPLICATION_JSON));
+            if (!userId.isBlank()) {
+                target = encodeQueryUser(query, userId);
+            }
+            else{
+                target = client.target(query);
+            }
+            response = target.request()
+                               .accept(MediaType.APPLICATION_JSON)
+                               .header("Authorization", auth)
+                               .header("X-SA-Ext-Date", ts)
+                               .post(Entity.entity(JSONUtil.convertObjectToJSON(userPasswordRequest),MediaType.APPLICATION_JSON));
 
             passwordChangeResponse = response.readEntity(ResponseObject.class);
 
@@ -875,37 +882,6 @@ public class SAExecuter {
         }catch(Exception e){
             logger.error(new StringBuilder().append("Exception Running Password Reset POST: \nQuery:\n\t")
                     .append(query).append("\nError:").append(e.getMessage()).toString(), e);
-        }
-
-        return passwordChangeResponse;
-
-    }
-
-    //Run Change Password (Self Service). This method supports special characters for userId since it uses QP (Query Params) in order to create the request.
-    public ResponseObject executeUserPasswordChangeQP(String auth, String query, String userId, UserPasswordRequest userPasswordRequest, String ts)throws Exception{
-
-        if(client == null) {
-            createConnection();
-        }
-
-        WebTarget target = null;
-        Response response = null;
-        ResponseObject passwordChangeResponse =null;
-        try{
-
-            target = encodeQueryUser(query, userId);
-            response = target.request()
-                            .accept(MediaType.APPLICATION_JSON)
-                            .header("Authorization", auth)
-                            .header("X-SA-Ext-Date", ts)
-                            .post(Entity.entity(JSONUtil.convertObjectToJSON(userPasswordRequest),MediaType.APPLICATION_JSON));
-
-            passwordChangeResponse = response.readEntity(ResponseObject.class);
-
-            response.close();
-        }catch(Exception e){
-            logger.error(new StringBuilder().append("Exception Running Password Reset POST: \nQuery:\n\t")
-                                 .append(query).append("\nError:").append(e.getMessage()).toString(), e);
         }
 
         return passwordChangeResponse;

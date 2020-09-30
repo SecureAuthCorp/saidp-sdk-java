@@ -1243,7 +1243,7 @@ public class SAAccess implements ISAAccess{
 
 
         try{
-            return saExecuter.executeUserPasswordResetQP(header,saBaseURL.getApplianceURL() + IDMQueries.queryUserResetPwdQP(saAuth.getRealm()), userId,userPasswordRequest,ts);
+            return saExecuter.executeUserPasswordReset(header,saBaseURL.getApplianceURL() + IDMQueries.queryUserResetPwdQP(saAuth.getRealm()), userId,userPasswordRequest,ts);
 
         }catch (Exception e){
             logger.error(new StringBuilder().append("Exception occurred executing REST query::\n").append(e.getMessage()).append("\n").toString(), e);
@@ -1297,7 +1297,7 @@ public class SAAccess implements ISAAccess{
 
 
         try{
-            return saExecuter.executeUserPasswordChangeQP(header,saBaseURL.getApplianceURL() + IDMQueries.queryUserChangePwdQP(saAuth.getRealm()), userId, userPasswordRequest, ts);
+            return saExecuter.executeUserPasswordChange(header,saBaseURL.getApplianceURL() + IDMQueries.queryUserChangePwdQP(saAuth.getRealm()), userId, userPasswordRequest, ts);
 
         }catch (Exception e){
             logger.error(new StringBuilder().append("Exception occurred executing REST query::\n").append(e.getMessage()).append("\n").toString(), e);
