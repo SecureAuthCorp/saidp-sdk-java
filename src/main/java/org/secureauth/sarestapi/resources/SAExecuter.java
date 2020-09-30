@@ -953,6 +953,11 @@ public class SAExecuter {
         return executePostRawRequestWithoutPayload(auth, query, valueType, ts);
     }
 
+    //Single User to Single Group
+    public <T> T executeSingleUserToSingleGroup(String auth, String query, String userId, String groupId, String ts, Class<T> valueType)throws Exception {
+        return executePostRawRequestWithoutPayload(auth, query, userId, groupId, valueType, ts);
+    }
+
     //Single Group Multiple Users
     public <T> T executeGroupToUsersRequest(String auth, String query, UsersToGroup usersToGroup, String ts, Class<T> valueType)throws Exception{
         return executePostRawRequest(auth, query, usersToGroup, valueType, ts);
@@ -961,7 +966,13 @@ public class SAExecuter {
 
     //Single Group to Single User
     public <T> T executeSingleGroupToSingleUser(String auth, String query, String ts, Class<T> valueType)throws Exception {
-        return executePostRawRequestWithoutPayload(auth, query, valueType, ts);
+        return executeSingleGroupToSingleUser(auth, query, "", "", ts, valueType);
+
+    }
+
+    //Single Group to Single User
+    public <T> T executeSingleGroupToSingleUser(String auth, String query, String userId, String groupId, String ts, Class<T> valueType)throws Exception {
+        return executePostRawRequestWithoutPayload(auth, query, userId, groupId, valueType, ts);
 
     }
 

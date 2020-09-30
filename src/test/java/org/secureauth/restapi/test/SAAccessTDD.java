@@ -45,6 +45,7 @@ public class SAAccessTDD {
 	private static String validPin;
 	private static String validPassword;
 	private final static String UNEXISTING_USERNAME = "unexisting-user";
+	private final static String UNEXISTING_USERNAME_QP = UNEXISTING_USERNAME + "!@#$%^&*(";
 
 	//DFP
 	private static String validFingerprintId;
@@ -231,7 +232,7 @@ public class SAAccessTDD {
 			}
 		 */
 
-		UserProfileResponse response = saAccess.getUserProfileQP(UNEXISTING_USERNAME + "!@#$%^&*(");
+		UserProfileResponse response = saAccess.getUserProfileQP(UNEXISTING_USERNAME_QP);
 		assertNotNull(response);
 		// If the special characters are not being recognised then we should get some sort of reject instead of a NOT_FOUND_MESSAGE here
 		assertEquals(NOT_FOUND_MESSAGE, response.getStatus());
@@ -432,7 +433,7 @@ public class SAAccessTDD {
 			}
 		 */
 
-		FactorsResponse response = saAccess.factorsByUserQP(UNEXISTING_USERNAME + "!@#$%^&*(");
+		FactorsResponse response = saAccess.factorsByUserQP(UNEXISTING_USERNAME_QP);
 		assertNotNull(response);
 		assertEquals(NOT_FOUND_MESSAGE, response.getStatus());
 		assertEquals("User Id was not found.", response.getMessage());
@@ -482,7 +483,7 @@ public class SAAccessTDD {
 			}
 		 */
 
-		BaseResponse response = saAccess.validateUser(UNEXISTING_USERNAME);
+		BaseResponse response = saAccess.validateUser(UNEXISTING_USERNAME_QP);
 		assertNotNull(response);
 		assertEquals(response.getStatus(), NOT_FOUND_MESSAGE);
 		assertEquals(response.getMessage(), "User Id was not found.");

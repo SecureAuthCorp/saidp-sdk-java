@@ -37,6 +37,7 @@ public class SAAccessTest {
 	private final static String host = "foobar.com";
 	private final static String port = "443";
 	private final static String userId = "foobar";
+	private final static String userIdQP = "foobar!@#$%^&(*";
 	private final static String passCode = "foobar";
 	private static SAAuth saAuth;
 	private static ISAAccess saAccess;
@@ -87,12 +88,12 @@ public class SAAccessTest {
 
 		String query = StatusQuery.queryStatusQP(saAuth.getRealm());
 
-		BaseResponse validUserResponse = BaseResponseUtils.validUserResponse(userId);
+		BaseResponse validUserResponse = BaseResponseUtils.validUserResponse(userIdQP);
 		//when
-		when(mockedSAExecuter.executeGetRequest(any(String.class), eq(saBaseURL.getApplianceURL() + query), eq(userId), any(), any()))
+		when(mockedSAExecuter.executeGetRequest(any(String.class), eq(saBaseURL.getApplianceURL() + query), eq(userIdQP), any(), any()))
 						.thenReturn(validUserResponse);
 
-		BaseResponse response = saAccess.getUserStatusQP(userId);
+		BaseResponse response = saAccess.getUserStatusQP(userIdQP);
 
 		Assert.assertEquals(validUserResponse, response);
 
@@ -118,12 +119,12 @@ public class SAAccessTest {
 		String query = StatusQuery.queryStatusQP(saAuth.getRealm());
 		String status = "new status";
 
-		BaseResponse successResponse = BaseResponseUtils.successResponse(userId);
+		BaseResponse successResponse = BaseResponseUtils.successResponse(userIdQP);
 		//when
-		when(mockedSAExecuter.executePostRawRequest(any(), eq(saBaseURL.getApplianceURL() + query), eq(userId), any(),
+		when(mockedSAExecuter.executePostRawRequest(any(), eq(saBaseURL.getApplianceURL() + query), eq(userIdQP), any(),
 						any(), any(), any())).thenReturn(successResponse);
 
-		BaseResponse response = saAccess.setUserStatusQP(userId, status);
+		BaseResponse response = saAccess.setUserStatusQP(userIdQP, status);
 
 		Assert.assertEquals(successResponse, response);
 	}
@@ -139,6 +140,21 @@ public class SAAccessTest {
 				any(), eq(ResponseObject.class))).thenReturn(validResponse);
 
 		ResponseObject response = saAccess.addUserToGroup(userId, groupName);
+
+		Assert.assertEquals(validResponse, response);
+	}
+
+	@Test
+	public void addUserToGroupWhenValidQP() throws Exception {
+		String groupName = "newGroup!@#$%^&(*";
+
+		ResponseObject validResponse = BaseResponseUtils.validResponse();
+		//when
+		when(mockedSAExecuter.executeSingleUserToSingleGroup(any(),
+						eq(saBaseURL.getApplianceURL() + IDMQueries.queryUserToGroupQP(saAuth.getRealm())), eq(userIdQP), eq(groupName),
+						any(), eq(ResponseObject.class))).thenReturn(validResponse);
+
+		ResponseObject response = saAccess.addUserToGroupQP(userIdQP, groupName);
 
 		Assert.assertEquals(validResponse, response);
 	}
@@ -174,6 +190,23 @@ public class SAAccessTest {
 				eq(GroupAssociationResponse.class))).thenReturn(validResponse);
 
 		GroupAssociationResponse response = saAccess.addGroupToUser(groupName, userId);
+
+		Assert.assertEquals(validResponse, response);
+	}
+
+	@Test
+	public void addGroupToUserWhenValidQP() throws Exception {
+		String groupName = "newGroup!@#$%^&(*";
+
+		GroupAssociationResponse validResponse = BaseResponseUtils.validGroupAssociationResponse();
+
+		UsersToGroup usersToGroup = new UsersToGroup(new String[]{groupName});
+		//when
+		when(mockedSAExecuter.executeSingleGroupToSingleUser(any(String.class),
+						eq(saBaseURL.getApplianceURL() + IDMQueries.queryGroupToUserQP(saAuth.getRealm())), eq(userIdQP), eq(groupName), any(),
+						eq(GroupAssociationResponse.class))).thenReturn(validResponse);
+
+		GroupAssociationResponse response = saAccess.addGroupToUserQP(groupName, userIdQP);
 
 		Assert.assertEquals(validResponse, response);
 	}

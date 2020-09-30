@@ -380,6 +380,16 @@ public interface ISAAccess {
 
 	/**
 	 * <p>
+	 *     Associate User to Group
+	 * </p>
+	 * @param userId the user id of the identity. This method supports special characters for userId since it uses QP (Query Params) in order to create the request.
+	 * @param groupName The Name of the group to associate the user to
+	 * @return {@link GroupAssociationResponse}
+	 */
+	ResponseObject addUserToGroupQP(String userId, String groupName);
+
+	/**
+	 * <p>
 	 *     Associate Group to Users
 	 * </p>
 	 * @param usersToGroup The Users to Group object holding the userIds
@@ -397,6 +407,16 @@ public interface ISAAccess {
 	 * @return {@link GroupAssociationResponse}
 	 */
 	GroupAssociationResponse addGroupToUser(String groupName, String userId);
+
+	/**
+	 * <p>
+	 *     Associate Group to User
+	 * </p>
+	 * @param groupName the Group Name
+	 * @param userId The userId to associate to the group. This method supports special characters for userId since it uses QP (Query Params) in order to create the request.
+	 * @return {@link GroupAssociationResponse}
+	 */
+	GroupAssociationResponse addGroupToUserQP(String groupName, String userId);
 
 	/**
 	 * <p>

@@ -1102,6 +1102,26 @@ public class SAAccess implements ISAAccess{
 
     /**
      * <p>
+     *     Associate User to Group
+     *     This method supports special characters for userId since it uses QP (Query Params) in order to create the request.
+     * </p>
+     * @param userId the user id of the identity
+     * @param groupName The Name of the group to associate the user to
+     * @return {@link GroupAssociationResponse}
+     */
+    public ResponseObject addUserToGroupQP(String userId, String groupName){
+        try{
+            String ts = getServerTime();
+            String header = RestApiHeader.getAuthorizationHeader(saAuth,"POST", IDMQueries.queryUserToGroupQP(saAuth.getRealm()),ts);
+
+            return saExecuter.executeSingleUserToSingleGroup(header,saBaseURL.getApplianceURL() + IDMQueries.queryUserToGroupQP(saAuth.getRealm()), userId, groupName, ts, ResponseObject.class);
+        }catch (Exception e){
+            throw new SARestAPIException("Exception occurred executing REST query:\n" + e.getMessage() + "\n", e);
+        }
+    }
+
+    /**
+     * <p>
      *     Associate Group to Users
      * </p>
      * @param usersToGroup The Users to Group object holding the userIds
@@ -1135,6 +1155,26 @@ public class SAAccess implements ISAAccess{
             String header = RestApiHeader.getAuthorizationHeader(saAuth,"POST", IDMQueries.queryGroupToUser(saAuth.getRealm(),userId,groupName),ts);
 
             return saExecuter.executeSingleGroupToSingleUser(header,saBaseURL.getApplianceURL() + IDMQueries.queryGroupToUser(saAuth.getRealm(),userId,groupName), ts, GroupAssociationResponse.class);
+        }catch (Exception e){
+            throw new SARestAPIException("Exception occurred executing REST query:\n" + e.getMessage() + "\n", e);
+        }
+    }
+
+    /**
+     * <p>
+     *     Associate Group to User
+     * </p>
+     * @param groupName the Group Name
+     * @param userId The userId to associate to the group
+     * @return {@link GroupAssociationResponse}
+     */
+    public GroupAssociationResponse addGroupToUserQP(String groupName, String userId){
+        try{
+            String ts = getServerTime();
+
+            String header = RestApiHeader.getAuthorizationHeader(saAuth,"POST", IDMQueries.queryGroupToUserQP(saAuth.getRealm()), userId,ts);
+
+            return saExecuter.executeSingleGroupToSingleUser(header,saBaseURL.getApplianceURL() + IDMQueries.queryGroupToUserQP(saAuth.getRealm()), userId, groupName, ts, GroupAssociationResponse.class);
         }catch (Exception e){
             throw new SARestAPIException("Exception occurred executing REST query:\n" + e.getMessage() + "\n", e);
         }
