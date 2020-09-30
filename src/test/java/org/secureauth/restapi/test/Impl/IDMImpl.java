@@ -107,43 +107,70 @@ public class IDMImpl implements IDMInterface {
     }
 
     @Override
-    public UserProfileResponse getUserProfile(SAAccess saAccess, String userid) {
-        System.out.println("START Get User Profile for " + userid + " Request ++++++++");
-        UserProfileResponse userProfileResponse = saAccess.getUserProfile(userid);
+    public UserProfileResponse getUserProfile(SAAccess saAccess, String userId) {
+        System.out.println("START Get User Profile for " + userId + " Request ++++++++");
+        UserProfileResponse userProfileResponse = saAccess.getUserProfile(userId);
         if(userProfileResponse != null){
             System.out.println(userProfileResponse.toString());
-            System.out.println("END Get User Profile for " + userid + " Request ++++++++");
+            System.out.println("END Get User Profile for " + userId + " Request ++++++++");
             return userProfileResponse;
         }else{
             System.out.println("Null Object you messed up");
         }
-        System.out.println("END Get User Profile for " + userid + " Request ++++++++");
+        System.out.println("END Get User Profile for " + userId + " Request ++++++++");
         return null;
     }
 
     @Override
-    public ResponseObject passwordReset(SAAccess saAccess, String userid, String password) {
-        System.out.println("Start Password Reset " + userid + " Request ++++++++");
-        ResponseObject resetPassword = saAccess.passwordReset(userid,password);
+    public ResponseObject passwordReset(SAAccess saAccess, String userId, String password) {
+        System.out.println("Start Password Reset " + userId + " Request ++++++++");
+        ResponseObject resetPassword = saAccess.passwordReset(userId,password);
         if(resetPassword != null){
             System.out.println(resetPassword.toString());
         }else{
             System.out.println("Failed");
         }
-        System.out.println("END Password Reset " + userid + " Request ++++++++");
+        System.out.println("END Password Reset " + userId + " Request ++++++++");
         return null;
     }
 
     @Override
-    public ResponseObject passwordChange(SAAccess saAccess, String userid, String currentPassword, String newPassword) {
-        System.out.println("Start Password Change " + userid + " Request ++++++++");
-        ResponseObject passwordChange = saAccess.passwordChange(userid,currentPassword,newPassword);
+    public ResponseObject passwordResetQP(SAAccess saAccess, String userId, String password) {
+        System.out.println("Start Password Reset " + userId + " Request ++++++++");
+        ResponseObject resetPassword = saAccess.passwordResetQP(userId,password);
+        if(resetPassword != null){
+            System.out.println(resetPassword.toString());
+        }else{
+            System.out.println("Failed");
+        }
+        System.out.println("END Password Reset " + userId + " Request ++++++++");
+        return null;
+    }
+
+    @Override
+    public ResponseObject passwordChange(SAAccess saAccess, String userId, String currentPassword, String newPassword) {
+        System.out.println("Start Password Change " + userId + " Request ++++++++");
+        ResponseObject passwordChange = saAccess.passwordChange(userId,currentPassword,newPassword);
         if(passwordChange != null){
             System.out.println(passwordChange.toString());
         }else{
             System.out.println("Failed");
         }
-        System.out.println("END Password Change " + userid + " Request ++++++++");
+        System.out.println("END Password Change " + userId + " Request ++++++++");
         return null;
     }
+
+    @Override
+    public ResponseObject passwordChangeQP(SAAccess saAccess, String userId, String currentPassword, String newPassword) {
+        System.out.println("Start Password Change " + userId + " Request ++++++++");
+        ResponseObject passwordChange = saAccess.passwordChangeQP(userId,currentPassword,newPassword);
+        if(passwordChange != null){
+            System.out.println(passwordChange.toString());
+        }else{
+            System.out.println("Failed");
+        }
+        System.out.println("END Password Change " + userId + " Request ++++++++");
+        return null;
+    }
+
 }

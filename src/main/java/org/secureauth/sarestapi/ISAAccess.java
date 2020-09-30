@@ -45,6 +45,15 @@ public interface ISAAccess {
 
 	/**
 	 * <p>
+	 *     Returns the list of Factors available for the specified user
+	 * </p>
+	 * @param userId the userid of the identity you wish to have a list of possible second factors. This method supports special characters for userId since it uses QP (Query Params) in order to create the request.
+	 * @return {@link FactorsResponse}
+	 */
+	FactorsResponse factorsByUserQP(String userId);
+
+	/**
+	 * <p>
 	 *     Send push to accept request asynchronously
 	 * </p>
 	 *
@@ -103,6 +112,15 @@ public interface ISAAccess {
 	 * @return base answer
 	 */
 	ThrottleResponse resetThrottleReq(String userId);
+
+	/**
+	 * the OTP throttling count to 0 after the end-user successfully authenticates;
+	 * the attempt count is stored in a directory attribute configured in the Web Admin
+	 * this method supports special characters
+	 * @param userId id of user
+	 * @return base answer
+	 */
+	ThrottleResponse resetThrottleReqQP(String userId);
 
 	/**
 	 * GET the end-user's current count of OTP usage attempts
@@ -362,6 +380,16 @@ public interface ISAAccess {
 
 	/**
 	 * <p>
+	 *     Associate User to Group
+	 * </p>
+	 * @param userId the user id of the identity. This method supports special characters for userId since it uses QP (Query Params) in order to create the request.
+	 * @param groupName The Name of the group to associate the user to
+	 * @return {@link GroupAssociationResponse}
+	 */
+	ResponseObject addUserToGroupQP(String userId, String groupName);
+
+	/**
+	 * <p>
 	 *     Associate Group to Users
 	 * </p>
 	 * @param usersToGroup The Users to Group object holding the userIds
@@ -379,6 +407,16 @@ public interface ISAAccess {
 	 * @return {@link GroupAssociationResponse}
 	 */
 	GroupAssociationResponse addGroupToUser(String groupName, String userId);
+
+	/**
+	 * <p>
+	 *     Associate Group to User
+	 * </p>
+	 * @param groupName the Group Name
+	 * @param userId The userId to associate to the group. This method supports special characters for userId since it uses QP (Query Params) in order to create the request.
+	 * @return {@link GroupAssociationResponse}
+	 */
+	GroupAssociationResponse addGroupToUserQP(String groupName, String userId);
 
 	/**
 	 * <p>
@@ -401,6 +439,15 @@ public interface ISAAccess {
 
 	/**
 	 * <p>
+	 *     Returns the UserProfile for the specified user supporting special characters
+	 * </p>
+	 * @param userId the userid of the identity you wish to have a list of possible second factors. This method supports special characters for userId since it uses QP (Query Params) in order to create the request.
+	 * @return {@link UserProfileResponse}
+	 */
+	UserProfileResponse getUserProfileQP(String userId);
+
+	/**
+	 * <p>
 	 *     Administrative Password Reset for the specified user
 	 * </p>
 	 * @param userId the userid of the identity you wish to have a list of possible second factors
@@ -408,6 +455,16 @@ public interface ISAAccess {
 	 * @return {@link ResponseObject}
 	 */
 	ResponseObject passwordReset(String userId, String password);
+
+	/**
+	 * <p>
+	 *     Administrative Password Reset for the specified user
+	 * </p>
+	 * @param userId the userid of the identity you wish to have a list of possible second factors. This method supports special characters for userId since it uses QP (Query Params) in order to create the request.
+	 * @param password the users new password
+	 * @return {@link ResponseObject}
+	 */
+	ResponseObject passwordResetQP(String userId, String password);
 
 	/**
 	 * <p>
@@ -419,6 +476,17 @@ public interface ISAAccess {
 	 * @return {@link ResponseObject}
 	 */
 	ResponseObject passwordChange(String userId, String currentPassword, String newPassword);
+
+	/**
+	 * <p>
+	 *     Self Service Password Reset for the specified user
+	 * </p>
+	 * @param userId the userid of the identity you wish to have a list of possible second factors. This method supports special characters for userId since it uses QP (Query Params) in order to create the request.
+	 * @param currentPassword the users Current password
+	 * @param newPassword the users new Password
+	 * @return {@link ResponseObject}
+	 */
+	ResponseObject passwordChangeQP(String userId, String currentPassword, String newPassword);
 
 	/**
 	 * <p>
@@ -457,12 +525,27 @@ public interface ISAAccess {
 	BaseResponse getUserStatus(String userId);
 
 	/**
+	 * Retrieves the user's status from the username in the endpoint URL and returns a response.
+	 * @param userId The User ID that you want to validate. This method supports special characters for userId since it uses QP (Query Params) in order to create the request.
+	 * @return {@link BaseResponse}
+	 */
+	BaseResponse getUserStatusQP(String userId);
+
+	/**
 	 * Method invokes a status to the user Id.
 	 * @param userId The User ID that you want to change status
 	 * @param status The new status [lock, unlock, enable, disable]
 	 * @return {@link BaseResponse}
 	 */
 	BaseResponse setUserStatus(String userId, String status);
+
+	/**
+	 * Method invokes a status to the user Id.
+	 * @param userId The User ID that you want to change status. This method supports special characters for userId since it uses QP (Query Params) in order to create the request.
+	 * @param status The new status [lock, unlock, enable, disable]
+	 * @return {@link BaseResponse}
+	 */
+	BaseResponse setUserStatusQP(String userId, String status);
 
 	/**
 	 * Retrieves score from fingerprint, user and host.

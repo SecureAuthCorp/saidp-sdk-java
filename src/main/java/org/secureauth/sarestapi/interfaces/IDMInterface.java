@@ -30,7 +30,11 @@ public interface IDMInterface {
 
     ResponseObject passwordReset(SAAccess saAccess, String userId, String password);
 
+    ResponseObject passwordResetQP(SAAccess saAccess, String userId, String password);
+
     ResponseObject passwordChange(SAAccess saAccess, String userId, String currentPassword, String newPassword);
+
+    ResponseObject passwordChangeQP(SAAccess saAccess, String userId, String currentPassword, String newPassword);
 
 
 }
