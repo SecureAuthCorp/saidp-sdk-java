@@ -133,6 +133,7 @@ public class IDMImpl implements IDMInterface {
             System.out.println("Null Object you messed up");
         }
         System.out.println("END Get User Profile for " + userId + " Request ++++++++");
+        return null;
     }
 
     @Override
