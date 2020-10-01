@@ -2,9 +2,15 @@ package org.secureauth.sarestapi;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.TimeZone;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
+import com.google.common.collect.Maps;
 import org.secureauth.sarestapi.data.*;
 import org.secureauth.sarestapi.data.BehavioralBio.BehaveBioRequest;
 import org.secureauth.sarestapi.data.DFP.DFP;
@@ -16,7 +22,7 @@ import org.secureauth.sarestapi.data.Response.*;
 import org.secureauth.sarestapi.data.Requests.UserPasswordRequest;
 import org.secureauth.sarestapi.data.Response.UserProfileResponse;
 import org.secureauth.sarestapi.data.UserProfile.NewUserProfile;
-import org.secureauth.sarestapi.data.UserProfile.UserProfile;
+import org.secureauth.sarestapi.data.UserProfile.UserProfileKB;
 import org.secureauth.sarestapi.data.UserProfile.UserToGroups;
 import org.secureauth.sarestapi.data.UserProfile.UsersToGroup;
 import org.secureauth.sarestapi.exception.SARestAPIException;
@@ -36,7 +42,7 @@ import org.slf4j.LoggerFactory;
  * </p>
  */
 
-public class SAAccess {
+public class SAAccess implements ISAAccess{
 
     private static Logger logger = LoggerFactory.getLogger(SAAccess.class);
     protected SABaseURL saBaseURL;
@@ -54,7 +60,10 @@ public class SAAccess {
      * @param realm the Configured Realm that enables the RESTApi
      * @param applicationID The Application ID from the Configured Realm
      * @param applicationKey The Application Key from the Configured Realm
+     *
+     * @deprecated from 1.0.6.0, replace by {@link org.secureauth.sarestapi.util.SAFactory}
      */
+    @Deprecated
     public SAAccess(String host, String port,boolean ssl, String realm, String applicationID, String applicationKey){
         saBaseURL=new SABaseURL(host,port,ssl);
         saAuth = new SAAuth(applicationID,applicationKey,realm);
@@ -74,7 +83,10 @@ public class SAAccess {
      * @param realm the Configured Realm that enables the RESTApi
      * @param applicationID The Application ID from the Configured Realm
      * @param applicationKey The Application Key from the Configured Realm
+     *
+     * @deprecated from 1.0.6.0, replace by {@link org.secureauth.sarestapi.util.SAFactory}
      */
+    @Deprecated
     public SAAccess(String host, String port,boolean ssl,boolean selfSigned, String realm, String applicationID, String applicationKey){
         saBaseURL=new SABaseURL(host,port,ssl,selfSigned);
         saAuth = new SAAuth(applicationID,applicationKey,realm);
@@ -82,23 +94,38 @@ public class SAAccess {
     }
 
     /**
+     *<p>
+     *     Returns a SAAccess Object that can be used to query the SecureAuth Rest API
+     *     This should be the default object used when setting up connectivity to the SecureAuth Appliance
+     *     This Object will allow users to support selfSigned Certificates
+     *</p>
+     * @param saBaseURL {@link org.secureauth.sarestapi.data.SABaseURL}
+     * @param saAuth {@link org.secureauth.sarestapi.data.SAAuth}
+     * @param saExecuter {@link org.secureauth.sarestapi.resources.SAExecuter}
+     */
+    public SAAccess(SABaseURL saBaseURL, SAAuth saAuth, SAExecuter saExecuter){
+        this.saBaseURL= saBaseURL;
+        this.saAuth = saAuth;
+        this.saExecuter = saExecuter;
+    }
+
+    /**
      * <p>
      *     Returns IP Risk Evaluation from the Rest API
      * </p>
-     * @param userid The User ID that you want to validate from
-     * @param ip_address The IP Address of the user making the request for access
+     * @param userId The User ID that you want to validate from
+     * @param ipAddress The IP Address of the user making the request for access
      * @return {@link org.secureauth.sarestapi.data.IPEval}
      *
      */
-    public IPEval iPEvaluation(String userid, String ip_address){
+    public IPEval iPEvaluation(String userId, String ipAddress){
         String ts = getServerTime();
-        RestApiHeader restApiHeader =new RestApiHeader();
         IPEvalRequest ipEvalRequest =new IPEvalRequest();
-        ipEvalRequest.setIp_address(ip_address);
-        ipEvalRequest.setUser_id(userid);
+        ipEvalRequest.setIp_address(ipAddress);
+        ipEvalRequest.setUser_id(userId);
         ipEvalRequest.setType("risk");
 
-        String header = restApiHeader.getAuthorizationHeader(saAuth,"POST", IPEvalQuery.queryIPEval(saAuth.getRealm()), ipEvalRequest, ts);
+        String header = RestApiHeader.getAuthorizationHeader(saAuth,"POST", IPEvalQuery.queryIPEval(saAuth.getRealm()), ipEvalRequest, ts);
 
         try{
 
@@ -115,16 +142,35 @@ public class SAAccess {
      * <p>
      *     Returns the list of Factors available for the specified user
      * </p>
-     * @param userid the userid of the identity you wish to have a list of possible second factors
+     * @param userId the userid of the identity you wish to have a list of possible second factors
      * @return {@link FactorsResponse}
      */
-    public FactorsResponse factorsByUser(String userid){
+    public FactorsResponse factorsByUser(String userId){
         String ts = getServerTime();
-        RestApiHeader restApiHeader = new RestApiHeader();
-        String header = restApiHeader.getAuthorizationHeader(saAuth, Resource.METHOD_GET, FactorsQuery.queryFactors(saAuth.getRealm(), userid), ts);
+        String header = RestApiHeader.getAuthorizationHeader(saAuth, Resource.METHOD_GET, FactorsQuery.queryFactors(saAuth.getRealm(), userId), ts);
 
         try{
-            return saExecuter.executeGetRequest(header,saBaseURL.getApplianceURL() + FactorsQuery.queryFactors(saAuth.getRealm(),userid), ts, FactorsResponse.class);
+            return saExecuter.executeGetRequest(header,saBaseURL.getApplianceURL() + FactorsQuery.queryFactors(saAuth.getRealm(), userId), ts, FactorsResponse.class);
+
+        }catch (Exception e){
+            logger.error(new StringBuilder().append("Exception occurred executing REST query::\n").append(e.getMessage()).append("\n").toString(), e);
+        }
+        return null;
+    }
+
+    /**
+     * <p>
+     *     Returns the list of Factors available for the specified user supporting special characters
+     * </p>
+     * @param userId the userid of the identity you wish to have a list of possible second factors. This method supports special characters for userId since it uses QP (Query Params) in order to create the request.
+     * @return {@link FactorsResponse}
+     */
+    public FactorsResponse factorsByUserQP(String userId) {
+        String ts = getServerTime();
+        String header = RestApiHeader.getAuthorizationHeader(saAuth, Resource.METHOD_GET, FactorsQuery.queryFactorsQP(saAuth.getRealm()), ts);
+
+        try{
+            return saExecuter.executeGetRequest(header,saBaseURL.getApplianceURL() + FactorsQuery.queryFactorsQP(saAuth.getRealm()), userId, ts, FactorsResponse.class);
 
         }catch (Exception e){
             logger.error(new StringBuilder().append("Exception occurred executing REST query::\n").append(e.getMessage()).append("\n").toString(), e);
@@ -137,24 +183,23 @@ public class SAAccess {
      *     Send push to accept request asynchronously
      * </p>
      *
-     * @param userid  the user id of the identity
-     * @param factor_id the P2A Id to be compared against
+     * @param userId  the user id of the identity
+     * @param factorId the P2A Id to be compared against
      * @param endUserIP The End Users IP Address
      * @param clientCompany The Client Company Name
      * @param clientDescription The Client Description
      * @return {@link FactorsResponse}
      */
-    public ResponseObject sendPushToAcceptReq(String userid, String factor_id, String endUserIP, String clientCompany, String clientDescription){
-       return sendPushReq(userid, factor_id, endUserIP, clientCompany, clientDescription, "push_accept");
+    public ResponseObject sendPushToAcceptReq(String userId, String factorId, String endUserIP, String clientCompany, String clientDescription){
+       return sendPushReq(userId, factorId, endUserIP, clientCompany, clientDescription, "push_accept");
     }
 
-    public ResponseObject sendPushToAcceptSymbolReq(String userid, String factor_id, String endUserIP, String clientCompany, String clientDescription){
-        return sendPushReq(userid, factor_id, endUserIP, clientCompany, clientDescription, "push_accept_symbol");
+    public ResponseObject sendPushToAcceptSymbolReq(String userId, String factorId, String endUserIP, String clientCompany, String clientDescription){
+        return sendPushReq(userId, factorId, endUserIP, clientCompany, clientDescription, "push_accept_symbol");
     }
 
     private ResponseObject sendPushReq(String userid, String factor_id, String endUserIP, String clientCompany, String clientDescription, String type) {
         String ts = getServerTime();
-        RestApiHeader restApiHeader = new RestApiHeader();
         PushToAcceptRequest req = new PushToAcceptRequest();
         req.setUser_id(userid);
         req.setType(type);
@@ -168,7 +213,7 @@ public class SAAccess {
             pad.setApplication_description(clientDescription);
         }
         req.setPush_accept_details(pad);
-        String header = restApiHeader.getAuthorizationHeader(saAuth,"POST", AuthQuery.queryAuth(saAuth.getRealm()), req,ts);
+        String header = RestApiHeader.getAuthorizationHeader(saAuth,"POST", AuthQuery.queryAuth(saAuth.getRealm()), req,ts);
 
         try{
             return saExecuter.executePostRequest(header,saBaseURL.getApplianceURL() + AuthQuery.queryAuth(saAuth.getRealm()), req,ts, ResponseObject.class);
@@ -184,20 +229,19 @@ public class SAAccess {
      * </p>
      *
      * @param biometricType fingerprint, face
-     * @param userid  the user id of the identity
-     * @param factor_id the P2A Id to be compared against
+     * @param userId  the user id of the identity
+     * @param factorId the P2A Id to be compared against
      * @param endUserIP The End Users IP Address
      * @param clientCompany The Client Company Name
      * @param clientDescription The Client Description
      * @return {@link FactorsResponse}
      */
-    public ResponseObject sendPushBiometricReq(String biometricType, String userid, String factor_id, String endUserIP, String clientCompany, String clientDescription) {
-        String ts = this.getServerTime();
-        RestApiHeader restApiHeader = new RestApiHeader();
+    public ResponseObject sendPushBiometricReq(String biometricType, String userId, String factorId, String endUserIP, String clientCompany, String clientDescription) {
+        String ts = getServerTime();
         PushToAcceptBiometricsRequest req = new PushToAcceptBiometricsRequest();
-        req.setUser_id(userid);
+        req.setUser_id(userId);
         req.setType("push_accept_biometric");
-        req.setFactor_id( factor_id );
+        req.setFactor_id(factorId);
         req.setBiometricType( biometricType );
         PushAcceptDetails pad = new PushAcceptDetails();
         pad.setEnduser_ip(endUserIP);
@@ -210,7 +254,7 @@ public class SAAccess {
         }
 
         req.setPush_accept_details(pad);
-        String header = restApiHeader.getAuthorizationHeader(this.saAuth, "POST", AuthQuery.queryAuth(this.saAuth.getRealm()), req, ts);
+        String header = RestApiHeader.getAuthorizationHeader(this.saAuth, "POST", AuthQuery.queryAuth(this.saAuth.getRealm()), req, ts);
 
         try {
             return (ResponseObject)this.saExecuter.executePostRequest(header, this.saBaseURL.getApplianceURL() + AuthQuery.queryAuth(this.saAuth.getRealm()), req, ts, ResponseObject.class);
@@ -224,15 +268,14 @@ public class SAAccess {
      * <p>
      *     Perform adaptive auth query
      * </p>
-     * @param userid the user id of the identity
+     * @param userId the user id of the identity
      * @param endUserIP the IP of requesting client
      * @return {@link FactorsResponse}
      */
-    public AdaptiveAuthResponse adaptiveAuthQuery(String userid, String endUserIP){
+    public AdaptiveAuthResponse adaptiveAuthQuery(String userId, String endUserIP){
         String ts = getServerTime();
-        RestApiHeader restApiHeader = new RestApiHeader();
-        AdaptiveAuthRequest req = new AdaptiveAuthRequest(userid, endUserIP);
-        String header = restApiHeader.getAuthorizationHeader(saAuth,"POST", AuthQuery.queryAAuth(saAuth.getRealm()), req,ts);
+        AdaptiveAuthRequest req = new AdaptiveAuthRequest(userId, endUserIP);
+        String header = RestApiHeader.getAuthorizationHeader(saAuth,"POST", AuthQuery.queryAAuth(saAuth.getRealm()), req,ts);
 
         try{
             return saExecuter.executePostRequest(header,saBaseURL.getApplianceURL() + AuthQuery.queryAAuth(saAuth.getRealm()), req, ts, AdaptiveAuthResponse.class);
@@ -244,9 +287,8 @@ public class SAAccess {
 
     public PushAcceptStatus queryPushAcceptStatus(String refId){
         String ts = getServerTime();
-        RestApiHeader restApiHeader = new RestApiHeader();
         String getUri = AuthQuery.queryAuth(saAuth.getRealm()) + "/" + refId;
-        String header = restApiHeader.getAuthorizationHeader(saAuth,"GET", getUri,ts);
+        String header = RestApiHeader.getAuthorizationHeader(saAuth,"GET", getUri,ts);
 
         try{
             return saExecuter.executeGetRequest(header,saBaseURL.getApplianceURL() + getUri,ts, PushAcceptStatus.class);
@@ -263,18 +305,17 @@ public class SAAccess {
      * <p>
      *     Checks if the Username exists within the datastore within SecureAuth
      * </p>
-     * @param userid the userid of the identity
+     * @param userId the userid of the identity
      * @return {@link ResponseObject}
      */
-    public BaseResponse validateUser(String userid){
+    public BaseResponse validateUser(String userId){
         String ts = getServerTime();
-        RestApiHeader restApiHeader = new RestApiHeader();
         AuthRequest authRequest = new AuthRequest();
 
-        authRequest.setUser_id(userid);
+        authRequest.setUser_id(userId);
         authRequest.setType("user_id");
 
-        String header = restApiHeader.getAuthorizationHeader(saAuth,"POST", AuthQuery.queryAuth(saAuth.getRealm()), authRequest,ts);
+        String header = RestApiHeader.getAuthorizationHeader(saAuth,"POST", AuthQuery.queryAuth(saAuth.getRealm()), authRequest,ts);
 
 
         try{
@@ -294,13 +335,32 @@ public class SAAccess {
     public ThrottleResponse resetThrottleReq(String userId){
         try{
             String ts = getServerTime();
-            RestApiHeader restApiHeader = new RestApiHeader();
             AuthRequest authRequest = new AuthRequest();
             ThrottleRequest throttleRequest = new ThrottleRequest(0);
 
-            String header = restApiHeader.getAuthorizationHeader(saAuth, Resource.METHOD_PUT, ThrottleQuery.queryThrottles(saAuth.getRealm(), userId), throttleRequest, ts);
+            String header = RestApiHeader.getAuthorizationHeader(saAuth, Resource.METHOD_PUT, ThrottleQuery.queryThrottles(saAuth.getRealm(), userId), throttleRequest, ts);
 
             return saExecuter.executePutRequest(header,saBaseURL.getApplianceURL() + ThrottleQuery.queryThrottles(saAuth.getRealm(), userId), throttleRequest,ThrottleResponse.class, ts);
+        }catch (Exception e){
+            throw new SARestAPIException("Exception occurred executing REST query:\n" + e.getMessage());
+        }
+    }
+
+    /**
+     * the OTP throttling count to 0 after the end-user successfully authenticates;
+     * the attempt count is stored in a directory attribute configured in the Web Admin
+     * @param userId id of user. This method supports special characters for userId since it uses QP (Query Params) in order to create the request.
+     * @return base answer
+     */
+    public ThrottleResponse resetThrottleReqQP(String userId){
+        try{
+            String ts = getServerTime();
+            AuthRequest authRequest = new AuthRequest();
+            ThrottleRequest throttleRequest = new ThrottleRequest(0);
+
+            String header = RestApiHeader.getAuthorizationHeader(saAuth, Resource.METHOD_PUT, ThrottleQuery.queryThrottlesQP(saAuth.getRealm()), throttleRequest, ts);
+
+            return saExecuter.executePutRequest(header,saBaseURL.getApplianceURL() + ThrottleQuery.queryThrottlesQP(saAuth.getRealm()), userId, throttleRequest,ThrottleResponse.class, ts);
         }catch (Exception e){
             throw new SARestAPIException("Exception occurred executing REST query:\n" + e.getMessage());
         }
@@ -314,12 +374,29 @@ public class SAAccess {
     public ThrottleResponse getThrottleReq(String userId){
         try{
             String ts = getServerTime();
-            RestApiHeader restApiHeader = new RestApiHeader();
             AuthRequest authRequest = new AuthRequest();
 
-            String header = restApiHeader.getAuthorizationHeader(saAuth, Resource.METHOD_GET, ThrottleQuery.queryThrottles(saAuth.getRealm(), userId), ts);
+            String header = RestApiHeader.getAuthorizationHeader(saAuth, Resource.METHOD_GET, ThrottleQuery.queryThrottles(saAuth.getRealm(), userId), ts);
 
             return saExecuter.executeGetRequest(header,saBaseURL.getApplianceURL() + ThrottleQuery.queryThrottles(saAuth.getRealm(), userId), ts, ThrottleResponse.class);
+        }catch (Exception e){
+            throw new SARestAPIException("Exception occurred executing REST query:\n" + e.getMessage());
+        }
+    }
+
+    /**
+     * GET the end-user's current count of OTP usage attempts
+     * @param userId id of user. This method supports special characters for userId since it uses QP (Query Params) in order to create the request.
+     * @return base answer
+     */
+    public ThrottleResponse getThrottleReqQP(String userId){
+        try{
+            String ts = getServerTime();
+            AuthRequest authRequest = new AuthRequest();
+
+            String header = RestApiHeader.getAuthorizationHeader(saAuth, Resource.METHOD_GET, ThrottleQuery.queryThrottlesQP(saAuth.getRealm()), ts);
+
+            return saExecuter.executeGetRequest(header,saBaseURL.getApplianceURL() + ThrottleQuery.queryThrottlesQP(saAuth.getRealm()), userId, ts, ThrottleResponse.class);
         }catch (Exception e){
             throw new SARestAPIException("Exception occurred executing REST query:\n" + e.getMessage());
         }
@@ -329,20 +406,19 @@ public class SAAccess {
      * <p>
      *     Checks the users password against SecureAuth Datastore
      * </p>
-     * @param userid the userid of the identity
+     * @param userId the userid of the identity
      * @param password The password of the user to validate
      * @return {@link ResponseObject}
      */
-    public BaseResponse validateUserPassword(String userid, String password){
+    public BaseResponse validateUserPassword(String userId, String password){
         String ts = getServerTime();
-        RestApiHeader restApiHeader = new RestApiHeader();
         AuthRequest authRequest = new AuthRequest();
 
-        authRequest.setUser_id(userid);
+        authRequest.setUser_id(userId);
         authRequest.setType("password");
         authRequest.setToken(password);
 
-        String header = restApiHeader.getAuthorizationHeader(saAuth,"POST", AuthQuery.queryAuth(saAuth.getRealm()), authRequest,ts);
+        String header = RestApiHeader.getAuthorizationHeader(saAuth,"POST", AuthQuery.queryAuth(saAuth.getRealm()), authRequest,ts);
 
         try{
             return saExecuter.executeValidateUserPassword(header,saBaseURL.getApplianceURL() + AuthQuery.queryAuth(saAuth.getRealm()),authRequest,ts);
@@ -356,20 +432,19 @@ public class SAAccess {
      * <p>
      *     Checks the users pin against SecureAuth Datastore
      * </p>
-     * @param userid the userid of the identity
+     * @param userId the userid of the identity
      * @param pin The pin of the user to validate
      * @return {@link ResponseObject}
      */
-    public BaseResponse validateUserPin(String userid, String pin){
+    public BaseResponse validateUserPin(String userId, String pin){
         String ts = getServerTime();
-        RestApiHeader restApiHeader = new RestApiHeader();
         AuthRequest authRequest = new AuthRequest();
 
-        authRequest.setUser_id(userid);
+        authRequest.setUser_id(userId);
         authRequest.setType("pin");
         authRequest.setToken(pin);
 
-        String header = restApiHeader.getAuthorizationHeader(saAuth,"POST", AuthQuery.queryAuth(saAuth.getRealm()), authRequest,ts);
+        String header = RestApiHeader.getAuthorizationHeader(saAuth,"POST", AuthQuery.queryAuth(saAuth.getRealm()), authRequest,ts);
 
         try{
             return saExecuter.executeValidateUserPin(header,saBaseURL.getApplianceURL() + AuthQuery.queryAuth(saAuth.getRealm()),authRequest,ts);
@@ -383,22 +458,21 @@ public class SAAccess {
      * <p>
      *     Validate the users Answer to a KB Question
      * </p>
-     * @param userid the userid of the identity
+     * @param userId the userid of the identity
      * @param answer The answer to the KBA
-     * @param factor_id the KB Id to be compared against
+     * @param factorId the KB Id to be compared against
      * @return {@link ResponseObject}
      */
-    public BaseResponse validateKba(String userid, String answer, String factor_id){
+    public BaseResponse validateKba(String userId, String answer, String factorId){
         String ts = getServerTime();
-        RestApiHeader restApiHeader = new RestApiHeader();
         AuthRequest authRequest = new AuthRequest();
 
-        authRequest.setUser_id(userid);
+        authRequest.setUser_id(userId);
         authRequest.setType("kba");
         authRequest.setToken(answer);
-        authRequest.setFactor_id(factor_id);
+        authRequest.setFactor_id(factorId);
 
-        String header = restApiHeader.getAuthorizationHeader(saAuth,"POST", AuthQuery.queryAuth(saAuth.getRealm()), authRequest,ts);
+        String header = RestApiHeader.getAuthorizationHeader(saAuth,"POST", AuthQuery.queryAuth(saAuth.getRealm()), authRequest,ts);
 
         try{
             return saExecuter.executeValidateKba(header,saBaseURL.getApplianceURL() + AuthQuery.queryAuth(saAuth.getRealm()),authRequest,ts);
@@ -412,20 +486,20 @@ public class SAAccess {
      *<p>
      *     Validate the Oath Token
      *</p>
-     * @param userid the userid of the identity
+     * @param userId the userid of the identity
      * @param otp The One Time Passcode to validate
-     * @param factor_id The Device Identifier
+     * @param factorId The Device Identifier
      * @return {@link ResponseObject}
      */
-    public BaseResponse validateOath(String userid, String otp, String factor_id){
+    public BaseResponse validateOath(String userId, String otp, String factorId){
         String ts = getServerTime();
         RestApiHeader restApiHeader = new RestApiHeader();
         AuthRequest authRequest = new AuthRequest();
 
-        authRequest.setUser_id(userid);
+        authRequest.setUser_id(userId);
         authRequest.setType("oath");
         authRequest.setToken(otp);
-        authRequest.setFactor_id(factor_id);
+        authRequest.setFactor_id(factorId);
 
         String header = restApiHeader.getAuthorizationHeader(saAuth,"POST", AuthQuery.queryAuth(saAuth.getRealm()), authRequest,ts);
 
@@ -441,18 +515,18 @@ public class SAAccess {
      * <p>
      *     Send One Time Passcode by Phone
      * </p>
-     * @param userid the userid of the identity
-     * @param factor_id  Phone Property   "Phone1"
+     * @param userId the userid of the identity
+     * @param factorId  Phone Property   "Phone1"
      * @return {@link ResponseObject}
      */
-    public ResponseObject deliverOTPByPhone(String userid, String factor_id){
+    public ResponseObject deliverOTPByPhone(String userId, String factorId){
         String ts = getServerTime();
         RestApiHeader restApiHeader = new RestApiHeader();
         AuthRequest authRequest = new AuthRequest();
 
-        authRequest.setUser_id(userid);
+        authRequest.setUser_id(userId);
         authRequest.setType("call");
-        authRequest.setFactor_id(factor_id);
+        authRequest.setFactor_id(factorId);
 
         String header = restApiHeader.getAuthorizationHeader(saAuth,"POST", AuthQuery.queryAuth(saAuth.getRealm()), authRequest,ts);
 
@@ -468,16 +542,16 @@ public class SAAccess {
      * <p>
      *     Send One Time Passcode by Phone Ad Hoc
      * </p>
-     * @param userid the userid of the identity
+     * @param userId the userid of the identity
      * @param phoneNumber  Phone Number to call
      * @return {@link ResponseObject}
      */
-    public ResponseObject deliverAdHocOTPByPhone(String userid, String phoneNumber){
+    public ResponseObject deliverAdHocOTPByPhone(String userId, String phoneNumber){
         String ts = getServerTime();
         RestApiHeader restApiHeader = new RestApiHeader();
         AuthRequest authRequest = new AuthRequest();
 
-        authRequest.setUser_id(userid);
+        authRequest.setUser_id(userId);
         authRequest.setType("call");
         authRequest.setToken(phoneNumber);
 
@@ -496,18 +570,18 @@ public class SAAccess {
      * <p>
      *     Send One Time Passcode by SMS to Registered User
      * </p>
-     * @param userid the userid of the identity
-     * @param factor_id  Phone Property   "Phone1"
+     * @param userId the userid of the identity
+     * @param factorId  Phone Property   "Phone1"
      * @return {@link ResponseObject}
      */
-    public ResponseObject deliverOTPBySMS(String userid, String factor_id){
+    public ResponseObject deliverOTPBySMS(String userId, String factorId){
         String ts = getServerTime();
         RestApiHeader restApiHeader = new RestApiHeader();
         AuthRequest authRequest = new AuthRequest();
 
-        authRequest.setUser_id(userid);
+        authRequest.setUser_id(userId);
         authRequest.setType("sms");
-        authRequest.setFactor_id(factor_id);
+        authRequest.setFactor_id(factorId);
         String header = restApiHeader.getAuthorizationHeader(saAuth,"POST", AuthQuery.queryAuth(saAuth.getRealm()), authRequest,ts);
 
         try{
@@ -523,16 +597,16 @@ public class SAAccess {
      * <p>
      *     Validate One Time Passcode sent by SMS
      * </p>
-     * @param userid the userid of the identity
+     * @param userId the userid of the identity
      * @param otp  OTP Value to compare against what was sent
      * @return {@link ValidateOTPResponse}
      */
-    public ValidateOTPResponse validateOTP(String userid, String otp){
+    public ValidateOTPResponse validateOTP(String userId, String otp){
         String ts = getServerTime();
         RestApiHeader restApiHeader = new RestApiHeader();
         ValidateOTPRequest validateOTPRequest = new ValidateOTPRequest();
 
-        validateOTPRequest.setUser_id(userid);
+        validateOTPRequest.setUser_id(userId);
         validateOTPRequest.setOtp(otp);
 
         String header = restApiHeader.getAuthorizationHeader(saAuth,"POST", ValidateOTPQuery.queryValidateOTP(saAuth.getRealm()), validateOTPRequest,ts);
@@ -549,16 +623,16 @@ public class SAAccess {
      * <p>
      *     Send One Time Passcode by SMS Ad Hoc
      * </p>
-     * @param userid the userid of the identity
+     * @param userId the userid of the identity
      * @param phoneNumber  Phone Number to send SMS to
      * @return {@link ResponseObject}
      */
-    public ResponseObject deliverAdHocOTPBySMS(String userid, String phoneNumber){
+    public ResponseObject deliverAdHocOTPBySMS(String userId, String phoneNumber){
         String ts = getServerTime();
         RestApiHeader restApiHeader = new RestApiHeader();
         AuthRequest authRequest = new AuthRequest();
 
-        authRequest.setUser_id(userid);
+        authRequest.setUser_id(userId);
         authRequest.setType("sms");
         authRequest.setToken(phoneNumber);
         String header = restApiHeader.getAuthorizationHeader(saAuth,"POST", AuthQuery.queryAuth(saAuth.getRealm()), authRequest,ts);
@@ -571,22 +645,22 @@ public class SAAccess {
         return null;
     }
 
-        /**
+    /**
      * <p>
      *     Send One Time Passcode by Email to Help Desk
      * </p>
-     * @param userid the userid of the identity
-     * @param factor_id  Help Desk Property   "HelpDesk1"
+     * @param userId the userid of the identity
+     * @param factorId  Help Desk Property   "HelpDesk1"
      * @return {@link ResponseObject}
      */
-    public ResponseObject deliverHelpDeskOTPByEmail(String userid, String factor_id){
+    public ResponseObject deliverHelpDeskOTPByEmail(String userId, String factorId){
         String ts = getServerTime();
         RestApiHeader restApiHeader = new RestApiHeader();
         AuthRequest authRequest = new AuthRequest();
 
-        authRequest.setUser_id(userid);
+        authRequest.setUser_id(userId);
         authRequest.setType("help_desk");
-        authRequest.setFactor_id(factor_id);
+        authRequest.setFactor_id(factorId);
         String header = restApiHeader.getAuthorizationHeader(saAuth,"POST", AuthQuery.queryAuth(saAuth.getRealm()), authRequest,ts);
 
         try{
@@ -601,18 +675,18 @@ public class SAAccess {
      * <p>
      *     Send One Time Passcode by Email
      * </p>
-     * @param userid the userid of the identity
-     * @param factor_id  Email Property   "Email1"
+     * @param userId the userid of the identity
+     * @param factorId  Email Property   "Email1"
      * @return {@link ResponseObject}
      */
-    public ResponseObject deliverOTPByEmail(String userid, String factor_id){
+    public ResponseObject deliverOTPByEmail(String userId, String factorId){
         String ts = getServerTime();
         RestApiHeader restApiHeader = new RestApiHeader();
         AuthRequest authRequest = new AuthRequest();
 
-        authRequest.setUser_id(userid);
+        authRequest.setUser_id(userId);
         authRequest.setType("email");
-        authRequest.setFactor_id(factor_id);
+        authRequest.setFactor_id(factorId);
         String header = restApiHeader.getAuthorizationHeader(saAuth,"POST", AuthQuery.queryAuth(saAuth.getRealm()), authRequest,ts);
 
         try{
@@ -627,16 +701,16 @@ public class SAAccess {
      * <p>
      *     Send One Time Passcode by Email Ad Hoc
      * </p>
-     * @param userid the userid of the identity
+     * @param userId the userid of the identity
      * @param emailAddress  Email Address
      * @return {@link ResponseObject}
      */
-    public ResponseObject deliverAdHocOTPByEmail(String userid, String emailAddress){
+    public ResponseObject deliverAdHocOTPByEmail(String userId, String emailAddress){
         String ts = getServerTime();
         RestApiHeader restApiHeader = new RestApiHeader();
         AuthRequest authRequest = new AuthRequest();
 
-        authRequest.setUser_id(userid);
+        authRequest.setUser_id(userId);
         authRequest.setType("email");
         authRequest.setToken(emailAddress);
         String header = restApiHeader.getAuthorizationHeader(saAuth,"POST", AuthQuery.queryAuth(saAuth.getRealm()), authRequest,ts);
@@ -654,18 +728,18 @@ public class SAAccess {
      * <p>
      *     Send One Time Passcode by Push
      * </p>
-     * @param userid the userid of the identity
-     * @param factor_id  Device Property   "z0y9x87wv6u5t43srq2p1on"
+     * @param userId the userid of the identity
+     * @param factorId  Device Property   "z0y9x87wv6u5t43srq2p1on"
      * @return {@link ResponseObject}
      */
-    public ResponseObject deliverOTPByPush(String userid, String factor_id){
+    public ResponseObject deliverOTPByPush(String userId, String factorId){
         String ts = getServerTime();
         RestApiHeader restApiHeader = new RestApiHeader();
         AuthRequest authRequest = new AuthRequest();
 
-        authRequest.setUser_id(userid);
+        authRequest.setUser_id(userId);
         authRequest.setType("push");
-        authRequest.setFactor_id(factor_id);
+        authRequest.setFactor_id(factorId);
         String header = restApiHeader.getAuthorizationHeader(saAuth,"POST", AuthQuery.queryAuth(saAuth.getRealm()), authRequest,ts);
 
         try{
@@ -680,18 +754,18 @@ public class SAAccess {
      * <p>
      *     Send One Time Passcode by Helpdesk
      * </p>
-     * @param userid the userid of the identity
-     * @param factor_id  Help Desk Property   "HelpDesk1"
+     * @param userId the userid of the identity
+     * @param factorId  Help Desk Property   "HelpDesk1"
      * @return {@link ResponseObject}
      */
-    public ResponseObject deliverOTPByHelpDesk(String userid, String factor_id){
+    public ResponseObject deliverOTPByHelpDesk(String userId, String factorId){
         String ts = getServerTime();
         RestApiHeader restApiHeader = new RestApiHeader();
         AuthRequest authRequest = new AuthRequest();
 
-        authRequest.setUser_id(userid);
+        authRequest.setUser_id(userId);
         authRequest.setType("help_desk");
-        authRequest.setFactor_id(factor_id);
+        authRequest.setFactor_id(factorId);
         String header = restApiHeader.getAuthorizationHeader(saAuth,"POST", AuthQuery.queryAuth(saAuth.getRealm()), authRequest,ts);
 
         try{
@@ -706,17 +780,17 @@ public class SAAccess {
      * <p>
      *     Returns response to Access History Post Rest API
      * </p>
-     * @param userid The User ID that you want to validate from
-     * @param ip_address The IP Address of the user to be stored in the Datastore for use when evaluating Geo-Velocity
+     * @param userId The User ID that you want to validate from
+     * @param ipAddress The IP Address of the user to be stored in the Datastore for use when evaluating Geo-Velocity
      * @return {@link AccessHistoryRequest}
      *
      */
-    public ResponseObject accessHistory(String userid, String ip_address){
+    public ResponseObject accessHistory(String userId, String ipAddress){
         String ts = getServerTime();
         RestApiHeader restApiHeader =new RestApiHeader();
         AccessHistoryRequest accessHistoryRequest =new AccessHistoryRequest();
-        accessHistoryRequest.setIp_address(ip_address);
-        accessHistoryRequest.setUser_id(userid);
+        accessHistoryRequest.setIp_address(ipAddress);
+        accessHistoryRequest.setUser_id(userId);
 
         String header = restApiHeader.getAuthorizationHeader(saAuth,"POST", AccessHistoryQuery.queryAccessHistory(saAuth.getRealm()), accessHistoryRequest, ts);
 
@@ -735,17 +809,17 @@ public class SAAccess {
      * <p>
      *     Confirm the DFP data from Client using the Rest API
      * </p>
-     * @param userid The User ID that you want to validate from
-     * @param fingerprint_id The ID of the finger print to check against the data store
+     * @param userId The User ID that you want to validate from
+     * @param fingerprintId The ID of the finger print to check against the data store
      * @return {@link DFPConfirmResponse}
      *
      */
-    public DFPConfirmResponse DFPConfirm(String userid, String fingerprint_id){
+    public DFPConfirmResponse DFPConfirm(String userId, String fingerprintId){
         String ts = getServerTime();
         RestApiHeader restApiHeader =new RestApiHeader();
         DFPConfirmRequest dfpConfirmRequest =new DFPConfirmRequest();
-        dfpConfirmRequest.setUser_id(userid);
-        dfpConfirmRequest.setFingerprint_id(fingerprint_id);
+        dfpConfirmRequest.setUser_id(userId);
+        dfpConfirmRequest.setFingerprint_id(fingerprintId);
 
 
         String header = restApiHeader.getAuthorizationHeader(saAuth,"POST", DFPQuery.queryDFPConfirm(saAuth.getRealm()), dfpConfirmRequest, ts);
@@ -765,20 +839,20 @@ public class SAAccess {
      * <p>
      *     Validate the DFP data from Client using the Rest API
      * </p>
-     * @param userid The User ID that you want to validate from
-     * @param host_address The ID of the finger print to check against the data store
+     * @param userId The User ID that you want to validate from
+     * @param hostAddress The ID of the finger print to check against the data store
      * @param jsonString The JSON String provided by the Java Script
      * @return {@link DFPValidateResponse}
      *
      */
-    public DFPValidateResponse DFPValidateNewFingerprint(String userid, String host_address, String jsonString){
+    public DFPValidateResponse DFPValidateNewFingerprint(String userId, String hostAddress, String jsonString){
         String ts = getServerTime();
         RestApiHeader restApiHeader =new RestApiHeader();
         DFPValidateRequest dfpValidateRequest = new DFPValidateRequest();
         DFP dfp = JSONUtil.getDFPFromJSONString(jsonString);
         dfpValidateRequest.setFingerprint(dfp);
-        dfpValidateRequest.setUser_id(userid);
-        dfpValidateRequest.setHost_address(host_address);
+        dfpValidateRequest.setUser_id(userId);
+        dfpValidateRequest.setHost_address(hostAddress);
 
         String header = restApiHeader.getAuthorizationHeader(saAuth,"POST", DFPQuery.queryDFPValidate(saAuth.getRealm()), dfpValidateRequest, ts);
 
@@ -791,6 +865,45 @@ public class SAAccess {
         }
 
         return null;
+    }
+
+
+    @Override
+    public DFPValidateResponse DFPScoreFingerprint(String userId, String hostAddress, String fingerprintId, String fingerPrintJSON) {
+        try{
+            String ts = getServerTime();
+            DFPConfirmRequest dfpConfirmRequest =new DFPConfirmRequest(userId, fingerprintId);
+            DFP dfp = JSONUtil.getDFPFromJSONString(fingerPrintJSON);
+            DFPValidateRequest dfpValidateRequest = new DFPValidateRequest(userId, hostAddress, dfp);
+
+            DFPScoreRequest dfpScoreRequest = new DFPScoreRequest(dfpConfirmRequest, dfpValidateRequest);
+
+            String query = DFPQuery.queryDFPScore(saAuth.getRealm());
+            String header = RestApiHeader.getAuthorizationHeader(saAuth, Resource.METHOD_POST, query, dfpScoreRequest, ts);
+            return saExecuter.executePostRawRequest(header,saBaseURL.getApplianceURL() +  query, dfpScoreRequest, DFPValidateResponse.class, ts);
+
+        }catch (Exception e){
+            throw new SARestAPIException("Exception occurred executing score fingerprint", e);
+        }
+    }
+
+    @Override
+    public DFPValidateResponse DFPSaveFingerprint(String userId, String hostAddress, String fingerprintId, String fingerPrintJSON) {
+        try{
+            String ts = getServerTime();
+            DFPConfirmRequest dfpConfirmRequest =new DFPConfirmRequest(userId, fingerprintId);
+            DFP dfp = JSONUtil.getDFPFromJSONString(fingerPrintJSON);
+            DFPValidateRequest dfpValidateRequest = new DFPValidateRequest(userId, hostAddress, dfp);
+
+            DFPScoreRequest dfpScoreRequest = new DFPScoreRequest(dfpConfirmRequest, dfpValidateRequest);
+
+            String query = DFPQuery.queryDFPSave(saAuth.getRealm());
+            String header = RestApiHeader.getAuthorizationHeader(saAuth, Resource.METHOD_POST, query, dfpScoreRequest, ts);
+            return saExecuter.executePostRawRequest(header,saBaseURL.getApplianceURL() + query, dfpScoreRequest, DFPValidateResponse.class, ts);
+
+        }catch (Exception e){
+            throw new SARestAPIException("Exception occurred executing save fingerprint", e);
+        }
     }
 
     /**
@@ -846,7 +959,7 @@ public class SAAccess {
      * <p>
      *     Submit Behave Bio Profile using the Rest API
      * </p>
-     * @param userid The User ID that you want to validate from
+     * @param userId The User ID that you want to validate from
      * @param behaviorProfile The Behavioral Profile of the user
      * @param hostAddress The IP Address of the user
      * @param userAgent  The Browser User Agent of the user
@@ -854,11 +967,11 @@ public class SAAccess {
      * @return {@link BehaveBioResponse}
      *
      */
-    public BehaveBioResponse BehaveBioProfileSubmit(String userid, String behaviorProfile, String hostAddress, String userAgent){
+    public BehaveBioResponse BehaveBioProfileSubmit(String userId, String behaviorProfile, String hostAddress, String userAgent){
         String ts = getServerTime();
         RestApiHeader restApiHeader =new RestApiHeader();
         BehaveBioRequest behaveBioRequest = new BehaveBioRequest();
-        behaveBioRequest.setUserId(userid);
+        behaveBioRequest.setUserId(userId);
         behaveBioRequest.setBehaviorProfile(behaviorProfile);
         behaveBioRequest.setHostAddress(hostAddress);
         behaveBioRequest.setUserAgent(userAgent);
@@ -880,7 +993,7 @@ public class SAAccess {
      * <p>
      *     Submit Reset Request to Behave Bio Profile using the Rest API
      * </p>
-     * @param userid The User ID that you want to validate from
+     * @param userId The User ID that you want to validate from
      * @param fieldName The Behavioral FieldName to Reset
      * @param fieldType The Behavioral FieldType to Reset
      * @param deviceType  The Behavioral DeviceType to Reset
@@ -888,11 +1001,11 @@ public class SAAccess {
      * @return {@link ResponseObject}
      *
      */
-    public ResponseObject BehaveBioProfileReset(String userid, String fieldName, String fieldType, String deviceType){
+    public ResponseObject BehaveBioProfileReset(String userId, String fieldName, String fieldType, String deviceType){
         String ts = getServerTime();
         RestApiHeader restApiHeader =new RestApiHeader();
         BehaveBioResetRequest behaveBioResetRequest = new BehaveBioResetRequest();
-        behaveBioResetRequest.setUserId(userid);
+        behaveBioResetRequest.setUserId(userId);
         behaveBioResetRequest.setFieldName(fieldName);
         behaveBioResetRequest.setFieldType(fieldType);
         behaveBioResetRequest.setDeviceType(deviceType);
@@ -927,22 +1040,32 @@ public class SAAccess {
      * @return {@link ResponseObject}
      */
     public ResponseObject createUser(NewUserProfile newUserProfile){
-        String ts = getServerTime();
-        RestApiHeader restApiHeader = new RestApiHeader();
-        String header = restApiHeader.getAuthorizationHeader(saAuth,"POST",IDMQueries.queryUsers(saAuth.getRealm()),newUserProfile,ts);
+        try{
+            validateUser(newUserProfile);
+            String ts = getServerTime();
+            sortKBQKBAbyKey(newUserProfile);
+            String header = RestApiHeader.getAuthorizationHeader(saAuth, Resource.METHOD_POST, IDMQueries.queryUsers(saAuth.getRealm()),newUserProfile,ts);
 
-        /*
-        At a minimum creating a user requires UserId and Passowrd
-         */
-        if(newUserProfile.getUserId() != null && !newUserProfile.getUserId().isEmpty() && newUserProfile.getPassword() != null && !newUserProfile.getPassword().isEmpty()){
-            try{
-                return saExecuter.executeUserProfileCreateRequest(header,saBaseURL.getApplianceURL() + IDMQueries.queryUsers(saAuth.getRealm()),newUserProfile,ts,ResponseObject.class);
+            return saExecuter.executeUserProfileCreateRequest(header,saBaseURL.getApplianceURL() + IDMQueries.queryUsers(saAuth.getRealm()),newUserProfile,ts,ResponseObject.class);
 
-            }catch (Exception e){
-                logger.error(new StringBuilder().append("Exception occurred executing REST query::\n").append(e.getMessage()).append("\n").toString(), e);
-            }
+        }catch (Exception e){
+            logger.error("Exception occurred executing REST query:\n" + e.getMessage() + "\n", e);
         }
         return null;
+    }
+
+    /**
+     * Check mandatory fields for creating a user.
+     *
+     * @param newUserProfile
+     * @return
+     */
+    private void validateUser(NewUserProfile newUserProfile){
+        if(newUserProfile.getUserId() == null || newUserProfile.getUserId().isEmpty() ||
+                newUserProfile.getPassword() == null || newUserProfile.getPassword().isEmpty()) {
+            throw new IllegalArgumentException("User and password are required to create a new user");
+        }
+        return;
     }
 
     /**
@@ -954,12 +1077,11 @@ public class SAAccess {
      * @return {@link ResponseObject}
      */
     public ResponseObject updateUser(String userId, NewUserProfile userProfile){
-        String ts = getServerTime();
-        RestApiHeader restApiHeader = new RestApiHeader();
-        String header = restApiHeader.getAuthorizationHeader(saAuth,"PUT",IDMQueries.queryUserProfile(saAuth.getRealm(),userId),userProfile,ts);
-
-
         try{
+            String ts = getServerTime();
+            sortKBQKBAbyKey(userProfile);
+            String header = RestApiHeader.getAuthorizationHeader(saAuth, Resource.METHOD_PUT, IDMQueries.queryUserProfile(saAuth.getRealm(),userId),userProfile,ts);
+
             return saExecuter.executeUserProfileUpdateRequest(header,
                     saBaseURL.getApplianceURL() + IDMQueries.queryUserProfile(saAuth.getRealm(),userId),
                     userProfile,
@@ -967,31 +1089,84 @@ public class SAAccess {
                     ResponseObject.class);
 
         }catch (Exception e){
-            logger.error(new StringBuilder().append("Exception occurred executing REST query::\n").append(e.getMessage()).append("\n").toString(), e);
+            logger.error("Exception occurred executing REST query:\n" + e.getMessage() + "\n", e);
         }
-
         return null;
+    }
+
+    private void sortKBQKBAbyKey(NewUserProfile userProfile){
+        List<Map.Entry<String, UserProfileKB>> userProfileList = userProfile.getKnowledgeBase().entrySet().stream()
+                .sorted(Map.Entry.comparingByKey(String::compareToIgnoreCase))
+                .collect(Collectors.toList());
+        userProfile.setKnowledgeBase(userProfileList.stream()
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue,
+                        (v1,v2)->v1,
+                        LinkedHashMap::new)));
+    }
+
+    /**
+     * <p>
+     *     Update User / Profile
+     *     This method supports special characters for userId since it uses QP (Query Params) in order to create the request.
+     * </p>
+     * @param userId the UserID tied to the Profile Object
+     * @param userProfile The User'sProfile Object to be updated
+     * @return {@link ResponseObject}
+     */
+    public ResponseObject updateUserQP(String userId, NewUserProfile userProfile){
+        try{
+            String ts = getServerTime();
+            sortKBQKBAbyKey(userProfile);
+            String header = RestApiHeader.getAuthorizationHeader(saAuth, Resource.METHOD_PUT, IDMQueries.queryUserProfileQP(saAuth.getRealm()),userProfile,ts);
+
+            return saExecuter.executeUserProfileUpdateRequest(header,
+                    saBaseURL.getApplianceURL() + IDMQueries.queryUserProfileQP(saAuth.getRealm()),userId,
+                    userProfile,
+                    ts,
+                    ResponseObject.class);
+
+        }catch (Exception e){
+            throw new SARestAPIException("Exception occurred executing REST query:\n" + e.getMessage() + "\n", e);
+        }
     }
 
     /**
      * <p>
      *     Associate User to Group
      * </p>
-     * @param userid the user id of the identity
+     * @param userId the user id of the identity
      * @param groupName The Name of the group to associate the user to
      * @return {@link GroupAssociationResponse}
      */
-    public ResponseObject addUserToGroup(String userid, String groupName){
-        String ts = getServerTime();
-        RestApiHeader restApiHeader = new RestApiHeader();
-        String header = restApiHeader.getAuthorizationHeader(saAuth,"POST", IDMQueries.queryUserToGroup(saAuth.getRealm(),userid,groupName),ts);
-
+    public ResponseObject addUserToGroup(String userId, String groupName){
         try{
-            return saExecuter.executeSingleUserToSingleGroup(header,saBaseURL.getApplianceURL() + IDMQueries.queryUserToGroup(saAuth.getRealm(),userid,groupName), ts, ResponseObject.class);
+            String ts = getServerTime();
+            String header = RestApiHeader.getAuthorizationHeader(saAuth,"POST", IDMQueries.queryUserToGroup(saAuth.getRealm(),userId,groupName),ts);
+
+            return saExecuter.executeSingleUserToSingleGroup(header,saBaseURL.getApplianceURL() + IDMQueries.queryUserToGroup(saAuth.getRealm(),userId,groupName), ts, ResponseObject.class);
         }catch (Exception e){
-            logger.error(new StringBuilder().append("Exception occurred executing REST query::\n").append(e.getMessage()).append("\n").toString(), e);
+            throw new SARestAPIException("Exception occurred executing REST query:\n" + e.getMessage() + "\n", e);
         }
-        return null;
+    }
+
+    /**
+     * <p>
+     *     Associate User to Group
+     *     This method supports special characters for userId since it uses QP (Query Params) in order to create the request.
+     * </p>
+     * @param userId the user id of the identity
+     * @param groupName The Name of the group to associate the user to
+     * @return {@link GroupAssociationResponse}
+     */
+    public ResponseObject addUserToGroupQP(String userId, String groupName){
+        try{
+            String ts = getServerTime();
+            String header = RestApiHeader.getAuthorizationHeader(saAuth,"POST", IDMQueries.queryUserToGroupQP(saAuth.getRealm()),ts);
+
+            return saExecuter.executeSingleUserToSingleGroup(header,saBaseURL.getApplianceURL() + IDMQueries.queryUserToGroupQP(saAuth.getRealm()), userId, groupName, ts, ResponseObject.class);
+        }catch (Exception e){
+            throw new SARestAPIException("Exception occurred executing REST query:\n" + e.getMessage() + "\n", e);
+        }
     }
 
     /**
@@ -1003,16 +1178,14 @@ public class SAAccess {
      * @return {@link GroupAssociationResponse}
      */
     public GroupAssociationResponse addUsersToGroup(UsersToGroup usersToGroup, String groupName){
-        String ts = getServerTime();
-        RestApiHeader restApiHeader = new RestApiHeader();
-        String header = restApiHeader.getAuthorizationHeader(saAuth,"POST", IDMQueries.queryGroupToUsers(saAuth.getRealm(),groupName),usersToGroup,ts);
-
         try{
+            String ts = getServerTime();
+            String header = RestApiHeader.getAuthorizationHeader(saAuth, Resource.METHOD_POST, IDMQueries.queryGroupToUsers(saAuth.getRealm(),groupName),usersToGroup,ts);
+
             return saExecuter.executeGroupToUsersRequest(header,saBaseURL.getApplianceURL() + IDMQueries.queryGroupToUsers(saAuth.getRealm(),groupName), usersToGroup, ts, GroupAssociationResponse.class);
         }catch (Exception e){
-            logger.error(new StringBuilder().append("Exception occurred executing REST query::\n").append(e.getMessage()).append("\n").toString(), e);
+            throw new SARestAPIException("Exception occurred executing REST query::\n" + e.getMessage() + "\n", e);
         }
-        return null;
     }
 
 
@@ -1021,20 +1194,39 @@ public class SAAccess {
      *     Associate Group to User
      * </p>
      * @param groupName the Group Name
-     * @param userid The userId to associate to the group
+     * @param userId The userId to associate to the group
      * @return {@link GroupAssociationResponse}
      */
-    public GroupAssociationResponse addGroupToUser(String groupName, String userid){
-        String ts = getServerTime();
-        RestApiHeader restApiHeader = new RestApiHeader();
-        String header = restApiHeader.getAuthorizationHeader(saAuth,"POST", IDMQueries.queryGroupToUser(saAuth.getRealm(),userid,groupName),ts);
-
+    public GroupAssociationResponse addGroupToUser(String groupName, String userId){
         try{
-            return saExecuter.executeSingleGroupToSingleUser(header,saBaseURL.getApplianceURL() + IDMQueries.queryGroupToUser(saAuth.getRealm(),userid,groupName), ts, GroupAssociationResponse.class);
+            String ts = getServerTime();
+
+            String header = RestApiHeader.getAuthorizationHeader(saAuth,"POST", IDMQueries.queryGroupToUser(saAuth.getRealm(),userId,groupName),ts);
+
+            return saExecuter.executeSingleGroupToSingleUser(header,saBaseURL.getApplianceURL() + IDMQueries.queryGroupToUser(saAuth.getRealm(),userId,groupName), ts, GroupAssociationResponse.class);
         }catch (Exception e){
-            logger.error(new StringBuilder().append("Exception occurred executing REST query::\n").append(e.getMessage()).append("\n").toString(), e);
+            throw new SARestAPIException("Exception occurred executing REST query:\n" + e.getMessage() + "\n", e);
         }
-        return null;
+    }
+
+    /**
+     * <p>
+     *     Associate Group to User
+     * </p>
+     * @param groupName the Group Name
+     * @param userId The userId to associate to the group
+     * @return {@link GroupAssociationResponse}
+     */
+    public GroupAssociationResponse addGroupToUserQP(String groupName, String userId){
+        try{
+            String ts = getServerTime();
+
+            String header = RestApiHeader.getAuthorizationHeader(saAuth,"POST", IDMQueries.queryGroupToUserQP(saAuth.getRealm()), userId,ts);
+
+            return saExecuter.executeSingleGroupToSingleUser(header,saBaseURL.getApplianceURL() + IDMQueries.queryGroupToUserQP(saAuth.getRealm()), userId, groupName, ts, GroupAssociationResponse.class);
+        }catch (Exception e){
+            throw new SARestAPIException("Exception occurred executing REST query:\n" + e.getMessage() + "\n", e);
+        }
     }
 
     /**
@@ -1046,33 +1238,75 @@ public class SAAccess {
      * @return {@link GroupAssociationResponse}
      */
     public GroupAssociationResponse addUserToGroups(String userId, UserToGroups userToGroups){
-        String ts = getServerTime();
-        RestApiHeader restApiHeader = new RestApiHeader();
-        String header = restApiHeader.getAuthorizationHeader(saAuth,"POST", IDMQueries.queryUserToGroups(saAuth.getRealm(),userId),userToGroups,ts);
-
         try{
+            String ts = getServerTime();
+            String header = RestApiHeader.getAuthorizationHeader(saAuth, Resource.METHOD_POST, IDMQueries.queryUserToGroups(saAuth.getRealm(),userId),userToGroups,ts);
+
             return saExecuter.executeUserToGroupsRequest(header,saBaseURL.getApplianceURL() + IDMQueries.queryUserToGroups(saAuth.getRealm(),userId), userToGroups, ts, GroupAssociationResponse.class);
         }catch (Exception e){
-            logger.error(new StringBuilder().append("Exception occurred executing REST query::\n").append(e.getMessage()).append("\n").toString(), e);
+            throw new SARestAPIException("Exception occurred executing REST query:\n" + e.getMessage() + "\n", e);
         }
-        return null;
     }
 
     /**
      * <p>
      *     Returns the UserProfile for the specified user
      * </p>
-     * @param userid the userid of the identity you wish to have a list of possible second factors
+     * @param userId the userid of the identity you wish to have a list of possible second factors
      * @return {@link UserProfileResponse}
      */
-    public UserProfileResponse getUserProfile(String userid){
+    public UserProfileResponse getUserProfile(String userId){
         String ts = getServerTime();
+        String header = RestApiHeader.getAuthorizationHeader(saAuth,"GET",IDMQueries.queryUserProfile(saAuth.getRealm(), userId),ts);
+
+        try{
+            return saExecuter.executeGetRequest(header,saBaseURL.getApplianceURL() + IDMQueries.queryUserProfile(saAuth.getRealm(), userId),ts, UserProfileResponse.class);
+
+        }catch (Exception e){
+            logger.error("Exception occurred executing REST query:\n" + e.getMessage() + "\n");
+        }
+        return null;
+    }
+
+    /**
+     * <p>
+     *     Returns the UserProfile for the specified user supporting special characters
+     * </p>
+     * @param userId the userid of the identity you wish to have a list of possible second factors. This method supports special characters for userId since it uses QP (Query Params) in order to create the request.
+     * @return {@link UserProfileResponse}
+     */
+    public UserProfileResponse getUserProfileQP(String userId){
+        String ts = getServerTime();
+        String header = RestApiHeader.getAuthorizationHeader(saAuth,"GET",IDMQueries.queryUserProfileQP(saAuth.getRealm()),ts);
+
+        try{
+            return saExecuter.executeGetRequest(header,saBaseURL.getApplianceURL() + IDMQueries.queryUserProfileQP(saAuth.getRealm()), userId , ts, UserProfileResponse.class);
+
+        }catch (Exception e){
+            logger.error("Exception occurred executing REST query:\n" + e.getMessage() + "\n");
+        }
+        return null;
+    }
+
+    /**
+     * <p>
+     *     Administrative Password Reset for the specified user
+     * </p>
+     * @param userId the userid of the identity you wish to have a list of possible second factors
+     * @param password the users new password
+     * @return {@link ResponseObject}
+     */
+
+    public ResponseObject passwordReset(String userId, String password){
+        String ts = getServerTime();
+        UserPasswordRequest userPasswordRequest = new UserPasswordRequest();
+        userPasswordRequest.setPassword(password);
         RestApiHeader restApiHeader = new RestApiHeader();
-        String header = restApiHeader.getAuthorizationHeader(saAuth,"GET",IDMQueries.queryUserProfile(saAuth.getRealm(),userid),ts);
+        String header = restApiHeader.getAuthorizationHeader(saAuth,"POST",IDMQueries.queryUserResetPwd(saAuth.getRealm(), userId),userPasswordRequest,ts);
 
 
         try{
-            return saExecuter.executeGetRequest(header,saBaseURL.getApplianceURL() + IDMQueries.queryUserProfile(saAuth.getRealm(),userid),ts, UserProfileResponse.class);
+            return saExecuter.executeUserPasswordReset(header,saBaseURL.getApplianceURL() + IDMQueries.queryUserResetPwd(saAuth.getRealm(), userId),userPasswordRequest,ts);
 
         }catch (Exception e){
             logger.error(new StringBuilder().append("Exception occurred executing REST query::\n").append(e.getMessage()).append("\n").toString(), e);
@@ -1084,20 +1318,21 @@ public class SAAccess {
      * <p>
      *     Administrative Password Reset for the specified user
      * </p>
-     * @param userid the userid of the identity you wish to have a list of possible second factors
+     * @param userId the userid of the identity you wish to have a list of possible second factors. This method supports special characters for userId since it uses QP (Query Params) in order to create the request.
      * @param password the users new password
      * @return {@link ResponseObject}
      */
-    public ResponseObject passwordReset(String userid, String password){
+
+    public ResponseObject passwordResetQP(String userId, String password){
         String ts = getServerTime();
         UserPasswordRequest userPasswordRequest = new UserPasswordRequest();
         userPasswordRequest.setPassword(password);
         RestApiHeader restApiHeader = new RestApiHeader();
-        String header = restApiHeader.getAuthorizationHeader(saAuth,"POST",IDMQueries.queryUserResetPwd(saAuth.getRealm(),userid),userPasswordRequest,ts);
+        String header = restApiHeader.getAuthorizationHeader(saAuth,"POST",IDMQueries.queryUserResetPwdQP(saAuth.getRealm()),userPasswordRequest,ts);
 
 
         try{
-            return saExecuter.executeUserPasswordReset(header,saBaseURL.getApplianceURL() + IDMQueries.queryUserResetPwd(saAuth.getRealm(),userid),userPasswordRequest,ts);
+            return saExecuter.executeUserPasswordReset(header,saBaseURL.getApplianceURL() + IDMQueries.queryUserResetPwdQP(saAuth.getRealm()), userId,userPasswordRequest,ts);
 
         }catch (Exception e){
             logger.error(new StringBuilder().append("Exception occurred executing REST query::\n").append(e.getMessage()).append("\n").toString(), e);
@@ -1109,22 +1344,49 @@ public class SAAccess {
      * <p>
      *     Self Service Password Reset for the specified user
      * </p>
-     * @param userid the userid of the identity you wish to have a list of possible second factors
+     * @param userId the userid of the identity you wish to have a list of possible second factors
      * @param currentPassword the users Current password
      * @param newPassword the users new Password
      * @return {@link ResponseObject}
      */
-    public ResponseObject passwordChange(String userid, String currentPassword, String newPassword){
+    public ResponseObject passwordChange(String userId, String currentPassword, String newPassword){
         String ts = getServerTime();
         UserPasswordRequest userPasswordRequest = new UserPasswordRequest();
         userPasswordRequest.setCurrentPassword(currentPassword);
         userPasswordRequest.setNewPassword(newPassword);
         RestApiHeader restApiHeader = new RestApiHeader();
-        String header = restApiHeader.getAuthorizationHeader(saAuth,"POST",IDMQueries.queryUserChangePwd(saAuth.getRealm(),userid),userPasswordRequest,ts);
+        String header = restApiHeader.getAuthorizationHeader(saAuth,"POST",IDMQueries.queryUserChangePwd(saAuth.getRealm(), userId),userPasswordRequest,ts);
 
 
         try{
-            return saExecuter.executeUserPasswordChange(header,saBaseURL.getApplianceURL() + IDMQueries.queryUserChangePwd(saAuth.getRealm(),userid),userPasswordRequest,ts);
+            return saExecuter.executeUserPasswordChange(header,saBaseURL.getApplianceURL() + IDMQueries.queryUserChangePwd(saAuth.getRealm(), userId),userPasswordRequest,ts);
+
+        }catch (Exception e){
+            logger.error(new StringBuilder().append("Exception occurred executing REST query::\n").append(e.getMessage()).append("\n").toString(), e);
+        }
+        return null;
+    }
+
+    /**
+     * <p>
+     *     Self Service Password Reset for the specified user
+     * </p>
+     * @param userId the userid of the identity you wish to have a list of possible second factors. This method supports special characters for userId since it uses QP (Query Params) in order to create the request.
+     * @param currentPassword the users Current password
+     * @param newPassword the users new Password
+     * @return {@link ResponseObject}
+     */
+    public ResponseObject passwordChangeQP(String userId, String currentPassword, String newPassword){
+        String ts = getServerTime();
+        UserPasswordRequest userPasswordRequest = new UserPasswordRequest();
+        userPasswordRequest.setCurrentPassword(currentPassword);
+        userPasswordRequest.setNewPassword(newPassword);
+        RestApiHeader restApiHeader = new RestApiHeader();
+        String header = restApiHeader.getAuthorizationHeader(saAuth,"POST",IDMQueries.queryUserChangePwdQP(saAuth.getRealm()),userPasswordRequest,ts);
+
+
+        try{
+            return saExecuter.executeUserPasswordChange(header,saBaseURL.getApplianceURL() + IDMQueries.queryUserChangePwdQP(saAuth.getRealm()), userId, userPasswordRequest, ts);
 
         }catch (Exception e){
             logger.error(new StringBuilder().append("Exception occurred executing REST query::\n").append(e.getMessage()).append("\n").toString(), e);
@@ -1136,6 +1398,42 @@ public class SAAccess {
      * End of IDM Methods
      */
 
+    @Override
+    public BaseResponse notifyAuthenticated(String userId, String result, String mfa) {
+        String url = saAuth.getRealm() + Resource.APPLIANCE_AUTHENTICATED;
+        String serverTime = this.getServerTime();
+        Map<String, String> body = Maps.newHashMap();
+        body.put( "user_id", userId );
+        body.put( "authenticated", result );
+        body.put( "authregmethod", mfa );
+        String authorization = RestApiHeader.getAuthorizationHeader(
+                this.saAuth,
+                "POST",
+                url,
+                body,
+                serverTime );
+        BaseResponse response;
+        try {
+            response = saExecuter.executePostRawRequest(
+                    authorization,
+                    saBaseURL.getApplianceURL() + url,
+                    body,
+                    BaseResponse.class,
+                    serverTime
+            );
+            logger.debug( "Authenticated notification for user with id [" + userId + "], " +
+                    "result [" + result + "] and mfa [" + mfa + "] " +
+                    "has been sent to IdP : " + response.getMessage() );
+        }catch (Exception e){
+            response = new BaseResponse();
+            response.setMessage( e.getMessage() );
+            response.setStatus( "invalid" );
+            logger.error( "Unable to send the authenticated notification for user with id [" + userId + "] " +
+                    ", result [" + result + "] and mfa [" + mfa + "] to IdP : " + e.getMessage(), e);
+        }
+        return response;
+    }
+
     /**
      * Start of  Phone Number Profile Methods
      */
@@ -1144,18 +1442,18 @@ public class SAAccess {
      * <p>
      *     Submit User Name and Phone Number to the Phone Number Profiling service using the Rest API
      * </p>
-     * @param userid The User ID that you want to validate from
-     * @param phone_number The Phone number to get a profile on
+     * @param userId The User ID that you want to validate from
+     * @param phoneNumber The Phone number to get a profile on
      *
      * @return {@link NumberProfileResponse}
      *
      */
-    public NumberProfileResponse PhoneNumberProfileSubmit(String userid, String phone_number){
+    public NumberProfileResponse PhoneNumberProfileSubmit(String userId, String phoneNumber){
         String ts = getServerTime();
         RestApiHeader restApiHeader =new RestApiHeader();
         NumberProfileRequest numberProfileRequest = new NumberProfileRequest();
-        numberProfileRequest.setUser_id(userid);
-        numberProfileRequest.setPhone_number(phone_number);
+        numberProfileRequest.setUser_id(userId);
+        numberProfileRequest.setPhone_number(phoneNumber);
 
         String header = restApiHeader.getAuthorizationHeader(saAuth,"POST", NumberProfileQuery.queryNumberProfile(saAuth.getRealm()), numberProfileRequest, ts);
 
@@ -1174,8 +1472,8 @@ public class SAAccess {
      * <p>
      *     Submit Update to Phone Number Profiling Service using the Rest API
      * </p>
-     * @param userid The User ID that you want to validate from
-     * @param phone_number user phone number provided
+     * @param userId The User ID that you want to validate from
+     * @param phoneNumber user phone number provided
      * @param portedStatus user phone status for the option to block phone numbers that recently changed carriers (not_ported, ported)
      * @param carrierCode 6-digit number or a concatenation of the country code and phone type
      * @param carrier name of the carrier or a concatenation of the country code and phone type
@@ -1185,12 +1483,12 @@ public class SAAccess {
      * @return {@link BaseResponse}
      *
      */
-    public BaseResponse UpdatePhoneNumberProfile(String userid, String phone_number, String portedStatus, String carrierCode, String carrier, String countryCode, String networkType){
+    public BaseResponse UpdatePhoneNumberProfile(String userId, String phoneNumber, String portedStatus, String carrierCode, String carrier, String countryCode, String networkType){
         String ts = getServerTime();
         RestApiHeader restApiHeader =new RestApiHeader();
         NumberProfileUpdateRequest numberProfileUpdateRequest = new NumberProfileUpdateRequest();
-        numberProfileUpdateRequest.setUser_id(userid);
-        numberProfileUpdateRequest.setPhone_number(phone_number);
+        numberProfileUpdateRequest.setUser_id(userId);
+        numberProfileUpdateRequest.setPhone_number(phoneNumber);
         numberProfileUpdateRequest.setPortedStatus(portedStatus);
         CarrierInfo carrierInfo = new CarrierInfo();
         carrierInfo.setCarrierCode(carrierCode);
@@ -1212,6 +1510,95 @@ public class SAAccess {
         return null;
     }
 
+    /**
+     * Retrieves the user's status from the username in the endpoint URL and returns a response.
+     * @param userId The User ID that you want to validate
+     * @return {@link BaseResponse}
+     */
+    public BaseResponse getUserStatus(String userId){
+        try{
+            String ts = getServerTime();
+
+            String query = StatusQuery.queryStatus(saAuth.getRealm(), userId);
+
+            String header = RestApiHeader.getAuthorizationHeader(saAuth, Resource.METHOD_GET, query, ts);
+
+            return saExecuter.executeGetRequest(header,saBaseURL.getApplianceURL() + query, ts, BaseResponse.class);
+        }catch (Exception e){
+            throw new SARestAPIException("Exception occurred executing get user status query", e);
+        }
+
+    }
+
+    /**
+     * Retrieves the user's status from the username in the endpoint URL and returns a response.
+     * @param userId The User ID that you want to validate. This method supports special characters for userId since it uses QP (Query Params) in order to create the request.
+     * @return {@link BaseResponse}
+     */
+    public BaseResponse getUserStatusQP(String userId){
+        try{
+            String ts = getServerTime();
+
+            String query = StatusQuery.queryStatusQP(saAuth.getRealm());
+
+            String header = RestApiHeader.getAuthorizationHeader(saAuth, Resource.METHOD_GET, query, ts);
+
+            return saExecuter.executeGetRequest(header,saBaseURL.getApplianceURL() + query, userId, ts, BaseResponse.class);
+        }catch (Exception e){
+            throw new SARestAPIException("Exception occurred executing get user status query", e);
+        }
+
+    }
+
+    /**
+     * Method invokes a status to the user Id.
+     * @param userId The User ID that you want to change status
+     * @param status The new status [lock, unlock, enable, disable]
+     * @return {@link BaseResponse}
+     */
+    public BaseResponse setUserStatus(String userId, String status){
+        try{
+            String ts = getServerTime();
+
+            String query = StatusQuery.queryStatus(saAuth.getRealm(), userId);
+
+            //payload
+            StatusRequest statusRequestPayload = new StatusRequest(status);
+
+            String header = RestApiHeader.getAuthorizationHeader(saAuth, Resource.METHOD_POST, query, statusRequestPayload, ts);
+
+            return saExecuter.executePostRawRequest(header,saBaseURL.getApplianceURL() + query, statusRequestPayload, BaseResponse.class, ts);
+
+        }catch (Exception e){
+            throw new SARestAPIException("Exception occurred executing set user status query", e);
+        }
+
+    }
+
+    /**
+     * Method invokes a status to the user Id.
+     * @param userId The User ID that you want to change status. This method supports special characters for userId since it uses QP (Query Params) in order to create the request.
+     * @param status The new status [lock, unlock, enable, disable]
+     * @return {@link BaseResponse}
+     */
+    public BaseResponse setUserStatusQP(String userId, String status){
+        try{
+            String ts = getServerTime();
+
+            String query = StatusQuery.queryStatusQP(saAuth.getRealm());
+
+            //payload
+            StatusRequest statusRequestPayload = new StatusRequest(status);
+
+            String header = RestApiHeader.getAuthorizationHeader(saAuth, Resource.METHOD_POST, query, statusRequestPayload, ts);
+
+            return saExecuter.executePostRawRequest(header,saBaseURL.getApplianceURL() + query, userId, "", statusRequestPayload, BaseResponse.class, ts);
+
+        }catch (Exception e){
+            throw new SARestAPIException("Exception occurred executing set user status query", e);
+        }
+
+    }
 
     /**
      * End of Number Profile Methods

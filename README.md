@@ -15,7 +15,7 @@ This is a community driven project, if you would like to contribute please fork 
 
 Requirements:
 ------------
-* Requires Java 1.7 or Newer
+* Requires Java 11
 * Requires gradle to build the package
 
 Dependencies:
@@ -23,7 +23,9 @@ Dependencies:
 * jackson-jaxrs-json-provider 2.7.3
 * jersey-client 2.5.1
 * Commons Codec 1.10
-* SLF4J 1.7.13
+* SLF4J 1.7.28
+* jaxb 2.3.0
+* junit 5.1.0
 
 Building:
 --------
@@ -53,21 +55,22 @@ String applicationKey = ".........";
  /*
  This will create the instance of the SAAccess which is able to execute REST calls.
  */
-SAAccess saAccess=new SAAccess(applianceHost, appliancePort, applianceSSL, selfSigned, realm, applicationID, applicationKey);
+ISAAccess saAccess = SAFactory.of(applianceHost, appliancePort, applianceSSL, selfSigned, realm, applicationID, applicationKey);
 
+try {
+  // To validate a user exists in your data store all you need to run the following.
+  System.out.println(saAccess.validateUser("USERNAME").toString());
 
-// To validate a user exists in your data store all you need to run the following.
-
-System.out.println(saAccess.validateUser("USERNAME").toString());
-
-ResponseObject validUser = saAccess.validateUser("USERNAME")
-if(validUser != null){
-            if(validUser.getStatus().equalsIgnoreCase("found")){
-                System.out.println("Matched User")
-            }
-            if(validUser.getStatus().equalsIgnoreCase("not_found")){
-                System.out.println("User was not found in DataStore!")
-            }
+  ResponseObject validUser = saAccess.validateUser("USERNAME")
+  if(validUser != null){
+     if(validUser.getStatus().equalsIgnoreCase("found")){
+         System.out.println("Matched User")
+     }
+  if(validUser.getStatus().equalsIgnoreCase("not_found")){
+      System.out.println("User was not found in DataStore!")
+  }
+}catch (SARestAPIException e){
+    //handle exception
 }
 
 ```

@@ -31,16 +31,14 @@ OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
  */
 public class RestApiHeader {
 
-    private String authHeader;
-    private StringBuilder stringBuilder;
-    private static Logger logger=LoggerFactory.getLogger(RestApiHeader.class);
+    private static Logger logger = LoggerFactory.getLogger(RestApiHeader.class);
     public RestApiHeader(){}
 
     //Payload in header
-    public String getAuthorizationHeader(SAAuth saAuth , String requestMethod, String uriPath, Object object, String ts){
+    public static String getAuthorizationHeader(SAAuth saAuth , String requestMethod, String uriPath, Object object, String ts){
 
         //Build our string for the AuthHeader
-        stringBuilder = new StringBuilder();
+        StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append(requestMethod).append("\n")
                 .append(ts).append("\n")
                 .append(saAuth.getApplicationID()).append("\n")
@@ -48,47 +46,46 @@ public class RestApiHeader {
                 .append(JSONUtil.convertObjectToJSON(object));
 
 
-
+        String authHeader = "";
         //Create a SHA256 Hash
         String base64Sha = "";
         try {
             base64Sha = new String(Base64.encodeBase64(HMACUtil.encode(saAuth.getApplicationKey(), stringBuilder.toString())));
         }catch(Exception e){
-            logger.error(new StringBuilder().append("Exception occurred while generating Authorization Header\n").append(e.getMessage()).append("\n").toString(), e);
+            logger.error("Exception occurred while generating Authorization Header\n" + e.getMessage() + "\n", e);
         }
 
         String appId = saAuth.getApplicationID() + ":" + base64Sha;
-        logger.trace(new StringBuilder("Auth Header before second encoding  ").append(appId).append("\n").toString());
+        logger.trace("Auth Header before second encoding  " + appId + "\n");
         try {
             authHeader = "Basic " + Base64.encodeBase64String(appId.getBytes("UTF-8"));
         }catch(UnsupportedEncodingException uee){
-            logger.error( new StringBuilder().append("Exception Encoding\n").append(uee.getMessage()).append("\n").toString(), uee);
+            logger.error("Exception Encoding\n" + uee.getMessage() + "\n", uee);
         }
 
         return authHeader;
     }
 
     //No Payload in header
-    public String getAuthorizationHeader(SAAuth saAuth, String requestMethod, String uriPath, String ts){
+    public static String getAuthorizationHeader(SAAuth saAuth, String requestMethod, String uriPath, String ts){
         //Build our string for the AuthHeader
-        stringBuilder = new StringBuilder();
+        StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append(requestMethod).append("\n")
                 .append(ts).append("\n")
                 .append(saAuth.getApplicationID()).append("\n")
                 .append(Resource.SLASH + uriPath);
 
-        //System.out.println("\nRequest: \n" + stringBuilder + "\n");
-
+        String authHeader = "";
         //Create a SHA256 Hash
         String base64Sha = "";
         try {
             base64Sha = new String(Base64.encodeBase64(HMACUtil.encode(saAuth.getApplicationKey(), stringBuilder.toString())));
         }catch(Exception e){
-            logger.error(new StringBuilder().append("Exception occurred while generating Authorization Header\n").append(e.getMessage()).append("\n").toString(), e);
+            logger.error("Exception occurred while generating Authorization Header\n" + e.getMessage() + "\n", e);
         }
 
         String appId = saAuth.getApplicationID() + ":" + base64Sha;
-        logger.trace(new StringBuilder("Auth Header before second encoding  ").append(appId).append("\n").toString());
+        logger.trace("Auth Header before second encoding  " + appId + "\n");
         authHeader = "Basic " + Base64.encodeBase64String(appId.getBytes(StandardCharsets.UTF_8));
         
         return authHeader;

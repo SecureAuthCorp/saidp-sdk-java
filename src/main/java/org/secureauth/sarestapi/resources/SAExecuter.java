@@ -1,17 +1,14 @@
 package org.secureauth.sarestapi.resources;
 
-
-
+import java.io.UnsupportedEncodingException;
+import java.net.URI;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
-import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
 import java.util.Optional;
 
-import javax.net.ssl.HostnameVerifier;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSession;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
+import javax.net.ssl.*;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.MediaType;
 
@@ -27,8 +24,12 @@ import org.secureauth.sarestapi.data.UserProfile.NewUserProfile;
 
 import org.secureauth.sarestapi.data.UserProfile.UserToGroups;
 import org.secureauth.sarestapi.data.UserProfile.UsersToGroup;
+import org.secureauth.sarestapi.exception.SARestAPIException;
 import org.secureauth.sarestapi.filters.SACheckRequestFilter;
+import org.secureauth.sarestapi.queries.StatusQuery;
+import org.secureauth.sarestapi.ssl.SATrustManagerFactory;
 import org.secureauth.sarestapi.util.JSONUtil;
+import org.secureauth.sarestapi.util.RestApiHeader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,7 +39,6 @@ import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.WebTarget;
 import org.glassfish.jersey.client.ClientConfig;
 import javax.ws.rs.core.Response;
-
 
 
 /**
@@ -63,70 +63,54 @@ OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
 public class SAExecuter {
 
     private ClientConfig config = null;
-
     private Client client = null;
     private static Logger logger = LoggerFactory.getLogger(SAExecuter.class);
     private static final String TEN_SECONDS = "10000";
+    private static final String TLS = "TLS";
+    private Integer idpApiTimeout;
 
     private SABaseURL saBaseURL = null;
 
     public SAExecuter(SABaseURL saBaseURL) {
         this.saBaseURL = saBaseURL;
+        this.idpApiTimeout = Integer.parseInt(Optional.ofNullable(System.getProperty("rest.api.timeout")).orElse(TEN_SECONDS) );
+    }
+
+    public void setTimeout(int timeoutInMillis) {
+        if( timeoutInMillis < 0 ) {
+            throw new IllegalArgumentException( "Timeout must be a positive integer value." );
+        }
+        this.idpApiTimeout = timeoutInMillis;
     }
 
     //Set up our Connection
     private void createConnection() throws Exception {
-
         config = new ClientConfig();
-        SSLContext ctx = null;
-        ctx = SSLContext.getInstance("TLS");
-
-
-        TrustManager[] certs = new TrustManager[]{
-                new X509TrustManager() {
-                    @Override
-                    public X509Certificate[] getAcceptedIssuers() {
-                        return null;
-                    }
-
-                    @Override
-                    public void checkServerTrusted(X509Certificate[] chain, String authType) throws CertificateException {
-                    }
-
-                    @Override
-                    public void checkClientTrusted(X509Certificate[] chain, String authType) throws CertificateException {
-                    }
-                }
-        };
-
-        ctx.init(null, certs, new SecureRandom());
-
+        SSLContext ctx = SSLContext.getInstance( TLS );
+        ctx.init(null, SATrustManagerFactory.createTrustsManagersFor( this.saBaseURL ) , new SecureRandom());
         try {
-
             config.register(SACheckRequestFilter.class);
             client = ClientBuilder.newBuilder()
                     .withConfig(config)
                     .sslContext(ctx)
-                    .hostnameVerifier(new HostnameVerifier() {
-                        @Override
-                        public boolean verify(String s, SSLSession sslSession) {
-                            return saBaseURL.isSelfSigned();
-                        }
-                    })
+                    .hostnameVerifier( (s, sslSession) -> saBaseURL.isSelfSigned() )
                     .build();
-            int timeoutSeconds = Integer.parseInt(Optional.ofNullable(System.getProperty("rest.api.timeout")).orElse(TEN_SECONDS));
-            client.property(ClientProperties.CONNECT_TIMEOUT, timeoutSeconds);
-            client.property(ClientProperties.READ_TIMEOUT, timeoutSeconds);
+            client.property( ClientProperties.CONNECT_TIMEOUT, this.idpApiTimeout );
+            client.property( ClientProperties.READ_TIMEOUT, this.idpApiTimeout );
         } catch (Exception e) {
-            logger.error(new StringBuilder().append("Exception occurred while attempting to associating our SSL cert to the session.").toString(), e);
+            logger.error("Exception occurred while attempting to associating our SSL cert to the session.", e);
         }
-
-        if (client == null)
-            throw new Exception(new StringBuilder().append("Unable to create connection object, creation attempt returned NULL.").toString());
+        if (client == null) {
+            throw new Exception("Unable to create connection object, creation attempt returned NULL.");
+        }
     }
 
     //Get Factors for the user requested
     public <T> T executeGetRequest(String auth, String query, String ts, Class<T> valueType) throws Exception {
+        return executeGetRequest(auth, query, "", ts, valueType);
+    }
+
+    public <T> T executeGetRequest(String auth, String query, String userId, String ts, Class<T> valueType) throws Exception {
         if (client == null) {
             createConnection();
         }
@@ -136,7 +120,12 @@ public class SAExecuter {
         T genericResponse = null;
         try {
 
-            target = client.target(query);
+            if (!userId.isBlank()) {
+                target = encodeQueryUser(query, userId);
+            }
+            else{
+                target = client.target(query);
+            }
             response = target.request().
                     accept(MediaType.APPLICATION_JSON).
                     header("Authorization", auth).
@@ -153,7 +142,49 @@ public class SAExecuter {
 
     }
 
-    public <T> T executePutRequest(String auth, String query, Object payloadRequest, Class<T> valueType, String ts)throws Exception {
+    private String encodedValue(String value) throws UnsupportedEncodingException {
+        return URLEncoder.encode(value, StandardCharsets.UTF_8.toString());
+    }
+
+    public <T> T executeGetRequest(SAAuth saAuth, String baseUrl, String query, String ts, Class<T> valueType) throws Exception {
+
+        String header = RestApiHeader.getAuthorizationHeader(saAuth, Resource.METHOD_GET, query, ts);
+
+        return executeGetRequest(header, baseUrl + query, ts, valueType);
+    }
+
+    // post request
+    public <T> T executePostRequest(String auth,String query, AuthRequest authRequest,String ts, Class<T> valueType)throws Exception {
+
+        if (client == null) {
+            createConnection();
+        }
+        try {
+            WebTarget target = null;
+            Response response = null;
+            T responseObject = null;
+
+            target = client.target(query);
+            response = target.request().
+                    accept(MediaType.APPLICATION_JSON).
+                    header("Authorization", auth).
+                    header("X-SA-Ext-Date", ts).
+                    post(Entity.entity(JSONUtil.convertObjectToJSON(authRequest), MediaType.APPLICATION_JSON));
+
+            responseObject = response.readEntity(valueType);
+            response.close();
+            return responseObject;
+        } catch (Exception e) {
+            throw new SARestAPIException("Exception Delivering OTP by Push: \nQuery:\n\t" +
+                    query + "\nError:" + e.getMessage(), e);
+        }
+    }
+
+    public <T> T executePutRequest(String auth, String query, Object payloadRequest, Class<T> responseValueType, String ts)throws Exception {
+        return executePutRequest(auth, query, "", payloadRequest, responseValueType, ts);
+    }
+
+    public <T> T executePutRequest(String auth, String query, String userId, Object payloadRequest, Class<T> responseValueType, String ts)throws Exception {
         if(client == null) {
             createConnection();
         }
@@ -163,24 +194,98 @@ public class SAExecuter {
         T genericResponse =null;
         try{
 
-            target = client.target(query);
+            if (!userId.isBlank()) {
+                target = encodeQueryUser(query, userId);
+            }
+            else{
+                target = client.target(query);
+            }
             response = target.request().
                     accept(MediaType.APPLICATION_JSON).
                     header("Authorization", auth).
                     header("X-SA-Ext-Date", ts).
                     put(Entity.entity(JSONUtil.convertObjectToJSON(payloadRequest),MediaType.APPLICATION_JSON));
             //consider using response.ok(valueType).build(); instead.
-            genericResponse = response.readEntity(valueType);
+            genericResponse = response.readEntity(responseValueType);
             response.close();
+            return genericResponse;
         }catch(Exception e){
-            logger.error("Exception Put  Request: \nQuery:\n\t" + query + "\nError:" + e.getMessage());
+            throw new SARestAPIException("Exception Put Request: \nQuery:\n\t" + query + "\nError:" + e.getMessage());
         }
-
-        return genericResponse;
-
     }
 
-    public String executeRawGetRequest(String auth, String query,String ts)throws Exception {
+    public <T> T executePostRawRequest(String auth,String query, Object authRequest, Class<T> valueType, String ts)throws Exception{
+        return executePostRawRequest(auth, query, "", "", authRequest, valueType, ts);
+    }
+
+    public <T> T executePostRawRequest(String auth,String query, String userId, String groupId, Object authRequest, Class<T> valueType, String ts)throws Exception{
+
+        if(client == null) {
+            createConnection();
+        }
+        try{
+            WebTarget target = null;
+            Response response = null;
+            T responseObject = null;
+
+            if (!userId.isBlank()) {
+                target = encodeQueryUser(query, userId, groupId);
+            }
+            else{
+                target = client.target(query);
+            }
+            response = target.request().
+                    accept(MediaType.APPLICATION_JSON).
+                    header("Authorization", auth).
+                    header("X-SA-Ext-Date", ts).
+                    post(Entity.entity(JSONUtil.convertObjectToJSON(authRequest),MediaType.APPLICATION_JSON));
+            responseObject = response.readEntity(valueType);
+            response.close();
+            return responseObject;
+        }catch(Exception e){
+            throw new SARestAPIException("Exception Post Request: \nQuery:\n\t" + query + "\nError:" + e.getMessage());
+        }
+    }
+
+    public <T> T executePostRawRequestWithoutPayload(String auth,String query, Class<T> valueType, String ts)throws Exception {
+        return executePostRawRequestWithoutPayload(auth, query, "", "",valueType, ts);
+    }
+
+    public <T> T executePostRawRequestWithoutPayload(String auth,String query, String userId,String groupId, Class<T> valueType, String ts)throws Exception{
+
+        if(client == null) {
+            createConnection();
+        }
+
+        WebTarget target = null;
+        Response response = null;
+        T responseObject = null;
+        try{
+
+            if (!userId.isBlank()) {
+                target = encodeQueryUser(query, userId, groupId);
+            }
+            else{
+                target = client.target(query);
+            }
+            response = target.request().
+                    accept(MediaType.APPLICATION_JSON).
+                    header("Authorization", auth).
+                    header("X-SA-Ext-Date", ts).
+                    post(Entity.entity("",MediaType.APPLICATION_JSON));
+            responseObject = response.readEntity(valueType);
+            response.close();
+            return responseObject;
+        }catch(Exception e){
+            throw new SARestAPIException("Exception Post Request: \nQuery:\n\t" + query + "\nError:" + e.getMessage());
+        }
+    }
+
+    public String executeRawGetRequest(String auth, String query, String ts) throws Exception {
+        return executeRawGetRequest(auth, query, "", ts);
+    }
+
+    public String executeRawGetRequest(String auth, String query, String userId, String ts) throws Exception {
         if(client == null) {
             createConnection();
         }
@@ -189,8 +294,12 @@ public class SAExecuter {
         Response response = null;
         String factors=null;
         try{
-
-            target = client.target(query);
+            if (!userId.isBlank()) {
+                target = encodeQueryUser(query, userId);
+            }
+            else{
+                target = client.target(query);
+            }
             response = target.request().
             		accept(MediaType.APPLICATION_JSON).
                     header("Authorization", auth).
@@ -198,8 +307,8 @@ public class SAExecuter {
                     get(Response.class);
             return response.readEntity(String.class);
         }catch(Exception e){
-            logger.error(new StringBuilder().append("Exception getting User Factors: \nQuery:\n\t")
-                    .append(query).append("\nError:").append(e.getMessage()).append(".\nResponse code is ").append(response).toString()
+            logger.error("Exception getting User Factors: \nQuery:\n\t" +
+                    query + "\nError:" + e.getMessage() + ".\nResponse code is " + response
                     + "; Raw response:" + factors, e);
         }
         return null;
@@ -445,36 +554,6 @@ public class SAExecuter {
             response.close();
         }catch(Exception e){
             logger.error(new StringBuilder().append("Exception Delivering OTP by Email: \nQuery:\n\t")
-                    .append(query).append("\nError:").append(e.getMessage()).toString(), e);
-        }
-
-        return responseObject;
-
-    }
-
-    // post request
-    public <T> T executePostRequest(String auth,String query, AuthRequest authRequest,String ts, Class<T> valueType)throws Exception{
-
-        if(client == null) {
-            createConnection();
-        }
-
-        WebTarget target = null;
-        Response response = null;
-        T responseObject =null;
-        try{
-
-            target = client.target(query);
-            response = target.request().
-                    accept(MediaType.APPLICATION_JSON).
-                    header("Authorization", auth).
-                    header("X-SA-Ext-Date", ts).
-                    post(Entity.entity(JSONUtil.convertObjectToJSON(authRequest),MediaType.APPLICATION_JSON));
-
-            responseObject=response.readEntity(valueType);
-            response.close();
-        }catch(Exception e){
-            logger.error(new StringBuilder().append("Exception Delivering OTP by Push: \nQuery:\n\t")
                     .append(query).append("\nError:").append(e.getMessage()).toString(), e);
         }
 
@@ -761,39 +840,21 @@ public class SAExecuter {
 
     }
 
-    //Run Password Reset (Admin level reset)
+    // Run Password Reset (Admin level reset).
     public ResponseObject executeUserPasswordReset(String auth, String query, UserPasswordRequest userPasswordRequest, String ts)throws Exception{
-
-        if(client == null) {
-            createConnection();
-        }
-
-        WebTarget target = null;
-        Response response = null;
-        ResponseObject passwordResetResponse =null;
-        try{
-            target = client.target(query);
-
-            response = target.request().
-                    accept(MediaType.APPLICATION_JSON).
-                    header("Authorization", auth).
-                    header("X-SA-Ext-Date", ts).
-                    post(Entity.entity(JSONUtil.convertObjectToJSON(userPasswordRequest),MediaType.APPLICATION_JSON));
-
-            passwordResetResponse = response.readEntity(ResponseObject.class);
-
-            response.close();
-        }catch(Exception e){
-            logger.error(new StringBuilder().append("Exception Running Password Reset POST: \nQuery:\n\t")
-                    .append(query).append("\nError:").append(e.getMessage()).toString(), e);
-        }
-
-        return passwordResetResponse;
-
+        return executeUserPasswordReset(auth, query, "", userPasswordRequest, ts);
+    }
+    // Fill userId string when you want to encode and send userId through Query Params.
+    public ResponseObject executeUserPasswordReset(String auth, String query, String userId, UserPasswordRequest userPasswordRequest, String ts)throws Exception{
+        return executePostRawRequest(auth, query, userId, "", userPasswordRequest, ResponseObject.class,  ts);
     }
 
-    //Run Change Password (Self Service)
+    // Run Change Password (Self Service).
     public ResponseObject executeUserPasswordChange(String auth, String query, UserPasswordRequest userPasswordRequest, String ts)throws Exception{
+        return executeUserPasswordChange(auth, query, "", userPasswordRequest, ts);
+    }
+    // Fill userId string when you want to encode and send userId through Query Params.
+    public ResponseObject executeUserPasswordChange(String auth, String query, String userId, UserPasswordRequest userPasswordRequest, String ts)throws Exception{
 
         if(client == null) {
             createConnection();
@@ -803,13 +864,17 @@ public class SAExecuter {
         Response response = null;
         ResponseObject passwordChangeResponse =null;
         try{
-            target = client.target(query);
-
-            response = target.request().
-                    accept(MediaType.APPLICATION_JSON).
-                    header("Authorization", auth).
-                    header("X-SA-Ext-Date", ts).
-                    post(Entity.entity(JSONUtil.convertObjectToJSON(userPasswordRequest),MediaType.APPLICATION_JSON));
+            if (!userId.isBlank()) {
+                target = encodeQueryUser(query, userId);
+            }
+            else{
+                target = client.target(query);
+            }
+            response = target.request()
+                               .accept(MediaType.APPLICATION_JSON)
+                               .header("Authorization", auth)
+                               .header("X-SA-Ext-Date", ts)
+                               .post(Entity.entity(JSONUtil.convertObjectToJSON(userPasswordRequest),MediaType.APPLICATION_JSON));
 
             passwordChangeResponse = response.readEntity(ResponseObject.class);
 
@@ -825,6 +890,10 @@ public class SAExecuter {
 
     //Update User Profile
     public <T> T executeUserProfileUpdateRequest(String auth, String query,NewUserProfile userProfile, String ts, Class<T> valueType)throws Exception{
+        return executeUserProfileUpdateRequest(auth, query, "", userProfile, ts, valueType);
+    }
+
+    public <T> T executeUserProfileUpdateRequest(String auth, String query, String userId, NewUserProfile userProfile, String ts, Class<T> valueType)throws Exception{
 
         if(client == null) {
             createConnection();
@@ -835,7 +904,12 @@ public class SAExecuter {
         T responseObject =null;
         try{
 
-            target = client.target(query);
+            if (!userId.isBlank()) {
+                target = encodeQueryUser(query, userId);
+            }
+            else{
+                target = client.target(query);
+            }
             response = target.request().
                     accept(MediaType.APPLICATION_JSON).
                     header("Authorization", auth).
@@ -855,148 +929,40 @@ public class SAExecuter {
 
     //create User Profile
     public <T> T executeUserProfileCreateRequest(String auth, String query, NewUserProfile newUserProfile, String ts, Class<T> valueType)throws Exception{
-
-        if(client == null) {
-            createConnection();
-        }
-
-        WebTarget target = null;
-        Response response = null;
-        T responseObject =null;
-        try{
-
-            target = client.target(query);
-            response = target.request().
-                    accept(MediaType.APPLICATION_JSON).
-                    header("Authorization", auth).
-                    header("X-SA-Ext-Date", ts).
-                    post(Entity.entity(JSONUtil.convertObjectToJSON(newUserProfile),MediaType.APPLICATION_JSON));
-
-            responseObject=response.readEntity(valueType);
-            response.close();
-        }catch(Exception e){
-            logger.error(new StringBuilder().append("Exception Creating User Profile: \nQuery:\n\t")
-                    .append(query).append("\nError:").append(e.getMessage()).toString(), e);
-        }
-
-        return responseObject;
-
+        return executePostRawRequest(auth, query, newUserProfile, valueType, ts);
     }
 
     //Single User to Single Group
-    public <T> T executeSingleUserToSingleGroup(String auth, String query,String ts,  Class<T> valueType)throws Exception {
-        if(client == null) {
-            createConnection();
-        }
+    public <T> T executeSingleUserToSingleGroup(String auth, String query, String ts, Class<T> valueType)throws Exception {
+        return executePostRawRequestWithoutPayload(auth, query, valueType, ts);
+    }
 
-        WebTarget target = null;
-        Response response = null;
-        T genericResponse =null;
-        try{
-
-            target = client.target(query);
-            response = target.request().
-                    accept(MediaType.APPLICATION_JSON).
-                    header("Authorization", auth).
-                    header("X-SA-Ext-Date", ts).
-                    post(Entity.entity("",MediaType.APPLICATION_JSON));
-            genericResponse = response.readEntity(valueType);
-            response.close();
-        }catch(Exception e){
-            logger.error(new StringBuilder().append("Exception Adding user to Group: \nQuery:\n\t")
-                    .append(query).append("\nError:").append(e.getMessage()).toString(), e);
-        }
-
-        return genericResponse;
-
+    //Single User to Single Group
+    public <T> T executeSingleUserToSingleGroup(String auth, String query, String userId, String groupId, String ts, Class<T> valueType)throws Exception {
+        return executePostRawRequestWithoutPayload(auth, query, userId, groupId, valueType, ts);
     }
 
     //Single Group Multiple Users
     public <T> T executeGroupToUsersRequest(String auth, String query, UsersToGroup usersToGroup, String ts, Class<T> valueType)throws Exception{
-
-        if(client == null) {
-            createConnection();
-        }
-
-        WebTarget target = null;
-        Response response = null;
-        T responseObject =null;
-        try{
-
-            target = client.target(query);
-            response = target.request().
-                    accept(MediaType.APPLICATION_JSON).
-                    header("Authorization", auth).
-                    header("X-SA-Ext-Date", ts).
-                    post(Entity.entity(JSONUtil.convertObjectToJSON(usersToGroup),MediaType.APPLICATION_JSON));
-
-            responseObject=response.readEntity(valueType);
-            response.close();
-        }catch(Exception e){
-            logger.error(new StringBuilder().append("Exception Associating Users to Group: \nQuery:\n\t")
-                    .append(query).append("\nError:").append(e.getMessage()).toString(), e);
-        }
-
-        return responseObject;
+        return executePostRawRequest(auth, query, usersToGroup, valueType, ts);
 
     }
 
     //Single Group to Single User
-    public <T> T executeSingleGroupToSingleUser(String auth, String query,String ts,  Class<T> valueType)throws Exception {
-        if(client == null) {
-            createConnection();
-        }
-
-        WebTarget target = null;
-        Response response = null;
-        T genericResponse =null;
-        try{
-
-            target = client.target(query);
-            response = target.request().
-                    accept(MediaType.APPLICATION_JSON).
-                    header("Authorization", auth).
-                    header("X-SA-Ext-Date", ts).
-                    post(Entity.entity("",MediaType.APPLICATION_JSON));
-            genericResponse = response.readEntity(valueType);
-            response.close();
-        }catch(Exception e){
-            logger.error(new StringBuilder().append("Exception Adding Group to User: \nQuery:\n\t")
-                    .append(query).append("\nError:").append(e.getMessage()).toString(), e);
-        }
-
-        return genericResponse;
+    public <T> T executeSingleGroupToSingleUser(String auth, String query, String ts, Class<T> valueType)throws Exception {
+        return executeSingleGroupToSingleUser(auth, query, "", "", ts, valueType);
 
     }
 
-    //Signle User to Multiple Groups
+    //Single Group to Single User
+    public <T> T executeSingleGroupToSingleUser(String auth, String query, String userId, String groupId, String ts, Class<T> valueType)throws Exception {
+        return executePostRawRequestWithoutPayload(auth, query, userId, groupId, valueType, ts);
+
+    }
+
+    //Single User to Multiple Groups
     public <T> T executeUserToGroupsRequest(String auth, String query, UserToGroups userToGroups, String ts, Class<T> valueType)throws Exception{
-
-        if(client == null) {
-            createConnection();
-        }
-
-        WebTarget target = null;
-        Response response = null;
-        T responseObject =null;
-        try{
-
-            target = client.target(query);
-            response = target.request().
-                    accept(MediaType.APPLICATION_JSON).
-                    header("Authorization", auth).
-                    header("X-SA-Ext-Date", ts).
-                    post(Entity.entity(JSONUtil.convertObjectToJSON(userToGroups),MediaType.APPLICATION_JSON));
-
-            responseObject=response.readEntity(valueType);
-            response.close();
-        }catch(Exception e){
-            logger.error(new StringBuilder().append("Exception Associating Users to Group: \nQuery:\n\t")
-                    .append(query).append("\nError:").append(e.getMessage()).toString(), e);
-        }
-
-        return responseObject;
-
+        return executePostRawRequest(auth, query, userToGroups, valueType, ts);
     }
 
     //Run NumberProfile Post
@@ -1061,5 +1027,34 @@ public class SAExecuter {
 
     }
 
+    public BaseResponse getUserStatus(String userId, String ts, SAAuth saAuth) {
+        try {
+            String query = StatusQuery.queryStatus(saAuth.getRealm(), userId);
+
+            String header = RestApiHeader.getAuthorizationHeader(saAuth, Resource.METHOD_GET, query, ts);
+
+            return executeGetRequest(header, saBaseURL.getApplianceURL() + query, ts, BaseResponse.class);
+
+        } catch (Exception e) {
+            throw new SARestAPIException("Exception occurred executing get user status query", e);
+        }
+
+    }
+
+    // Helper function for encoding users with special characters
+    private WebTarget encodeQueryUser (String query, String userId) throws Exception{
+        return encodeQueryUser(query, userId,"");
+    }
+
+    private WebTarget encodeQueryUser (String query, String userId, String groupId) throws Exception{
+
+        URI uri = URI.create(query);
+        WebTarget target = client.target(uri);
+        String encodedUser = encodedValue(userId);
+        if (!groupId.isBlank()) {
+            target.queryParam("groups", encodedValue(groupId));
+        }
+        return target.queryParam("username", encodedUser);
+    }
 
 }
