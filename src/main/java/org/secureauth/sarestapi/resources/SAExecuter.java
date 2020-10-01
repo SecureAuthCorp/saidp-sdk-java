@@ -10,6 +10,7 @@ import java.util.Optional;
 
 import javax.net.ssl.*;
 import javax.ws.rs.client.Entity;
+import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.MediaType;
 
 import org.glassfish.jersey.client.ClientProperties;
@@ -110,6 +111,27 @@ public class SAExecuter {
         return executeGetRequest(auth, query, "", ts, valueType);
     }
 
+    public <T> T executeGetRequestStateful(String auth, Cookie ingressCookie, String query, String ts, Class<T> valueType) throws Exception {
+        if (client == null) {
+            createConnection();
+        }
+        try {
+            WebTarget target = client.target( query );
+            Response response = target.request().
+                    accept(MediaType.APPLICATION_JSON).
+                    header("Authorization", auth).
+                    header("X-SA-Ext-Date", ts).
+                    cookie( ingressCookie ).
+                    get();
+            T genericResponse = response.readEntity(valueType);
+            response.close();
+            return genericResponse;
+        } catch (Exception e) {
+            logger.error("Exception Get Request: \nQuery:\n\t" + query + "\nError:" + e.getMessage());
+        }
+        return null;
+    }
+
     public <T> T executeGetRequest(String auth, String query, String userId, String ts, Class<T> valueType) throws Exception {
         if (client == null) {
             createConnection();
@@ -179,6 +201,28 @@ public class SAExecuter {
                     query + "\nError:" + e.getMessage(), e);
         }
     }
+
+    public <T extends StatefulResponseObject> T executePostRequestStateful(String auth,String query, AuthRequest authRequest,String ts, Class<T> valueType)throws Exception {
+        if (client == null) {
+            createConnection();
+        }
+        try {
+            WebTarget target = client.target(query);
+            Response response = target.request().
+                    accept(MediaType.APPLICATION_JSON).
+                    header("Authorization", auth).
+                    header("X-SA-Ext-Date", ts).
+                    post(Entity.entity(JSONUtil.convertObjectToJSON(authRequest), MediaType.APPLICATION_JSON));
+            T responseObject = response.readEntity(valueType);
+            responseObject.setIngressCookie( response.getCookies().get( "INGRESSCOOKIE" ) );
+            response.close();
+            return responseObject;
+        } catch (Exception e) {
+            throw new SARestAPIException("Exception Delivering Push Notifiation: \nQuery:\n\t" +
+                    query + "\nError:" + e.getMessage(), e);
+        }
+    }
+
 
     public <T> T executePutRequest(String auth, String query, Object payloadRequest, Class<T> responseValueType, String ts)throws Exception {
         return executePutRequest(auth, query, "", payloadRequest, responseValueType, ts);
