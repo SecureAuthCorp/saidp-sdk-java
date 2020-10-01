@@ -5,9 +5,11 @@ import org.junit.Before;
 import org.junit.Test;
 import org.secureauth.sarestapi.ISAAccess;
 import org.secureauth.sarestapi.SAAccess;
+import org.secureauth.sarestapi.data.Requests.DeleteUserRequest;
 import org.secureauth.sarestapi.data.Response.BaseResponse;
 import org.secureauth.sarestapi.data.Response.DFPValidateResponse;
 import org.secureauth.sarestapi.data.Response.FactorsResponse;
+import org.secureauth.sarestapi.data.Response.ResponseObject;
 import org.secureauth.sarestapi.data.Response.UserProfileResponse;
 import org.secureauth.sarestapi.data.SAAuth;
 import org.secureauth.sarestapi.data.SABaseURL;
@@ -459,6 +461,16 @@ public class SAAccessTDD {
 	}
 
 	@Test
+	public void testDeleteUserValid() throws Exception {
+
+		ResponseObject responseObj = saAccess.deleteUser(validUsername, "domain", Boolean.FALSE );
+
+		assertNotNull(responseObj);
+		assertEquals("success", responseObj.getStatus());
+		assertEquals("", responseObj.getMessage());
+	}
+
+	@Test
 	public void testDFPScoreWithValidFoundData() throws Exception {
 		/*
 		 * Response would return:
@@ -557,6 +569,8 @@ public class SAAccessTDD {
 		assertEquals(90.0, response.getUpdate_score(), 1);
 		assertEquals(89.0, response.getMatch_score(), 1);
 	}
+
+
 
 	@Test
 	public void testDFPSaveWithValidFound() throws Exception {

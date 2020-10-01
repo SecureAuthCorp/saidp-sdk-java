@@ -1023,6 +1023,21 @@ public class SAAccess implements ISAAccess{
         return null;
     }
 
+    @Override
+    public ResponseObject deleteUser(String userId, String domain, Boolean deleteRelatedData) {
+        try{
+            String ts = getServerTime();
+            DeleteUserRequest deleteUserRequest = new DeleteUserRequest(userId, deleteRelatedData, domain);
+
+            String header = RestApiHeader.getAuthorizationHeader(saAuth, Resource.METHOD_DELETE, IDMQueries.queryUsers(saAuth.getRealm()),ts);
+
+            return saExecuter.executeDeleteRawRequest(header,saBaseURL.getApplianceURL() + IDMQueries.queryUsers(saAuth.getRealm()),
+                    ts, deleteUserRequest, ResponseObject.class);
+        }catch (Exception e){
+            throw new SARestAPIException("Exception occurred executing REST query:\n" + e.getMessage() + "\n", e);
+        }
+    }
+
     /**
      * <p>
      *     Associate User to Group

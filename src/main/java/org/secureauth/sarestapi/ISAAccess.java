@@ -352,6 +352,17 @@ public interface ISAAccess {
 
 	/**
 	 * <p>
+	 * 	    Delete User
+	 * </p>
+	 * @param userId the UserID to delete
+	 * @param domain
+	 * @param deleteRelatedData
+	 * @return {@link ResponseObject}
+	 */
+	ResponseObject deleteUser(String userId, String domain, Boolean deleteRelatedData);
+
+	/**
+	 * <p>
 	 *     Associate User to Group
 	 * </p>
 	 * @param userId the user id of the identity
