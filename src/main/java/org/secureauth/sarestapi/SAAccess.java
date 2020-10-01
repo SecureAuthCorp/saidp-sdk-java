@@ -2,13 +2,9 @@ package org.secureauth.sarestapi;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
 
 import com.google.common.collect.Maps;
 import org.secureauth.sarestapi.data.*;
@@ -22,7 +18,6 @@ import org.secureauth.sarestapi.data.Response.*;
 import org.secureauth.sarestapi.data.Requests.UserPasswordRequest;
 import org.secureauth.sarestapi.data.Response.UserProfileResponse;
 import org.secureauth.sarestapi.data.UserProfile.NewUserProfile;
-import org.secureauth.sarestapi.data.UserProfile.UserProfileKB;
 import org.secureauth.sarestapi.data.UserProfile.UserToGroups;
 import org.secureauth.sarestapi.data.UserProfile.UsersToGroup;
 import org.secureauth.sarestapi.exception.SARestAPIException;
@@ -1040,31 +1035,22 @@ public class SAAccess implements ISAAccess{
      * @return {@link ResponseObject}
      */
     public ResponseObject createUser(NewUserProfile newUserProfile){
-        try{
-            validateUser(newUserProfile);
-            String ts = getServerTime();
-            sortKBQKBAbyKey(newUserProfile);
-            String header = RestApiHeader.getAuthorizationHeader(saAuth, Resource.METHOD_POST, IDMQueries.queryUsers(saAuth.getRealm()),newUserProfile,ts);
+        String ts = getServerTime();
+        RestApiHeader restApiHeader = new RestApiHeader();
+        String header = restApiHeader.getAuthorizationHeader(saAuth,"POST",IDMQueries.queryUsers(saAuth.getRealm()),newUserProfile,ts);
 
-            return saExecuter.executeUserProfileCreateRequest(header,saBaseURL.getApplianceURL() + IDMQueries.queryUsers(saAuth.getRealm()),newUserProfile,ts,ResponseObject.class);
+        /*
+        At a minimum creating a user requires UserId and Passowrd
+         */
+        if(newUserProfile.getUserId() != null && !newUserProfile.getUserId().isEmpty() && newUserProfile.getPassword() != null && !newUserProfile.getPassword().isEmpty()){
+            try{
+                return saExecuter.executeUserProfileCreateRequest(header,saBaseURL.getApplianceURL() + IDMQueries.queryUsers(saAuth.getRealm()),newUserProfile,ts,ResponseObject.class);
 
-        }catch (Exception e){
-            throw new SARestAPIException("Exception occurred executing REST query on createUser:\n" + e.getMessage() + "\n", e);
+            }catch (Exception e){
+                logger.error(new StringBuilder().append("Exception occurred executing REST query::\n").append(e.getMessage()).append("\n").toString(), e);
+            }
         }
-    }
-
-    /**
-     * Check mandatory fields for creating a user.
-     *
-     * @param newUserProfile
-     * @return
-     */
-    private void validateUser(NewUserProfile newUserProfile){
-        if(newUserProfile.getUserId() == null || newUserProfile.getUserId().isEmpty() ||
-                newUserProfile.getPassword() == null || newUserProfile.getPassword().isEmpty()) {
-            throw new IllegalArgumentException("User and password are required to create a new user");
-        }
-        return;
+        return null;
     }
 
     /**
@@ -1076,11 +1062,12 @@ public class SAAccess implements ISAAccess{
      * @return {@link ResponseObject}
      */
     public ResponseObject updateUser(String userId, NewUserProfile userProfile){
-        try{
-            String ts = getServerTime();
-            sortKBQKBAbyKey(userProfile);
-            String header = RestApiHeader.getAuthorizationHeader(saAuth, Resource.METHOD_PUT, IDMQueries.queryUserProfile(saAuth.getRealm(),userId),userProfile,ts);
+        String ts = getServerTime();
+        RestApiHeader restApiHeader = new RestApiHeader();
+        String header = restApiHeader.getAuthorizationHeader(saAuth,"PUT",IDMQueries.queryUserProfile(saAuth.getRealm(),userId),userProfile,ts);
 
+
+        try{
             return saExecuter.executeUserProfileUpdateRequest(header,
                     saBaseURL.getApplianceURL() + IDMQueries.queryUserProfile(saAuth.getRealm(),userId),
                     userProfile,
@@ -1088,18 +1075,10 @@ public class SAAccess implements ISAAccess{
                     ResponseObject.class);
 
         }catch (Exception e){
-            throw new SARestAPIException("Exception occurred executing REST query on updateUser:\n" + e.getMessage() + "\n", e);
+            logger.error(new StringBuilder().append("Exception occurred executing REST query::\n").append(e.getMessage()).append("\n").toString(), e);
         }
-    }
 
-    private void sortKBQKBAbyKey(NewUserProfile userProfile){
-        List<Map.Entry<String, UserProfileKB>> userProfileList = userProfile.getKnowledgeBase().entrySet().stream()
-                .sorted(Map.Entry.comparingByKey(String::compareToIgnoreCase))
-                .collect(Collectors.toList());
-        userProfile.setKnowledgeBase(userProfileList.stream()
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue,
-                        (v1,v2)->v1,
-                        LinkedHashMap::new)));
+        return null;
     }
 
     /**
@@ -1112,11 +1091,12 @@ public class SAAccess implements ISAAccess{
      * @return {@link ResponseObject}
      */
     public ResponseObject updateUserQP(String userId, NewUserProfile userProfile){
-        try{
-            String ts = getServerTime();
-            sortKBQKBAbyKey(userProfile);
-            String header = RestApiHeader.getAuthorizationHeader(saAuth, Resource.METHOD_PUT, IDMQueries.queryUserProfileQP(saAuth.getRealm()),userProfile,ts);
+        String ts = getServerTime();
+        RestApiHeader restApiHeader = new RestApiHeader();
+        String header = restApiHeader.getAuthorizationHeader(saAuth,"PUT",IDMQueries.queryUserProfileQP(saAuth.getRealm()),userProfile,ts);
 
+
+        try{
             return saExecuter.executeUserProfileUpdateRequest(header,
                     saBaseURL.getApplianceURL() + IDMQueries.queryUserProfileQP(saAuth.getRealm()),userId,
                     userProfile,
@@ -1124,8 +1104,10 @@ public class SAAccess implements ISAAccess{
                     ResponseObject.class);
 
         }catch (Exception e){
-            throw new SARestAPIException("Exception occurred executing REST query:\n" + e.getMessage() + "\n", e);
+            logger.error(new StringBuilder().append("Exception occurred executing REST query::\n").append(e.getMessage()).append("\n").toString(), e);
         }
+
+        return null;
     }
 
     /**

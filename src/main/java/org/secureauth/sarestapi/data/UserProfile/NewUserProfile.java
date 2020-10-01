@@ -4,9 +4,6 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 
 import javax.xml.bind.annotation.XmlRootElement;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.TreeMap;
 
 /**
  * Created by rrowcliffe on 5/2/16.
@@ -17,7 +14,7 @@ public class NewUserProfile {
     private String userId;
     private String password;
     private NewUserProfileProperties properties;
-    private Map<String,UserProfileKB> knowledgeBase = new LinkedHashMap<>();
+    private HashMap<String,UserProfileKB> knowledgeBase = new HashMap<>();
     private UserProfileGroups groups;
     private UserProfileAccessHistories accessHistories;
 
@@ -45,11 +42,11 @@ public class NewUserProfile {
         this.properties = properties;
     }
 
-    public Map<String, UserProfileKB> getKnowledgeBase() {
+    public HashMap<String, UserProfileKB> getKnowledgeBase() {
         return knowledgeBase;
     }
 
-    public void setKnowledgeBase(Map<String, UserProfileKB> knowledgeBase) {
+    public void setKnowledgeBase(HashMap<String, UserProfileKB> knowledgeBase) {
         this.knowledgeBase = knowledgeBase;
     }
 

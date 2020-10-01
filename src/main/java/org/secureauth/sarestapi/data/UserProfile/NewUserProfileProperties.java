@@ -35,6 +35,7 @@ public class NewUserProfileProperties {
     private String auxId10;
     private String pinHash;
 
+
     public String getFirstName() {
         return firstName;
     }
