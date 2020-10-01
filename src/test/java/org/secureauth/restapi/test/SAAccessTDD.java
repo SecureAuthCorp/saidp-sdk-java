@@ -2,7 +2,9 @@ package org.secureauth.restapi.test;
 
 import org.junit.Assume;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.secureauth.sarestapi.ISAAccess;
 import org.secureauth.sarestapi.SAAccess;
 import org.secureauth.sarestapi.data.Requests.DeleteUserRequest;
@@ -13,6 +15,10 @@ import org.secureauth.sarestapi.data.Response.ResponseObject;
 import org.secureauth.sarestapi.data.Response.UserProfileResponse;
 import org.secureauth.sarestapi.data.SAAuth;
 import org.secureauth.sarestapi.data.SABaseURL;
+import org.secureauth.sarestapi.data.UserProfile.NewUserProfile;
+import org.secureauth.sarestapi.data.UserProfile.NewUserProfileProperties;
+import org.secureauth.sarestapi.data.UserProfile.UserProfileKB;
+import org.secureauth.sarestapi.exception.SARestAPIException;
 import org.secureauth.sarestapi.resources.SAExecuter;
 import org.secureauth.sarestapi.util.Property;
 import org.secureauth.sarestapi.util.RetrievePropertiesUtils;
@@ -29,6 +35,8 @@ import static org.junit.Assert.assertTrue;
 public class SAAccessTDD {
 
 	private static Logger logger = LoggerFactory.getLogger(SAAccessTDD.class);
+	@Rule
+	public ExpectedException exceptionRule = ExpectedException.none();
 
 	private static SAAuth saAuth;
 	private static ISAAccess saAccess;
@@ -47,6 +55,7 @@ public class SAAccessTDD {
 	private static String validPin;
 	private static String validPassword;
 	private final static String UNEXISTING_USERNAME = "unexisting-user";
+	private final static String UNEXISTING_USERNAME_QP = UNEXISTING_USERNAME + "!@#$%^&*(";
 
 	//DFP
 	private static String validFingerprintId;
@@ -158,6 +167,46 @@ public class SAAccessTDD {
 	}
 
 	@Test
+	public void testGetPropertiesWithValidUserQP() throws Exception {
+		/*
+		 * Response would return:
+			{
+			  "status" : "found",
+			  "message" : "",
+			  "userId" : "jsmith",
+			  "properties" : {
+			    "firstName" : {
+			      "value" : "John",
+			      "isWritable" : "false"
+			    },
+			    "lastName" : {
+			      "value" : "Smith",
+			      "isWritable" : "false"
+			    },
+			    "email1" : {
+			      "value" : "jsmith@secureauth.com",
+			      "isWritable" : "false"
+			    }
+			  },
+			  "knowledgeBase" : { },
+			  "groups" : [ ],
+			  "accessHistories" : [ {
+			    "userAgent" : "Jersey/2.5.1 (HttpUrlConnection 1.8.0_202)",
+			    "ipAddress" : "11.1.1.2",
+			    "timeStamp" : "2019-07-12T18:13:17.921501Z",
+			    "authState" : "Success"
+			  },
+			  {...} ]
+			}
+		 */
+
+		UserProfileResponse response = saAccess.getUserProfileQP(validUsername);
+		assertNotNull(response);
+		assertEquals(FOUND_MESSAGE, response.getStatus());
+		assertTrue(response.getMessage().isEmpty());
+	}
+
+	@Test
 	public void testGetPropertiesWithUnexistingUser() throws Exception {
 		/*
 		 * Response would return:
@@ -174,8 +223,30 @@ public class SAAccessTDD {
 
 		UserProfileResponse response = saAccess.getUserProfile(UNEXISTING_USERNAME);
 		assertNotNull(response);
-		assertEquals(response.getStatus(), NOT_FOUND_MESSAGE);
-		assertEquals(response.getMessage(), "User Id was not found.");
+		assertEquals(NOT_FOUND_MESSAGE, response.getStatus());
+		assertEquals( "User Id was not found.", response.getMessage());
+	}
+
+	@Test
+	public void testGetPropertiesWithUnexistingUserQP() throws Exception {
+		/*
+		 * Response would return:
+			{
+			  "status" : "not_found",
+			  "message" : "User Id was not found.",
+			  "user_id" : "unexisting-user",
+			  "properties" : { },
+			  "knowledgeBase" : { },
+			  "groups" : [ ],
+			  "accessHistories" : [ ]
+			}
+		 */
+
+		UserProfileResponse response = saAccess.getUserProfileQP(UNEXISTING_USERNAME_QP);
+		assertNotNull(response);
+		// If the special characters are not being recognised then we should get some sort of reject instead of a NOT_FOUND_MESSAGE here
+		assertEquals(NOT_FOUND_MESSAGE, response.getStatus());
+		assertEquals( "User Id was not found.", response.getMessage());
 	}
 
 	@Test
@@ -303,7 +374,42 @@ public class SAAccessTDD {
 
 		FactorsResponse response = saAccess.factorsByUser(validUsername);
 		assertNotNull(response);
-		assertEquals(response.getStatus(), FOUND_MESSAGE);
+		assertEquals(FOUND_MESSAGE, response.getStatus());
+		assertTrue(response.getMessage().isEmpty());
+	}
+
+	@Test
+	public void testGetFactorsFromValidUserQP() throws Exception {
+		/*
+		 * Response would return:
+			{
+			  "status" : "found",
+			  "message" : "",
+			  "user_id" : "jsmith",
+			  "factors" : [ {
+			    "type" : "email",
+			    "id" : "Email1",
+			    "value" : "jsmith@secureauth.com"
+			  }, {
+			    "type" : "push",
+			    "id" : "8020890sxt414974b2235e31f4192785",
+			    "value" : "SM-J7",
+			    "capabilities" : [ "push", "push_accept" ]
+			  }, {
+			    "type" : "oath",
+			    "id" : "7edec5b5e3f553150f1e90261a03b8fd",
+			    "value" : "Windows"
+			  }, {
+			    "type" : "oath",
+			    "id" : "6f669edbb4504a15acec016d7ef9f42b",
+			    "value" : "SM-J7"
+			  } ]
+			}
+		 */
+
+		FactorsResponse response = saAccess.factorsByUserQP(validUsername);
+		assertNotNull(response);
+		assertEquals(FOUND_MESSAGE, response.getStatus());
 		assertTrue(response.getMessage().isEmpty());
 	}
 
@@ -321,8 +427,26 @@ public class SAAccessTDD {
 
 		FactorsResponse response = saAccess.factorsByUser(UNEXISTING_USERNAME);
 		assertNotNull(response);
-		assertEquals(response.getStatus(), NOT_FOUND_MESSAGE);
-		assertEquals(response.getMessage(), "User Id was not found.");
+		assertEquals(NOT_FOUND_MESSAGE, response.getStatus());
+		assertEquals("User Id was not found.", response.getMessage());
+	}
+
+	@Test
+	public void testGetFactorsFromUnexistingUserQP() throws Exception {
+		/*
+		 * Response would return:
+			{
+			  "status" : "not_found",
+			  "message" : "User Id was not found.",
+			  "user_id" : "unexisting-user",
+			  "factors" : [ ]
+			}
+		 */
+
+		FactorsResponse response = saAccess.factorsByUserQP(UNEXISTING_USERNAME_QP);
+		assertNotNull(response);
+		assertEquals(NOT_FOUND_MESSAGE, response.getStatus());
+		assertEquals("User Id was not found.", response.getMessage());
 	}
 
 	@Test
@@ -369,7 +493,7 @@ public class SAAccessTDD {
 			}
 		 */
 
-		BaseResponse response = saAccess.validateUser(UNEXISTING_USERNAME);
+		BaseResponse response = saAccess.validateUser(UNEXISTING_USERNAME_QP);
 		assertNotNull(response);
 		assertEquals(response.getStatus(), NOT_FOUND_MESSAGE);
 		assertEquals(response.getMessage(), "User Id was not found.");
@@ -435,6 +559,78 @@ public class SAAccessTDD {
 		assertNotNull(response);
 		assertEquals(response.getStatus(), invalidStringForPin);
 		assertTrue(response.getMessage().contains("PIN is invalid."));
+	}
+
+	@Test
+	public void testUpdateUserProfileKBQKBAOrderedValid() throws Exception {
+		NewUserProfile newUserProfile = new NewUserProfile();
+		newUserProfile.getKnowledgeBase().put("nonFormated1", new UserProfileKB("kbq1", "kba1"));
+		newUserProfile.getKnowledgeBase().put("nonFormated3", new UserProfileKB("kbq3", "kba3"));
+		newUserProfile.getKnowledgeBase().put("nonFormated2", new UserProfileKB("kbq2", "kba2"));
+		newUserProfile.setPassword(validPassword);
+		NewUserProfileProperties newUserProfileProperties = new NewUserProfileProperties();
+		newUserProfileProperties.setEmail4("email@email.com");
+		newUserProfileProperties.setAuxId10("aux10");
+		newUserProfileProperties.setPhone4("123-456-7890");
+		newUserProfile.setProperties(newUserProfileProperties);
+
+		ResponseObject responseObj = saAccess.updateUser(validUsername, newUserProfile);
+
+		assertNotNull(responseObj);
+		assertEquals("success", responseObj.getStatus());
+		assertEquals("", responseObj.getMessage());
+	}
+
+	@Test
+	public void testCreateUserProfileKBQKBAOrderedValid() throws Exception {
+
+		NewUserProfile newUserProfile = new NewUserProfile();
+		newUserProfile.getKnowledgeBase().put("NonFormated2", new UserProfileKB("Kbq2", "kba2"));
+		newUserProfile.getKnowledgeBase().put("nOnFormated3", new UserProfileKB("kbq3", "kba3"));
+		newUserProfile.getKnowledgeBase().put("nonFormated1", new UserProfileKB("kBq1", "kba1"));
+		newUserProfile.setPassword(validPassword);
+		newUserProfile.setUserId(String.valueOf(randomNumberBetween(1, 1000)));
+		NewUserProfileProperties newUserProfileProperties = new NewUserProfileProperties();
+		newUserProfileProperties.setEmail1("email@email.com");
+		newUserProfileProperties.setAuxId10("aux10");
+		newUserProfileProperties.setPhone4("123-456-7890");
+		newUserProfileProperties.setFirstName("foo");
+		newUserProfileProperties.setLastName("foo");
+		newUserProfile.setProperties(newUserProfileProperties);
+
+		ResponseObject responseObj = saAccess.createUser(newUserProfile);
+
+		assertNotNull(responseObj);
+		assertEquals("success", responseObj.getStatus());
+		assertEquals("", responseObj.getMessage());
+	}
+
+	@Test(expected = SARestAPIException.class)
+	public void testCreateUserProfileKBQKBAOrderedInValid() throws Exception {
+
+		NewUserProfile newUserProfile = new NewUserProfile();
+		newUserProfile.getKnowledgeBase().put("nonFormated1", new UserProfileKB("kbq1", "kba1"));
+		newUserProfile.getKnowledgeBase().put("nonFormated2", new UserProfileKB("kbq2", "kba2"));
+		newUserProfile.getKnowledgeBase().put("nonFormated3", new UserProfileKB("kbq3", "kba3"));
+		newUserProfile.setPassword("");
+		newUserProfile.setUserId("");
+		NewUserProfileProperties newUserProfileProperties = new NewUserProfileProperties();
+		newUserProfileProperties.setEmail1("email@email.com");
+		newUserProfileProperties.setAuxId10("aux10");
+		newUserProfileProperties.setPhone4("123-456-7890");
+		newUserProfileProperties.setFirstName("foo");
+		newUserProfileProperties.setLastName("foo");
+		newUserProfile.setProperties(newUserProfileProperties);
+
+		ResponseObject responseObj = saAccess.createUser(newUserProfile);
+
+		exceptionRule.expect(SARestAPIException.class);
+		exceptionRule.expectMessage("User and password are required to create a new user");
+		assertEquals(null, responseObj);
+	}
+
+	private double randomNumberBetween(int min, int max){
+		return (Math.random() * ((max - min) + 1)) + min;
 	}
 
 	@Test

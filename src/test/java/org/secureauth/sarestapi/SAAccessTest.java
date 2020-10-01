@@ -11,6 +11,9 @@ import org.secureauth.sarestapi.data.SAAuth;
 import org.secureauth.sarestapi.data.SABaseURL;
 import org.secureauth.sarestapi.data.Response.GroupAssociationResponse;
 import org.secureauth.sarestapi.data.Response.ResponseObject;
+import org.secureauth.sarestapi.data.UserProfile.NewUserProfile;
+import org.secureauth.sarestapi.data.UserProfile.NewUserProfileProperties;
+import org.secureauth.sarestapi.data.UserProfile.UserProfileKB;
 import org.secureauth.sarestapi.data.UserProfile.UserToGroups;
 import org.secureauth.sarestapi.data.UserProfile.UsersToGroup;
 import org.secureauth.sarestapi.queries.IDMQueries;
@@ -19,6 +22,8 @@ import org.secureauth.sarestapi.resources.SAExecuter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
@@ -37,6 +42,7 @@ public class SAAccessTest {
 	private final static String host = "foobar.com";
 	private final static String port = "443";
 	private final static String userId = "foobar";
+	private final static String userIdQP = "foobar!@#$%^&(*";
 	private final static String passCode = "foobar";
 	private static SAAuth saAuth;
 	private static ISAAccess saAccess;
@@ -83,6 +89,22 @@ public class SAAccessTest {
 	}
 
 	@Test
+	public void getUserStatusWhenValidUserQP() throws Exception {
+
+		String query = StatusQuery.queryStatusQP(saAuth.getRealm());
+
+		BaseResponse validUserResponse = BaseResponseUtils.validUserResponse(userIdQP);
+		//when
+		when(mockedSAExecuter.executeGetRequest(any(String.class), eq(saBaseURL.getApplianceURL() + query), eq(userIdQP), any(), any()))
+						.thenReturn(validUserResponse);
+
+		BaseResponse response = saAccess.getUserStatusQP(userIdQP);
+
+		Assert.assertEquals(validUserResponse, response);
+
+	}
+
+	@Test
 	public void setUserStatusWhenValidStatus() throws Exception {
 		String query = StatusQuery.queryStatus(saAuth.getRealm(), userId);
 		String status = "new status";
@@ -98,6 +120,21 @@ public class SAAccessTest {
 	}
 
 	@Test
+	public void setUserStatusWhenValidStatusQP() throws Exception {
+		String query = StatusQuery.queryStatusQP(saAuth.getRealm());
+		String status = "new status";
+
+		BaseResponse successResponse = BaseResponseUtils.successResponse(userIdQP);
+		//when
+		when(mockedSAExecuter.executePostRawRequest(any(), eq(saBaseURL.getApplianceURL() + query), eq(userIdQP), any(),
+						any(), any(), any())).thenReturn(successResponse);
+
+		BaseResponse response = saAccess.setUserStatusQP(userIdQP, status);
+
+		Assert.assertEquals(successResponse, response);
+	}
+
+	@Test
 	public void addUserToGroupWhenValid() throws Exception {
 		String groupName = "newGroup";
 
@@ -108,6 +145,21 @@ public class SAAccessTest {
 				any(), eq(ResponseObject.class))).thenReturn(validResponse);
 
 		ResponseObject response = saAccess.addUserToGroup(userId, groupName);
+
+		Assert.assertEquals(validResponse, response);
+	}
+
+	@Test
+	public void addUserToGroupWhenValidQP() throws Exception {
+		String groupName = "newGroup!@#$%^&(*";
+
+		ResponseObject validResponse = BaseResponseUtils.validResponse();
+		//when
+		when(mockedSAExecuter.executeSingleUserToSingleGroup(any(),
+						eq(saBaseURL.getApplianceURL() + IDMQueries.queryUserToGroupQP(saAuth.getRealm())), eq(userIdQP), eq(groupName),
+						any(), eq(ResponseObject.class))).thenReturn(validResponse);
+
+		ResponseObject response = saAccess.addUserToGroupQP(userIdQP, groupName);
 
 		Assert.assertEquals(validResponse, response);
 	}
@@ -148,6 +200,23 @@ public class SAAccessTest {
 	}
 
 	@Test
+	public void addGroupToUserWhenValidQP() throws Exception {
+		String groupName = "newGroup!@#$%^&(*";
+
+		GroupAssociationResponse validResponse = BaseResponseUtils.validGroupAssociationResponse();
+
+		UsersToGroup usersToGroup = new UsersToGroup(new String[]{groupName});
+		//when
+		when(mockedSAExecuter.executeSingleGroupToSingleUser(any(String.class),
+						eq(saBaseURL.getApplianceURL() + IDMQueries.queryGroupToUserQP(saAuth.getRealm())), eq(userIdQP), eq(groupName), any(),
+						eq(GroupAssociationResponse.class))).thenReturn(validResponse);
+
+		GroupAssociationResponse response = saAccess.addGroupToUserQP(groupName, userIdQP);
+
+		Assert.assertEquals(validResponse, response);
+	}
+
+	@Test
 	public void addUserToGroupsWhenValid() throws Exception {
 		String groupName = "newGroup";
 
@@ -162,4 +231,5 @@ public class SAAccessTest {
 
 		Assert.assertEquals(validResponse, response);
 	}
+
 }

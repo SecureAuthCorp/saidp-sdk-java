@@ -18,6 +18,8 @@ public interface IDMInterface {
 
     ResponseObject updateUser(SAAccess saAccess, String userId, NewUserProfile newUserProfile);
 
+    ResponseObject updateUserQP(SAAccess saAccess, String userId, NewUserProfile newUserProfile);
+
     ResponseObject addUserToGroup(SAAccess saAccess, String userId, String groupName);
 
     GroupAssociationResponse addUsersToGroup(SAAccess saAccess, UsersToGroup usersToGroup, String groupName);
@@ -30,7 +32,11 @@ public interface IDMInterface {
 
     ResponseObject passwordReset(SAAccess saAccess, String userId, String password);
 
+    ResponseObject passwordResetQP(SAAccess saAccess, String userId, String password);
+
     ResponseObject passwordChange(SAAccess saAccess, String userId, String currentPassword, String newPassword);
+
+    ResponseObject passwordChangeQP(SAAccess saAccess, String userId, String currentPassword, String newPassword);
 
 
 }

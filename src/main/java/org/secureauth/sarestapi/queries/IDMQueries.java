@@ -45,11 +45,29 @@ public class IDMQueries {
     }
 
     /*
+    Users Profile. This method supports special characters for userId since it uses QP (Query Params) in order to create the request.
+    */
+    public static String queryUserProfileQP(String realm){
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append(realm).append(removeLastChar(Resource.APPLIANCE_USERS));
+        return stringBuilder.toString();
+    }
+
+    /*
     Reset User Password
      */
     public static String queryUserResetPwd(String realm, String userName){
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append(realm).append(Resource.APPLIANCE_USERS).append(userName).append(Resource.APPLIANCE_IDM_USERS_PASSWD_RESET);
+        return stringBuilder.toString();
+    }
+
+    /*
+    Reset User Password. This method supports special characters for userId since it uses QP (Query Params) in order to create the request.
+     */
+    public static String queryUserResetPwdQP(String realm){
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append(realm).append(Resource.APPLIANCE_IDM_USERS_PASSWD_RESET).append(removeLastChar(Resource.APPLIANCE_USERS));
         return stringBuilder.toString();
     }
 
@@ -63,11 +81,29 @@ public class IDMQueries {
     }
 
     /*
+    User Self-Service Change Password. This method supports special characters for userId since it uses QP (Query Params) in order to create the request.
+     */
+    public static String queryUserChangePwdQP(String realm){
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append(realm).append(Resource.APPLIANCE_IDM_USERS_PASSWD_CHANGE).append(removeLastChar(Resource.APPLIANCE_USERS));
+        return stringBuilder.toString();
+    }
+
+    /*
     Single User to Single Group
      */
     public static String queryUserToGroup(String realm, String userName, String groupId){
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append(realm).append(Resource.APPLIANCE_USERS).append(userName).append(Resource.APPLIANCE_IDM_USERS_GROUPS).append(encodeGroup(groupId));
+        return stringBuilder.toString();
+    }
+
+    /*
+     Single User to Single Group. This method supports special characters for userId since it uses QP (Query Params) in order to create the request.
+      */
+    public static String queryUserToGroupQP(String realm){
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append(realm).append(removeLastChar(Resource.APPLIANCE_USERS)).append(removeLastChar(Resource.APPLIANCE_IDM_USERS_GROUPS));
         return stringBuilder.toString();
     }
 
@@ -90,6 +126,15 @@ public class IDMQueries {
     }
 
     /*
+    Single Group to Single User. This method supports special characters for userId since it uses QP (Query Params) in order to create the request.
+     */
+    public static String queryGroupToUserQP(String realm){
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append(realm).append(Resource.APPLIANCE_IDM_GROUPS).append(removeLastChar(Resource.APPLIANCE_IDM_USERS));
+        return stringBuilder.toString();
+    }
+
+    /*
     Single User to Multiple Groups
      */
 
@@ -107,5 +152,9 @@ public class IDMQueries {
             uee.printStackTrace();
         }
         return encodedGroupId;
+    }
+
+    private static String removeLastChar (String query){
+        return query.substring(0, query.length()-1);
     }
 }
