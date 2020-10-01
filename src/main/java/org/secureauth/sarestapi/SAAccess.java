@@ -1049,8 +1049,9 @@ public class SAAccess implements ISAAccess{
             return saExecuter.executeUserProfileCreateRequest(header,saBaseURL.getApplianceURL() + IDMQueries.queryUsers(saAuth.getRealm()),newUserProfile,ts,ResponseObject.class);
 
         }catch (Exception e){
-            throw new SARestAPIException("Exception occurred executing REST query on createUser:\n" + e.getMessage() + "\n", e);
+            logger.error("Exception occurred executing REST query:\n" + e.getMessage() + "\n", e);
         }
+        return null;
     }
 
     /**
@@ -1088,8 +1089,9 @@ public class SAAccess implements ISAAccess{
                     ResponseObject.class);
 
         }catch (Exception e){
-            throw new SARestAPIException("Exception occurred executing REST query on updateUser:\n" + e.getMessage() + "\n", e);
+            logger.error("Exception occurred executing REST query:\n" + e.getMessage() + "\n", e);
         }
+        return null;
     }
 
     private void sortKBQKBAbyKey(NewUserProfile userProfile){
