@@ -1112,12 +1112,11 @@ public class SAAccess implements ISAAccess{
      * @return {@link ResponseObject}
      */
     public ResponseObject updateUserQP(String userId, NewUserProfile userProfile){
-        String ts = getServerTime();
-        RestApiHeader restApiHeader = new RestApiHeader();
-        String header = restApiHeader.getAuthorizationHeader(saAuth,"PUT",IDMQueries.queryUserProfileQP(saAuth.getRealm()),userProfile,ts);
-
-
         try{
+            String ts = getServerTime();
+            sortKBQKBAbyKey(userProfile);
+            String header = RestApiHeader.getAuthorizationHeader(saAuth, Resource.METHOD_PUT, IDMQueries.queryUserProfileQP(saAuth.getRealm()),userProfile,ts);
+
             return saExecuter.executeUserProfileUpdateRequest(header,
                     saBaseURL.getApplianceURL() + IDMQueries.queryUserProfileQP(saAuth.getRealm()),userId,
                     userProfile,
@@ -1125,10 +1124,8 @@ public class SAAccess implements ISAAccess{
                     ResponseObject.class);
 
         }catch (Exception e){
-            logger.error(new StringBuilder().append("Exception occurred executing REST query::\n").append(e.getMessage()).append("\n").toString(), e);
+            throw new SARestAPIException("Exception occurred executing REST query:\n" + e.getMessage() + "\n", e);
         }
-
-        return null;
     }
 
     /**
