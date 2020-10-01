@@ -973,32 +973,7 @@ public class SAExecuter {
 
     //create User Profile
     public <T> T executeUserProfileCreateRequest(String auth, String query, NewUserProfile newUserProfile, String ts, Class<T> valueType)throws Exception{
-
-        if(client == null) {
-            createConnection();
-        }
-
-        WebTarget target = null;
-        Response response = null;
-        T responseObject =null;
-        try{
-
-            target = client.target(query);
-            response = target.request().
-                    accept(MediaType.APPLICATION_JSON).
-                    header("Authorization", auth).
-                    header("X-SA-Ext-Date", ts).
-                    post(Entity.entity(JSONUtil.convertObjectToJSON(newUserProfile),MediaType.APPLICATION_JSON));
-
-            responseObject=response.readEntity(valueType);
-            response.close();
-        }catch(Exception e){
-            logger.error(new StringBuilder().append("Exception Creating User Profile: \nQuery:\n\t")
-                    .append(query).append("\nError:").append(e.getMessage()).toString(), e);
-        }
-
-        return responseObject;
-
+        return executePostRawRequest(auth, query, newUserProfile, valueType, ts);
     }
 
     //Single User to Single Group
@@ -1098,12 +1073,9 @@ public class SAExecuter {
 
     public BaseResponse getUserStatus(String userId, String ts, SAAuth saAuth) {
         try {
-
-            RestApiHeader restApiHeader = new RestApiHeader();
-
             String query = StatusQuery.queryStatus(saAuth.getRealm(), userId);
 
-            String header = restApiHeader.getAuthorizationHeader(saAuth, Resource.METHOD_GET, query, ts);
+            String header = RestApiHeader.getAuthorizationHeader(saAuth, Resource.METHOD_GET, query, ts);
 
             return executeGetRequest(header, saBaseURL.getApplianceURL() + query, ts, BaseResponse.class);
 
