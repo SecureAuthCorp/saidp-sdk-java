@@ -24,9 +24,21 @@ OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
 
 public class FactorsQuery {
 
+    //https://{domain}/{realm}/v1/users/{username}/factors
     public static String queryFactors(String realm, String userName){
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append(realm).append(Resource.APPLIANCE_USERS).append(userName).append(Resource.APPLIANCE_FACTORS);
         return stringBuilder.toString();
+    }
+
+    //https://{domain}/{realm}/v1/users/factors?username={username}
+    public static String queryFactorsQP(String realm) {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append(realm).append(removeLastChar(Resource.APPLIANCE_USERS)).append(Resource.APPLIANCE_FACTORS);
+        return stringBuilder.toString();
+    }
+
+    private static String removeLastChar (String query){
+        return query.substring(0, query.length()-1);
     }
 }

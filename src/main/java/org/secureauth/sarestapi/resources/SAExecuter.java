@@ -1,5 +1,10 @@
 package org.secureauth.sarestapi.resources;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URI;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
 import java.util.Optional;
 
@@ -34,7 +39,6 @@ import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.WebTarget;
 import org.glassfish.jersey.client.ClientConfig;
 import javax.ws.rs.core.Response;
-
 
 
 /**
@@ -103,6 +107,10 @@ public class SAExecuter {
 
     //Get Factors for the user requested
     public <T> T executeGetRequest(String auth, String query, String ts, Class<T> valueType) throws Exception {
+        return executeGetRequest(auth, query, "", ts, valueType);
+    }
+
+    public <T> T executeGetRequest(String auth, String query, String userId, String ts, Class<T> valueType) throws Exception {
         if (client == null) {
             createConnection();
         }
@@ -112,7 +120,12 @@ public class SAExecuter {
         T genericResponse = null;
         try {
 
-            target = client.target(query);
+            if (!userId.isBlank()) {
+                target = encodeQueryUser(query, userId);
+            }
+            else{
+                target = client.target(query);
+            }
             response = target.request().
                     accept(MediaType.APPLICATION_JSON).
                     header("Authorization", auth).
@@ -127,6 +140,10 @@ public class SAExecuter {
 
         return genericResponse;
 
+    }
+
+    private String encodedValue(String value) throws UnsupportedEncodingException {
+        return URLEncoder.encode(value, StandardCharsets.UTF_8.toString());
     }
 
     public <T> T executeGetRequest(SAAuth saAuth, String baseUrl, String query, String ts, Class<T> valueType) throws Exception {
@@ -164,6 +181,10 @@ public class SAExecuter {
     }
 
     public <T> T executePutRequest(String auth, String query, Object payloadRequest, Class<T> responseValueType, String ts)throws Exception {
+        return executePutRequest(auth, query, "", payloadRequest, responseValueType, ts);
+    }
+
+    public <T> T executePutRequest(String auth, String query, String userId, Object payloadRequest, Class<T> responseValueType, String ts)throws Exception {
         if(client == null) {
             createConnection();
         }
@@ -173,7 +194,12 @@ public class SAExecuter {
         T genericResponse =null;
         try{
 
-            target = client.target(query);
+            if (!userId.isBlank()) {
+                target = encodeQueryUser(query, userId);
+            }
+            else{
+                target = client.target(query);
+            }
             response = target.request().
                     accept(MediaType.APPLICATION_JSON).
                     header("Authorization", auth).
@@ -189,6 +215,10 @@ public class SAExecuter {
     }
 
     public <T> T executePostRawRequest(String auth,String query, Object authRequest, Class<T> valueType, String ts)throws Exception{
+        return executePostRawRequest(auth, query, "", "", authRequest, valueType, ts);
+    }
+
+    public <T> T executePostRawRequest(String auth,String query, String userId, String groupId, Object authRequest, Class<T> valueType, String ts)throws Exception{
 
         if(client == null) {
             createConnection();
@@ -198,7 +228,12 @@ public class SAExecuter {
             Response response = null;
             T responseObject = null;
 
-            target = client.target(query);
+            if (!userId.isBlank()) {
+                target = encodeQueryUser(query, userId, groupId);
+            }
+            else{
+                target = client.target(query);
+            }
             response = target.request().
                     accept(MediaType.APPLICATION_JSON).
                     header("Authorization", auth).
@@ -212,7 +247,11 @@ public class SAExecuter {
         }
     }
 
-    public <T> T executePostRawRequestWithoutPayload(String auth,String query, Class<T> valueType, String ts)throws Exception{
+    public <T> T executePostRawRequestWithoutPayload(String auth,String query, Class<T> valueType, String ts)throws Exception {
+        return executePostRawRequestWithoutPayload(auth, query, "", "",valueType, ts);
+    }
+
+    public <T> T executePostRawRequestWithoutPayload(String auth,String query, String userId,String groupId, Class<T> valueType, String ts)throws Exception{
 
         if(client == null) {
             createConnection();
@@ -223,7 +262,12 @@ public class SAExecuter {
         T responseObject = null;
         try{
 
-            target = client.target(query);
+            if (!userId.isBlank()) {
+                target = encodeQueryUser(query, userId, groupId);
+            }
+            else{
+                target = client.target(query);
+            }
             response = target.request().
                     accept(MediaType.APPLICATION_JSON).
                     header("Authorization", auth).
@@ -237,7 +281,11 @@ public class SAExecuter {
         }
     }
 
-    public String executeRawGetRequest(String auth, String query,String ts)throws Exception {
+    public String executeRawGetRequest(String auth, String query, String ts) throws Exception {
+        return executeRawGetRequest(auth, query, "", ts);
+    }
+
+    public String executeRawGetRequest(String auth, String query, String userId, String ts) throws Exception {
         if(client == null) {
             createConnection();
         }
@@ -246,8 +294,12 @@ public class SAExecuter {
         Response response = null;
         String factors=null;
         try{
-
-            target = client.target(query);
+            if (!userId.isBlank()) {
+                target = encodeQueryUser(query, userId);
+            }
+            else{
+                target = client.target(query);
+            }
             response = target.request().
             		accept(MediaType.APPLICATION_JSON).
                     header("Authorization", auth).
@@ -788,39 +840,21 @@ public class SAExecuter {
 
     }
 
-    //Run Password Reset (Admin level reset)
+    // Run Password Reset (Admin level reset).
     public ResponseObject executeUserPasswordReset(String auth, String query, UserPasswordRequest userPasswordRequest, String ts)throws Exception{
-
-        if(client == null) {
-            createConnection();
-        }
-
-        WebTarget target = null;
-        Response response = null;
-        ResponseObject passwordResetResponse =null;
-        try{
-            target = client.target(query);
-
-            response = target.request().
-                    accept(MediaType.APPLICATION_JSON).
-                    header("Authorization", auth).
-                    header("X-SA-Ext-Date", ts).
-                    post(Entity.entity(JSONUtil.convertObjectToJSON(userPasswordRequest),MediaType.APPLICATION_JSON));
-
-            passwordResetResponse = response.readEntity(ResponseObject.class);
-
-            response.close();
-        }catch(Exception e){
-            logger.error(new StringBuilder().append("Exception Running Password Reset POST: \nQuery:\n\t")
-                    .append(query).append("\nError:").append(e.getMessage()).toString(), e);
-        }
-
-        return passwordResetResponse;
-
+        return executeUserPasswordReset(auth, query, "", userPasswordRequest, ts);
+    }
+    // Fill userId string when you want to encode and send userId through Query Params.
+    public ResponseObject executeUserPasswordReset(String auth, String query, String userId, UserPasswordRequest userPasswordRequest, String ts)throws Exception{
+        return executePostRawRequest(auth, query, userId, "", userPasswordRequest, ResponseObject.class,  ts);
     }
 
-    //Run Change Password (Self Service)
+    // Run Change Password (Self Service).
     public ResponseObject executeUserPasswordChange(String auth, String query, UserPasswordRequest userPasswordRequest, String ts)throws Exception{
+        return executeUserPasswordChange(auth, query, "", userPasswordRequest, ts);
+    }
+    // Fill userId string when you want to encode and send userId through Query Params.
+    public ResponseObject executeUserPasswordChange(String auth, String query, String userId, UserPasswordRequest userPasswordRequest, String ts)throws Exception{
 
         if(client == null) {
             createConnection();
@@ -830,13 +864,17 @@ public class SAExecuter {
         Response response = null;
         ResponseObject passwordChangeResponse =null;
         try{
-            target = client.target(query);
-
-            response = target.request().
-                    accept(MediaType.APPLICATION_JSON).
-                    header("Authorization", auth).
-                    header("X-SA-Ext-Date", ts).
-                    post(Entity.entity(JSONUtil.convertObjectToJSON(userPasswordRequest),MediaType.APPLICATION_JSON));
+            if (!userId.isBlank()) {
+                target = encodeQueryUser(query, userId);
+            }
+            else{
+                target = client.target(query);
+            }
+            response = target.request()
+                               .accept(MediaType.APPLICATION_JSON)
+                               .header("Authorization", auth)
+                               .header("X-SA-Ext-Date", ts)
+                               .post(Entity.entity(JSONUtil.convertObjectToJSON(userPasswordRequest),MediaType.APPLICATION_JSON));
 
             passwordChangeResponse = response.readEntity(ResponseObject.class);
 
@@ -852,7 +890,41 @@ public class SAExecuter {
 
     //Update User Profile
     public <T> T executeUserProfileUpdateRequest(String auth, String query,NewUserProfile userProfile, String ts, Class<T> valueType)throws Exception{
-        return executePutRequest(auth, query, userProfile, valueType, ts);
+        return executeUserProfileUpdateRequest(auth, query, "", userProfile, ts, valueType);
+    }
+
+    public <T> T executeUserProfileUpdateRequest(String auth, String query, String userId, NewUserProfile userProfile, String ts, Class<T> valueType)throws Exception{
+
+        if(client == null) {
+            createConnection();
+        }
+
+        WebTarget target = null;
+        Response response = null;
+        T responseObject =null;
+        try{
+
+            if (!userId.isBlank()) {
+                target = encodeQueryUser(query, userId);
+            }
+            else{
+                target = client.target(query);
+            }
+            response = target.request().
+                    accept(MediaType.APPLICATION_JSON).
+                    header("Authorization", auth).
+                    header("X-SA-Ext-Date", ts).
+                    put(Entity.entity(JSONUtil.convertObjectToJSON(userProfile), MediaType.APPLICATION_JSON));
+
+            responseObject=response.readEntity(valueType);
+            response.close();
+        }catch(Exception e){
+            logger.error(new StringBuilder().append("Exception Updating User Profile: \nQuery:\n\t")
+                    .append(query).append("\nError:").append(e.getMessage()).toString(), e);
+        }
+
+        return responseObject;
+
     }
 
     //create User Profile
@@ -865,6 +937,11 @@ public class SAExecuter {
         return executePostRawRequestWithoutPayload(auth, query, valueType, ts);
     }
 
+    //Single User to Single Group
+    public <T> T executeSingleUserToSingleGroup(String auth, String query, String userId, String groupId, String ts, Class<T> valueType)throws Exception {
+        return executePostRawRequestWithoutPayload(auth, query, userId, groupId, valueType, ts);
+    }
+
     //Single Group Multiple Users
     public <T> T executeGroupToUsersRequest(String auth, String query, UsersToGroup usersToGroup, String ts, Class<T> valueType)throws Exception{
         return executePostRawRequest(auth, query, usersToGroup, valueType, ts);
@@ -873,7 +950,13 @@ public class SAExecuter {
 
     //Single Group to Single User
     public <T> T executeSingleGroupToSingleUser(String auth, String query, String ts, Class<T> valueType)throws Exception {
-        return executePostRawRequestWithoutPayload(auth, query, valueType, ts);
+        return executeSingleGroupToSingleUser(auth, query, "", "", ts, valueType);
+
+    }
+
+    //Single Group to Single User
+    public <T> T executeSingleGroupToSingleUser(String auth, String query, String userId, String groupId, String ts, Class<T> valueType)throws Exception {
+        return executePostRawRequestWithoutPayload(auth, query, userId, groupId, valueType, ts);
 
     }
 
@@ -944,22 +1027,34 @@ public class SAExecuter {
 
     }
 
-    public BaseResponse getUserStatus(String userId, String ts, SAAuth saAuth){
-        try{
-
-            RestApiHeader restApiHeader = new RestApiHeader();
-
+    public BaseResponse getUserStatus(String userId, String ts, SAAuth saAuth) {
+        try {
             String query = StatusQuery.queryStatus(saAuth.getRealm(), userId);
 
-            String header = restApiHeader.getAuthorizationHeader(saAuth, Resource.METHOD_GET, query, ts);
+            String header = RestApiHeader.getAuthorizationHeader(saAuth, Resource.METHOD_GET, query, ts);
 
-            return executeGetRequest(header,saBaseURL.getApplianceURL() + query, ts, BaseResponse.class);
+            return executeGetRequest(header, saBaseURL.getApplianceURL() + query, ts, BaseResponse.class);
 
-        }catch (Exception e){
+        } catch (Exception e) {
             throw new SARestAPIException("Exception occurred executing get user status query", e);
         }
 
     }
 
+    // Helper function for encoding users with special characters
+    private WebTarget encodeQueryUser (String query, String userId) throws Exception{
+        return encodeQueryUser(query, userId,"");
+    }
+
+    private WebTarget encodeQueryUser (String query, String userId, String groupId) throws Exception{
+
+        URI uri = URI.create(query);
+        WebTarget target = client.target(uri);
+        String encodedUser = encodedValue(userId);
+        if (!groupId.isBlank()) {
+            target.queryParam("groups", encodedValue(groupId));
+        }
+        return target.queryParam("username", encodedUser);
+    }
 
 }

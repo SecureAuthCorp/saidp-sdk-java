@@ -54,6 +54,7 @@ public class SAAccessTDD {
 	private static String validPin;
 	private static String validPassword;
 	private final static String UNEXISTING_USERNAME = "unexisting-user";
+	private final static String UNEXISTING_USERNAME_QP = UNEXISTING_USERNAME + "!@#$%^&*(";
 
 	//DFP
 	private static String validFingerprintId;
@@ -165,6 +166,46 @@ public class SAAccessTDD {
 	}
 
 	@Test
+	public void testGetPropertiesWithValidUserQP() throws Exception {
+		/*
+		 * Response would return:
+			{
+			  "status" : "found",
+			  "message" : "",
+			  "userId" : "jsmith",
+			  "properties" : {
+			    "firstName" : {
+			      "value" : "John",
+			      "isWritable" : "false"
+			    },
+			    "lastName" : {
+			      "value" : "Smith",
+			      "isWritable" : "false"
+			    },
+			    "email1" : {
+			      "value" : "jsmith@secureauth.com",
+			      "isWritable" : "false"
+			    }
+			  },
+			  "knowledgeBase" : { },
+			  "groups" : [ ],
+			  "accessHistories" : [ {
+			    "userAgent" : "Jersey/2.5.1 (HttpUrlConnection 1.8.0_202)",
+			    "ipAddress" : "11.1.1.2",
+			    "timeStamp" : "2019-07-12T18:13:17.921501Z",
+			    "authState" : "Success"
+			  },
+			  {...} ]
+			}
+		 */
+
+		UserProfileResponse response = saAccess.getUserProfileQP(validUsername);
+		assertNotNull(response);
+		assertEquals(FOUND_MESSAGE, response.getStatus());
+		assertTrue(response.getMessage().isEmpty());
+	}
+
+	@Test
 	public void testGetPropertiesWithUnexistingUser() throws Exception {
 		/*
 		 * Response would return:
@@ -181,8 +222,30 @@ public class SAAccessTDD {
 
 		UserProfileResponse response = saAccess.getUserProfile(UNEXISTING_USERNAME);
 		assertNotNull(response);
-		assertEquals(response.getStatus(), NOT_FOUND_MESSAGE);
-		assertEquals(response.getMessage(), "User Id was not found.");
+		assertEquals(NOT_FOUND_MESSAGE, response.getStatus());
+		assertEquals( "User Id was not found.", response.getMessage());
+	}
+
+	@Test
+	public void testGetPropertiesWithUnexistingUserQP() throws Exception {
+		/*
+		 * Response would return:
+			{
+			  "status" : "not_found",
+			  "message" : "User Id was not found.",
+			  "user_id" : "unexisting-user",
+			  "properties" : { },
+			  "knowledgeBase" : { },
+			  "groups" : [ ],
+			  "accessHistories" : [ ]
+			}
+		 */
+
+		UserProfileResponse response = saAccess.getUserProfileQP(UNEXISTING_USERNAME_QP);
+		assertNotNull(response);
+		// If the special characters are not being recognised then we should get some sort of reject instead of a NOT_FOUND_MESSAGE here
+		assertEquals(NOT_FOUND_MESSAGE, response.getStatus());
+		assertEquals( "User Id was not found.", response.getMessage());
 	}
 
 	@Test
@@ -310,7 +373,42 @@ public class SAAccessTDD {
 
 		FactorsResponse response = saAccess.factorsByUser(validUsername);
 		assertNotNull(response);
-		assertEquals(response.getStatus(), FOUND_MESSAGE);
+		assertEquals(FOUND_MESSAGE, response.getStatus());
+		assertTrue(response.getMessage().isEmpty());
+	}
+
+	@Test
+	public void testGetFactorsFromValidUserQP() throws Exception {
+		/*
+		 * Response would return:
+			{
+			  "status" : "found",
+			  "message" : "",
+			  "user_id" : "jsmith",
+			  "factors" : [ {
+			    "type" : "email",
+			    "id" : "Email1",
+			    "value" : "jsmith@secureauth.com"
+			  }, {
+			    "type" : "push",
+			    "id" : "8020890sxt414974b2235e31f4192785",
+			    "value" : "SM-J7",
+			    "capabilities" : [ "push", "push_accept" ]
+			  }, {
+			    "type" : "oath",
+			    "id" : "7edec5b5e3f553150f1e90261a03b8fd",
+			    "value" : "Windows"
+			  }, {
+			    "type" : "oath",
+			    "id" : "6f669edbb4504a15acec016d7ef9f42b",
+			    "value" : "SM-J7"
+			  } ]
+			}
+		 */
+
+		FactorsResponse response = saAccess.factorsByUserQP(validUsername);
+		assertNotNull(response);
+		assertEquals(FOUND_MESSAGE, response.getStatus());
 		assertTrue(response.getMessage().isEmpty());
 	}
 
@@ -328,8 +426,26 @@ public class SAAccessTDD {
 
 		FactorsResponse response = saAccess.factorsByUser(UNEXISTING_USERNAME);
 		assertNotNull(response);
-		assertEquals(response.getStatus(), NOT_FOUND_MESSAGE);
-		assertEquals(response.getMessage(), "User Id was not found.");
+		assertEquals(NOT_FOUND_MESSAGE, response.getStatus());
+		assertEquals("User Id was not found.", response.getMessage());
+	}
+
+	@Test
+	public void testGetFactorsFromUnexistingUserQP() throws Exception {
+		/*
+		 * Response would return:
+			{
+			  "status" : "not_found",
+			  "message" : "User Id was not found.",
+			  "user_id" : "unexisting-user",
+			  "factors" : [ ]
+			}
+		 */
+
+		FactorsResponse response = saAccess.factorsByUserQP(UNEXISTING_USERNAME_QP);
+		assertNotNull(response);
+		assertEquals(NOT_FOUND_MESSAGE, response.getStatus());
+		assertEquals("User Id was not found.", response.getMessage());
 	}
 
 	@Test
@@ -376,7 +492,7 @@ public class SAAccessTDD {
 			}
 		 */
 
-		BaseResponse response = saAccess.validateUser(UNEXISTING_USERNAME);
+		BaseResponse response = saAccess.validateUser(UNEXISTING_USERNAME_QP);
 		assertNotNull(response);
 		assertEquals(response.getStatus(), NOT_FOUND_MESSAGE);
 		assertEquals(response.getMessage(), "User Id was not found.");

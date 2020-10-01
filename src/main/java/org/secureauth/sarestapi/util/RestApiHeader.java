@@ -34,7 +34,6 @@ public class RestApiHeader {
     private static Logger logger = LoggerFactory.getLogger(RestApiHeader.class);
     public RestApiHeader(){}
 
-
     //Payload in header
     public static String getAuthorizationHeader(SAAuth saAuth , String requestMethod, String uriPath, Object object, String ts){
 
