@@ -1133,9 +1133,7 @@ public class SAAccess implements ISAAccess{
         try{
             String ts = getServerTime();
             DeleteUserRequest deleteUserRequest = new DeleteUserRequest(userId, deleteRelatedData, domain);
-
-            String header = RestApiHeader.getAuthorizationHeader(saAuth, Resource.METHOD_DELETE, IDMQueries.queryUsers(saAuth.getRealm()),ts);
-
+            String header = RestApiHeader.getAuthorizationHeader(saAuth, Resource.METHOD_DELETE, IDMQueries.queryUsers(saAuth.getRealm()), deleteUserRequest, ts);
             return saExecuter.executeDeleteRawRequest(header,saBaseURL.getApplianceURL() + IDMQueries.queryUsers(saAuth.getRealm()),
                     ts, deleteUserRequest, ResponseObject.class);
         }catch (Exception e){

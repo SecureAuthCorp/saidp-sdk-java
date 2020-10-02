@@ -98,6 +98,7 @@ public class SAExecuter {
                     .build();
             client.property( ClientProperties.CONNECT_TIMEOUT, this.idpApiTimeout );
             client.property( ClientProperties.READ_TIMEOUT, this.idpApiTimeout );
+            client.property( ClientProperties.SUPPRESS_HTTP_COMPLIANCE_VALIDATION, true);
         } catch (Exception e) {
             logger.error("Exception occurred while attempting to associating our SSL cert to the session.", e);
         }
