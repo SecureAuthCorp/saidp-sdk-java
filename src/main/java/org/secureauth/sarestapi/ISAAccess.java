@@ -128,6 +128,13 @@ public interface ISAAccess {
 	 * @return base answer
 	 */
 	ThrottleResponse getThrottleReq(String userId);
+	
+	/**
+	 * GET the end-user's current count of OTP usage attempts
+	 * @param userId id of user. This method supports special characters for userId since it uses QP (Query Params) in order to create the request.
+	 * @return base answer
+	 */
+	ThrottleResponse getThrottleReqQP(String userId);
 
 	/**
 	 * <p>
