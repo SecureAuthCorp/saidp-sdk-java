@@ -219,9 +219,8 @@ public class SAAccess implements ISAAccess{
         try{
             return saExecuter.executePostRequestStateful(header,saBaseURL.getApplianceURL() + AuthQuery.queryAuth(saAuth.getRealm()), req,ts, StatefulResponseObject.class);
         }catch (Exception e){
-            logger.error(new StringBuilder().append("Exception occurred executing REST query::\n").append(e.getMessage()).append("\n").toString(), e);
+            throw new SARestAPIException( e );
         }
-        return null;
     }
 
     private ResponseObject sendPushReq(String userid, String factor_id, String endUserIP, String clientCompany, String clientDescription, String type) {
@@ -231,9 +230,8 @@ public class SAAccess implements ISAAccess{
         try{
             return saExecuter.executePostRequest(header,saBaseURL.getApplianceURL() + AuthQuery.queryAuth(saAuth.getRealm()), req,ts, ResponseObject.class);
         }catch (Exception e){
-            logger.error(new StringBuilder().append("Exception occurred executing REST query::\n").append(e.getMessage()).append("\n").toString(), e);
+            throw new SARestAPIException( e );
         }
-        return null;
     }
 
     private PushToAcceptRequest createPushToAcceptRequest(String userid, String factor_id, String endUserIP, String clientCompany, String clientDescription, String type) {
@@ -272,9 +270,8 @@ public class SAAccess implements ISAAccess{
         String header = RestApiHeader.getAuthorizationHeader(this.saAuth, "POST", AuthQuery.queryAuth(this.saAuth.getRealm()), req, ts);
         try {
             return (ResponseObject)this.saExecuter.executePostRequest(header, this.saBaseURL.getApplianceURL() + AuthQuery.queryAuth(this.saAuth.getRealm()), req, ts, ResponseObject.class);
-        } catch (Exception var12) {
-            logger.error("Exception occurred executing REST query::\n" + var12.getMessage() + "\n", var12);
-            return null;
+        } catch (Exception e) {
+            throw new SARestAPIException( e );
         }
     }
 
@@ -285,9 +282,8 @@ public class SAAccess implements ISAAccess{
         String header = RestApiHeader.getAuthorizationHeader(this.saAuth, "POST", AuthQuery.queryAuth(this.saAuth.getRealm()), req, ts);
         try {
             return saExecuter.executePostRequestStateful(header,saBaseURL.getApplianceURL() + AuthQuery.queryAuth(saAuth.getRealm()), req,ts, StatefulResponseObject.class);
-        } catch (Exception var12) {
-            logger.error("Exception occurred executing REST query::\n" + var12.getMessage() + "\n", var12);
-            return null;
+        } catch (Exception e) {
+            throw new SARestAPIException( e );
         }
     }
 
@@ -336,9 +332,8 @@ public class SAAccess implements ISAAccess{
         try{
             return saExecuter.executeGetRequest(header,saBaseURL.getApplianceURL() + getUri,ts, PushAcceptStatus.class);
         }catch (Exception e){
-            logger.error(new StringBuilder().append("Exception occurred executing REST query::\n").append(e.getMessage()).append("\n").toString(), e);
+            throw new SARestAPIException( e );
         }
-        return null;
     }
 
     @Override
@@ -349,9 +344,8 @@ public class SAAccess implements ISAAccess{
         try{
             return saExecuter.executeGetRequestStateful( header, ingressCookie, saBaseURL.getApplianceURL() + getUri,ts, PushAcceptStatus.class);
         }catch (Exception e){
-            logger.error(new StringBuilder().append("Exception occurred executing REST query::\n").append(e.getMessage()).append("\n").toString(), e);
+            throw new SARestAPIException( e );
         }
-        return null;
     }
 
     private String makePushNotificationQueryURI(String refId) {

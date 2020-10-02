@@ -39,6 +39,8 @@ import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.WebTarget;
 import org.glassfish.jersey.client.ClientConfig;
+
+import javax.ws.rs.core.NewCookie;
 import javax.ws.rs.core.Response;
 
 
@@ -214,7 +216,11 @@ public class SAExecuter {
                     header("X-SA-Ext-Date", ts).
                     post(Entity.entity(JSONUtil.convertObjectToJSON(authRequest), MediaType.APPLICATION_JSON));
             T responseObject = response.readEntity(valueType);
-            responseObject.setIngressCookie( response.getCookies().get( "INGRESSCOOKIE" ) );
+            final String ingressCookie = "INGRESSCOOKIE";
+            responseObject.setIngressCookie(
+                    // return a null-empty cookie when "ingresscookie" is not found.
+                    response.getCookies().getOrDefault( ingressCookie, new NewCookie( ingressCookie, "" ) )
+            );
             response.close();
             return responseObject;
         } catch (Exception e) {
