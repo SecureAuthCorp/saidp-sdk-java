@@ -1129,13 +1129,13 @@ public class SAAccess implements ISAAccess{
     }
 
     @Override
-    public ResponseObject deleteUser(String userId, String domain, Boolean deleteRelatedData) {
+    public BaseResponse deleteUser(String userId, String domain, Boolean deleteRelatedData) {
         try{
             String ts = getServerTime();
             DeleteUserRequest deleteUserRequest = new DeleteUserRequest(userId, deleteRelatedData, domain);
-            String header = RestApiHeader.getAuthorizationHeader(saAuth, Resource.METHOD_DELETE, IDMQueries.queryUsers(saAuth.getRealm()), deleteUserRequest, ts);
+            String header = RestApiHeader.getAuthorizationHeader(saAuth, Resource.METHOD_DELETE, IDMQueries.queryUsers(saAuth.getRealm()), deleteUserRequest,  ts);
             return saExecuter.executeDeleteRawRequest(header,saBaseURL.getApplianceURL() + IDMQueries.queryUsers(saAuth.getRealm()),
-                    ts, deleteUserRequest, ResponseObject.class);
+                    ts, deleteUserRequest, BaseResponse.class);
         }catch (Exception e){
             throw new SARestAPIException("Exception occurred executing REST query:\n" + e.getMessage() + "\n", e);
         }

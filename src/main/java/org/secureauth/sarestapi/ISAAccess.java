@@ -377,7 +377,7 @@ public interface ISAAccess {
 	 * @param deleteRelatedData
 	 * @return {@link ResponseObject}
 	 */
-	ResponseObject deleteUser(String userId, String domain, Boolean deleteRelatedData);
+	BaseResponse deleteUser(String userId, String domain, Boolean deleteRelatedData);
 
 	/**
 	 * <p>

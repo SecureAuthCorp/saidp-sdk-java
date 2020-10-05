@@ -658,12 +658,24 @@ public class SAAccessTDD {
 
 	@Test
 	public void testDeleteUserValid() throws Exception {
-
-		ResponseObject responseObj = saAccess.deleteUser(validUsername, "domain", Boolean.FALSE );
-
+		//when
+		BaseResponse responseObj = saAccess.deleteUser(validUsername, "", Boolean.FALSE );
+		//then
 		assertNotNull(responseObj);
 		assertEquals("success", responseObj.getStatus());
-		assertEquals("", responseObj.getMessage());
+		assertEquals("User delete complete", responseObj.getMessage());
+		assertEquals(validUsername, responseObj.getUser_id());
+	}
+
+	@Test
+	public void testDeleteUserInvalidUser() throws Exception {
+		//when
+		BaseResponse responseObj = saAccess.deleteUser(UNEXISTING_USERNAME, "SAQA.LOCAL", Boolean.FALSE );
+		//then
+		assertNotNull(responseObj);
+		assertEquals("failed", responseObj.getStatus());
+		assertEquals("user_id does not exist", responseObj.getMessage());
+		assertEquals("SAQA.LOCAL\\" + UNEXISTING_USERNAME, responseObj.getUser_id());
 	}
 
 	@Test

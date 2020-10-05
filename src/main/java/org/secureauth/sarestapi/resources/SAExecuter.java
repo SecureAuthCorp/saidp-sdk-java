@@ -260,6 +260,7 @@ public class SAExecuter {
 
             target = client.target(query);
             response = target.request().
+
                     accept(MediaType.APPLICATION_JSON).
                     header("Authorization", auth).
                     header("X-SA-Ext-Date", ts).
