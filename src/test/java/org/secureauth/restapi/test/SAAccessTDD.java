@@ -54,6 +54,7 @@ public class SAAccessTDD {
 	private static String validUsername;
 	private static String validPin;
 	private static String validPassword;
+	private static String userDomain;
 	private final static String UNEXISTING_USERNAME = "unexisting-user";
 	private final static String UNEXISTING_USERNAME_QP = UNEXISTING_USERNAME + "!@#$%^&*(";
 
@@ -96,6 +97,7 @@ public class SAAccessTDD {
 		validUsername = getValue(Property.VALID_USERNAME);
 		validPin = getValue(Property.VALID_PIN);
 		validPassword = getValue(Property.VALID_PASSWORD);
+		userDomain = getValue(Property.USER_DOMAIN);
 		validFactorIdForOathOtp = getValue(Property.VALID_FACTOR_ID_FOR_OATH_OTP);
 		validUserOtp = getValue(Property.VALID_OTP_PIN_CODE);
 		validUserOtpOath = getValue(Property.VALID_OTP_OATH_CODE);
@@ -659,23 +661,23 @@ public class SAAccessTDD {
 	@Test
 	public void testDeleteUserValid() throws Exception {
 		//when
-		BaseResponse responseObj = saAccess.deleteUser(validUsername, "", Boolean.FALSE );
+		BaseResponse responseObj = saAccess.deleteUser(validUsername, userDomain, Boolean.FALSE );
 		//then
 		assertNotNull(responseObj);
 		assertEquals("success", responseObj.getStatus());
 		assertEquals("User delete complete", responseObj.getMessage());
-		assertEquals(validUsername, responseObj.getUser_id());
+		assertEquals(userDomain + "\\" +validUsername, responseObj.getUser_id());
 	}
 
 	@Test
 	public void testDeleteUserInvalidUser() throws Exception {
 		//when
-		BaseResponse responseObj = saAccess.deleteUser(UNEXISTING_USERNAME, "SAQA.LOCAL", Boolean.FALSE );
+		BaseResponse responseObj = saAccess.deleteUser(UNEXISTING_USERNAME, userDomain, Boolean.FALSE );
 		//then
 		assertNotNull(responseObj);
 		assertEquals("failed", responseObj.getStatus());
 		assertEquals("user_id does not exist", responseObj.getMessage());
-		assertEquals("SAQA.LOCAL\\" + UNEXISTING_USERNAME, responseObj.getUser_id());
+		assertEquals(userDomain + "\\" + UNEXISTING_USERNAME, responseObj.getUser_id());
 	}
 
 	@Test

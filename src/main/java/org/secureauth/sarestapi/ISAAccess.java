@@ -373,11 +373,11 @@ public interface ISAAccess {
 	 * 	    Delete User
 	 * </p>
 	 * @param userId the UserID to delete
-	 * @param domain
-	 * @param deleteRelatedData
+	 * @param domain the datastore name
+	 * @param deleteRelatedData TRUE for complete delete, FALSE for only logical.
 	 * @return {@link ResponseObject}
 	 */
-	BaseResponse deleteUser(String userId, String domain, Boolean deleteRelatedData);
+	BaseResponse deleteUser(String userId, String domain, boolean deleteRelatedData);
 
 	/**
 	 * <p>

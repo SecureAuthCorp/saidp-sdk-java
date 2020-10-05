@@ -1129,7 +1129,7 @@ public class SAAccess implements ISAAccess{
     }
 
     @Override
-    public BaseResponse deleteUser(String userId, String domain, Boolean deleteRelatedData) {
+    public BaseResponse deleteUser(String userId, String domain, boolean deleteRelatedData) {
         try{
             String ts = getServerTime();
             DeleteUserRequest deleteUserRequest = new DeleteUserRequest(userId, deleteRelatedData, domain);

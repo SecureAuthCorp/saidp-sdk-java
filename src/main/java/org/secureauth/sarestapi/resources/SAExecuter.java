@@ -98,7 +98,7 @@ public class SAExecuter {
                     .build();
             client.property( ClientProperties.CONNECT_TIMEOUT, this.idpApiTimeout );
             client.property( ClientProperties.READ_TIMEOUT, this.idpApiTimeout );
-            client.property( ClientProperties.SUPPRESS_HTTP_COMPLIANCE_VALIDATION, true);
+
         } catch (Exception e) {
             logger.error("Exception occurred while attempting to associating our SSL cert to the session.", e);
         }
@@ -253,6 +253,9 @@ public class SAExecuter {
         if (client == null) {
             createConnection();
         }
+        if(Resource.METHOD_DELETE.equals(method)){
+            client.property(ClientProperties.SUPPRESS_HTTP_COMPLIANCE_VALIDATION, true);
+        }
         try {
             WebTarget target;
             Response response;
@@ -272,6 +275,10 @@ public class SAExecuter {
             return responseObject;
         } catch (Exception e) {
             throw new SARestAPIException("Exception Request: \nQuery:\n\t" + query + "\nError:" + e.getMessage(), e);
+        } finally {
+            if(Resource.METHOD_DELETE.equals(method)){
+                client.property(ClientProperties.SUPPRESS_HTTP_COMPLIANCE_VALIDATION, false);
+            }
         }
     }
 
