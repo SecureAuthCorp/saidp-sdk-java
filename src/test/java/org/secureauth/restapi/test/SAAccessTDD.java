@@ -11,6 +11,8 @@ import org.secureauth.sarestapi.data.Response.FactorsResponse;
 import org.secureauth.sarestapi.data.Response.UserProfileResponse;
 import org.secureauth.sarestapi.data.SAAuth;
 import org.secureauth.sarestapi.data.SABaseURL;
+import org.secureauth.sarestapi.data.UserProfile.NewUserProfile;
+import org.secureauth.sarestapi.data.UserProfile.UserProfile;
 import org.secureauth.sarestapi.resources.SAExecuter;
 import org.secureauth.sarestapi.util.Property;
 import org.secureauth.sarestapi.util.RetrievePropertiesUtils;
@@ -45,7 +47,7 @@ public class SAAccessTDD {
 	private static String validPin;
 	private static String validPassword;
 	private final static String UNEXISTING_USERNAME = "unexisting-user";
-	private final static String UNEXISTING_USERNAME_QP = UNEXISTING_USERNAME + "!@#$%^&*(";
+	private final static String UNEXISTING_USERNAME_QP = UNEXISTING_USERNAME + "+~.!@$%^&*'_";
 
 	//DFP
 	private static String validFingerprintId;
@@ -829,5 +831,56 @@ public class SAAccessTDD {
 	public void testWhenUserIdIsNotValidThenNotifyAuthenticatedResultFail() {
 		BaseResponse response = saAccess.notifyAuthenticated( UNEXISTING_USERNAME, "success", "NONE" );
 		assertEquals( "User Id was not found.", response.getMessage() );
+	}
+
+	// This tests the creation of a real user
+	@Test
+	public void testCreateUserWithSpecialCharacters() {
+		NewUserProfile userProfile = new NewUserProfile();
+		userProfile.setUserId(UNEXISTING_USERNAME_QP);
+		userProfile.setPassword("1234");
+
+		BaseResponse response = saAccess.createUser(userProfile);
+		assertEquals("OK", response.getStatus());
+	}
+
+	@Test
+	public void testGetCreatedUserWithSpecialCharacters() {
+		String userName = UNEXISTING_USERNAME_QP;
+		BaseResponse response = saAccess.getUserProfileQP(userName);
+
+		assertEquals("found", response.getStatus());
+	}
+
+	@Test
+	public void testGetCreatedFactorsUserWithSpecialCharacters() {
+		String userName = UNEXISTING_USERNAME_QP;
+		BaseResponse response = saAccess.factorsByUserQP(userName);
+
+		assertEquals("found", response.getStatus());
+	}
+
+	@Test
+	public void testGetCreatedThrottleUserWithSpecialCharacters() {
+		String userName = UNEXISTING_USERNAME_QP;
+		BaseResponse response = saAccess.getThrottleReqQP(userName);
+
+		assertEquals("found", response.getStatus());
+	}
+
+	@Test
+	public void testUpdateUserWithSpecialCharacters() {
+		String userName = UNEXISTING_USERNAME_QP;
+		NewUserProfile userProfile = new NewUserProfile();
+		userProfile.setUserId(UNEXISTING_USERNAME_QP+"25");
+		userProfile.setPassword("1234");
+		BaseResponse response = saAccess.updateUserQP(userName, userProfile);
+
+		assertEquals("success", response.getStatus());
+	}
+
+	@Test
+	public void testDeleteUserWithSpecialCharacters() {
+		// TODO: Look for a way to delete the previously created user
 	}
 }
