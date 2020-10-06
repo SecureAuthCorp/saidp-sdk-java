@@ -59,6 +59,7 @@ public interface ISAAccess {
 
 	/**
 	 * Send push to accept request asynchronously retrieving the cookie required to check the push notification status later.
+	 * This method only applies when Identity Platform is on Cloud
 	 *
 	 * @param userId  the user id of the identity
 	 * @param factorId the P2A Id to be compared against
@@ -73,6 +74,7 @@ public interface ISAAccess {
 
 	/**
 	 * Send push symbol to accept request asynchronously retrieving the cookie required to check the push notification status later.
+	 * This method only applies when Identity Platform is on Cloud
 	 *
 	 * @param userId  the user id of the identity
 	 * @param factorId the P2A Id to be compared against
