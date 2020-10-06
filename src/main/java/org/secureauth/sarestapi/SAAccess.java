@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 import com.google.common.collect.Maps;
@@ -46,8 +45,7 @@ import javax.ws.rs.core.Cookie;
 
 public class SAAccess implements ISAAccess{
     private static final String PUSH_TO_ACCEPT = "push_accept";
-    private static final String PUSH_TO_ACCEPT_SYMBOL = "push_accept_symbol";
-    private static final String PUSH_TO_ACCEPT_BIOMETRIC = "push_accept_biometric";
+    private static final String SYMBOL_TO_ACCEPT = "push_accept_symbol";
     private static Logger logger = LoggerFactory.getLogger(SAAccess.class);
     protected SABaseURL saBaseURL;
     protected SAAuth saAuth;
@@ -204,17 +202,17 @@ public class SAAccess implements ISAAccess{
     }
 
     public ResponseObject sendPushToAcceptSymbolReq(String userId, String factorId, String endUserIP, String clientCompany, String clientDescription){
-        return sendPushReq(userId, factorId, endUserIP, clientCompany, clientDescription, PUSH_TO_ACCEPT_SYMBOL );
+        return sendPushReq(userId, factorId, endUserIP, clientCompany, clientDescription, SYMBOL_TO_ACCEPT);
     }
 
     @Override
     public StatefulResponseObject sendPushToAcceptSymbolReqStateful(String userId, String factorId, String endUserIP, String clientCompany, String clientDescription) {
-        return sendPushToAcceptReqStatefulForType( userId, factorId, endUserIP, clientCompany, clientDescription, PUSH_TO_ACCEPT_SYMBOL );
+        return sendPushToAcceptReqStatefulForType( userId, factorId, endUserIP, clientCompany, clientDescription, SYMBOL_TO_ACCEPT);
     }
 
     private StatefulResponseObject sendPushToAcceptReqStatefulForType(String userId, String factorId, String endUserIP, String clientCompany, String clientDescription, String type) {
         String ts = getServerTime();
-        PushToAcceptRequest req = createPushToAcceptRequest( userId, factorId, endUserIP, clientCompany, clientDescription, type );
+        PushToAcceptRequest req = PushToAcceptRequestsFactory.createPushToAcceptRequest( userId, factorId, endUserIP, clientCompany, clientDescription, type );
         String header = RestApiHeader.getAuthorizationHeader(saAuth,"POST", AuthQuery.queryAuth(saAuth.getRealm()), req,ts);
         try{
             return saExecuter.executePostRequestStateful(header,saBaseURL.getApplianceURL() + AuthQuery.queryAuth(saAuth.getRealm()), req,ts, StatefulResponseObject.class);
@@ -225,7 +223,7 @@ public class SAAccess implements ISAAccess{
 
     private ResponseObject sendPushReq(String userid, String factor_id, String endUserIP, String clientCompany, String clientDescription, String type) {
         String ts = getServerTime();
-        PushToAcceptRequest req = createPushToAcceptRequest( userid, factor_id, endUserIP, clientCompany, clientDescription, type );
+        PushToAcceptRequest req = PushToAcceptRequestsFactory.createPushToAcceptRequest( userid, factor_id, endUserIP, clientCompany, clientDescription, type );
         String header = RestApiHeader.getAuthorizationHeader(saAuth,"POST", AuthQuery.queryAuth(saAuth.getRealm()), req,ts);
         try{
             return saExecuter.executePostRequest(header,saBaseURL.getApplianceURL() + AuthQuery.queryAuth(saAuth.getRealm()), req,ts, ResponseObject.class);
@@ -234,22 +232,7 @@ public class SAAccess implements ISAAccess{
         }
     }
 
-    private PushToAcceptRequest createPushToAcceptRequest(String userid, String factor_id, String endUserIP, String clientCompany, String clientDescription, String type) {
-        PushToAcceptRequest req = new PushToAcceptRequest();
-        req.setUser_id(userid);
-        req.setType(type);
-        req.setFactor_id(factor_id);
-        PushAcceptDetails pad = new PushAcceptDetails();
-        pad.setEnduser_ip(endUserIP);
-        if (clientCompany != null) {
-            pad.setCompany_name(clientCompany);
-        }
-        if (clientDescription != null) {
-            pad.setApplication_description(clientDescription);
-        }
-        req.setPush_accept_details(pad);
-        return req;
-    }
+
 
     /**
      * <p>
@@ -266,7 +249,7 @@ public class SAAccess implements ISAAccess{
      */
     public ResponseObject sendPushBiometricReq(String biometricType, String userId, String factorId, String endUserIP, String clientCompany, String clientDescription) {
         String ts = getServerTime();
-        PushToAcceptBiometricsRequest req = createPushToAcceptBiometricRequest( biometricType, userId, factorId, endUserIP, clientCompany, clientDescription );
+        PushToAcceptBiometricsRequest req = PushToAcceptRequestsFactory.createPushToAcceptBiometricRequest( biometricType, userId, factorId, endUserIP, clientCompany, clientDescription );
         String header = RestApiHeader.getAuthorizationHeader(this.saAuth, "POST", AuthQuery.queryAuth(this.saAuth.getRealm()), req, ts);
         try {
             return (ResponseObject)this.saExecuter.executePostRequest(header, this.saBaseURL.getApplianceURL() + AuthQuery.queryAuth(this.saAuth.getRealm()), req, ts, ResponseObject.class);
@@ -278,7 +261,7 @@ public class SAAccess implements ISAAccess{
     @Override
     public StatefulResponseObject sendPushBiometricReqStateful(String biometricType, String userId, String factorId, String endUserIP, String clientCompany, String clientDescription) {
         String ts = getServerTime();
-        PushToAcceptBiometricsRequest req = createPushToAcceptBiometricRequest( biometricType, userId, factorId, endUserIP, clientCompany, clientDescription );
+        PushToAcceptBiometricsRequest req = PushToAcceptRequestsFactory.createPushToAcceptBiometricRequest( biometricType, userId, factorId, endUserIP, clientCompany, clientDescription );
         String header = RestApiHeader.getAuthorizationHeader(this.saAuth, "POST", AuthQuery.queryAuth(this.saAuth.getRealm()), req, ts);
         try {
             return saExecuter.executePostRequestStateful(header,saBaseURL.getApplianceURL() + AuthQuery.queryAuth(saAuth.getRealm()), req,ts, StatefulResponseObject.class);
@@ -287,23 +270,6 @@ public class SAAccess implements ISAAccess{
         }
     }
 
-    private PushToAcceptBiometricsRequest createPushToAcceptBiometricRequest(String biometricType, String userId, String factorId, String endUserIP, String clientCompany, String clientDescription) {
-        PushToAcceptBiometricsRequest req = new PushToAcceptBiometricsRequest();
-        req.setUser_id(userId);
-        req.setType( PUSH_TO_ACCEPT_BIOMETRIC );
-        req.setFactor_id(factorId);
-        req.setBiometricType( biometricType );
-        PushAcceptDetails pad = new PushAcceptDetails();
-        pad.setEnduser_ip(endUserIP);
-        if (clientCompany != null) {
-            pad.setCompany_name(clientCompany);
-        }
-        if (clientDescription != null) {
-            pad.setApplication_description(clientDescription);
-        }
-        req.setPush_accept_details(pad);
-        return req;
-    }
     /**
      * <p>
      *     Perform adaptive auth query
