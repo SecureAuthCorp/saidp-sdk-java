@@ -4,13 +4,13 @@ import javax.ws.rs.core.NewCookie;
 
 public class StatefulResponseObject extends ResponseObject {
 
-    private NewCookie ingressCookie;
+    private NewCookie sessionAffinityCookie;
 
-    public NewCookie getIngressCookie() {
-        return ingressCookie;
+    public NewCookie getSessionAffinityCookie() {
+        return sessionAffinityCookie;
     }
 
-    public void setIngressCookie(NewCookie ingressCookie) {
-        this.ingressCookie = ingressCookie;
+    public void setSessionAffinityCookie(NewCookie sessionAffinityCookie) {
+        this.sessionAffinityCookie = sessionAffinityCookie;
     }
 }

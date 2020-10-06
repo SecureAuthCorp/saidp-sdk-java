@@ -100,6 +100,7 @@ public interface ISAAccess {
 
 	/**
 	 * Send push to accept request asynchronously retrieving the cookie required to check the push notification status later.
+	 * This method only applies when Identity Platform is on Cloud
 	 *
 	 * @param biometricType fingerprint, face
 	 * @param userId  the user id of the identity
@@ -124,9 +125,10 @@ public interface ISAAccess {
 	PushAcceptStatus queryPushAcceptStatus(String refId);
 
 	/**
-	 * Perform push notification status query in mode stateful using the ingresscookie.
+	 * Perform push notification status query in mode stateful using the session affinity cookie.
+	 * This method only applies when Identity Platform is on Cloud
 	 * @param refId the reference id
-	 * @param cookie the ingresscookie
+	 * @param cookie the the session affinity cookie.
 	 * @return {@link PushAcceptStatus}
 	 */
 	PushAcceptStatus queryPushAcceptStatusStateful(String refId, Cookie cookie);

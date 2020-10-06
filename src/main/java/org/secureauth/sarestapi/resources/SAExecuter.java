@@ -2,7 +2,6 @@ package org.secureauth.sarestapi.resources;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
-import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
@@ -70,6 +69,8 @@ public class SAExecuter {
     private static Logger logger = LoggerFactory.getLogger(SAExecuter.class);
     private static final String TEN_SECONDS = "10000";
     private static final String TLS = "TLS";
+    // The IdP Cloud version uses "INGRESSCOOKIE" as fixed value to support sticky sessions.
+    private static final String SESSION_AFFINITY_COOKIE_NAME = "INGRESSCOOKIE";
     private Integer idpApiTimeout;
 
     private SABaseURL saBaseURL = null;
@@ -216,10 +217,9 @@ public class SAExecuter {
                     header("X-SA-Ext-Date", ts).
                     post(Entity.entity(JSONUtil.convertObjectToJSON(authRequest), MediaType.APPLICATION_JSON));
             T responseObject = response.readEntity(valueType);
-            final String ingressCookie = "INGRESSCOOKIE";
-            responseObject.setIngressCookie(
-                    // return a null-empty cookie when "ingresscookie" is not found.
-                    response.getCookies().getOrDefault( ingressCookie, new NewCookie( ingressCookie, "" ) )
+            responseObject.setSessionAffinityCookie(
+                    // return a null-empty cookie when the session affinity cookie is not found.
+                    response.getCookies().getOrDefault(SESSION_AFFINITY_COOKIE_NAME, new NewCookie(SESSION_AFFINITY_COOKIE_NAME, "" ) )
             );
             response.close();
             return responseObject;

@@ -49,7 +49,7 @@ public class SAAccessUnitTest {
         // when
         StatefulResponseObject resp = this.saAccess.sendPushToAcceptReqStateful( userId, factorId, "127.0.0.1", "", "" );
         // then
-        Assert.assertEquals("1570217946.933.809.995388", resp.getIngressCookie().getValue());
+        Assert.assertEquals("1570217946.933.809.995388", resp.getSessionAffinityCookie().getValue());
     }
 
     @Test
@@ -59,7 +59,7 @@ public class SAAccessUnitTest {
         final String factorId = "9a29542309654256a0d71f9e86095f45";
         StatefulResponseObject resp = this.saAccess.sendPushToAcceptReqStateful( userId, factorId, "127.0.0.2", "", "" );
         // when
-       PushAcceptStatus pushAcceptStatus = this.saAccess.queryPushAcceptStatusStateful( resp.getReference_id(), resp.getIngressCookie() );
+       PushAcceptStatus pushAcceptStatus = this.saAccess.queryPushAcceptStatusStateful( resp.getReference_id(), resp.getSessionAffinityCookie() );
         // then
         Assert.assertEquals("PENDING", pushAcceptStatus.getMessage());
     }

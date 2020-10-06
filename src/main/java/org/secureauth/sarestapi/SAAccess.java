@@ -337,12 +337,12 @@ public class SAAccess implements ISAAccess{
     }
 
     @Override
-    public PushAcceptStatus queryPushAcceptStatusStateful(String refId, Cookie ingressCookie) {
+    public PushAcceptStatus queryPushAcceptStatusStateful(String refId, Cookie sessionAffinityCookie) {
         String ts = getServerTime();
         String getUri = makePushNotificationQueryURI( refId );
         String header = RestApiHeader.getAuthorizationHeader(saAuth,"GET", getUri,ts);
         try{
-            return saExecuter.executeGetRequestStateful( header, ingressCookie, saBaseURL.getApplianceURL() + getUri,ts, PushAcceptStatus.class);
+            return saExecuter.executeGetRequestStateful( header, sessionAffinityCookie, saBaseURL.getApplianceURL() + getUri,ts, PushAcceptStatus.class);
         }catch (Exception e){
             throw new SARestAPIException( e );
         }
