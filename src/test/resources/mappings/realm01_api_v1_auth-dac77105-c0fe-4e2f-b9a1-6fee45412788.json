@@ -1,0 +1,31 @@
+{
+  "id" : "dac77105-c0fe-4e2f-b9a1-6fee45412788",
+  "name" : "realm01_api_v1_auth",
+  "request" : {
+    "url" : "/Realm01/api/v1/auth",
+    "method" : "POST",
+    "bodyPatterns" : [ {
+      "equalToJson" : "{\r\n  \"user_id\" : \"test-user-2\",\r\n  \"type\" : \"push_accept\",\r\n  \"factor_id\" : \"9a29542309654256a0d71f9e86095f45\",\r\n  \"push_accept_details\" : {\r\n    \"company_name\" : \"\",\r\n    \"application_description\" : \"\",\r\n    \"enduser_ip\" : \"127.0.0.2\"\r\n  }\r\n}",
+      "ignoreArrayOrder" : true,
+      "ignoreExtraElements" : true
+    } ]
+  },
+  "response" : {
+    "status" : 200,
+    "body" : "{\"reference_id\":\"41f43a30-510b-42a9-8c2c-c04aaf96a18e\",\"status\":\"valid\",\"message\":\"\",\"user_id\":\"test-user-2\"}",
+    "headers" : {
+      "Cache-Control" : "no-cache, no-store",
+      "Pragma" : "no-cache",
+      "Content-Type" : "application/json; charset=utf-8",
+      "Expires" : "-1",
+      "Set-Cookie" : "INGRESSCOOKIE=1570217946.933.809.995388; Expires=Fri, 04-Oct-19 19:41:05 GMT; Max-Age=120; Path=/; Secure; HttpOnly",
+      "X-SA-SIGNATURE" : "uqmCDFtpfoEo0QonH12Z9kOalqSeceEZuXhE1Z4kO9E=",
+      "X-SA-DATE" : "Fri, 02 Oct 2020 15:44:45 GMT",
+      "Strict-Transport-Security" : "max-age=31536000",
+      "Date" : "Fri, 02 Oct 2020 15:44:45 GMT"
+    }
+  },
+  "uuid" : "dac77105-c0fe-4e2f-b9a1-6fee45412788",
+  "persistent" : true,
+  "insertionIndex" : 2
+}
