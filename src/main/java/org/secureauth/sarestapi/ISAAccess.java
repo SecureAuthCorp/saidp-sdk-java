@@ -4,22 +4,13 @@ import org.secureauth.sarestapi.data.IPEval;
 import org.secureauth.sarestapi.data.PushAcceptStatus;
 import org.secureauth.sarestapi.data.Requests.AccessHistoryRequest;
 import org.secureauth.sarestapi.data.Requests.DFPScoreRequest;
-import org.secureauth.sarestapi.data.Response.AdaptiveAuthResponse;
-import org.secureauth.sarestapi.data.Response.BaseResponse;
-import org.secureauth.sarestapi.data.Response.BehaveBioResponse;
-import org.secureauth.sarestapi.data.Response.DFPConfirmResponse;
-import org.secureauth.sarestapi.data.Response.DFPValidateResponse;
-import org.secureauth.sarestapi.data.Response.FactorsResponse;
-import org.secureauth.sarestapi.data.Response.GroupAssociationResponse;
-import org.secureauth.sarestapi.data.Response.JSObjectResponse;
-import org.secureauth.sarestapi.data.Response.NumberProfileResponse;
-import org.secureauth.sarestapi.data.Response.ResponseObject;
-import org.secureauth.sarestapi.data.Response.ThrottleResponse;
-import org.secureauth.sarestapi.data.Response.UserProfileResponse;
-import org.secureauth.sarestapi.data.Response.ValidateOTPResponse;
+import org.secureauth.sarestapi.data.Response.*;
 import org.secureauth.sarestapi.data.UserProfile.NewUserProfile;
 import org.secureauth.sarestapi.data.UserProfile.UserToGroups;
 import org.secureauth.sarestapi.data.UserProfile.UsersToGroup;
+
+import javax.ws.rs.core.Cookie;
+import javax.ws.rs.core.NewCookie;
 
 public interface ISAAccess {
 
@@ -66,7 +57,33 @@ public interface ISAAccess {
 	 */
 	ResponseObject sendPushToAcceptReq(String userId, String factorId, String endUserIP, String clientCompany, String clientDescription);
 
+	/**
+	 * Send push to accept request asynchronously retrieving the cookie required to check the push notification status later.
+	 * This method only applies when Identity Platform is on Cloud
+	 *
+	 * @param userId  the user id of the identity
+	 * @param factorId the P2A Id to be compared against
+	 * @param endUserIP The End Users IP Address
+	 * @param clientCompany The Client Company Name
+	 * @param clientDescription The Client Description
+	 * @return {@link StatefulResponseObject}
+	 */
+	StatefulResponseObject sendPushToAcceptReqStateful(String userId, String factorId, String endUserIP, String clientCompany, String clientDescription);
+
 	ResponseObject sendPushToAcceptSymbolReq(String userId, String factorId, String endUserIP, String clientCompany, String clientDescription);
+
+	/**
+	 * Send push symbol to accept request asynchronously retrieving the cookie required to check the push notification status later.
+	 * This method only applies when Identity Platform is on Cloud
+	 *
+	 * @param userId  the user id of the identity
+	 * @param factorId the P2A Id to be compared against
+	 * @param endUserIP The End Users IP Address
+	 * @param clientCompany The Client Company Name
+	 * @param clientDescription The Client Description
+	 * @return {@link StatefulResponseObject}
+	 */
+	StatefulResponseObject sendPushToAcceptSymbolReqStateful(String userId, String factorId, String endUserIP, String clientCompany, String clientDescription);
 
 	/**
 	 * <p>
@@ -84,6 +101,20 @@ public interface ISAAccess {
 	ResponseObject sendPushBiometricReq(String biometricType, String userId, String factorId, String endUserIP, String clientCompany, String clientDescription);
 
 	/**
+	 * Send push to accept request asynchronously retrieving the cookie required to check the push notification status later.
+	 * This method only applies when Identity Platform is on Cloud
+	 *
+	 * @param biometricType fingerprint, face
+	 * @param userId  the user id of the identity
+	 * @param factorId the P2A Id to be compared against
+	 * @param endUserIP The End Users IP Address
+	 * @param clientCompany The Client Company Name
+	 * @param clientDescription The Client Description
+	 * @return {@link StatefulResponseObject}
+	 */
+	StatefulResponseObject sendPushBiometricReqStateful(String biometricType, String userId, String factorId, String endUserIP, String clientCompany, String clientDescription);
+
+	/**
 	 * <p>
 	 *     Perform adaptive auth query
 	 * </p>
@@ -94,6 +125,15 @@ public interface ISAAccess {
 	AdaptiveAuthResponse adaptiveAuthQuery(String userId, String endUserIP);
 
 	PushAcceptStatus queryPushAcceptStatus(String refId);
+
+	/**
+	 * Perform push notification status query in mode stateful using the session affinity cookie.
+	 * This method only applies when Identity Platform is on Cloud
+	 * @param refId the reference id
+	 * @param cookie the the session affinity cookie.
+	 * @return {@link PushAcceptStatus}
+	 */
+	PushAcceptStatus queryPushAcceptStatusStateful(String refId, Cookie cookie);
 
 	/**
 	 *
@@ -128,6 +168,13 @@ public interface ISAAccess {
 	 * @return base answer
 	 */
 	ThrottleResponse getThrottleReq(String userId);
+	
+	/**
+	 * GET the end-user's current count of OTP usage attempts
+	 * @param userId id of user. This method supports special characters for userId since it uses QP (Query Params) in order to create the request.
+	 * @return base answer
+	 */
+	ThrottleResponse getThrottleReqQP(String userId);
 
 	/**
 	 * <p>
