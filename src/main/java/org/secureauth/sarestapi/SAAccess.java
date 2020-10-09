@@ -1150,6 +1150,35 @@ public class SAAccess implements ISAAccess{
 
     /**
      * <p>
+     *     Update User / Profile
+     *     This method supports special characters for userId since it uses QP (Query Params) in order to create the request.
+     * </p>
+     * @param userId the UserID tied to the Profile Object
+     * @param userProfile The User'sProfile Object to be updated
+     * @return {@link ResponseObject}
+     */
+    public ResponseObject updateUserQP(String userId, NewUserProfile userProfile){
+        String ts = getServerTime();
+        RestApiHeader restApiHeader = new RestApiHeader();
+        String header = restApiHeader.getAuthorizationHeader(saAuth,"PUT",IDMQueries.queryUserProfileQP(saAuth.getRealm()),userProfile,ts);
+
+
+        try{
+            return saExecuter.executeUserProfileUpdateRequest(header,
+                    saBaseURL.getApplianceURL() + IDMQueries.queryUserProfileQP(saAuth.getRealm()),userId,
+                    userProfile,
+                    ts,
+                    ResponseObject.class);
+
+        }catch (Exception e){
+            logger.error(new StringBuilder().append("Exception occurred executing REST query::\n").append(e.getMessage()).append("\n").toString(), e);
+        }
+
+        return null;
+    }
+
+    /**
+     * <p>
      *     Associate User to Group
      * </p>
      * @param userId the user id of the identity
