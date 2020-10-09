@@ -867,9 +867,4 @@ public class SAAccessTDD {
 
 		assertEquals("found", response.getStatus());
 	}
-
-	@Test
-	public void testDeleteUserWithSpecialCharacters() {
-		// TODO: Look for a way to delete the previously created user
-	}
 }
