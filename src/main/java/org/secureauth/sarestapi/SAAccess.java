@@ -44,7 +44,6 @@ import javax.ws.rs.core.Cookie;
  */
 
 public class SAAccess implements ISAAccess{
-
     private static final String PUSH_TO_ACCEPT = "push_accept";
     private static final String SYMBOL_TO_ACCEPT = "push_accept_symbol";
     private static Logger logger = LoggerFactory.getLogger(SAAccess.class);
@@ -154,7 +153,6 @@ public class SAAccess implements ISAAccess{
 
         try{
             return saExecuter.executeGetRequest(header,saBaseURL.getApplianceURL() + FactorsQuery.queryFactors(saAuth.getRealm(), userId), ts, FactorsResponse.class);
-
         }catch (Exception e){
             logger.error(new StringBuilder().append("Exception occurred executing REST query::\n").append(e.getMessage()).append("\n").toString(), e);
         }
@@ -1125,32 +1123,6 @@ public class SAAccess implements ISAAccess{
 
     /**
      * <p>
-     *     Update User / Profile
-     *     This method supports special characters for userId since it uses QP (Query Params) in order to create the request.
-     * </p>
-     * @param userId the UserID tied to the Profile Object
-     * @param userProfile The User'sProfile Object to be updated
-     * @return {@link ResponseObject}
-     */
-    public ResponseObject updateUserQP(String userId, NewUserProfile userProfile){
-        try{
-            String ts = getServerTime();
-            sortKBQKBAbyKey(userProfile);
-            String header = RestApiHeader.getAuthorizationHeader(saAuth, Resource.METHOD_PUT, IDMQueries.queryUserProfileQP(saAuth.getRealm()),userProfile,ts);
-
-            return saExecuter.executeUserProfileUpdateRequest(header,
-                    saBaseURL.getApplianceURL() + IDMQueries.queryUserProfileQP(saAuth.getRealm()),userId,
-                    userProfile,
-                    ts,
-                    ResponseObject.class);
-
-        }catch (Exception e){
-            throw new SARestAPIException("Exception occurred executing REST query:\n" + e.getMessage() + "\n", e);
-        }
-    }
-
-    /**
-     * <p>
      *     Associate User to Group
      * </p>
      * @param userId the user id of the identity
@@ -1161,7 +1133,6 @@ public class SAAccess implements ISAAccess{
         try{
             String ts = getServerTime();
             String header = RestApiHeader.getAuthorizationHeader(saAuth,"POST", IDMQueries.queryUserToGroup(saAuth.getRealm(),userId,groupName),ts);
-
             return saExecuter.executeSingleUserToSingleGroup(header,saBaseURL.getApplianceURL() + IDMQueries.queryUserToGroup(saAuth.getRealm(),userId,groupName), ts, ResponseObject.class);
         }catch (Exception e){
             throw new SARestAPIException("Exception occurred executing REST query:\n" + e.getMessage() + "\n", e);
@@ -1221,7 +1192,6 @@ public class SAAccess implements ISAAccess{
             String ts = getServerTime();
 
             String header = RestApiHeader.getAuthorizationHeader(saAuth,"POST", IDMQueries.queryGroupToUser(saAuth.getRealm(),userId,groupName),ts);
-
             return saExecuter.executeSingleGroupToSingleUser(header,saBaseURL.getApplianceURL() + IDMQueries.queryGroupToUser(saAuth.getRealm(),userId,groupName), ts, GroupAssociationResponse.class);
         }catch (Exception e){
             throw new SARestAPIException("Exception occurred executing REST query:\n" + e.getMessage() + "\n", e);

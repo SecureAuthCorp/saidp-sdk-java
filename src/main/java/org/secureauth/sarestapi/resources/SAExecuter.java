@@ -42,6 +42,9 @@ import org.glassfish.jersey.client.ClientConfig;
 import javax.ws.rs.core.NewCookie;
 import javax.ws.rs.core.Response;
 
+import javax.ws.rs.core.NewCookie;
+import javax.ws.rs.core.Response;
+
 /**
  * @author rrowcliffe@secureauth.com
  *
@@ -268,7 +271,6 @@ public class SAExecuter {
     }
 
     public <T> T executePostRawRequest(String auth,String query, String userId, String groupId, Object authRequest, Class<T> valueType, String ts)throws Exception{
-
         if(client == null) {
             createConnection();
         }
