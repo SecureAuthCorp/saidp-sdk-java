@@ -67,7 +67,7 @@ public class IDMQueries {
      */
     public static String queryUserResetPwdQP(String realm){
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(realm).append(Resource.APPLIANCE_IDM_USERS_PASSWD_RESET).append(removeLastChar(Resource.APPLIANCE_USERS));
+        stringBuilder.append(realm).append(removeLastChar(Resource.APPLIANCE_USERS)).append(Resource.APPLIANCE_IDM_USERS_PASSWD_RESET);
         return stringBuilder.toString();
     }
 
@@ -85,7 +85,7 @@ public class IDMQueries {
      */
     public static String queryUserChangePwdQP(String realm){
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(realm).append(Resource.APPLIANCE_IDM_USERS_PASSWD_CHANGE).append(removeLastChar(Resource.APPLIANCE_USERS));
+        stringBuilder.append(realm).append(removeLastChar(Resource.APPLIANCE_USERS)).append(Resource.APPLIANCE_IDM_USERS_PASSWD_CHANGE);
         return stringBuilder.toString();
     }
 
@@ -130,7 +130,7 @@ public class IDMQueries {
      */
     public static String queryGroupToUserQP(String realm){
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(realm).append(Resource.APPLIANCE_IDM_GROUPS).append(removeLastChar(Resource.APPLIANCE_IDM_USERS));
+        stringBuilder.append(realm).append(removeLastChar(Resource.APPLIANCE_IDM_USERS)).append(Resource.APPLIANCE_IDM_GROUPS);
         return stringBuilder.toString();
     }
 
