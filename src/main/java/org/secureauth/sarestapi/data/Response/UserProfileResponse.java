@@ -8,7 +8,9 @@ import org.secureauth.sarestapi.util.JSONUtil;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by rrowcliffe on 5/1/16.
@@ -17,8 +19,8 @@ import java.util.List;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class UserProfileResponse extends BaseResponse{
     private String userId;
-    private HashMap<String,UserProfileProperty> properties = new HashMap<>();
-    private HashMap<String,UserProfileKB> knowledgeBase = new HashMap<>();
+    private Map<String,UserProfileProperty> properties = new HashMap<>();
+    private Map<String,UserProfileKB> knowledgeBase = new LinkedHashMap<>();
     private List<String> groups = new ArrayList<>();
     private List<UserProfileAccessHistory> accessHistories = new ArrayList<>();
 
@@ -30,7 +32,7 @@ public class UserProfileResponse extends BaseResponse{
         this.userId = userId;
     }
 
-    public HashMap<String, UserProfileProperty> getProperties() {
+    public Map<String, UserProfileProperty> getProperties() {
         return properties;
     }
 
@@ -38,7 +40,7 @@ public class UserProfileResponse extends BaseResponse{
         this.properties = properties;
     }
 
-    public HashMap<String, UserProfileKB> getKnowledgeBase() {
+    public Map<String, UserProfileKB> getKnowledgeBase() {
         return knowledgeBase;
     }
 

@@ -13,7 +13,7 @@ import org.secureauth.sarestapi.resources.Resource;
 /**
  * Created by rrowcliffe on 5/14/16.
  */
-public class AuthenticationImpl implements AuthenticationInterface {
+public class AuthenticationImpl implements AuthenticationInterface{
 
     public AuthenticationImpl(){}
 
@@ -128,7 +128,6 @@ public class AuthenticationImpl implements AuthenticationInterface {
         return pinResponse;
     }
 
-
     @Override
     public void PushToAccept(SAAccess saAccess, String user, String factorID, String ipAddress) throws InterruptedException {
         System.out.println("Start Push 2 Accept Test ++++++++++++++++++");
@@ -154,9 +153,19 @@ public class AuthenticationImpl implements AuthenticationInterface {
     }
 
     @Override
-    public ThrottleResponse sendResetThrottleReq(SAAccess saAccess, String userid) {
+    public ThrottleResponse sendResetThrottleReq(SAAccess saAccess, String userId) {
         System.out.println("TEST Reset Throttle");
-        ThrottleResponse throttleResponse = saAccess.resetThrottleReq(userid);
+        ThrottleResponse throttleResponse = saAccess.resetThrottleReq(userId);
+        System.out.println(throttleResponse.toString());
+        System.out.println("END Reset Throttle +++++++++++");
+
+        return throttleResponse;
+    }
+
+    @Override
+    public ThrottleResponse sendResetThrottleReqQP(SAAccess saAccess, String userId) {
+        System.out.println("TEST Reset Throttle");
+        ThrottleResponse throttleResponse = saAccess.resetThrottleReqQP(userId);
         System.out.println(throttleResponse.toString());
         System.out.println("END Reset Throttle +++++++++++");
 

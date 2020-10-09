@@ -2,6 +2,7 @@
 plugins {
     id 'java-library'
     id 'com.jfrog.artifactory' version '4.10.0'
+    id 'jacoco'
 }
 
 apply plugin: 'maven'
@@ -41,7 +42,22 @@ dependencies {
     implementation('javax.xml.bind:jaxb-api:2.3.0')
     implementation('com.sun.xml.bind:jaxb-core:2.3.0')
     implementation('com.sun.xml.bind:jaxb-impl:2.3.0')
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.1.0'
+    implementation('javax.activation:activation:1.1')
+
+    implementation 'org.slf4j:slf4j-api:1.7.28'
+    implementation 'org.apache.logging.log4j:log4j-core:2.5'
+    annotationProcessor 'org.apache.logging.log4j:log4j-core:2.5'
+
+    testImplementation 'junit:junit:4.12'
+    testImplementation 'com.google.guava:guava:11.0.2'
+    testImplementation 'org.junit.jupiter:junit-jupiter-engine:5.1.0'
+    testImplementation 'org.junit.vintage:junit-vintage-engine:5.5.2'
+    testImplementation 'org.mockito:mockito-core:2.28.2'
+    testImplementation "com.github.tomakehurst:wiremock-jre8:2.21.0"
+
+    testRuntimeOnly 'org.apache.logging.log4j:log4j-slf4j-impl:2.5'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.5.2'
+
 }
 
 task copyToLib(type: Copy){
@@ -59,3 +75,21 @@ task generate_zip(type: Zip) {
 build.dependsOn( copyToLib )
 build.dependsOn( javadoc )
 generate_zip.finalizedBy( build )
+
+jacoco {
+    toolVersion = '0.8.4'
+}
+
+jacocoTestReport {
+    reports {
+        xml.enabled false
+        csv.enabled false
+        html.destination file("${buildDir}/coverageReport/html")
+    }
+}
+
+test {
+    useJUnitPlatform()
+}
+
+test.finalizedBy( jacocoTestReport )

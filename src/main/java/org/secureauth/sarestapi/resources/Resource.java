@@ -24,6 +24,7 @@ OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
 public class Resource {
 
     public static final String API_VERSION = "v1";
+    public static final String API_VERSION_2 = "v2";
     public static final String HTTPS = "https://";
     public static final String HTTP = "http://";
     public static final String COLON = ":";
@@ -31,6 +32,7 @@ public class Resource {
     public static final String APPLIANCE_AUTH="/api/"+ API_VERSION +"/auth";
     public static final String APPLIANCE_AAUTH="/api/"+ API_VERSION +"/adaptauth";
     public static final String APPLIANCE_USERS="/api/"+ API_VERSION + "/users/";
+    public static final String APPLIANCE_AUTHENTICATED = "/api/" + API_VERSION_2 + "/authenticated";
     public static final String APPLIANCE_IDM_USERS="/users/";
     public static final String APPLIANCE_IDM_USERS_PASSWD_RESET="/resetpwd";
     public static final String APPLIANCE_IDM_USERS_PASSWD_CHANGE="/changepwd";
@@ -42,6 +44,8 @@ public class Resource {
     public static final String APPLIANCE_DFP_JS=APPLIANCE_DFP + "/js";
     public static final String APPLIANCE_DFP_VALIDATE=APPLIANCE_DFP + "/validate";
     public static final String APPLIANCE_DFP_CONFIRM=APPLIANCE_DFP + "/confirm";
+    public static final String APPLIANCE_DFP_SCORE = APPLIANCE_DFP + "/score";
+    public static final String APPLIANCE_DFP_SAVE = APPLIANCE_DFP + "/save";
     public static final String APPLIANCE_ACCESSHISTORY="/api/" + API_VERSION + "/accesshistory";
     public static final String APPLIANCE_BEHAVEBIO="/api/" + API_VERSION + "/behavebio";
     public static final String APPLIANCE_BEHAVEBIO_JS=APPLIANCE_BEHAVEBIO + "/js";
@@ -49,6 +53,7 @@ public class Resource {
     public static final String APPLIANCE_OTP="/api/" + API_VERSION + "/otp";
     public static final String APPLIANCE_OTP_VALIDATE=APPLIANCE_OTP + "/validate";
     public static final String APPLIANCE_THROTTLE = "/throttle";
+    public static final String APPLIANCE_STATUS = "/status";
 
 
     public static final String STATUS_INVALID="invalid";

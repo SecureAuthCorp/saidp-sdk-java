@@ -1,0 +1,25 @@
+{
+  "id" : "15839fba-cd27-4016-899d-bf08f37cb035",
+  "name" : "realm01_api_v1_auth_41f43a30-510b-42a9-8c2c-c04aaf96a18e",
+  "request" : {
+    "url" : "/Realm01/api/v1/auth/41f43a30-510b-42a9-8c2c-c04aaf96a18e",
+    "method" : "GET"
+  },
+  "response" : {
+    "status" : 200,
+    "body" : "{\"status\":\"found\",\"message\":\"PENDING\"}",
+    "headers" : {
+      "Cache-Control" : "no-cache, no-store",
+      "Pragma" : "no-cache",
+      "Content-Type" : "application/json; charset=utf-8",
+      "Expires" : "-1",
+      "X-SA-SIGNATURE" : "bcDSXj5zqtW8PU2O+S4XEOxJOH88T6g9Bt3P02RAZJ0=",
+      "X-SA-DATE" : "Fri, 02 Oct 2020 15:44:45 GMT",
+      "Strict-Transport-Security" : "max-age=31536000",
+      "Date" : "Fri, 02 Oct 2020 15:44:45 GMT"
+    }
+  },
+  "uuid" : "15839fba-cd27-4016-899d-bf08f37cb035",
+  "persistent" : true,
+  "insertionIndex" : 3
+}
