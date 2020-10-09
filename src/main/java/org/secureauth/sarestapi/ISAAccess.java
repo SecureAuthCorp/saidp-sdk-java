@@ -414,6 +414,16 @@ public interface ISAAccess {
 	 * @return {@link ResponseObject}
 	 */
 	ResponseObject updateUser(String userId, NewUserProfile userProfile);
+	
+	/**
+	 * <p>
+	 *     Update User / Profile
+	 * </p>
+	 * @param userId the UserID tied to the Profile Object
+	 * @param userProfile The User'sProfile Object to be updated
+	 * @return {@link ResponseObject}
+	 */
+	ResponseObject updateUserQP(String userId, NewUserProfile userProfile);
 
 	/**
 	 * <p>
