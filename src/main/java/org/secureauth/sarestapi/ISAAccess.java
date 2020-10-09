@@ -130,6 +130,13 @@ public interface ISAAccess {
 	ThrottleResponse getThrottleReq(String userId);
 
 	/**
+	 * GET the end-user's current count of OTP usage attempts
+	 * @param userId id of user
+	 * @return base answer
+	 */
+	ThrottleResponse getThrottleReqQP(String userId);
+
+	/**
 	 * <p>
 	 *     Checks the users password against SecureAuth Datastore
 	 * </p>

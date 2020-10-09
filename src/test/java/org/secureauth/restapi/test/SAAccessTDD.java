@@ -869,17 +869,6 @@ public class SAAccessTDD {
 	}
 
 	@Test
-	public void testUpdateUserWithSpecialCharacters() {
-		String userName = UNEXISTING_USERNAME_QP;
-		NewUserProfile userProfile = new NewUserProfile();
-		userProfile.setUserId(UNEXISTING_USERNAME_QP+"25");
-		userProfile.setPassword("1234");
-		BaseResponse response = saAccess.updateUserQP(userName, userProfile);
-
-		assertEquals("success", response.getStatus());
-	}
-
-	@Test
 	public void testDeleteUserWithSpecialCharacters() {
 		// TODO: Look for a way to delete the previously created user
 	}
