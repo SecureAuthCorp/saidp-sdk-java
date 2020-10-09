@@ -11,6 +11,9 @@ import org.secureauth.sarestapi.data.SAAuth;
 import org.secureauth.sarestapi.data.SABaseURL;
 import org.secureauth.sarestapi.data.Response.GroupAssociationResponse;
 import org.secureauth.sarestapi.data.Response.ResponseObject;
+import org.secureauth.sarestapi.data.UserProfile.NewUserProfile;
+import org.secureauth.sarestapi.data.UserProfile.NewUserProfileProperties;
+import org.secureauth.sarestapi.data.UserProfile.UserProfileKB;
 import org.secureauth.sarestapi.data.UserProfile.UserToGroups;
 import org.secureauth.sarestapi.data.UserProfile.UsersToGroup;
 import org.secureauth.sarestapi.queries.IDMQueries;
@@ -19,6 +22,8 @@ import org.secureauth.sarestapi.resources.SAExecuter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
@@ -226,4 +231,5 @@ public class SAAccessTest {
 
 		Assert.assertEquals(validResponse, response);
 	}
+
 }

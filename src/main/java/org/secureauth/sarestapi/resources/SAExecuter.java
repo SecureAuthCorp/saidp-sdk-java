@@ -2,7 +2,6 @@ package org.secureauth.sarestapi.resources;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
-import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
@@ -10,6 +9,7 @@ import java.util.Optional;
 
 import javax.net.ssl.*;
 import javax.ws.rs.client.Entity;
+import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.MediaType;
 
 import org.glassfish.jersey.client.ClientProperties;
@@ -38,6 +38,8 @@ import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.WebTarget;
 import org.glassfish.jersey.client.ClientConfig;
+
+import javax.ws.rs.core.NewCookie;
 import javax.ws.rs.core.Response;
 
 
@@ -67,6 +69,8 @@ public class SAExecuter {
     private static Logger logger = LoggerFactory.getLogger(SAExecuter.class);
     private static final String TEN_SECONDS = "10000";
     private static final String TLS = "TLS";
+    // The IdP Cloud version uses "INGRESSCOOKIE" as fixed value to support sticky sessions.
+    private static final String SESSION_AFFINITY_COOKIE_NAME = "INGRESSCOOKIE";
     private Integer idpApiTimeout;
 
     private SABaseURL saBaseURL = null;
@@ -108,6 +112,27 @@ public class SAExecuter {
     //Get Factors for the user requested
     public <T> T executeGetRequest(String auth, String query, String ts, Class<T> valueType) throws Exception {
         return executeGetRequest(auth, query, "", ts, valueType);
+    }
+
+    public <T> T executeGetRequestStateful(String auth, Cookie ingressCookie, String query, String ts, Class<T> valueType) throws Exception {
+        if (client == null) {
+            createConnection();
+        }
+        try {
+            WebTarget target = client.target( query );
+            Response response = target.request().
+                    accept(MediaType.APPLICATION_JSON).
+                    header("Authorization", auth).
+                    header("X-SA-Ext-Date", ts).
+                    cookie( ingressCookie ).
+                    get();
+            T genericResponse = response.readEntity(valueType);
+            response.close();
+            return genericResponse;
+        } catch (Exception e) {
+            logger.error("Exception Get Request: \nQuery:\n\t" + query + "\nError:" + e.getMessage());
+        }
+        return null;
     }
 
     public <T> T executeGetRequest(String auth, String query, String userId, String ts, Class<T> valueType) throws Exception {
@@ -179,6 +204,31 @@ public class SAExecuter {
                     query + "\nError:" + e.getMessage(), e);
         }
     }
+
+    public <T extends StatefulResponseObject> T executePostRequestStateful(String auth,String query, AuthRequest authRequest,String ts, Class<T> valueType)throws Exception {
+        if (client == null) {
+            createConnection();
+        }
+        try {
+            WebTarget target = client.target(query);
+            Response response = target.request().
+                    accept(MediaType.APPLICATION_JSON).
+                    header("Authorization", auth).
+                    header("X-SA-Ext-Date", ts).
+                    post(Entity.entity(JSONUtil.convertObjectToJSON(authRequest), MediaType.APPLICATION_JSON));
+            T responseObject = response.readEntity(valueType);
+            responseObject.setSessionAffinityCookie(
+                    // return a null-empty cookie when the session affinity cookie is not found.
+                    response.getCookies().getOrDefault(SESSION_AFFINITY_COOKIE_NAME, new NewCookie(SESSION_AFFINITY_COOKIE_NAME, "" ) )
+            );
+            response.close();
+            return responseObject;
+        } catch (Exception e) {
+            throw new SARestAPIException("Exception Delivering Push Notifiation: \nQuery:\n\t" +
+                    query + "\nError:" + e.getMessage(), e);
+        }
+    }
+
 
     public <T> T executePutRequest(String auth, String query, Object payloadRequest, Class<T> responseValueType, String ts)throws Exception {
         return executePutRequest(auth, query, "", payloadRequest, responseValueType, ts);
@@ -929,32 +979,7 @@ public class SAExecuter {
 
     //create User Profile
     public <T> T executeUserProfileCreateRequest(String auth, String query, NewUserProfile newUserProfile, String ts, Class<T> valueType)throws Exception{
-
-        if(client == null) {
-            createConnection();
-        }
-
-        WebTarget target = null;
-        Response response = null;
-        T responseObject =null;
-        try{
-
-            target = client.target(query);
-            response = target.request().
-                    accept(MediaType.APPLICATION_JSON).
-                    header("Authorization", auth).
-                    header("X-SA-Ext-Date", ts).
-                    post(Entity.entity(JSONUtil.convertObjectToJSON(newUserProfile),MediaType.APPLICATION_JSON));
-
-            responseObject=response.readEntity(valueType);
-            response.close();
-        }catch(Exception e){
-            logger.error(new StringBuilder().append("Exception Creating User Profile: \nQuery:\n\t")
-                    .append(query).append("\nError:").append(e.getMessage()).toString(), e);
-        }
-
-        return responseObject;
-
+        return executePostRawRequest(auth, query, newUserProfile, valueType, ts);
     }
 
     //Single User to Single Group
@@ -1054,12 +1079,9 @@ public class SAExecuter {
 
     public BaseResponse getUserStatus(String userId, String ts, SAAuth saAuth) {
         try {
-
-            RestApiHeader restApiHeader = new RestApiHeader();
-
             String query = StatusQuery.queryStatus(saAuth.getRealm(), userId);
 
-            String header = restApiHeader.getAuthorizationHeader(saAuth, Resource.METHOD_GET, query, ts);
+            String header = RestApiHeader.getAuthorizationHeader(saAuth, Resource.METHOD_GET, query, ts);
 
             return executeGetRequest(header, saBaseURL.getApplianceURL() + query, ts, BaseResponse.class);
 

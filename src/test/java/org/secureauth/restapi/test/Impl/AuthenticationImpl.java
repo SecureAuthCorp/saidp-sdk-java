@@ -13,7 +13,7 @@ import org.secureauth.sarestapi.resources.Resource;
 /**
  * Created by rrowcliffe on 5/14/16.
  */
-public class AuthenticationImpl implements AuthenticationInterface {
+public class AuthenticationImpl implements AuthenticationInterface{
 
     public AuthenticationImpl(){}
 
@@ -127,7 +127,6 @@ public class AuthenticationImpl implements AuthenticationInterface {
 
         return pinResponse;
     }
-
 
     @Override
     public void PushToAccept(SAAccess saAccess, String user, String factorID, String ipAddress) throws InterruptedException {

@@ -2,9 +2,12 @@ package org.secureauth.sarestapi;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;
+import java.util.stream.Collectors;
 
 import com.google.common.collect.Maps;
 import org.secureauth.sarestapi.data.*;
@@ -18,6 +21,7 @@ import org.secureauth.sarestapi.data.Response.*;
 import org.secureauth.sarestapi.data.Requests.UserPasswordRequest;
 import org.secureauth.sarestapi.data.Response.UserProfileResponse;
 import org.secureauth.sarestapi.data.UserProfile.NewUserProfile;
+import org.secureauth.sarestapi.data.UserProfile.UserProfileKB;
 import org.secureauth.sarestapi.data.UserProfile.UserToGroups;
 import org.secureauth.sarestapi.data.UserProfile.UsersToGroup;
 import org.secureauth.sarestapi.exception.SARestAPIException;
@@ -29,6 +33,8 @@ import org.secureauth.sarestapi.util.RestApiHeader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.ws.rs.core.Cookie;
+
 /**
  * @author rrowcliffe@secureauth.com
  * <p>
@@ -38,7 +44,8 @@ import org.slf4j.LoggerFactory;
  */
 
 public class SAAccess implements ISAAccess{
-
+    private static final String PUSH_TO_ACCEPT = "push_accept";
+    private static final String SYMBOL_TO_ACCEPT = "push_accept_symbol";
     private static Logger logger = LoggerFactory.getLogger(SAAccess.class);
     protected SABaseURL saBaseURL;
     protected SAAuth saAuth;
@@ -186,37 +193,46 @@ public class SAAccess implements ISAAccess{
      * @return {@link FactorsResponse}
      */
     public ResponseObject sendPushToAcceptReq(String userId, String factorId, String endUserIP, String clientCompany, String clientDescription){
-       return sendPushReq(userId, factorId, endUserIP, clientCompany, clientDescription, "push_accept");
+       return sendPushReq(userId, factorId, endUserIP, clientCompany, clientDescription, PUSH_TO_ACCEPT );
+    }
+
+    @Override
+    public StatefulResponseObject sendPushToAcceptReqStateful(String userId, String factorId, String endUserIP, String clientCompany, String clientDescription) {
+       return sendPushToAcceptReqStatefulForType( userId, factorId, endUserIP, clientCompany, clientDescription, PUSH_TO_ACCEPT );
     }
 
     public ResponseObject sendPushToAcceptSymbolReq(String userId, String factorId, String endUserIP, String clientCompany, String clientDescription){
-        return sendPushReq(userId, factorId, endUserIP, clientCompany, clientDescription, "push_accept_symbol");
+        return sendPushReq(userId, factorId, endUserIP, clientCompany, clientDescription, SYMBOL_TO_ACCEPT);
+    }
+
+    @Override
+    public StatefulResponseObject sendPushToAcceptSymbolReqStateful(String userId, String factorId, String endUserIP, String clientCompany, String clientDescription) {
+        return sendPushToAcceptReqStatefulForType( userId, factorId, endUserIP, clientCompany, clientDescription, SYMBOL_TO_ACCEPT);
+    }
+
+    private StatefulResponseObject sendPushToAcceptReqStatefulForType(String userId, String factorId, String endUserIP, String clientCompany, String clientDescription, String type) {
+        String ts = getServerTime();
+        PushToAcceptRequest req = PushToAcceptRequestsFactory.createPushToAcceptRequest( userId, factorId, endUserIP, clientCompany, clientDescription, type );
+        String header = RestApiHeader.getAuthorizationHeader(saAuth,"POST", AuthQuery.queryAuth(saAuth.getRealm()), req,ts);
+        try{
+            return saExecuter.executePostRequestStateful(header,saBaseURL.getApplianceURL() + AuthQuery.queryAuth(saAuth.getRealm()), req,ts, StatefulResponseObject.class);
+        }catch (Exception e){
+            throw new SARestAPIException( e );
+        }
     }
 
     private ResponseObject sendPushReq(String userid, String factor_id, String endUserIP, String clientCompany, String clientDescription, String type) {
         String ts = getServerTime();
-        PushToAcceptRequest req = new PushToAcceptRequest();
-        req.setUser_id(userid);
-        req.setType(type);
-        req.setFactor_id(factor_id);
-        PushAcceptDetails pad = new PushAcceptDetails();
-        pad.setEnduser_ip(endUserIP);
-        if (clientCompany != null) {
-            pad.setCompany_name(clientCompany);
-        }
-        if (clientDescription != null) {
-            pad.setApplication_description(clientDescription);
-        }
-        req.setPush_accept_details(pad);
+        PushToAcceptRequest req = PushToAcceptRequestsFactory.createPushToAcceptRequest( userid, factor_id, endUserIP, clientCompany, clientDescription, type );
         String header = RestApiHeader.getAuthorizationHeader(saAuth,"POST", AuthQuery.queryAuth(saAuth.getRealm()), req,ts);
-
         try{
             return saExecuter.executePostRequest(header,saBaseURL.getApplianceURL() + AuthQuery.queryAuth(saAuth.getRealm()), req,ts, ResponseObject.class);
         }catch (Exception e){
-            logger.error(new StringBuilder().append("Exception occurred executing REST query::\n").append(e.getMessage()).append("\n").toString(), e);
+            throw new SARestAPIException( e );
         }
-        return null;
     }
+
+
 
     /**
      * <p>
@@ -233,29 +249,24 @@ public class SAAccess implements ISAAccess{
      */
     public ResponseObject sendPushBiometricReq(String biometricType, String userId, String factorId, String endUserIP, String clientCompany, String clientDescription) {
         String ts = getServerTime();
-        PushToAcceptBiometricsRequest req = new PushToAcceptBiometricsRequest();
-        req.setUser_id(userId);
-        req.setType("push_accept_biometric");
-        req.setFactor_id(factorId);
-        req.setBiometricType( biometricType );
-        PushAcceptDetails pad = new PushAcceptDetails();
-        pad.setEnduser_ip(endUserIP);
-        if (clientCompany != null) {
-            pad.setCompany_name(clientCompany);
-        }
-
-        if (clientDescription != null) {
-            pad.setApplication_description(clientDescription);
-        }
-
-        req.setPush_accept_details(pad);
+        PushToAcceptBiometricsRequest req = PushToAcceptRequestsFactory.createPushToAcceptBiometricRequest( biometricType, userId, factorId, endUserIP, clientCompany, clientDescription );
         String header = RestApiHeader.getAuthorizationHeader(this.saAuth, "POST", AuthQuery.queryAuth(this.saAuth.getRealm()), req, ts);
-
         try {
             return (ResponseObject)this.saExecuter.executePostRequest(header, this.saBaseURL.getApplianceURL() + AuthQuery.queryAuth(this.saAuth.getRealm()), req, ts, ResponseObject.class);
-        } catch (Exception var12) {
-            logger.error("Exception occurred executing REST query::\n" + var12.getMessage() + "\n", var12);
-            return null;
+        } catch (Exception e) {
+            throw new SARestAPIException( e );
+        }
+    }
+
+    @Override
+    public StatefulResponseObject sendPushBiometricReqStateful(String biometricType, String userId, String factorId, String endUserIP, String clientCompany, String clientDescription) {
+        String ts = getServerTime();
+        PushToAcceptBiometricsRequest req = PushToAcceptRequestsFactory.createPushToAcceptBiometricRequest( biometricType, userId, factorId, endUserIP, clientCompany, clientDescription );
+        String header = RestApiHeader.getAuthorizationHeader(this.saAuth, "POST", AuthQuery.queryAuth(this.saAuth.getRealm()), req, ts);
+        try {
+            return saExecuter.executePostRequestStateful(header,saBaseURL.getApplianceURL() + AuthQuery.queryAuth(saAuth.getRealm()), req,ts, StatefulResponseObject.class);
+        } catch (Exception e) {
+            throw new SARestAPIException( e );
         }
     }
 
@@ -282,18 +293,30 @@ public class SAAccess implements ISAAccess{
 
     public PushAcceptStatus queryPushAcceptStatus(String refId){
         String ts = getServerTime();
-        String getUri = AuthQuery.queryAuth(saAuth.getRealm()) + "/" + refId;
+        String getUri = makePushNotificationQueryURI( refId );
         String header = RestApiHeader.getAuthorizationHeader(saAuth,"GET", getUri,ts);
-
         try{
             return saExecuter.executeGetRequest(header,saBaseURL.getApplianceURL() + getUri,ts, PushAcceptStatus.class);
         }catch (Exception e){
-            logger.error(new StringBuilder().append("Exception occurred executing REST query::\n").append(e.getMessage()).append("\n").toString(), e);
+            throw new SARestAPIException( e );
         }
-        return null;
     }
 
+    @Override
+    public PushAcceptStatus queryPushAcceptStatusStateful(String refId, Cookie sessionAffinityCookie) {
+        String ts = getServerTime();
+        String getUri = makePushNotificationQueryURI( refId );
+        String header = RestApiHeader.getAuthorizationHeader(saAuth,"GET", getUri,ts);
+        try{
+            return saExecuter.executeGetRequestStateful( header, sessionAffinityCookie, saBaseURL.getApplianceURL() + getUri,ts, PushAcceptStatus.class);
+        }catch (Exception e){
+            throw new SARestAPIException( e );
+        }
+    }
 
+    private String makePushNotificationQueryURI(String refId) {
+        return AuthQuery.queryAuth( saAuth.getRealm() ) + "/" + refId;
+    }
 
     /**
      *
@@ -1035,22 +1058,32 @@ public class SAAccess implements ISAAccess{
      * @return {@link ResponseObject}
      */
     public ResponseObject createUser(NewUserProfile newUserProfile){
-        String ts = getServerTime();
-        RestApiHeader restApiHeader = new RestApiHeader();
-        String header = restApiHeader.getAuthorizationHeader(saAuth,"POST",IDMQueries.queryUsers(saAuth.getRealm()),newUserProfile,ts);
+        try{
+            validateUser(newUserProfile);
+            String ts = getServerTime();
+            sortKBQKBAbyKey(newUserProfile);
+            String header = RestApiHeader.getAuthorizationHeader(saAuth, Resource.METHOD_POST, IDMQueries.queryUsers(saAuth.getRealm()),newUserProfile,ts);
 
-        /*
-        At a minimum creating a user requires UserId and Passowrd
-         */
-        if(newUserProfile.getUserId() != null && !newUserProfile.getUserId().isEmpty() && newUserProfile.getPassword() != null && !newUserProfile.getPassword().isEmpty()){
-            try{
-                return saExecuter.executeUserProfileCreateRequest(header,saBaseURL.getApplianceURL() + IDMQueries.queryUsers(saAuth.getRealm()),newUserProfile,ts,ResponseObject.class);
+            return saExecuter.executeUserProfileCreateRequest(header,saBaseURL.getApplianceURL() + IDMQueries.queryUsers(saAuth.getRealm()),newUserProfile,ts,ResponseObject.class);
 
-            }catch (Exception e){
-                logger.error(new StringBuilder().append("Exception occurred executing REST query::\n").append(e.getMessage()).append("\n").toString(), e);
-            }
+        }catch (Exception e){
+            logger.error("Exception occurred executing REST query:\n" + e.getMessage() + "\n", e);
         }
         return null;
+    }
+
+    /**
+     * Check mandatory fields for creating a user.
+     *
+     * @param newUserProfile
+     * @return
+     */
+    private void validateUser(NewUserProfile newUserProfile){
+        if(newUserProfile.getUserId() == null || newUserProfile.getUserId().isEmpty() ||
+                newUserProfile.getPassword() == null || newUserProfile.getPassword().isEmpty()) {
+            throw new IllegalArgumentException("User and password are required to create a new user");
+        }
+        return;
     }
 
     /**
@@ -1062,12 +1095,11 @@ public class SAAccess implements ISAAccess{
      * @return {@link ResponseObject}
      */
     public ResponseObject updateUser(String userId, NewUserProfile userProfile){
-        String ts = getServerTime();
-        RestApiHeader restApiHeader = new RestApiHeader();
-        String header = restApiHeader.getAuthorizationHeader(saAuth,"PUT",IDMQueries.queryUserProfile(saAuth.getRealm(),userId),userProfile,ts);
-
-
         try{
+            String ts = getServerTime();
+            sortKBQKBAbyKey(userProfile);
+            String header = RestApiHeader.getAuthorizationHeader(saAuth, Resource.METHOD_PUT, IDMQueries.queryUserProfile(saAuth.getRealm(),userId),userProfile,ts);
+
             return saExecuter.executeUserProfileUpdateRequest(header,
                     saBaseURL.getApplianceURL() + IDMQueries.queryUserProfile(saAuth.getRealm(),userId),
                     userProfile,
@@ -1075,10 +1107,19 @@ public class SAAccess implements ISAAccess{
                     ResponseObject.class);
 
         }catch (Exception e){
-            logger.error(new StringBuilder().append("Exception occurred executing REST query::\n").append(e.getMessage()).append("\n").toString(), e);
+            logger.error("Exception occurred executing REST query:\n" + e.getMessage() + "\n", e);
         }
-
         return null;
+    }
+
+    private void sortKBQKBAbyKey(NewUserProfile userProfile){
+        List<Map.Entry<String, UserProfileKB>> userProfileList = userProfile.getKnowledgeBase().entrySet().stream()
+                .sorted(Map.Entry.comparingByKey(String::compareToIgnoreCase))
+                .collect(Collectors.toList());
+        userProfile.setKnowledgeBase(userProfileList.stream()
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue,
+                        (v1,v2)->v1,
+                        LinkedHashMap::new)));
     }
 
     /**

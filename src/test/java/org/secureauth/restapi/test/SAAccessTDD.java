@@ -2,17 +2,23 @@ package org.secureauth.restapi.test;
 
 import org.junit.Assume;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.secureauth.sarestapi.ISAAccess;
 import org.secureauth.sarestapi.SAAccess;
 import org.secureauth.sarestapi.data.Response.BaseResponse;
 import org.secureauth.sarestapi.data.Response.DFPValidateResponse;
 import org.secureauth.sarestapi.data.Response.FactorsResponse;
+import org.secureauth.sarestapi.data.Response.ResponseObject;
 import org.secureauth.sarestapi.data.Response.UserProfileResponse;
 import org.secureauth.sarestapi.data.SAAuth;
 import org.secureauth.sarestapi.data.SABaseURL;
 import org.secureauth.sarestapi.data.UserProfile.NewUserProfile;
 import org.secureauth.sarestapi.data.UserProfile.UserProfile;
+import org.secureauth.sarestapi.data.UserProfile.NewUserProfileProperties;
+import org.secureauth.sarestapi.data.UserProfile.UserProfileKB;
+import org.secureauth.sarestapi.exception.SARestAPIException;
 import org.secureauth.sarestapi.resources.SAExecuter;
 import org.secureauth.sarestapi.util.Property;
 import org.secureauth.sarestapi.util.RetrievePropertiesUtils;
@@ -29,6 +35,8 @@ import static org.junit.Assert.assertTrue;
 public class SAAccessTDD {
 
 	private static Logger logger = LoggerFactory.getLogger(SAAccessTDD.class);
+	@Rule
+	public ExpectedException exceptionRule = ExpectedException.none();
 
 	private static SAAuth saAuth;
 	private static ISAAccess saAccess;
@@ -551,6 +559,78 @@ public class SAAccessTDD {
 		assertNotNull(response);
 		assertEquals(response.getStatus(), invalidStringForPin);
 		assertTrue(response.getMessage().contains("PIN is invalid."));
+	}
+
+	@Test
+	public void testUpdateUserProfileKBQKBAOrderedValid() throws Exception {
+		NewUserProfile newUserProfile = new NewUserProfile();
+		newUserProfile.getKnowledgeBase().put("nonFormated1", new UserProfileKB("kbq1", "kba1"));
+		newUserProfile.getKnowledgeBase().put("nonFormated3", new UserProfileKB("kbq3", "kba3"));
+		newUserProfile.getKnowledgeBase().put("nonFormated2", new UserProfileKB("kbq2", "kba2"));
+		newUserProfile.setPassword(validPassword);
+		NewUserProfileProperties newUserProfileProperties = new NewUserProfileProperties();
+		newUserProfileProperties.setEmail4("email@email.com");
+		newUserProfileProperties.setAuxId10("aux10");
+		newUserProfileProperties.setPhone4("123-456-7890");
+		newUserProfile.setProperties(newUserProfileProperties);
+
+		ResponseObject responseObj = saAccess.updateUser(validUsername, newUserProfile);
+
+		assertNotNull(responseObj);
+		assertEquals("success", responseObj.getStatus());
+		assertEquals("", responseObj.getMessage());
+	}
+
+	@Test
+	public void testCreateUserProfileKBQKBAOrderedValid() throws Exception {
+
+		NewUserProfile newUserProfile = new NewUserProfile();
+		newUserProfile.getKnowledgeBase().put("NonFormated2", new UserProfileKB("Kbq2", "kba2"));
+		newUserProfile.getKnowledgeBase().put("nOnFormated3", new UserProfileKB("kbq3", "kba3"));
+		newUserProfile.getKnowledgeBase().put("nonFormated1", new UserProfileKB("kBq1", "kba1"));
+		newUserProfile.setPassword(validPassword);
+		newUserProfile.setUserId(String.valueOf(randomNumberBetween(1, 1000)));
+		NewUserProfileProperties newUserProfileProperties = new NewUserProfileProperties();
+		newUserProfileProperties.setEmail1("email@email.com");
+		newUserProfileProperties.setAuxId10("aux10");
+		newUserProfileProperties.setPhone4("123-456-7890");
+		newUserProfileProperties.setFirstName("foo");
+		newUserProfileProperties.setLastName("foo");
+		newUserProfile.setProperties(newUserProfileProperties);
+
+		ResponseObject responseObj = saAccess.createUser(newUserProfile);
+
+		assertNotNull(responseObj);
+		assertEquals("success", responseObj.getStatus());
+		assertEquals("", responseObj.getMessage());
+	}
+
+	@Test(expected = SARestAPIException.class)
+	public void testCreateUserProfileKBQKBAOrderedInValid() throws Exception {
+
+		NewUserProfile newUserProfile = new NewUserProfile();
+		newUserProfile.getKnowledgeBase().put("nonFormated1", new UserProfileKB("kbq1", "kba1"));
+		newUserProfile.getKnowledgeBase().put("nonFormated2", new UserProfileKB("kbq2", "kba2"));
+		newUserProfile.getKnowledgeBase().put("nonFormated3", new UserProfileKB("kbq3", "kba3"));
+		newUserProfile.setPassword("");
+		newUserProfile.setUserId("");
+		NewUserProfileProperties newUserProfileProperties = new NewUserProfileProperties();
+		newUserProfileProperties.setEmail1("email@email.com");
+		newUserProfileProperties.setAuxId10("aux10");
+		newUserProfileProperties.setPhone4("123-456-7890");
+		newUserProfileProperties.setFirstName("foo");
+		newUserProfileProperties.setLastName("foo");
+		newUserProfile.setProperties(newUserProfileProperties);
+
+		ResponseObject responseObj = saAccess.createUser(newUserProfile);
+
+		exceptionRule.expect(SARestAPIException.class);
+		exceptionRule.expectMessage("User and password are required to create a new user");
+		assertEquals(null, responseObj);
+	}
+
+	private double randomNumberBetween(int min, int max){
+		return (Math.random() * ((max - min) + 1)) + min;
 	}
 
 	@Test
