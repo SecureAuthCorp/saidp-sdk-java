@@ -19,6 +19,7 @@ import org.secureauth.sarestapi.data.UserProfile.UserProfile;
 import org.secureauth.sarestapi.data.UserProfile.NewUserProfileProperties;
 import org.secureauth.sarestapi.data.UserProfile.UserProfileKB;
 import org.secureauth.sarestapi.exception.SARestAPIException;
+import org.secureauth.sarestapi.guid.GUIDStrategy;
 import org.secureauth.sarestapi.resources.SAExecuter;
 import org.secureauth.sarestapi.util.Property;
 import org.secureauth.sarestapi.util.RetrievePropertiesUtils;
@@ -26,6 +27,8 @@ import org.secureauth.sarestapi.util.SAFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+
+import java.util.UUID;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -120,6 +123,24 @@ public class SAAccessTDD {
 			}
 		 */
 		BaseResponse response = saAccess.validateUserPin(validUsername, validPin);
+		assertNotNull(response);
+		assertEquals("valid", response.getStatus());
+		assertTrue(response.getMessage().isEmpty());
+
+	}
+
+	@Test
+	public void testUserPINWithValidValuesIncludingAXRequestID() throws Exception {
+		/*
+		 * Response would return:
+			{
+			  "status" : "valid",
+			  "message" : ""
+			}
+		 */
+		final GUIDStrategy guidStrategy = UUID::randomUUID;
+		SAAccess saAccessWithXRequestID = new SAAccess( saBaseURL, saAuth, new SAExecuter( saBaseURL, guidStrategy) );
+		BaseResponse response = saAccessWithXRequestID.validateUserPin(validUsername, validPin);
 		assertNotNull(response);
 		assertEquals("valid", response.getStatus());
 		assertTrue(response.getMessage().isEmpty());
