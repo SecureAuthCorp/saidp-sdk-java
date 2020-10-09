@@ -17,6 +17,8 @@ public interface IDMInterface {
     ResponseObject createUser(SAAccess saAccess, NewUserProfile newUserProfile);
 
     ResponseObject updateUser(SAAccess saAccess, String userId, NewUserProfile newUserProfile);
+    
+    ResponseObject updateUserQP(SAAccess saAccess, String userId, NewUserProfile newUserProfile);
 
     ResponseObject addUserToGroup(SAAccess saAccess, String userId, String groupName);
 

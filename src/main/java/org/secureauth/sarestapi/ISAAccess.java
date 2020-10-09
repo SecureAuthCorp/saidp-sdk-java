@@ -414,7 +414,7 @@ public interface ISAAccess {
 	 * @return {@link ResponseObject}
 	 */
 	ResponseObject updateUser(String userId, NewUserProfile userProfile);
-
+	
 	/**
 	 * <p>
 	 *     Associate User to Group
