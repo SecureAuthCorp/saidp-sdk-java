@@ -417,6 +417,17 @@ public interface ISAAccess {
 
 	/**
 	 * <p>
+	 *     Update User / Profile
+	 *     This method supports special characters for userId since it uses QP (Query Params) in order to create the request.
+	 * </p>
+	 * @param userId the UserID tied to the Profile Object
+	 * @param userProfile The User'sProfile Object to be updated
+	 * @return {@link ResponseObject}
+	 */
+	ResponseObject updateUserQP(String userId, NewUserProfile userProfile);
+
+	/**
+	 * <p>
 	 *     Associate User to Group
 	 * </p>
 	 * @param userId the user id of the identity
