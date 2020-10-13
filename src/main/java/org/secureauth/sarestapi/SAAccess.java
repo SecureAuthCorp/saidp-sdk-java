@@ -25,6 +25,7 @@ import org.secureauth.sarestapi.data.UserProfile.UserProfileKB;
 import org.secureauth.sarestapi.data.UserProfile.UserToGroups;
 import org.secureauth.sarestapi.data.UserProfile.UsersToGroup;
 import org.secureauth.sarestapi.exception.SARestAPIException;
+import org.secureauth.sarestapi.guid.GUIDStrategy;
 import org.secureauth.sarestapi.queries.*;
 import org.secureauth.sarestapi.resources.Resource;
 import org.secureauth.sarestapi.resources.SAExecuter;
@@ -93,6 +94,12 @@ public class SAAccess implements ISAAccess{
         saBaseURL=new SABaseURL(host,port,ssl,selfSigned);
         saAuth = new SAAuth(applicationID,applicationKey,realm);
         saExecuter=new SAExecuter(saBaseURL);
+    }
+
+    public SAAccess(String host, String port,boolean ssl,boolean selfSigned, String realm, String applicationID, String applicationKey, GUIDStrategy guidStrategy){
+        saBaseURL=new SABaseURL(host,port,ssl,selfSigned);
+        saAuth = new SAAuth(applicationID,applicationKey,realm);
+        saExecuter=new SAExecuter(saBaseURL, guidStrategy);
     }
 
     /**

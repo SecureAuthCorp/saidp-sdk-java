@@ -8,7 +8,7 @@ import java.security.SecureRandom;
 import java.util.Optional;
 
 import javax.net.ssl.*;
-import javax.ws.rs.client.Entity;
+import javax.ws.rs.client.*;
 import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.MediaType;
 
@@ -26,6 +26,8 @@ import org.secureauth.sarestapi.data.UserProfile.UserToGroups;
 import org.secureauth.sarestapi.data.UserProfile.UsersToGroup;
 import org.secureauth.sarestapi.exception.SARestAPIException;
 import org.secureauth.sarestapi.filters.SACheckRequestFilter;
+import org.secureauth.sarestapi.guid.GUIDStrategy;
+import org.secureauth.sarestapi.guid.XRequestIDFilter;
 import org.secureauth.sarestapi.queries.StatusQuery;
 import org.secureauth.sarestapi.ssl.SATrustManagerFactory;
 import org.secureauth.sarestapi.util.JSONUtil;
@@ -34,9 +36,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 //Jersey 2 Libs
-import javax.ws.rs.client.Client;
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.WebTarget;
 import org.glassfish.jersey.client.ClientConfig;
 
 import javax.ws.rs.core.NewCookie;
@@ -74,12 +73,19 @@ public class SAExecuter {
     // The IdP Cloud version uses "INGRESSCOOKIE" as fixed value to support sticky sessions.
     private static final String SESSION_AFFINITY_COOKIE_NAME = "INGRESSCOOKIE";
     private Integer idpApiTimeout;
+    // Default is do nothing.
+    private ClientRequestFilter xRequestIDFilter = (requestContext) -> {};
 
     private SABaseURL saBaseURL = null;
 
     public SAExecuter(SABaseURL saBaseURL) {
         this.saBaseURL = saBaseURL;
         this.idpApiTimeout = Integer.parseInt(Optional.ofNullable(System.getProperty("rest.api.timeout")).orElse(TEN_SECONDS) );
+    }
+
+    public SAExecuter(SABaseURL saBaseURL, GUIDStrategy guidStrategy) {
+        this( saBaseURL );
+        this.xRequestIDFilter = new XRequestIDFilter( guidStrategy );
     }
 
     public void setTimeout(int timeoutInMillis) {
@@ -96,6 +102,7 @@ public class SAExecuter {
         ctx.init(null, SATrustManagerFactory.createTrustsManagersFor( this.saBaseURL ) , new SecureRandom());
         try {
             config.register(SACheckRequestFilter.class);
+            config.register( this.xRequestIDFilter );
             client = ClientBuilder.newBuilder()
                     .withConfig(config)
                     .sslContext(ctx)
