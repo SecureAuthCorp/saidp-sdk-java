@@ -25,6 +25,7 @@ import org.secureauth.sarestapi.data.UserProfile.UserProfileKB;
 import org.secureauth.sarestapi.data.UserProfile.UserToGroups;
 import org.secureauth.sarestapi.data.UserProfile.UsersToGroup;
 import org.secureauth.sarestapi.exception.SARestAPIException;
+import org.secureauth.sarestapi.guid.GUIDStrategy;
 import org.secureauth.sarestapi.queries.*;
 import org.secureauth.sarestapi.resources.Resource;
 import org.secureauth.sarestapi.resources.SAExecuter;
@@ -93,6 +94,12 @@ public class SAAccess implements ISAAccess{
         saBaseURL=new SABaseURL(host,port,ssl,selfSigned);
         saAuth = new SAAuth(applicationID,applicationKey,realm);
         saExecuter=new SAExecuter(saBaseURL);
+    }
+
+    public SAAccess(String host, String port,boolean ssl,boolean selfSigned, String realm, String applicationID, String applicationKey, GUIDStrategy guidStrategy){
+        saBaseURL=new SABaseURL(host,port,ssl,selfSigned);
+        saAuth = new SAAuth(applicationID,applicationKey,realm);
+        saExecuter=new SAExecuter(saBaseURL, guidStrategy);
     }
 
     /**
@@ -1120,6 +1127,33 @@ public class SAAccess implements ISAAccess{
                         (v1,v2)->v1,
                         LinkedHashMap::new)));
     }
+	
+    /**
+     * <p>
+     *     Update User / Profile
+     *     This method supports special characters for userId since it uses QP (Query Params) in order to create the request.
+     * </p>
+     * @param userId the UserID tied to the Profile Object
+     * @param userProfile The User'sProfile Object to be updated
+     * @return {@link ResponseObject}
+     */
+    public ResponseObject updateUserQP(String userId, NewUserProfile userProfile){
+        try{
+            String ts = getServerTime();
+            sortKBQKBAbyKey(userProfile);
+            String header = RestApiHeader.getAuthorizationHeader(saAuth, Resource.METHOD_PUT, IDMQueries.queryUserProfileQP(saAuth.getRealm()),userProfile,ts);
+
+            return saExecuter.executeUserProfileUpdateRequest(header,
+                    saBaseURL.getApplianceURL() + IDMQueries.queryUserProfileQP(saAuth.getRealm()),userId,
+                    userProfile,
+                    ts,
+                    ResponseObject.class);
+
+        }catch (Exception e){
+            throw new SARestAPIException("Exception occurred executing REST query:\n" + e.getMessage() + "\n", e);
+        }
+    }
+
 
     /**
      * <p>
