@@ -699,7 +699,8 @@ public class SAAccessTDD {
 		assertNotNull(responseObj);
 		assertEquals("failed", responseObj.getStatus());
 		assertEquals("user_id does not exist", responseObj.getMessage());
-		assertEquals(userDomain + "\\" + UNEXISTING_USERNAME, responseObj.getUser_id());
+		String domainAndUser = userDomain.isEmpty() ? UNEXISTING_USERNAME : userDomain + "\\" + UNEXISTING_USERNAME;
+		assertEquals(domainAndUser, responseObj.getUser_id());
 	}
 
 	@Test
