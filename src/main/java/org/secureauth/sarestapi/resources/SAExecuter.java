@@ -28,6 +28,7 @@ import org.secureauth.sarestapi.exception.SARestAPIException;
 import org.secureauth.sarestapi.filters.SACheckRequestFilter;
 import org.secureauth.sarestapi.guid.GUIDStrategy;
 import org.secureauth.sarestapi.guid.XRequestIDFilter;
+import org.secureauth.sarestapi.queries.IDMQueries;
 import org.secureauth.sarestapi.queries.StatusQuery;
 import org.secureauth.sarestapi.ssl.SATrustManagerFactory;
 import org.secureauth.sarestapi.util.JSONUtil;
@@ -303,6 +304,43 @@ public class SAExecuter {
         }catch(Exception e){
             throw new SARestAPIException("Exception Post Request: \nQuery:\n\t" + query + "\nError:" + e.getMessage());
         }
+    }
+
+    public <T> T executeGenericRawRequest(String auth,String query, String ts, String method, Object authRequest, Class<T> valueType)throws Exception {
+        if (client == null) {
+            createConnection();
+        }
+        if(Resource.METHOD_DELETE.equals(method)){
+            client.property(ClientProperties.SUPPRESS_HTTP_COMPLIANCE_VALIDATION, true);
+        }
+        try {
+            WebTarget target;
+            Response response;
+            T responseObject;
+
+            target = client.target(query);
+            response = target.request().
+
+                    accept(MediaType.APPLICATION_JSON).
+                    header("Authorization", auth).
+                    header("X-SA-Ext-Date", ts).
+                    build(method, Entity.entity(JSONUtil.convertObjectToJSON(authRequest),MediaType.APPLICATION_JSON))
+                    .invoke();
+
+            responseObject = response.readEntity(valueType);
+            response.close();
+            return responseObject;
+        } catch (Exception e) {
+            throw new SARestAPIException("Exception Request: \nQuery:\n\t" + query + "\nError:" + e.getMessage(), e);
+        } finally {
+            if(Resource.METHOD_DELETE.equals(method)){
+                client.property(ClientProperties.SUPPRESS_HTTP_COMPLIANCE_VALIDATION, false);
+            }
+        }
+    }
+
+    public <T> T executeDeleteRawRequest(String auth,String query, String ts, Object authRequest, Class<T> valueType)throws Exception{
+        return executeGenericRawRequest(auth, query, ts, Resource.METHOD_DELETE, authRequest, valueType);
     }
 
     public <T> T executePostRawRequestWithoutPayload(String auth,String query, Class<T> valueType, String ts)throws Exception {
