@@ -60,7 +60,7 @@ public class IDMImpl implements IDMInterface {
         System.out.println("END Update User " + userId + " Request ++++++++");
         return null;
     }
-
+    
     @Override
     public ResponseObject addUserToGroup(SAAccess saAccess, String userId, String groupName) {
         System.out.println("START Update user " + userId + " Request ++++++++");

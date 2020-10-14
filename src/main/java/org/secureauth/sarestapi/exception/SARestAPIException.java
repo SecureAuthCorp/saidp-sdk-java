@@ -11,4 +11,8 @@ public class SARestAPIException extends RuntimeException {
 	public SARestAPIException(String s, Exception e) {
 		super(s,e);
 	}
+
+	public SARestAPIException(Exception exception) {
+		super("Exception occurred executing REST query:\n" + exception.getMessage(), exception);
+	}
 }

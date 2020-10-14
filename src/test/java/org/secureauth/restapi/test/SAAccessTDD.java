@@ -16,9 +16,11 @@ import org.secureauth.sarestapi.data.Response.UserProfileResponse;
 import org.secureauth.sarestapi.data.SAAuth;
 import org.secureauth.sarestapi.data.SABaseURL;
 import org.secureauth.sarestapi.data.UserProfile.NewUserProfile;
+import org.secureauth.sarestapi.data.UserProfile.UserProfile;
 import org.secureauth.sarestapi.data.UserProfile.NewUserProfileProperties;
 import org.secureauth.sarestapi.data.UserProfile.UserProfileKB;
 import org.secureauth.sarestapi.exception.SARestAPIException;
+import org.secureauth.sarestapi.guid.GUIDStrategy;
 import org.secureauth.sarestapi.resources.SAExecuter;
 import org.secureauth.sarestapi.util.Property;
 import org.secureauth.sarestapi.util.RetrievePropertiesUtils;
@@ -26,6 +28,8 @@ import org.secureauth.sarestapi.util.SAFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+
+import java.util.UUID;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -56,7 +60,7 @@ public class SAAccessTDD {
 	private static String validPassword;
 	private static String userDomain;
 	private final static String UNEXISTING_USERNAME = "unexisting-user";
-	private final static String UNEXISTING_USERNAME_QP = UNEXISTING_USERNAME + "!@#$%^&*(";
+	private final static String UNEXISTING_USERNAME_QP = UNEXISTING_USERNAME + "+~.!@$%^&*'_";
 
 	//DFP
 	private static String validFingerprintId;
@@ -122,6 +126,24 @@ public class SAAccessTDD {
 			}
 		 */
 		BaseResponse response = saAccess.validateUserPin(validUsername, validPin);
+		assertNotNull(response);
+		assertEquals("valid", response.getStatus());
+		assertTrue(response.getMessage().isEmpty());
+
+	}
+
+	@Test
+	public void testUserPINWithValidValuesIncludingAXRequestID() throws Exception {
+		/*
+		 * Response would return:
+			{
+			  "status" : "valid",
+			  "message" : ""
+			}
+		 */
+		final GUIDStrategy guidStrategy = UUID::randomUUID;
+		SAAccess saAccessWithXRequestID = new SAAccess( saBaseURL, saAuth, new SAExecuter( saBaseURL, guidStrategy) );
+		BaseResponse response = saAccessWithXRequestID.validateUserPin(validUsername, validPin);
 		assertNotNull(response);
 		assertEquals("valid", response.getStatus());
 		assertTrue(response.getMessage().isEmpty());
@@ -937,5 +959,40 @@ public class SAAccessTDD {
 	public void testWhenUserIdIsNotValidThenNotifyAuthenticatedResultFail() {
 		BaseResponse response = saAccess.notifyAuthenticated( UNEXISTING_USERNAME, "success", "NONE" );
 		assertEquals( "User Id was not found.", response.getMessage() );
+	}
+
+	// This tests the creation of a real user
+	@Test
+	public void testCreateUserWithSpecialCharacters() {
+		NewUserProfile userProfile = new NewUserProfile();
+		userProfile.setUserId(UNEXISTING_USERNAME_QP);
+		userProfile.setPassword("1234");
+
+		BaseResponse response = saAccess.createUser(userProfile);
+		assertEquals("OK", response.getStatus());
+	}
+
+	@Test
+	public void testGetCreatedUserWithSpecialCharacters() {
+		String userName = UNEXISTING_USERNAME_QP;
+		BaseResponse response = saAccess.getUserProfileQP(userName);
+
+		assertEquals("found", response.getStatus());
+	}
+
+	@Test
+	public void testGetCreatedFactorsUserWithSpecialCharacters() {
+		String userName = UNEXISTING_USERNAME_QP;
+		BaseResponse response = saAccess.factorsByUserQP(userName);
+
+		assertEquals("found", response.getStatus());
+	}
+
+	@Test
+	public void testGetCreatedThrottleUserWithSpecialCharacters() {
+		String userName = UNEXISTING_USERNAME_QP;
+		BaseResponse response = saAccess.getThrottleReqQP(userName);
+
+		assertEquals("found", response.getStatus());
 	}
 }
