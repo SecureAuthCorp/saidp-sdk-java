@@ -819,13 +819,7 @@ public class SAAccess implements ISAAccess{
         String ts = getServerTime();
         RestApiHeader restApiHeader = new RestApiHeader();
         AuthRequest authRequest = LinkToAcceptFactory.createLinkToAcceptAuthRequest(userId, factorId, Resource.EMAIL_LINK);
-        String header = restApiHeader.getAuthorizationHeader(saAuth,"POST", AuthQuery.queryAuth(saAuth.getRealm()), authRequest,ts);
-
-        try{
-            return saExecuter.executePostRequestStateful(header, saBaseURL.getApplianceURL() + AuthQuery.queryAuth(saAuth.getRealm()), authRequest, ts, StatefulResponseObject.class);
-        }catch (Exception e){
-            throw new SARestAPIException( e );
-        }
+        return getResponseObject(ts, restApiHeader, authRequest);
     }
 
     /**
@@ -847,10 +841,33 @@ public class SAAccess implements ISAAccess{
         String ts = getServerTime();
         RestApiHeader restApiHeader = new RestApiHeader();
         AuthRequest authRequest = LinkToAcceptFactory.createLinkToAcceptAuthRequest(userId, factorId, Resource.SMS_LINK);
-        String header = restApiHeader.getAuthorizationHeader(saAuth,"POST", AuthQuery.queryAuth(saAuth.getRealm()), authRequest,ts);
+        return getResponseObject(ts, restApiHeader, authRequest);
+    }
+
+    private ResponseObject getResponseObject(String ts, RestApiHeader restApiHeader, AuthRequest authRequest) {
+        String header = restApiHeader.getAuthorizationHeader(saAuth, Resource.METHOD_POST, AuthQuery.queryAuth(saAuth.getRealm()), authRequest,ts);
 
         try{
             return saExecuter.executePostRequestStateful(header, saBaseURL.getApplianceURL() + AuthQuery.queryAuth(saAuth.getRealm()), authRequest, ts, StatefulResponseObject.class);
+        }catch (Exception e){
+            throw new SARestAPIException( e );
+        }
+    }
+
+    /**
+     * <p>
+     *     Verify Link to accept using code
+     * </p>
+     * @param linkId the id provided when making a link to accept request
+     * @return {@link ResponseObject}
+     */
+    public ResponseObject verifyLinkToAcceptStatus(String linkId) {
+        String ts = getServerTime();
+        RestApiHeader restApiHeader = new RestApiHeader();
+        String header = restApiHeader.getAuthorizationHeader(saAuth, Resource.METHOD_GET, AuthQuery.queryAuthLink(saAuth.getRealm(), linkId), ts);
+
+        try{
+            return saExecuter.executeGetRequest(header, saBaseURL.getApplianceURL() + AuthQuery.queryAuthLink(saAuth.getRealm(), linkId), ts, StatefulResponseObject.class);
         }catch (Exception e){
             throw new SARestAPIException( e );
         }

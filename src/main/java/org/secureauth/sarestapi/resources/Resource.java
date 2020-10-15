@@ -30,6 +30,7 @@ public class Resource {
     public static final String COLON = ":";
     public static final String SLASH = "/";
     public static final String APPLIANCE_AUTH="/api/"+ API_VERSION +"/auth";
+    public static final String APPLIANCE_AUTH_LINK="/api/"+ API_VERSION +"/auth/link/";
     public static final String APPLIANCE_AAUTH="/api/"+ API_VERSION +"/adaptauth";
     public static final String APPLIANCE_USERS="/api/"+ API_VERSION + "/users/";
     public static final String APPLIANCE_AUTHENTICATED = "/api/" + API_VERSION_2 + "/authenticated";

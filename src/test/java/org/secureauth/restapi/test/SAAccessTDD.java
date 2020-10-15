@@ -970,15 +970,23 @@ public class SAAccessTDD {
 
 	@Test
 	public void testLinkToAcceptEmail() {
-		BaseResponse response = saAccess.emailLink(validUsername, "Email1");
+		ResponseObject response = saAccess.emailLink(validUsername, "Email1");
 
 		assertEquals("valid", response.getStatus());
 	}
 
 	@Test
 	public void testLinkToAcceptSMS() {
-		BaseResponse response = saAccess.smsLink(validUsername, "Phone1");
+		ResponseObject response = saAccess.smsLink(validUsername, "Phone1");
 
 		assertEquals("valid", response.getStatus());
+	}
+
+	@Test
+	public void testLinkToAcceptVerify() {
+		ResponseObject linkResponse = saAccess.emailLink(validUsername, "Email1");
+		ResponseObject response = saAccess.verifyLinkToAcceptStatus(linkResponse.getReference_id());
+
+		assertEquals("found", response.getStatus());
 	}
 }

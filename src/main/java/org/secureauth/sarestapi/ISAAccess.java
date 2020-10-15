@@ -337,6 +337,16 @@ public interface ISAAccess {
 	 * @return {@link ResponseObject}
 	 */
 	ResponseObject smsLink(String userId, String factorId);
+
+	/**
+	 * <p>
+	 *     Verify Link to accept using code
+	 * </p>
+	 * @param linkId the id provided when making a link to accept request
+	 * @return {@link ResponseObject}
+	 */
+	ResponseObject verifyLinkToAcceptStatus(String linkId);
+
 	/**
 	 * <p>
 	 *     Returns response to Access History Post Rest API
