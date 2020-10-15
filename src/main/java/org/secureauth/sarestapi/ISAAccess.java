@@ -333,7 +333,7 @@ public interface ISAAccess {
 	 *     Send Link to accept by email
 	 * </p>
 	 * @param userId the userid of the identity
-	 * @param factorId  Email Property "Email1"
+	 * @param factorId  Phone Property "Phone1"
 	 * @return {@link ResponseObject}
 	 */
 	ResponseObject smsLink(String userId, String factorId);

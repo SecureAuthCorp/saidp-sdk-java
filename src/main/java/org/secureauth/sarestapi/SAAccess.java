@@ -834,7 +834,7 @@ public class SAAccess implements ISAAccess{
      *      }
      * </p>
      * @param userId the userid of the identity
-     * @param factorId  Email Property "Email1"
+     * @param factorId  Phone Property "Phone1"
      * @return {@link ResponseObject}
      */
     public ResponseObject smsLink(String userId, String factorId){
