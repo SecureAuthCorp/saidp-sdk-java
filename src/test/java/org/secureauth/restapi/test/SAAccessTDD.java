@@ -15,7 +15,6 @@ import org.secureauth.sarestapi.data.Response.UserProfileResponse;
 import org.secureauth.sarestapi.data.SAAuth;
 import org.secureauth.sarestapi.data.SABaseURL;
 import org.secureauth.sarestapi.data.UserProfile.NewUserProfile;
-import org.secureauth.sarestapi.data.UserProfile.UserProfile;
 import org.secureauth.sarestapi.data.UserProfile.NewUserProfileProperties;
 import org.secureauth.sarestapi.data.UserProfile.UserProfileKB;
 import org.secureauth.sarestapi.exception.SARestAPIException;
@@ -967,5 +966,12 @@ public class SAAccessTDD {
 		BaseResponse response = saAccess.getThrottleReqQP(userName);
 
 		assertEquals("found", response.getStatus());
+	}
+
+	@Test
+	public void testLinkToAcceptEmail() {
+		BaseResponse response = saAccess.emailLink(validUsername, "Email1");
+
+		assertEquals("valid", response.getStatus());
 	}
 }

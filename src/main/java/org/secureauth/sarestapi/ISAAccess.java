@@ -320,6 +320,15 @@ public interface ISAAccess {
 
 	/**
 	 * <p>
+	 *     Send Link to accept by email
+	 * </p>
+	 * @param userId the userid of the identity
+	 * @param factorId  Email Property "Email1"
+	 * @return {@link ResponseObject}
+	 */
+	ResponseObject emailLink(String userId, String factorId);
+	/**
+	 * <p>
 	 *     Returns response to Access History Post Rest API
 	 * </p>
 	 * @param userId The User ID that you want to validate from

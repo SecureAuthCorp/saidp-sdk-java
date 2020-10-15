@@ -657,7 +657,7 @@ public class SAAccess implements ISAAccess{
         AuthRequest authRequest = new AuthRequest();
 
         authRequest.setUser_id(userId);
-        authRequest.setType("sms");
+        authRequest.setType(Resource.SMS);
         authRequest.setToken(phoneNumber);
         String header = restApiHeader.getAuthorizationHeader(saAuth,"POST", AuthQuery.queryAuth(saAuth.getRealm()), authRequest,ts);
 
@@ -709,7 +709,7 @@ public class SAAccess implements ISAAccess{
         AuthRequest authRequest = new AuthRequest();
 
         authRequest.setUser_id(userId);
-        authRequest.setType("email");
+        authRequest.setType(Resource.EMAIL);
         authRequest.setFactor_id(factorId);
         String header = restApiHeader.getAuthorizationHeader(saAuth,"POST", AuthQuery.queryAuth(saAuth.getRealm()), authRequest,ts);
 
@@ -798,6 +798,34 @@ public class SAAccess implements ISAAccess{
             logger.error(new StringBuilder().append("Exception occurred executing REST query::\n").append(e.getMessage()).append("\n").toString(), e);
         }
         return null;
+    }
+
+    /**
+     * <p>
+     *     Send Link to accept by email
+     *     The response is as follows
+     *     {
+     *        "reference_id": "xxxxxxxxxxxxxxxxx",
+     *        "status": "valid",
+     *        "message": "",
+     *        "user_id": "xxxxxxxxxxx"
+     *      }
+     * </p>
+     * @param userId the userid of the identity
+     * @param factorId  Email Property "Email1"
+     * @return {@link ResponseObject}
+     */
+    public ResponseObject emailLink(String userId, String factorId){
+        String ts = getServerTime();
+        RestApiHeader restApiHeader = new RestApiHeader();
+        AuthRequest authRequest = LinkToAcceptFactory.createEmailToAcceptAuthRequest(userId, factorId);
+        String header = restApiHeader.getAuthorizationHeader(saAuth,"POST", AuthQuery.queryAuth(saAuth.getRealm()), authRequest,ts);
+
+        try{
+            return saExecuter.executePostRequestStateful(header, saBaseURL.getApplianceURL() + AuthQuery.queryAuth(saAuth.getRealm()), authRequest, ts, StatefulResponseObject.class);
+        }catch (Exception e){
+            throw new SARestAPIException( e );
+        }
     }
 
     /**

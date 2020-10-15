@@ -82,5 +82,9 @@ public class Resource {
     public static final String FACTORS="factors";
     public static final String FACTOR="factor";
     public static final String GEOLOC="GeoLoc";
+    public static final String EMAIL = "email";
+    public static final String SMS = "sms";
+    public static final String EMAIL_LINK = "email_link";
+    public static final String SMS_LINK = "sms_link";
 
 }
