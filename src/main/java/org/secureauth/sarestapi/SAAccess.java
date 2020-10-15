@@ -818,7 +818,35 @@ public class SAAccess implements ISAAccess{
     public ResponseObject emailLink(String userId, String factorId){
         String ts = getServerTime();
         RestApiHeader restApiHeader = new RestApiHeader();
-        AuthRequest authRequest = LinkToAcceptFactory.createEmailToAcceptAuthRequest(userId, factorId);
+        AuthRequest authRequest = LinkToAcceptFactory.createLinkToAcceptAuthRequest(userId, factorId, Resource.EMAIL_LINK);
+        String header = restApiHeader.getAuthorizationHeader(saAuth,"POST", AuthQuery.queryAuth(saAuth.getRealm()), authRequest,ts);
+
+        try{
+            return saExecuter.executePostRequestStateful(header, saBaseURL.getApplianceURL() + AuthQuery.queryAuth(saAuth.getRealm()), authRequest, ts, StatefulResponseObject.class);
+        }catch (Exception e){
+            throw new SARestAPIException( e );
+        }
+    }
+
+    /**
+     * <p>
+     *     Send Link to accept by email
+     *     The response is as follows
+     *     {
+     *        "reference_id": "xxxxxxxxxxxxxxxxx",
+     *        "status": "valid",
+     *        "message": "",
+     *        "user_id": "xxxxxxxxxxx"
+     *      }
+     * </p>
+     * @param userId the userid of the identity
+     * @param factorId  Email Property "Email1"
+     * @return {@link ResponseObject}
+     */
+    public ResponseObject smsLink(String userId, String factorId){
+        String ts = getServerTime();
+        RestApiHeader restApiHeader = new RestApiHeader();
+        AuthRequest authRequest = LinkToAcceptFactory.createLinkToAcceptAuthRequest(userId, factorId, Resource.SMS_LINK);
         String header = restApiHeader.getAuthorizationHeader(saAuth,"POST", AuthQuery.queryAuth(saAuth.getRealm()), authRequest,ts);
 
         try{

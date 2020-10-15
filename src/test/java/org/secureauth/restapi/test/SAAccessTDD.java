@@ -974,4 +974,11 @@ public class SAAccessTDD {
 
 		assertEquals("valid", response.getStatus());
 	}
+
+	@Test
+	public void testLinkToAcceptSMS() {
+		BaseResponse response = saAccess.smsLink(validUsername, "Phone1");
+
+		assertEquals("valid", response.getStatus());
+	}
 }
