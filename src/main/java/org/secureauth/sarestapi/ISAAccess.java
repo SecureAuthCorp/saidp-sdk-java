@@ -343,9 +343,9 @@ public interface ISAAccess {
 	 *     Verify Link to accept using code
 	 * </p>
 	 * @param linkId the id provided when making a link to accept request
-	 * @return {@link StatefulResponseObject}
+	 * @return {@link PushAcceptStatus}
 	 */
-	StatefulResponseObject verifyLinkToAcceptStatus(String linkId, Cookie cookie);
+	PushAcceptStatus verifyLinkToAcceptStatus(String linkId, Cookie cookie);
 
 	/**
 	 * <p>

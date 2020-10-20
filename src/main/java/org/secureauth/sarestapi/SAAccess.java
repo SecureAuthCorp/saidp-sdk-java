@@ -859,15 +859,15 @@ public class SAAccess implements ISAAccess{
      *     Verify Link to accept using code
      * </p>
      * @param linkId the id provided when making a link to accept request
-     * @return {@link StatefulResponseObject}
+     * @return {@link PushAcceptStatus}
      */
-    public StatefulResponseObject verifyLinkToAcceptStatus(String linkId, Cookie cookie) {
+    public PushAcceptStatus verifyLinkToAcceptStatus(String linkId, Cookie cookie) {
         String ts = getServerTime();
         RestApiHeader restApiHeader = new RestApiHeader();
         String header = restApiHeader.getAuthorizationHeader(saAuth, Resource.METHOD_GET, AuthQuery.queryAuthLink(saAuth.getRealm(), linkId), ts);
 
         try{
-            return saExecuter.executeGetRequestStateful(header, cookie, saBaseURL.getApplianceURL() + AuthQuery.queryAuthLink(saAuth.getRealm(), linkId), ts, StatefulResponseObject.class);
+            return saExecuter.executeGetRequestStateful(header, cookie, saBaseURL.getApplianceURL() + AuthQuery.queryAuthLink(saAuth.getRealm(), linkId), ts, PushAcceptStatus.class);
         }catch (Exception e){
             throw new SARestAPIException( e );
         }
