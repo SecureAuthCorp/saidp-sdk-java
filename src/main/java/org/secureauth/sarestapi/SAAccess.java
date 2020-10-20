@@ -813,13 +813,13 @@ public class SAAccess implements ISAAccess{
      * </p>
      * @param userId the userid of the identity
      * @param factorId  Email Property "Email1"
-     * @return {@link ResponseObject}
+     * @return {@link StatefulResponseObject}
      */
-    public ResponseObject emailLink(String userId, String factorId){
+    public StatefulResponseObject emailLink(String userId, String factorId){
         String ts = getServerTime();
         RestApiHeader restApiHeader = new RestApiHeader();
         AuthRequest authRequest = LinkToAcceptFactory.createLinkToAcceptAuthRequest(userId, factorId, Resource.EMAIL_LINK);
-        return getResponseObject(ts, restApiHeader, authRequest);
+        return getStatefulResponseObject(ts, restApiHeader, authRequest);
     }
 
     /**
@@ -835,16 +835,16 @@ public class SAAccess implements ISAAccess{
      * </p>
      * @param userId the userid of the identity
      * @param factorId  Phone Property "Phone1"
-     * @return {@link ResponseObject}
+     * @return {@link StatefulResponseObject}
      */
-    public ResponseObject smsLink(String userId, String factorId){
+    public StatefulResponseObject smsLink(String userId, String factorId){
         String ts = getServerTime();
         RestApiHeader restApiHeader = new RestApiHeader();
         AuthRequest authRequest = LinkToAcceptFactory.createLinkToAcceptAuthRequest(userId, factorId, Resource.SMS_LINK);
-        return getResponseObject(ts, restApiHeader, authRequest);
+        return getStatefulResponseObject(ts, restApiHeader, authRequest);
     }
 
-    private ResponseObject getResponseObject(String ts, RestApiHeader restApiHeader, AuthRequest authRequest) {
+    private StatefulResponseObject getStatefulResponseObject(String ts, RestApiHeader restApiHeader, AuthRequest authRequest) {
         String header = restApiHeader.getAuthorizationHeader(saAuth, Resource.METHOD_POST, AuthQuery.queryAuth(saAuth.getRealm()), authRequest,ts);
 
         try{
