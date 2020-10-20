@@ -36,8 +36,10 @@ artifactory {
 // to use a local version exported in maven local without collide 
 // with the version uploaded in mavenCentral.
 task buildLocal {
-    version = currentVersion + '_LOCAL'
-    finalizedBy( compileJava )
+    if( project.hasProperty( 'useMavenLocal' ) ) {
+        version = currentVersion + '_LOCAL'
+        finalizedBy( compileJava )
+    }
 }
 sourceCompatibility = 11.0
 
