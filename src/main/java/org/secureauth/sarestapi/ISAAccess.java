@@ -324,9 +324,9 @@ public interface ISAAccess {
 	 * </p>
 	 * @param userId the userid of the identity
 	 * @param factorId  Email Property "Email1"
-	 * @return {@link ResponseObject}
+	 * @return {@link StatefulResponseObject}
 	 */
-	ResponseObject emailLink(String userId, String factorId);
+	StatefulResponseObject emailLink(String userId, String factorId);
 
 	/**
 	 * <p>
@@ -334,18 +334,18 @@ public interface ISAAccess {
 	 * </p>
 	 * @param userId the userid of the identity
 	 * @param factorId  Phone Property "Phone1"
-	 * @return {@link ResponseObject}
+	 * @return {@link StatefulResponseObject}
 	 */
-	ResponseObject smsLink(String userId, String factorId);
+	StatefulResponseObject smsLink(String userId, String factorId);
 
 	/**
 	 * <p>
 	 *     Verify Link to accept using code
 	 * </p>
 	 * @param linkId the id provided when making a link to accept request
-	 * @return {@link ResponseObject}
+	 * @return {@link StatefulResponseObject}
 	 */
-	ResponseObject verifyLinkToAcceptStatus(String linkId);
+	StatefulResponseObject verifyLinkToAcceptStatus(String linkId, Cookie cookie);
 
 	/**
 	 * <p>

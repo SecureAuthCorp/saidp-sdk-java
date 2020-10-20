@@ -7,11 +7,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.secureauth.sarestapi.ISAAccess;
 import org.secureauth.sarestapi.SAAccess;
-import org.secureauth.sarestapi.data.Response.BaseResponse;
-import org.secureauth.sarestapi.data.Response.DFPValidateResponse;
-import org.secureauth.sarestapi.data.Response.FactorsResponse;
-import org.secureauth.sarestapi.data.Response.ResponseObject;
-import org.secureauth.sarestapi.data.Response.UserProfileResponse;
+import org.secureauth.sarestapi.data.Response.*;
 import org.secureauth.sarestapi.data.SAAuth;
 import org.secureauth.sarestapi.data.SABaseURL;
 import org.secureauth.sarestapi.data.UserProfile.NewUserProfile;
@@ -970,22 +966,22 @@ public class SAAccessTDD {
 
 	@Test
 	public void testLinkToAcceptEmail() {
-		ResponseObject response = saAccess.emailLink(validUsername, "Email1");
+		StatefulResponseObject response = saAccess.emailLink(validUsername, "Email1");
 
 		assertEquals("valid", response.getStatus());
 	}
 
 	@Test
 	public void testLinkToAcceptSMS() {
-		ResponseObject response = saAccess.smsLink(validUsername, "Phone1");
+		StatefulResponseObject response = saAccess.smsLink(validUsername, "Phone1");
 
 		assertEquals("valid", response.getStatus());
 	}
 
 	@Test
 	public void testLinkToAcceptVerify() {
-		ResponseObject linkResponse = saAccess.emailLink(validUsername, "Email1");
-		ResponseObject response = saAccess.verifyLinkToAcceptStatus(linkResponse.getReference_id());
+		StatefulResponseObject linkResponse = saAccess.emailLink(validUsername, "Email1");
+		StatefulResponseObject response = saAccess.verifyLinkToAcceptStatus(linkResponse.getReference_id(), linkResponse.getSessionAffinityCookie());
 
 		assertEquals("found", response.getStatus());
 	}
