@@ -53,6 +53,7 @@ public class SAAccessTDD {
 	private static String validUsername;
 	private static String validPin;
 	private static String validPassword;
+	private static String userDomain;
 	private final static String UNEXISTING_USERNAME = "unexisting-user";
 	private final static String UNEXISTING_USERNAME_QP = UNEXISTING_USERNAME + "+~.!@$%^&*'_";
 
@@ -95,6 +96,7 @@ public class SAAccessTDD {
 		validUsername = getValue(Property.VALID_USERNAME);
 		validPin = getValue(Property.VALID_PIN);
 		validPassword = getValue(Property.VALID_PASSWORD);
+		userDomain = getValue(Property.USER_DOMAIN);
 		validFactorIdForOathOtp = getValue(Property.VALID_FACTOR_ID_FOR_OATH_OTP);
 		validUserOtp = getValue(Property.VALID_OTP_PIN_CODE);
 		validUserOtpOath = getValue(Property.VALID_OTP_OATH_CODE);
@@ -674,6 +676,29 @@ public class SAAccessTDD {
 	}
 
 	@Test
+	public void testDeleteUserValid() throws Exception {
+		//when
+		BaseResponse responseObj = saAccess.deleteUser(validUsername, userDomain, Boolean.FALSE );
+		//then
+		assertNotNull(responseObj);
+		assertEquals("success", responseObj.getStatus());
+		assertEquals("User delete complete", responseObj.getMessage());
+		assertEquals(userDomain + "\\" +validUsername, responseObj.getUser_id());
+	}
+
+	@Test
+	public void testDeleteUserInvalidUser() throws Exception {
+		//when
+		BaseResponse responseObj = saAccess.deleteUser(UNEXISTING_USERNAME, userDomain, Boolean.FALSE );
+		//then
+		assertNotNull(responseObj);
+		assertEquals("failed", responseObj.getStatus());
+		assertEquals("user_id does not exist", responseObj.getMessage());
+		String domainAndUser = userDomain.isEmpty() ? UNEXISTING_USERNAME : userDomain + "\\" + UNEXISTING_USERNAME;
+		assertEquals(domainAndUser, responseObj.getUser_id());
+	}
+
+	@Test
 	public void testDFPScoreWithValidFoundData() throws Exception {
 		/*
 		 * Response would return:
@@ -772,6 +797,8 @@ public class SAAccessTDD {
 		assertEquals(90.0, response.getUpdate_score(), 1);
 		assertEquals(89.0, response.getMatch_score(), 1);
 	}
+
+
 
 	@Test
 	public void testDFPSaveWithValidFound() throws Exception {

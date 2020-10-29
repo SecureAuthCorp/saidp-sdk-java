@@ -446,6 +446,17 @@ public interface ISAAccess {
 
 	/**
 	 * <p>
+	 * 	    Delete User
+	 * </p>
+	 * @param userId the UserID to delete
+	 * @param domain the datastore name
+	 * @param deleteRelatedData TRUE for complete delete, FALSE for only logical.
+	 * @return {@link ResponseObject}
+	 */
+	BaseResponse deleteUser(String userId, String domain, boolean deleteRelatedData);
+
+	/**
+	 * <p>
 	 *     Update User / Profile
 	 *     This method supports special characters for userId since it uses QP (Query Params) in order to create the request.
 	 * </p>

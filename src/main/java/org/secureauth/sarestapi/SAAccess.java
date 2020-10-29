@@ -1200,7 +1200,7 @@ public class SAAccess implements ISAAccess{
                         (v1,v2)->v1,
                         LinkedHashMap::new)));
     }
-	
+
     /**
      * <p>
      *     Update User / Profile
@@ -1227,6 +1227,18 @@ public class SAAccess implements ISAAccess{
         }
     }
 
+    @Override
+    public BaseResponse deleteUser(String userId, String domain, boolean deleteRelatedData) {
+        try{
+            String ts = getServerTime();
+            DeleteUserRequest deleteUserRequest = new DeleteUserRequest(userId, deleteRelatedData, domain);
+            String header = RestApiHeader.getAuthorizationHeader(saAuth, Resource.METHOD_DELETE, IDMQueries.queryUsers(saAuth.getRealm()), deleteUserRequest,  ts);
+            return saExecuter.executeDeleteRawRequest(header,saBaseURL.getApplianceURL() + IDMQueries.queryUsers(saAuth.getRealm()),
+                    ts, deleteUserRequest, BaseResponse.class);
+        }catch (Exception e){
+            throw new SARestAPIException("Exception occurred executing REST query:\n" + e.getMessage() + "\n", e);
+        }
+    }
 
     /**
      * <p>
