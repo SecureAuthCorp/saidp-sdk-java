@@ -7,16 +7,11 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.secureauth.sarestapi.ISAAccess;
 import org.secureauth.sarestapi.SAAccess;
-import org.secureauth.sarestapi.data.Requests.DeleteUserRequest;
-import org.secureauth.sarestapi.data.Response.BaseResponse;
-import org.secureauth.sarestapi.data.Response.DFPValidateResponse;
-import org.secureauth.sarestapi.data.Response.FactorsResponse;
-import org.secureauth.sarestapi.data.Response.ResponseObject;
-import org.secureauth.sarestapi.data.Response.UserProfileResponse;
+import org.secureauth.sarestapi.data.PushAcceptStatus;
+import org.secureauth.sarestapi.data.Response.*;
 import org.secureauth.sarestapi.data.SAAuth;
 import org.secureauth.sarestapi.data.SABaseURL;
 import org.secureauth.sarestapi.data.UserProfile.NewUserProfile;
-import org.secureauth.sarestapi.data.UserProfile.UserProfile;
 import org.secureauth.sarestapi.data.UserProfile.NewUserProfileProperties;
 import org.secureauth.sarestapi.data.UserProfile.UserProfileKB;
 import org.secureauth.sarestapi.exception.SARestAPIException;
@@ -993,6 +988,28 @@ public class SAAccessTDD {
 	public void testGetCreatedThrottleUserWithSpecialCharacters() {
 		String userName = UNEXISTING_USERNAME_QP;
 		BaseResponse response = saAccess.getThrottleReqQP(userName);
+
+		assertEquals("found", response.getStatus());
+	}
+
+	@Test
+	public void testLinkToAcceptEmail() {
+		StatefulResponseObject response = saAccess.emailLink(validUsername, "Email1");
+
+		assertEquals("valid", response.getStatus());
+	}
+
+	@Test
+	public void testLinkToAcceptSMS() {
+		StatefulResponseObject response = saAccess.smsLink(validUsername, "Phone1");
+
+		assertEquals("valid", response.getStatus());
+	}
+
+	@Test
+	public void testLinkToAcceptVerify() {
+		StatefulResponseObject linkResponse = saAccess.emailLink(validUsername, "Email1");
+		PushAcceptStatus response = saAccess.verifyLinkToAcceptStatus(linkResponse.getReference_id(), linkResponse.getSessionAffinityCookie());
 
 		assertEquals("found", response.getStatus());
 	}
