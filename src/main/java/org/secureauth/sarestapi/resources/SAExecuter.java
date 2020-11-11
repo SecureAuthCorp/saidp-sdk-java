@@ -141,8 +141,8 @@ public class SAExecuter {
             return genericResponse;
         } catch (Exception e) {
             logger.error("Exception Get Request: \nQuery:\n\t" + query + "\nError:" + e.getMessage());
+            throw e;
         }
-        return null;
     }
 
     public <T> T executeGetRequest(String auth, String query, String userId, String ts, Class<T> valueType) throws Exception {
