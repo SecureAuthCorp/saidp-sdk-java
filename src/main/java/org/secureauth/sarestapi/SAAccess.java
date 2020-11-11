@@ -657,7 +657,7 @@ public class SAAccess implements ISAAccess{
         AuthRequest authRequest = new AuthRequest();
 
         authRequest.setUser_id(userId);
-        authRequest.setType("sms");
+        authRequest.setType(Resource.SMS);
         authRequest.setToken(phoneNumber);
         String header = restApiHeader.getAuthorizationHeader(saAuth,"POST", AuthQuery.queryAuth(saAuth.getRealm()), authRequest,ts);
 
@@ -709,7 +709,7 @@ public class SAAccess implements ISAAccess{
         AuthRequest authRequest = new AuthRequest();
 
         authRequest.setUser_id(userId);
-        authRequest.setType("email");
+        authRequest.setType(Resource.EMAIL);
         authRequest.setFactor_id(factorId);
         String header = restApiHeader.getAuthorizationHeader(saAuth,"POST", AuthQuery.queryAuth(saAuth.getRealm()), authRequest,ts);
 
@@ -798,6 +798,79 @@ public class SAAccess implements ISAAccess{
             logger.error(new StringBuilder().append("Exception occurred executing REST query::\n").append(e.getMessage()).append("\n").toString(), e);
         }
         return null;
+    }
+
+    /**
+     * <p>
+     *     Send Link to accept by email
+     *     The response is as follows
+     *     {
+     *        "reference_id": "xxxxxxxxxxxxxxxxx",
+     *        "status": "valid",
+     *        "message": "",
+     *        "user_id": "xxxxxxxxxxx"
+     *      }
+     * </p>
+     * @param userId the userid of the identity
+     * @param factorId  Email Property "Email1"
+     * @return {@link StatefulResponseObject}
+     */
+    public StatefulResponseObject emailLink(String userId, String factorId){
+        String ts = getServerTime();
+        RestApiHeader restApiHeader = new RestApiHeader();
+        AuthRequest authRequest = LinkToAcceptFactory.createLinkToAcceptAuthRequest(userId, factorId, Resource.EMAIL_LINK);
+        return getStatefulResponseObject(ts, restApiHeader, authRequest);
+    }
+
+    /**
+     * <p>
+     *     Send Link to accept by email
+     *     The response is as follows
+     *     {
+     *        "reference_id": "xxxxxxxxxxxxxxxxx",
+     *        "status": "valid",
+     *        "message": "",
+     *        "user_id": "xxxxxxxxxxx"
+     *      }
+     * </p>
+     * @param userId the userid of the identity
+     * @param factorId  Phone Property "Phone1"
+     * @return {@link StatefulResponseObject}
+     */
+    public StatefulResponseObject smsLink(String userId, String factorId){
+        String ts = getServerTime();
+        RestApiHeader restApiHeader = new RestApiHeader();
+        AuthRequest authRequest = LinkToAcceptFactory.createLinkToAcceptAuthRequest(userId, factorId, Resource.SMS_LINK);
+        return getStatefulResponseObject(ts, restApiHeader, authRequest);
+    }
+
+    private StatefulResponseObject getStatefulResponseObject(String ts, RestApiHeader restApiHeader, AuthRequest authRequest) {
+        String header = restApiHeader.getAuthorizationHeader(saAuth, Resource.METHOD_POST, AuthQuery.queryAuth(saAuth.getRealm()), authRequest,ts);
+
+        try{
+            return saExecuter.executePostRequestStateful(header, saBaseURL.getApplianceURL() + AuthQuery.queryAuth(saAuth.getRealm()), authRequest, ts, StatefulResponseObject.class);
+        }catch (Exception e){
+            throw new SARestAPIException( e );
+        }
+    }
+
+    /**
+     * <p>
+     *     Verify Link to accept using code
+     * </p>
+     * @param linkId the id provided when making a link to accept request
+     * @return {@link PushAcceptStatus}
+     */
+    public PushAcceptStatus verifyLinkToAcceptStatus(String linkId, Cookie cookie) {
+        String ts = getServerTime();
+        RestApiHeader restApiHeader = new RestApiHeader();
+        String header = restApiHeader.getAuthorizationHeader(saAuth, Resource.METHOD_GET, AuthQuery.queryAuthLink(saAuth.getRealm(), linkId), ts);
+
+        try{
+            return saExecuter.executeGetRequestStateful(header, cookie, saBaseURL.getApplianceURL() + AuthQuery.queryAuthLink(saAuth.getRealm(), linkId), ts, PushAcceptStatus.class);
+        }catch (Exception e){
+            throw new SARestAPIException( e );
+        }
     }
 
     /**
@@ -1127,7 +1200,7 @@ public class SAAccess implements ISAAccess{
                         (v1,v2)->v1,
                         LinkedHashMap::new)));
     }
-	
+
     /**
      * <p>
      *     Update User / Profile
@@ -1154,6 +1227,18 @@ public class SAAccess implements ISAAccess{
         }
     }
 
+    @Override
+    public BaseResponse deleteUser(String userId, String domain, boolean deleteRelatedData) {
+        try{
+            String ts = getServerTime();
+            DeleteUserRequest deleteUserRequest = new DeleteUserRequest(userId, deleteRelatedData, domain);
+            String header = RestApiHeader.getAuthorizationHeader(saAuth, Resource.METHOD_DELETE, IDMQueries.queryUsers(saAuth.getRealm()), deleteUserRequest,  ts);
+            return saExecuter.executeDeleteRawRequest(header,saBaseURL.getApplianceURL() + IDMQueries.queryUsers(saAuth.getRealm()),
+                    ts, deleteUserRequest, BaseResponse.class);
+        }catch (Exception e){
+            throw new SARestAPIException("Exception occurred executing REST query:\n" + e.getMessage() + "\n", e);
+        }
+    }
 
     /**
      * <p>
