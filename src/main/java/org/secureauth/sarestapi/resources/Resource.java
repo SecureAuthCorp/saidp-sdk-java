@@ -25,6 +25,7 @@ public class Resource {
 
     public static final String API_VERSION = "v1";
     public static final String API_VERSION_2 = "v2";
+    public static final String API_VERSION_3 = "v3";
     public static final String HTTPS = "https://";
     public static final String HTTP = "http://";
     public static final String COLON = ":";
@@ -33,6 +34,7 @@ public class Resource {
     public static final String APPLIANCE_AUTH_LINK="/api/"+ API_VERSION +"/auth/link/";
     public static final String APPLIANCE_AAUTH="/api/"+ API_VERSION +"/adaptauth";
     public static final String APPLIANCE_USERS="/api/"+ API_VERSION + "/users/";
+    public static final String APPLIANCE_SYSINFO = "api/"+ API_VERSION_3 + "/sysinfo";
     public static final String APPLIANCE_AUTHENTICATED = "/api/" + API_VERSION_2 + "/authenticated";
     public static final String APPLIANCE_IDM_USERS="/users/";
     public static final String APPLIANCE_IDM_USERS_PASSWD_RESET="/resetpwd";
@@ -55,6 +57,7 @@ public class Resource {
     public static final String APPLIANCE_OTP_VALIDATE=APPLIANCE_OTP + "/validate";
     public static final String APPLIANCE_THROTTLE = "/throttle";
     public static final String APPLIANCE_STATUS = "/status";
+    public static final String APPLIANCE_VERSION = APPLIANCE_SYSINFO + "/ping";
 
 
     public static final String STATUS_INVALID="invalid";

@@ -14,6 +14,13 @@ import javax.ws.rs.core.NewCookie;
 
 public interface ISAAccess {
 
+
+	/**
+	 *
+	 * @return {@link org.secureauth.sarestapi.data.Response.SystemInfoResponse}
+	 */
+	SystemInfoResponse getSystemInfo();
+
 	/**
 	 * <p>
 	 *     Returns IP Risk Evaluation from the Rest API

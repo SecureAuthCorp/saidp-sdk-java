@@ -166,15 +166,12 @@ public class SAExecuter {
                     header("Authorization", auth).
                     header("X-SA-Ext-Date", ts).
                     get();
-            //consider using response.ok(valueType).build(); instead.
             genericResponse = response.readEntity(valueType);
             response.close();
+            return genericResponse;
         } catch (Exception e) {
-            logger.error("Exception Get Request: \nQuery:\n\t" + query + "\nError:" + e.getMessage());
+            throw new SARestAPIException("Exception Get Request: \nQuery:\n\t" + query + "\nError:" + e.getMessage(), e);
         }
-
-        return genericResponse;
-
     }
 
     private String encodedValue(String value) throws UnsupportedEncodingException {
