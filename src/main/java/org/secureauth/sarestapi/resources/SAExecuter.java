@@ -468,7 +468,8 @@ public class SAExecuter {
             response.close();
         }catch(Exception e){
             logger.error("Exception Validating User Password: \nQuery:\n\t" +
-                    query + "\nError:" + e.getMessage(), e);
+                    query + "\nError message: " + e.getMessage());
+            logger.trace("Detailed trace: ", e);
         }
 
         return responseObject;
