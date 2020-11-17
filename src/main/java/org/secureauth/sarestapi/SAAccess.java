@@ -118,6 +118,18 @@ public class SAAccess implements ISAAccess{
         this.saExecuter = saExecuter;
     }
 
+
+    @Override
+    public SystemInfoResponse getSystemInfo() {
+        String ts = getServerTime();
+        String header = RestApiHeader.getAuthorizationHeader(saAuth, Resource.METHOD_GET, Resource.APPLIANCE_VERSION, ts);
+        try{
+            return saExecuter.executeGetRequest(header,saBaseURL.getApplianceURL() + Resource.APPLIANCE_VERSION,ts, SystemInfoResponse.class);
+        }catch (Exception e){
+            throw new SARestAPIException( e );
+        }
+    }
+
     /**
      * <p>
      *     Returns IP Risk Evaluation from the Rest API
