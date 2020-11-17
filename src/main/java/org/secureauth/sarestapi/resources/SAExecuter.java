@@ -140,9 +140,8 @@ public class SAExecuter {
             response.close();
             return genericResponse;
         } catch (Exception e) {
-            logger.error("Exception Get Request: \nQuery:\n\t" + query + "\nError:" + e.getMessage());
+            throw new SARestAPIException("Exception Get Request: \nQuery:\n\t" + query + "\nError:" + e.getMessage());
         }
-        return null;
     }
 
     public <T> T executeGetRequest(String auth, String query, String userId, String ts, Class<T> valueType) throws Exception {

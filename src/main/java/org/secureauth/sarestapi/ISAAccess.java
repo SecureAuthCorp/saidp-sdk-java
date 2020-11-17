@@ -16,7 +16,9 @@ public interface ISAAccess {
 
 
 	/**
-	 *
+	 *  <p>
+	 *      Returns IdP system information.
+	 *  </p>
 	 * @return {@link org.secureauth.sarestapi.data.Response.SystemInfoResponse}
 	 */
 	SystemInfoResponse getSystemInfo();
