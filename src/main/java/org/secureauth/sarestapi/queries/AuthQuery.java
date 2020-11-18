@@ -36,4 +36,10 @@ public class AuthQuery {
         stringBuilder.append(realm).append(Resource.APPLIANCE_AAUTH);
         return stringBuilder.toString();
     }
+
+    public static String queryAuthLink(String realm, String linkId){
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append(realm).append(Resource.APPLIANCE_AUTH_LINK).append(linkId);
+        return stringBuilder.toString();
+    }
 }

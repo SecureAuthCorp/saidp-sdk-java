@@ -320,6 +320,35 @@ public interface ISAAccess {
 
 	/**
 	 * <p>
+	 *     Send Link to accept by email
+	 * </p>
+	 * @param userId the userid of the identity
+	 * @param factorId  Email Property "Email1"
+	 * @return {@link StatefulResponseObject}
+	 */
+	StatefulResponseObject emailLink(String userId, String factorId);
+
+	/**
+	 * <p>
+	 *     Send Link to accept by email
+	 * </p>
+	 * @param userId the userid of the identity
+	 * @param factorId  Phone Property "Phone1"
+	 * @return {@link StatefulResponseObject}
+	 */
+	StatefulResponseObject smsLink(String userId, String factorId);
+
+	/**
+	 * <p>
+	 *     Verify Link to accept using code
+	 * </p>
+	 * @param linkId the id provided when making a link to accept request
+	 * @return {@link PushAcceptStatus}
+	 */
+	PushAcceptStatus verifyLinkToAcceptStatus(String linkId, Cookie cookie);
+
+	/**
+	 * <p>
 	 *     Returns response to Access History Post Rest API
 	 * </p>
 	 * @param userId The User ID that you want to validate from
@@ -415,6 +444,28 @@ public interface ISAAccess {
 	 */
 	ResponseObject updateUser(String userId, NewUserProfile userProfile);
 	
+	/**
+	 * <p>
+	 *     Update User / Profile
+	 *     This method supports special characters for userId since it uses QP (Query Params) in order to create the request.
+	 * </p>
+	 * @param userId the UserID tied to the Profile Object
+	 * @param userProfile The User'sProfile Object to be updated
+	 * @return {@link ResponseObject}
+	 */
+	ResponseObject updateUserQP(String userId, NewUserProfile userProfile);
+
+	/**
+	 * <p>
+	 * 	    Delete User
+	 * </p>
+	 * @param userId the UserID to delete
+	 * @param domain the datastore name
+	 * @param deleteRelatedData TRUE for complete delete, FALSE for only logical.
+	 * @return {@link ResponseObject}
+	 */
+	BaseResponse deleteUser(String userId, String domain, boolean deleteRelatedData);
+
 	/**
 	 * <p>
 	 *     Update User / Profile

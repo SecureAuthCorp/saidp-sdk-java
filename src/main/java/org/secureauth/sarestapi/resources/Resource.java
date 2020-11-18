@@ -30,6 +30,7 @@ public class Resource {
     public static final String COLON = ":";
     public static final String SLASH = "/";
     public static final String APPLIANCE_AUTH="/api/"+ API_VERSION +"/auth";
+    public static final String APPLIANCE_AUTH_LINK="/api/"+ API_VERSION +"/auth/link/";
     public static final String APPLIANCE_AAUTH="/api/"+ API_VERSION +"/adaptauth";
     public static final String APPLIANCE_USERS="/api/"+ API_VERSION + "/users/";
     public static final String APPLIANCE_AUTHENTICATED = "/api/" + API_VERSION_2 + "/authenticated";
@@ -68,6 +69,7 @@ public class Resource {
     public static final String METHOD_GET = "GET";
     public static final String METHOD_POST = "POST";
     public static final String METHOD_PUT = "PUT";
+    public static final String METHOD_DELETE = "DELETE";
 
     public static final String PHONES="Phones";
     public static final String PHONE="Phone";
@@ -82,5 +84,9 @@ public class Resource {
     public static final String FACTORS="factors";
     public static final String FACTOR="factor";
     public static final String GEOLOC="GeoLoc";
+    public static final String EMAIL = "email";
+    public static final String SMS = "sms";
+    public static final String EMAIL_LINK = "email_link";
+    public static final String SMS_LINK = "sms_link";
 
 }
