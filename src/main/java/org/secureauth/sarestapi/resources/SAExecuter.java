@@ -112,7 +112,7 @@ public class SAExecuter {
             client.property( ClientProperties.CONNECT_TIMEOUT, this.idpApiTimeout );
             client.property( ClientProperties.READ_TIMEOUT, this.idpApiTimeout );
         } catch (Exception e) {
-            logger.error("Exception occurred while attempting to associating our SSL cert to the session.");
+            logger.error("Exception occurred while attempting to associating our SSL cert to the session: " + e.getMessage());
             logger.trace("Detailed trace: ", e);
         }
         if (client == null) {
