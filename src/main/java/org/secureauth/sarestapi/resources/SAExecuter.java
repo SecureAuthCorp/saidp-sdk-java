@@ -112,7 +112,8 @@ public class SAExecuter {
             client.property( ClientProperties.CONNECT_TIMEOUT, this.idpApiTimeout );
             client.property( ClientProperties.READ_TIMEOUT, this.idpApiTimeout );
         } catch (Exception e) {
-            logger.error("Exception occurred while attempting to associating our SSL cert to the session.", e);
+            logger.error("Exception occurred while attempting to associating our SSL cert to the session: " + e.getMessage());
+            logger.trace("Detailed trace: ", e);
         }
         if (client == null) {
             throw new Exception("Unable to create connection object, creation attempt returned NULL.");
@@ -405,7 +406,8 @@ public class SAExecuter {
         }catch(Exception e){
             logger.error("Exception getting User Factors: \nQuery:\n\t" +
                     query + "\nError:" + e.getMessage() + ".\nResponse code is " + response
-                    + "; Raw response:" + factors, e);
+                    + "; Raw response:" + factors);
+            logger.trace("Detailed trace: ", e);
         }
         return null;
     }
@@ -435,7 +437,8 @@ public class SAExecuter {
             response.close();
         }catch(Exception e){
             logger.error(new StringBuilder().append("Exception Validating User: \nQuery:\n\t")
-                    .append(query).append("\nError: \n\t").toString(), e);
+                    .append(query).append("\nError: \n\t").toString());
+            logger.trace("Detailed trace: ", e);
         }
 
         return responseObject;
@@ -468,7 +471,8 @@ public class SAExecuter {
             response.close();
         }catch(Exception e){
             logger.error("Exception Validating User Password: \nQuery:\n\t" +
-                    query + "\nError:" + e.getMessage(), e);
+                    query + "\nError message: " + e.getMessage());
+            logger.trace("Detailed trace: ", e);
         }
 
         return responseObject;
@@ -497,7 +501,8 @@ public class SAExecuter {
             response.close();
         }catch(Exception e){
             logger.error(new StringBuilder().append("Exception Validating User Password: \nQuery:\n\t")
-                    .append(query).append("\nError:").append(e.getMessage()).toString(), e);
+                    .append(query).append("\nError:").append(e.getMessage()).toString());
+            logger.trace("Detailed trace: ", e);
         }
 
         return responseObject;
@@ -527,7 +532,8 @@ public class SAExecuter {
             response.close();
         }catch(Exception e){
             logger.error(new StringBuilder().append("Exception Validating KBA: \nQuery:\n\t")
-                    .append(query).append("\nError:").append(e.getMessage()).toString(), e);
+                    .append(query).append("\nError:").append(e.getMessage()).toString());
+            logger.trace("Detailed trace: ", e);
         }
 
         return responseObject;
@@ -557,7 +563,8 @@ public class SAExecuter {
             response.close();
         }catch(Exception e){
             logger.error(new StringBuilder().append("Exception Validating OATH: \nQuery:\n\t")
-                    .append(query).append("\nError:").append(e.getMessage()).toString(), e);
+                    .append(query).append("\nError:").append(e.getMessage()).toString());
+            logger.trace("Detailed trace: ", e);
         }
 
         return responseObject;
@@ -589,7 +596,8 @@ public class SAExecuter {
             response.close();
         }catch(Exception e){
             logger.error(new StringBuilder().append("Exception Delivering OTP by Phone: \nQuery:\n\t")
-                    .append(query).append("\nError:").append(e.getMessage()).toString(), e);
+                    .append(query).append("\nError:").append(e.getMessage()).toString());
+            logger.trace("Detailed trace: ", e);
         }
 
         return responseObject;
@@ -619,7 +627,8 @@ public class SAExecuter {
             response.close();
         }catch(Exception e){
             logger.error(new StringBuilder().append("Exception Delivering OTP by SMS: \nQuery:\n\t")
-                    .append(query).append("\nError:").append(e.getMessage()).toString(), e);
+                    .append(query).append("\nError:").append(e.getMessage()).toString());
+            logger.trace("Detailed trace: ", e);
         }
 
         return responseObject;
@@ -650,7 +659,8 @@ public class SAExecuter {
             response.close();
         }catch(Exception e){
             logger.error(new StringBuilder().append("Exception Delivering OTP by Email: \nQuery:\n\t")
-                    .append(query).append("\nError:").append(e.getMessage()).toString(), e);
+                    .append(query).append("\nError:").append(e.getMessage()).toString());
+            logger.trace("Detailed trace: ", e);
         }
 
         return responseObject;
@@ -681,7 +691,8 @@ public class SAExecuter {
             response.close();
         }catch(Exception e){
             logger.error(new StringBuilder().append("Exception Running Validate OTP POST: \nQuery:\n\t")
-                    .append(query).append("\nError:").append(e.getMessage()).toString(), e);
+                    .append(query).append("\nError:").append(e.getMessage()).toString());
+            logger.trace("Detailed trace: ", e);
         }
 
         return validateOTPResponse;
@@ -712,7 +723,8 @@ public class SAExecuter {
             response.close();
         }catch(Exception e){
             logger.error(new StringBuilder().append("Exception Delivering OTP by HelpDesk: \nQuery:\n\t")
-                    .append(query).append("\nError:").append(e.getMessage()).toString(), e);
+                    .append(query).append("\nError:").append(e.getMessage()).toString());
+            logger.trace("Detailed trace: ", e);
         }
 
         return responseObject;
@@ -747,7 +759,8 @@ public class SAExecuter {
             response.close();
         }catch(Exception e){
             logger.error(new StringBuilder().append("Exception Running IP Evaluation: \nQuery:\n\t")
-                    .append(query).append("\nError:").append(e.getMessage()).toString(), e);
+                    .append(query).append("\nError:").append(e.getMessage()).toString());
+            logger.trace("Detailed trace: ", e);
         }
 
         return ipEval;
@@ -778,7 +791,8 @@ public class SAExecuter {
             response.close();
         }catch(Exception e){
             logger.error(new StringBuilder().append("Exception Running Access History POST: \nQuery:\n\t")
-                    .append(query).append("\nError:").append(e.getMessage()).toString(), e);
+                    .append(query).append("\nError:").append(e.getMessage()).toString());
+            logger.trace("Detailed trace: ", e);
         }
 
         return accessHistory;
@@ -807,7 +821,8 @@ public class SAExecuter {
             response.close();
         }catch(Exception e){
             logger.error(new StringBuilder().append("Exception Running Access History POST: \nQuery:\n\t")
-                    .append(query).append("\nError:").append(e.getMessage()).toString(), e);
+                    .append(query).append("\nError:").append(e.getMessage()).toString());
+            logger.trace("Detailed trace: ", e);
         }
 
         return dfpValidateResponse;
@@ -839,7 +854,8 @@ public class SAExecuter {
             response.close();
         }catch(Exception e){
             logger.error(new StringBuilder().append("Exception Running DFP Confirm POST: \nQuery:\n\t")
-                    .append(query).append("\nError:").append(e.getMessage()).toString(), e);
+                    .append(query).append("\nError:").append(e.getMessage()).toString());
+            logger.trace("Detailed trace: ", e);
         }
 
         return dfpConfirmResponse;
@@ -867,7 +883,8 @@ public class SAExecuter {
             response.close();
         }catch(Exception e){
             logger.error(new StringBuilder().append("Exception getting JS Object SRC: \nQuery:\n\t")
-                    .append(query).append("\nError:").append(e.getMessage()).toString(), e);
+                    .append(query).append("\nError:").append(e.getMessage()).toString());
+            logger.trace("Detailed trace: ", e);
         }
 
         return jsObjectResponse;
@@ -898,7 +915,8 @@ public class SAExecuter {
             response.close();
         }catch(Exception e){
             logger.error(new StringBuilder().append("Exception Running BehaveBio POST: \nQuery:\n\t")
-                    .append(query).append("\nError:").append(e.getMessage()).toString(), e);
+                    .append(query).append("\nError:").append(e.getMessage()).toString());
+            logger.trace("Detailed trace: ", e);
         }
 
         return behaveBioResponse;
@@ -929,7 +947,8 @@ public class SAExecuter {
             response.close();
         }catch(Exception e){
             logger.error(new StringBuilder().append("Exception Running BehaveBio POST: \nQuery:\n\t")
-                    .append(query).append("\nError:").append(e.getMessage()).toString(), e);
+                    .append(query).append("\nError:").append(e.getMessage()).toString());
+            logger.trace("Detailed trace: ", e);
         }
 
         return behaveBioResponse;
@@ -977,7 +996,8 @@ public class SAExecuter {
             response.close();
         }catch(Exception e){
             logger.error(new StringBuilder().append("Exception Running Password Reset POST: \nQuery:\n\t")
-                    .append(query).append("\nError:").append(e.getMessage()).toString(), e);
+                    .append(query).append("\nError:").append(e.getMessage()).toString());
+            logger.trace("Detailed trace: ", e);
         }
 
         return passwordChangeResponse;
@@ -1016,7 +1036,8 @@ public class SAExecuter {
             response.close();
         }catch(Exception e){
             logger.error(new StringBuilder().append("Exception Updating User Profile: \nQuery:\n\t")
-                    .append(query).append("\nError:").append(e.getMessage()).toString(), e);
+                    .append(query).append("\nError:").append(e.getMessage()).toString());
+            logger.trace("Detailed trace: ", e);
         }
 
         return responseObject;
@@ -1085,7 +1106,8 @@ public class SAExecuter {
             response.close();
         }catch(Exception e){
             logger.error(new StringBuilder().append("Exception Running NumberProfile POST: \nQuery:\n\t")
-                    .append(query).append("\nError:").append(e.getMessage()).toString(), e);
+                    .append(query).append("\nError:").append(e.getMessage()).toString());
+            logger.trace("Detailed trace: ", e);
         }
 
         return numberProfileResponse;
@@ -1116,7 +1138,8 @@ public class SAExecuter {
             response.close();
         }catch(Exception e){
             logger.error(new StringBuilder().append("Exception Running NumberProfile POST: \nQuery:\n\t")
-                    .append(query).append("\nError:").append(e.getMessage()).toString(), e);
+                    .append(query).append("\nError:").append(e.getMessage()).toString());
+            logger.trace("Detailed trace: ", e);
         }
 
         return numberProfileUpdateResponse;
