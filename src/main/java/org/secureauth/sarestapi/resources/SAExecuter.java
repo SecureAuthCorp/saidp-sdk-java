@@ -64,7 +64,7 @@ IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
 OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-public class SAExecuter {
+public final class SAExecuter {
 
     private Client client = null;
     private static final Logger logger = LoggerFactory.getLogger(SAExecuter.class);
@@ -139,12 +139,11 @@ public class SAExecuter {
             response.close();
             return genericResponse;
         } catch (Exception e) {
-            logger.error("Exception Get Request: \nQuery:\n\t" + query + "\nError:" + e.getMessage());
-            throw e;
+            throw new SARestAPIException("Exception Get Request: \nQuery:\n\t" + query, e);
         }
     }
 
-    public <T> T executeGetRequest(String auth, String query, String userId, String ts, Class<T> valueType) {
+    public <T> T executeGetRequest(String auth, String query, String userId, String ts, Class<T> valueType) throws SARestAPIException {
 
         WebTarget target = null;
         Response response = null;
@@ -169,7 +168,7 @@ public class SAExecuter {
             genericResponse = response.readEntity(valueType);
             response.close();
         } catch (SARestAPIException e) {
-            logger.error("Exception Get Request: \nQuery:\n\t" + query + "\nError:" + e.getMessage());
+            throw new SARestAPIException("Exception Get Request: \nQuery:\n\t" + query, e);
         }
 
         return genericResponse;
@@ -190,13 +189,12 @@ public class SAExecuter {
     // post request
     public <T> T executePostRequest(String auth,String query, AuthRequest authRequest,String ts, Class<T> valueType)throws SARestAPIException {
 
+        Response response = null;
         try {
             if (client == null) {
                 createConnection();
             }
             WebTarget target = null;
-            Response response = null;
-            T responseObject = null;
 
             target = client.target(query);
             response = target.request().
@@ -205,22 +203,23 @@ public class SAExecuter {
                     header("X-SA-Ext-Date", ts).
                     post(Entity.entity(JSONUtil.convertObjectToJSON(authRequest), MediaType.APPLICATION_JSON));
 
-            responseObject = response.readEntity(valueType);
-            response.close();
-            return responseObject;
+            return response.readEntity(valueType);
         } catch (Exception e) {
             throw new SARestAPIException("Exception Delivering OTP by Push: \nQuery:\n\t" +
                     query + "\nError:" + e.getMessage(), e);
+        }finally {
+            response.close();
         }
     }
 
     public <T extends StatefulResponseObject> T executePostRequestStateful(String auth,String query, AuthRequest authRequest,String ts, Class<T> valueType)throws Exception {
-        if (client == null) {
-            createConnection();
-        }
+        Response response = null;
         try {
+            if (client == null) {
+                createConnection();
+            }
             WebTarget target = client.target(query);
-            Response response = target.request().
+            response = target.request().
                     accept(MediaType.APPLICATION_JSON).
                     header("Authorization", auth).
                     header("X-SA-Ext-Date", ts).
@@ -230,11 +229,12 @@ public class SAExecuter {
                     // return a null-empty cookie when the session affinity cookie is not found.
                     response.getCookies().getOrDefault(SESSION_AFFINITY_COOKIE_NAME, new NewCookie(SESSION_AFFINITY_COOKIE_NAME, "" ) )
             );
-            response.close();
             return responseObject;
         } catch (Exception e) {
             throw new SARestAPIException("Exception Delivering Push Notifiation: \nQuery:\n\t" +
                     query + "\nError:" + e.getMessage(), e);
+        } finally {
+            response.close();
         }
     }
 
@@ -247,7 +247,6 @@ public class SAExecuter {
 
         WebTarget target = null;
         Response response = null;
-        T genericResponse =null;
         try{
             if(client == null) {
                 createConnection();
@@ -265,11 +264,11 @@ public class SAExecuter {
                     header("X-SA-Ext-Date", ts).
                     put(Entity.entity(JSONUtil.convertObjectToJSON(payloadRequest),MediaType.APPLICATION_JSON));
             //consider using response.ok(valueType).build(); instead.
-            genericResponse = response.readEntity(responseValueType);
-            response.close();
-            return genericResponse;
+            return response.readEntity(responseValueType);
         }catch(SARestAPIException e){
             throw new SARestAPIException("Exception Put Request: \nQuery:\n\t" + query + "\n", e);
+        }finally {
+            response.close();
         }
     }
 
@@ -278,14 +277,12 @@ public class SAExecuter {
     }
 
     public <T> T executePostRawRequest(String auth,String query, String userId, String groupId, Object authRequest, Class<T> valueType, String ts) throws SARestAPIException{
-        if(client == null) {
-            createConnection();
-        }
+        Response response = null;
         try{
+            if(client == null) {
+                createConnection();
+            }
             WebTarget target = null;
-            Response response = null;
-            T responseObject = null;
-
             if (!userId.isBlank()) {
                 target = encodeQueryUser(query, userId, groupId);
             }
@@ -297,44 +294,40 @@ public class SAExecuter {
                     header("Authorization", auth).
                     header("X-SA-Ext-Date", ts).
                     post(Entity.entity(JSONUtil.convertObjectToJSON(authRequest),MediaType.APPLICATION_JSON));
-            responseObject = response.readEntity(valueType);
-            response.close();
-            return responseObject;
+            return response.readEntity(valueType);
         }catch(SARestAPIException e){
             throw new SARestAPIException("Exception Post Request: \nQuery:\n\t" + query, e);
+        }finally {
+            response.close();
         }
     }
 
     public <T> T executeGenericRawRequest(String auth,String query, String ts, String method, Object authRequest, Class<T> valueType)throws Exception {
-        if (client == null) {
-            createConnection();
-        }
-        if(Resource.METHOD_DELETE.equals(method)){
-            client.property(ClientProperties.SUPPRESS_HTTP_COMPLIANCE_VALIDATION, true);
-        }
+        Response response = null;
         try {
+            if (client == null) {
+                createConnection();
+            }
+            if(Resource.METHOD_DELETE.equals(method)){
+                client.property(ClientProperties.SUPPRESS_HTTP_COMPLIANCE_VALIDATION, true);
+            }
             WebTarget target;
-            Response response;
-            T responseObject;
-
             target = client.target(query);
             response = target.request().
-
                     accept(MediaType.APPLICATION_JSON).
                     header("Authorization", auth).
                     header("X-SA-Ext-Date", ts).
                     build(method, Entity.entity(JSONUtil.convertObjectToJSON(authRequest),MediaType.APPLICATION_JSON))
                     .invoke();
 
-            responseObject = response.readEntity(valueType);
-            response.close();
-            return responseObject;
+            return response.readEntity(valueType);
         } catch (Exception e) {
             throw new SARestAPIException("Exception Request: \nQuery:\n\t" + query + "\nError:" + e.getMessage(), e);
         } finally {
             if(Resource.METHOD_DELETE.equals(method)){
                 client.property(ClientProperties.SUPPRESS_HTTP_COMPLIANCE_VALIDATION, false);
             }
+            response.close();
         }
     }
 
@@ -347,8 +340,6 @@ public class SAExecuter {
     }
 
     public <T> T executePostRawRequestWithoutPayload(String auth,String query, String userId,String groupId, Class<T> valueType, String ts) throws SARestAPIException{
-
-
         WebTarget target = null;
         Response response = null;
         T responseObject = null;
@@ -412,452 +403,72 @@ public class SAExecuter {
 
     //Validate User against Repository
     public BaseResponse executeValidateUser(String header,String query, AuthRequest authRequest,String ts)throws Exception{
-
-        if(client == null) {
-            createConnection();
-        }
-
-
-        WebTarget target = null;
-        Response response = null;
-
-        BaseResponse responseObject =null;
-        try{
-            target = client.target(query);
-
-            response = target.request().
-                    accept(MediaType.APPLICATION_JSON).
-                    header("Authorization", header).
-                    header("X-SA-Ext-Date", ts).
-                    post(Entity.entity(JSONUtil.convertObjectToJSON(authRequest),MediaType.APPLICATION_JSON));
-
-            responseObject = response.readEntity(BaseResponse.class);
-            response.close();
-        }catch(Exception e){
-            logger.error(new StringBuilder().append("Exception Validating User: \nQuery:\n\t")
-                    .append(query).append("\nError: \n\t").toString());
-            logger.trace("Detailed trace: ", e);
-        }
-
-        return responseObject;
-
+        return executePostRawRequest(header, query, authRequest, BaseResponse.class, ts);
     }
 
     //Validate Users Password
     public BaseResponse executeValidateUserPassword(String auth,String query, AuthRequest authRequest,String ts)throws Exception{
-
-        if(client == null) {
-            createConnection();
-        }
-
-        WebTarget target = null;
-        Response response = null;
-        BaseResponse responseObject =null;
-        try{
-
-            target = client.target(query);
-            response = target.request().
-                    accept(MediaType.APPLICATION_JSON).
-                    header("Authorization", auth).
-                    header("X-SA-Ext-Date", ts).
-                    post(Entity.entity(JSONUtil.convertObjectToJSON(authRequest), MediaType.APPLICATION_JSON));
-            try{
-                responseObject=response.readEntity(BaseResponse.class);
-            }catch (MessageBodyProviderNotFoundException e){
-                logger.error("BAD status ("+response.getStatus() +") answer from API IdP. Please check: " + query );
-            }
-            response.close();
-        }catch(Exception e){
-            logger.error("Exception Validating User Password: \nQuery:\n\t" +
-                    query + "\nError message: " + e.getMessage());
-            logger.trace("Detailed trace: ", e);
-        }
-
-        return responseObject;
-
+        return executePostRawRequest(auth, query, authRequest, BaseResponse.class, ts);
     }
 
     //Validate Users Pin
     public BaseResponse executeValidateUserPin(String auth,String query, AuthRequest authRequest,String ts)throws Exception{
-
-        if(client == null) {
-            createConnection();
-        }
-
-        WebTarget target = null;
-        Response response = null;
-        BaseResponse responseObject =null;
-        try{
-
-            target = client.target(query);
-            response = target.request().
-                    accept(MediaType.APPLICATION_JSON).
-                    header("Authorization", auth).
-                    header("X-SA-Ext-Date", ts).
-                    post(Entity.entity(JSONUtil.convertObjectToJSON(authRequest), MediaType.APPLICATION_JSON));
-            responseObject=response.readEntity(BaseResponse.class);
-            response.close();
-        }catch(Exception e){
-            logger.error(new StringBuilder().append("Exception Validating User Password: \nQuery:\n\t")
-                    .append(query).append("\nError:").append(e.getMessage()).toString());
-            logger.trace("Detailed trace: ", e);
-        }
-
-        return responseObject;
-
+        return executePostRawRequest(auth, query, authRequest, BaseResponse.class, ts);
     }
 
     //Validate Users KBA
     public BaseResponse executeValidateKba(String auth,String query, AuthRequest authRequest, String ts)throws Exception{
-
-        if(client == null) {
-            createConnection();
-        }
-
-        WebTarget target = null;
-        Response response = null;
-        BaseResponse responseObject =null;
-        try{
-
-            target = client.target(query);
-            response = target.request().
-                    accept(MediaType.APPLICATION_JSON).
-                    header("Authorization", auth).
-                    header("X-SA-Ext-Date", ts).
-                    post(Entity.entity(JSONUtil.convertObjectToJSON(authRequest), MediaType.APPLICATION_JSON));
-
-            responseObject=response.readEntity(BaseResponse.class);
-            response.close();
-        }catch(Exception e){
-            logger.error(new StringBuilder().append("Exception Validating KBA: \nQuery:\n\t")
-                    .append(query).append("\nError:").append(e.getMessage()).toString());
-            logger.trace("Detailed trace: ", e);
-        }
-
-        return responseObject;
-
+        return executePostRawRequest(auth, query, authRequest, BaseResponse.class, ts);
     }
 
     //Validate User Oath Token
     public BaseResponse executeValidateOath(String auth,String query, AuthRequest authRequest, String ts)throws Exception{
-
-        if(client == null) {
-            createConnection();
-        }
-
-        WebTarget target = null;
-        Response response = null;
-        BaseResponse responseObject =null;
-        try{
-
-            target = client.target(query);
-            response = target.request()
-                    .accept(MediaType.APPLICATION_JSON).
-                            header("Authorization", auth).
-                            header("X-SA-Ext-Date", ts).
-                            post(Entity.entity(JSONUtil.convertObjectToJSON(authRequest), MediaType.APPLICATION_JSON));
-
-            responseObject=response.readEntity(BaseResponse.class);
-            response.close();
-        }catch(Exception e){
-            logger.error(new StringBuilder().append("Exception Validating OATH: \nQuery:\n\t")
-                    .append(query).append("\nError:").append(e.getMessage()).toString());
-            logger.trace("Detailed trace: ", e);
-        }
-
-        return responseObject;
-
+        return executePostRawRequest(auth, query, authRequest, BaseResponse.class, ts);
     }
 
     //Validate OTP By Phone
     public ResponseObject executeOTPByPhone(String auth,String query, AuthRequest authRequest, String ts)throws Exception{
-
-        if(client == null) {
-            createConnection();
-        }
-
-        WebTarget target = null;
-        Response response = null;
-        ResponseObject responseObject =null;
-        try{
-
-            target = client.target(query);
-            response = target.request().
-                    accept(MediaType.APPLICATION_JSON).
-                    //type(MediaType.APPLICATION_JSON).
-                            header("Authorization", auth).
-                            header("X-SA-Ext-Date", ts).
-                            post(Entity.entity(JSONUtil.convertObjectToJSON(authRequest), MediaType.APPLICATION_JSON));
-
-            responseObject=response.readEntity(ResponseObject.class);
-
-            response.close();
-        }catch(Exception e){
-            logger.error(new StringBuilder().append("Exception Delivering OTP by Phone: \nQuery:\n\t")
-                    .append(query).append("\nError:").append(e.getMessage()).toString());
-            logger.trace("Detailed trace: ", e);
-        }
-
-        return responseObject;
-
+        return executePostRawRequest(auth, query, authRequest, ResponseObject.class, ts);
     }
 
     //Validate User OATH by SMS
     public ResponseObject executeOTPBySMS(String auth, String query, AuthRequest authRequest, String ts)throws Exception{
-
-        if(client == null) {
-            createConnection();
-        }
-
-        WebTarget target = null;
-        Response response = null;
-        ResponseObject responseObject =null;
-        try{
-
-            target = client.target(query);
-            response = target.request()
-                    .accept(MediaType.APPLICATION_JSON).
-                            header("Authorization", auth).
-                            header("X-SA-Ext-Date", ts).
-                            post(Entity.entity(JSONUtil.convertObjectToJSON(authRequest), MediaType.APPLICATION_JSON));
-
-            responseObject=response.readEntity(ResponseObject.class);
-            response.close();
-        }catch(Exception e){
-            logger.error(new StringBuilder().append("Exception Delivering OTP by SMS: \nQuery:\n\t")
-                    .append(query).append("\nError:").append(e.getMessage()).toString());
-            logger.trace("Detailed trace: ", e);
-        }
-
-        return responseObject;
-
+        return executePostRawRequest(auth, query, authRequest, ResponseObject.class, ts);
     }
 
     //Validate User OTP by Email
     public ResponseObject executeOTPByEmail(String auth,String query, AuthRequest authRequest,String ts)throws Exception{
-
-        if(client == null) {
-            createConnection();
-        }
-
-        WebTarget target = null;
-        Response response = null;
-        ResponseObject responseObject =null;
-        try{
-
-            target = client.target(query);
-            response = target.request().
-                    accept(MediaType.APPLICATION_JSON).
-                    header("Authorization", auth).
-                    header("X-SA-Ext-Date", ts).
-                    post(Entity.entity(JSONUtil.convertObjectToJSON(authRequest), MediaType.APPLICATION_JSON));
-
-            responseObject=response.readEntity(ResponseObject.class);
-
-            response.close();
-        }catch(Exception e){
-            logger.error(new StringBuilder().append("Exception Delivering OTP by Email: \nQuery:\n\t")
-                    .append(query).append("\nError:").append(e.getMessage()).toString());
-            logger.trace("Detailed trace: ", e);
-        }
-
-        return responseObject;
-
+        return executePostRawRequest(auth, query, authRequest, ResponseObject.class, ts);
     }
 
     //VALIDATE OTP by using IDP EndPoint
     public ValidateOTPResponse executeValidateOTP(String auth, String query, ValidateOTPRequest validateOTPRequest, String ts)throws Exception{
-
-        if(client == null) {
-            createConnection();
-        }
-
-        WebTarget target = null;
-        Response response = null;
-        ValidateOTPResponse validateOTPResponse =null;
-        try{
-            target = client.target(query);
-
-            response = target.request().
-                    accept(MediaType.APPLICATION_JSON).
-                    header("Authorization", auth).
-                    header("X-SA-Ext-Date", ts).
-                    post(Entity.entity(JSONUtil.convertObjectToJSON(validateOTPRequest),MediaType.APPLICATION_JSON));
-
-            validateOTPResponse = response.readEntity(ValidateOTPResponse.class);
-
-            response.close();
-        }catch(Exception e){
-            logger.error(new StringBuilder().append("Exception Running Validate OTP POST: \nQuery:\n\t")
-                    .append(query).append("\nError:").append(e.getMessage()).toString());
-            logger.trace("Detailed trace: ", e);
-        }
-
-        return validateOTPResponse;
-
+        return executePostRawRequest(auth, query, validateOTPRequest, ValidateOTPResponse.class, ts);
     }
 
     //Validate User Token by Help Desk Call
     public ResponseObject executeOTPByHelpDesk(String auth,String query, AuthRequest authRequest, String ts)throws Exception{
-
-        if(client == null) {
-            createConnection();
-        }
-
-        WebTarget target = null;
-        Response response = null;
-        ResponseObject responseObject =null;
-        try{
-
-            target = client.target(query);
-            response = target.request().
-                    accept(MediaType.APPLICATION_JSON).
-                    header("Authorization", auth).
-                    header("X-SA-Ext-Date", ts).
-                    post(Entity.entity(JSONUtil.convertObjectToJSON(authRequest),MediaType.APPLICATION_JSON));
-
-            responseObject=response.readEntity(ResponseObject.class);
-
-            response.close();
-        }catch(Exception e){
-            logger.error(new StringBuilder().append("Exception Delivering OTP by HelpDesk: \nQuery:\n\t")
-                    .append(query).append("\nError:").append(e.getMessage()).toString());
-            logger.trace("Detailed trace: ", e);
-        }
-
-        return responseObject;
-
+        return executePostRawRequest(auth, query, authRequest, ResponseObject.class, ts);
     }
 
     //Run IP Evaluation against user and IP Address
     public IPEval executeIPEval(String auth, String query, IPEvalRequest ipEvalRequest, String ts)throws Exception{
-
-        if(client == null) {
-            createConnection();
-        }
-
-        WebTarget target = null;
-        Response response = null;
-        String responseStr=null;
-        IPEval ipEval =null;
-
-        try{
-
-            target = client.target(query);
-
-
-            response = target.request().
-                    accept(MediaType.APPLICATION_JSON).
-                    header("Authorization", auth).
-                    header("X-SA-Ext-Date", ts).
-                    post(Entity.entity(JSONUtil.convertObjectToJSON(ipEvalRequest), MediaType.APPLICATION_JSON));
-
-            ipEval = response.readEntity(IPEval.class);
-
-            response.close();
-        }catch(Exception e){
-            logger.error(new StringBuilder().append("Exception Running IP Evaluation: \nQuery:\n\t")
-                    .append(query).append("\nError:").append(e.getMessage()).toString());
-            logger.trace("Detailed trace: ", e);
-        }
-
-        return ipEval;
-
+        return executePostRawRequest(auth, query, ipEvalRequest, IPEval.class, ts);
     }
 
     //Run AccessHistories Post
     public ResponseObject executeAccessHistory(String auth, String query, AccessHistoryRequest accessHistoryRequest, String ts)throws Exception{
-
-        if(client == null) {
-            createConnection();
-        }
-
-        WebTarget target = null;
-        Response response = null;
-        ResponseObject accessHistory =null;
-        try{
-            target = client.target(query);
-
-            response = target.request().
-                    accept(MediaType.APPLICATION_JSON).
-                    header("Authorization", auth).
-                    header("X-SA-Ext-Date", ts).
-                    post(Entity.entity(JSONUtil.convertObjectToJSON(accessHistoryRequest),MediaType.APPLICATION_JSON));
-
-            accessHistory = response.readEntity(ResponseObject.class);
-
-            response.close();
-        }catch(Exception e){
-            logger.error(new StringBuilder().append("Exception Running Access History POST: \nQuery:\n\t")
-                    .append(query).append("\nError:").append(e.getMessage()).toString());
-            logger.trace("Detailed trace: ", e);
-        }
-
-        return accessHistory;
-
+        return executePostRawRequest(auth, query, accessHistoryRequest, ResponseObject.class, ts);
     }
+
     // Run DFP Validate
     public DFPValidateResponse executeDFPValidate(String auth, String query, DFPValidateRequest dfpValidateRequest, String ts)throws Exception{
-
-        if(client == null) {
-            createConnection();
-        }
-
-        WebTarget target = null;
-        Response response = null;
-        DFPValidateResponse dfpValidateResponse =null;
-        try{
-            target = client.target(query);
-
-            response = target.request().
-                    accept(MediaType.APPLICATION_JSON).
-                    header("Authorization", auth).
-                    header("X-SA-Ext-Date", ts).
-                    post(Entity.entity(JSONUtil.convertObjectToJSON(dfpValidateRequest),MediaType.APPLICATION_JSON));
-
-            dfpValidateResponse = response.readEntity(DFPValidateResponse.class);
-            response.close();
-        }catch(Exception e){
-            logger.error(new StringBuilder().append("Exception Running Access History POST: \nQuery:\n\t")
-                    .append(query).append("\nError:").append(e.getMessage()).toString());
-            logger.trace("Detailed trace: ", e);
-        }
-
-        return dfpValidateResponse;
-
+        return executePostRawRequest(auth, query, dfpValidateRequest, DFPValidateResponse.class, ts);
     }
 
     // Run DFP Confirm
     public DFPConfirmResponse executeDFPConfirm(String auth, String query, DFPConfirmRequest dfpConfirmRequest, String ts)throws Exception{
-
-        if(client == null) {
-            createConnection();
-        }
-
-        WebTarget target = null;
-        Response response = null;
-        DFPConfirmResponse dfpConfirmResponse =null;
-        try{
-            target = client.target(query);
-
-            response = target.request().
-                    accept(MediaType.APPLICATION_JSON).
-                    header("Authorization", auth).
-                    header("X-SA-Ext-Date", ts).
-                    post(Entity.entity(JSONUtil.convertObjectToJSON(dfpConfirmRequest),MediaType.APPLICATION_JSON));
-
-
-            dfpConfirmResponse = response.readEntity(DFPConfirmResponse.class);
-
-            response.close();
-        }catch(Exception e){
-            logger.error(new StringBuilder().append("Exception Running DFP Confirm POST: \nQuery:\n\t")
-                    .append(query).append("\nError:").append(e.getMessage()).toString());
-            logger.trace("Detailed trace: ", e);
-        }
-
-        return dfpConfirmResponse;
-
+        return executePostRawRequest(auth, query, dfpConfirmRequest, DFPConfirmResponse.class, ts);
     }
 
     //Get JavaScript Source for DFP and Behavioral
@@ -891,66 +502,12 @@ public class SAExecuter {
 
     //Run BehaveBio Post
     public BehaveBioResponse executeBehaveBioPost(String auth, String query, BehaveBioRequest behaveBioRequest, String ts)throws Exception{
-
-        if(client == null) {
-            createConnection();
-        }
-
-        WebTarget target = null;
-        Response response = null;
-        BehaveBioResponse behaveBioResponse =null;
-        try{
-            target = client.target(query);
-
-            response = target.request().
-                    accept(MediaType.APPLICATION_JSON).
-                    header("Authorization", auth).
-                    header("X-SA-Ext-Date", ts).
-                    post(Entity.entity(JSONUtil.convertObjectToJSON(behaveBioRequest),MediaType.APPLICATION_JSON));
-
-            behaveBioResponse = response.readEntity(BehaveBioResponse.class);
-
-            response.close();
-        }catch(Exception e){
-            logger.error(new StringBuilder().append("Exception Running BehaveBio POST: \nQuery:\n\t")
-                    .append(query).append("\nError:").append(e.getMessage()).toString());
-            logger.trace("Detailed trace: ", e);
-        }
-
-        return behaveBioResponse;
-
+        return executePostRawRequest(auth, query, behaveBioRequest, BehaveBioResponse.class, ts);
     }
 
     //Run BehaveBio Put
     public ResponseObject executeBehaveBioReset(String auth, String query, BehaveBioResetRequest behaveBioResetRequest, String ts)throws Exception{
-
-        if(client == null) {
-            createConnection();
-        }
-
-        WebTarget target = null;
-        Response response = null;
-        ResponseObject behaveBioResponse =null;
-        try{
-            target = client.target(query);
-
-            response = target.request().
-                    accept(MediaType.APPLICATION_JSON).
-                    header("Authorization", auth).
-                    header("X-SA-Ext-Date", ts).
-                    put(Entity.entity(JSONUtil.convertObjectToJSON(behaveBioResetRequest),MediaType.APPLICATION_JSON));
-
-            behaveBioResponse = response.readEntity(ResponseObject.class);
-
-            response.close();
-        }catch(Exception e){
-            logger.error(new StringBuilder().append("Exception Running BehaveBio POST: \nQuery:\n\t")
-                    .append(query).append("\nError:").append(e.getMessage()).toString());
-            logger.trace("Detailed trace: ", e);
-        }
-
-        return behaveBioResponse;
-
+        return executePutRequest(auth, query, behaveBioResetRequest, ResponseObject.class, ts);
     }
 
     // Run Password Reset (Admin level reset).
@@ -966,40 +523,10 @@ public class SAExecuter {
     public ResponseObject executeUserPasswordChange(String auth, String query, UserPasswordRequest userPasswordRequest, String ts)throws Exception{
         return executeUserPasswordChange(auth, query, "", userPasswordRequest, ts);
     }
+
     // Fill userId string when you want to encode and send userId through Query Params.
     public ResponseObject executeUserPasswordChange(String auth, String query, String userId, UserPasswordRequest userPasswordRequest, String ts)throws Exception{
-
-        if(client == null) {
-            createConnection();
-        }
-
-        WebTarget target = null;
-        Response response = null;
-        ResponseObject passwordChangeResponse =null;
-        try{
-            if (!userId.isBlank()) {
-                target = encodeQueryUser(query, userId);
-            }
-            else{
-                target = client.target(query);
-            }
-            response = target.request()
-                               .accept(MediaType.APPLICATION_JSON)
-                               .header("Authorization", auth)
-                               .header("X-SA-Ext-Date", ts)
-                               .post(Entity.entity(JSONUtil.convertObjectToJSON(userPasswordRequest),MediaType.APPLICATION_JSON));
-
-            passwordChangeResponse = response.readEntity(ResponseObject.class);
-
-            response.close();
-        }catch(Exception e){
-            logger.error(new StringBuilder().append("Exception Running Password Reset POST: \nQuery:\n\t")
-                    .append(query).append("\nError:").append(e.getMessage()).toString());
-            logger.trace("Detailed trace: ", e);
-        }
-
-        return passwordChangeResponse;
-
+        return executePostRawRequest(auth, query, userPasswordRequest, ResponseObject.class, ts);
     }
 
     //Update User Profile
@@ -1082,66 +609,12 @@ public class SAExecuter {
 
     //Run NumberProfile Post
     public NumberProfileResponse executeNumberProfilePost(String auth, String query, NumberProfileRequest numberProfileRequest, String ts)throws Exception{
-
-        if(client == null) {
-            createConnection();
-        }
-
-        WebTarget target = null;
-        Response response = null;
-        NumberProfileResponse numberProfileResponse =null;
-        try{
-            target = client.target(query);
-
-            response = target.request().
-                    accept(MediaType.APPLICATION_JSON).
-                    header("Authorization", auth).
-                    header("X-SA-Ext-Date", ts).
-                    post(Entity.entity(JSONUtil.convertObjectToJSON(numberProfileRequest),MediaType.APPLICATION_JSON));
-
-            numberProfileResponse = response.readEntity(NumberProfileResponse.class);
-
-            response.close();
-        }catch(Exception e){
-            logger.error(new StringBuilder().append("Exception Running NumberProfile POST: \nQuery:\n\t")
-                    .append(query).append("\nError:").append(e.getMessage()).toString());
-            logger.trace("Detailed trace: ", e);
-        }
-
-        return numberProfileResponse;
-
+        return executePostRawRequest(auth, query, numberProfileRequest, NumberProfileResponse.class, ts);
     }
 
     //Run Number Profile Put
     public BaseResponse executeNumberProfileUpdate(String auth, String query, NumberProfileUpdateRequest numberProfileUpdateRequest, String ts)throws Exception{
-
-        if(client == null) {
-            createConnection();
-        }
-
-        WebTarget target = null;
-        Response response = null;
-        BaseResponse numberProfileUpdateResponse =null;
-        try{
-            target = client.target(query);
-
-            response = target.request().
-                    accept(MediaType.APPLICATION_JSON).
-                    header("Authorization", auth).
-                    header("X-SA-Ext-Date", ts).
-                    put(Entity.entity(JSONUtil.convertObjectToJSON(numberProfileUpdateRequest),MediaType.APPLICATION_JSON));
-
-            numberProfileUpdateResponse = response.readEntity(BaseResponse.class);
-
-            response.close();
-        }catch(Exception e){
-            logger.error(new StringBuilder().append("Exception Running NumberProfile POST: \nQuery:\n\t")
-                    .append(query).append("\nError:").append(e.getMessage()).toString());
-            logger.trace("Detailed trace: ", e);
-        }
-
-        return numberProfileUpdateResponse;
-
+        return executePutRequest(auth, query, numberProfileUpdateRequest, ResponseObject.class, ts);
     }
 
     public BaseResponse getUserStatus(String userId, String ts, SAAuth saAuth) {
