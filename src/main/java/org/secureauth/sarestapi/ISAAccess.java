@@ -1,5 +1,6 @@
 package org.secureauth.sarestapi;
 
+import org.secureauth.sarestapi.data.DFP.DFP;
 import org.secureauth.sarestapi.data.IPEval;
 import org.secureauth.sarestapi.data.PushAcceptStatus;
 import org.secureauth.sarestapi.data.Requests.AccessHistoryRequest;
@@ -8,6 +9,7 @@ import org.secureauth.sarestapi.data.Response.*;
 import org.secureauth.sarestapi.data.UserProfile.NewUserProfile;
 import org.secureauth.sarestapi.data.UserProfile.UserToGroups;
 import org.secureauth.sarestapi.data.UserProfile.UsersToGroup;
+import org.secureauth.sarestapi.exception.SARestAPIException;
 
 import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.NewCookie;
@@ -23,7 +25,7 @@ public interface ISAAccess {
 	 * @return {@link org.secureauth.sarestapi.data.IPEval}
 	 *
 	 */
-	IPEval iPEvaluation(String userId, String ipAddress);
+	IPEval iPEvaluation(String userId, String ipAddress) throws SARestAPIException;
 
 	/**
 	 * <p>
@@ -32,7 +34,7 @@ public interface ISAAccess {
 	 * @param userId the userid of the identity you wish to have a list of possible second factors
 	 * @return {@link FactorsResponse}
 	 */
-	FactorsResponse factorsByUser(String userId);
+	FactorsResponse factorsByUser(String userId) throws SARestAPIException;
 
 	/**
 	 * <p>
@@ -41,7 +43,7 @@ public interface ISAAccess {
 	 * @param userId the userid of the identity you wish to have a list of possible second factors. This method supports special characters for userId since it uses QP (Query Params) in order to create the request.
 	 * @return {@link FactorsResponse}
 	 */
-	FactorsResponse factorsByUserQP(String userId);
+	FactorsResponse factorsByUserQP(String userId) throws SARestAPIException;
 
 	/**
 	 * <p>
@@ -160,7 +162,7 @@ public interface ISAAccess {
 	 * @param userId id of user
 	 * @return base answer
 	 */
-	ThrottleResponse resetThrottleReqQP(String userId);
+	ThrottleResponse resetThrottleReqQP(String userId) throws SARestAPIException;
 
 	/**
 	 * GET the end-user's current count of OTP usage attempts
@@ -379,7 +381,10 @@ public interface ISAAccess {
 	 * @return {@link DFPValidateResponse}
 	 *
 	 */
+	@Deprecated
 	DFPValidateResponse DFPValidateNewFingerprint(String userId, String hostAddress, String jsonString);
+
+	DFPValidateResponse DFPValidateNewFingerprint(DFP fingerprint);
 
 	/**
 	 * <p>
@@ -653,8 +658,10 @@ public interface ISAAccess {
 	 * @param fingerPrintJSON Descriptive name derived from the user_agent string
 	 * @return {@link DFPValidateResponse}
 	 */
+	@Deprecated
 	DFPValidateResponse DFPScoreFingerprint(String userId, String hostAddress, String fingerprintId, String fingerPrintJSON);
 
+	DFPValidateResponse DFPScoreFingerprint(DFP fingerprint);
 	/**
 	 * Method to complete the user account profile in the directory
 	 * @param userId User ID provided

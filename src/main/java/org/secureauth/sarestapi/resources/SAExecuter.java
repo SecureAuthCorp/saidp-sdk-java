@@ -4,6 +4,9 @@ import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.Optional;
 
@@ -28,7 +31,6 @@ import org.secureauth.sarestapi.exception.SARestAPIException;
 import org.secureauth.sarestapi.filters.SACheckRequestFilter;
 import org.secureauth.sarestapi.guid.GUIDStrategy;
 import org.secureauth.sarestapi.guid.XRequestIDFilter;
-import org.secureauth.sarestapi.queries.IDMQueries;
 import org.secureauth.sarestapi.queries.StatusQuery;
 import org.secureauth.sarestapi.ssl.SATrustManagerFactory;
 import org.secureauth.sarestapi.util.JSONUtil;
@@ -42,8 +44,6 @@ import org.glassfish.jersey.client.ClientConfig;
 import javax.ws.rs.core.NewCookie;
 import javax.ws.rs.core.Response;
 
-import javax.ws.rs.core.NewCookie;
-import javax.ws.rs.core.Response;
 
 /**
  * @author rrowcliffe@secureauth.com
@@ -66,9 +66,8 @@ OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
 
 public class SAExecuter {
 
-    private ClientConfig config = null;
     private Client client = null;
-    private static Logger logger = LoggerFactory.getLogger(SAExecuter.class);
+    private static final Logger logger = LoggerFactory.getLogger(SAExecuter.class);
     private static final String TEN_SECONDS = "10000";
     private static final String TLS = "TLS";
     // The IdP Cloud version uses "INGRESSCOOKIE" as fixed value to support sticky sessions.
@@ -97,11 +96,12 @@ public class SAExecuter {
     }
 
     //Set up our Connection
-    private void createConnection() throws Exception {
-        config = new ClientConfig();
-        SSLContext ctx = SSLContext.getInstance( TLS );
-        ctx.init(null, SATrustManagerFactory.createTrustsManagersFor( this.saBaseURL ) , new SecureRandom());
+    private void createConnection() throws SARestAPIException {
+        ClientConfig config = new ClientConfig();
         try {
+            SSLContext ctx = null;
+            ctx = SSLContext.getInstance( TLS );
+            ctx.init(null, SATrustManagerFactory.createTrustsManagersFor( this.saBaseURL ) , new SecureRandom());
             config.register(SACheckRequestFilter.class);
             config.register( this.xRequestIDFilter );
             client = ClientBuilder.newBuilder()
@@ -111,12 +111,10 @@ public class SAExecuter {
                     .build();
             client.property( ClientProperties.CONNECT_TIMEOUT, this.idpApiTimeout );
             client.property( ClientProperties.READ_TIMEOUT, this.idpApiTimeout );
-        } catch (Exception e) {
+        } catch (NoSuchAlgorithmException | KeyManagementException | KeyStoreException e) {
             logger.error("Exception occurred while attempting to associating our SSL cert to the session: " + e.getMessage());
             logger.trace("Detailed trace: ", e);
-        }
-        if (client == null) {
-            throw new Exception("Unable to create connection object, creation attempt returned NULL.");
+            throw new SARestAPIException("Unable to create connection object, creation attempt returned NULL.", e);
         }
     }
 
@@ -125,11 +123,11 @@ public class SAExecuter {
         return executeGetRequest(auth, query, "", ts, valueType);
     }
 
-    public <T> T executeGetRequestStateful(String auth, Cookie ingressCookie, String query, String ts, Class<T> valueType) throws Exception {
-        if (client == null) {
-            createConnection();
-        }
+    public <T> T executeGetRequestStateful(String auth, Cookie ingressCookie, String query, String ts, Class<T> valueType) {
         try {
+            if (client == null) {
+                createConnection();
+            }
             WebTarget target = client.target( query );
             Response response = target.request().
                     accept(MediaType.APPLICATION_JSON).
@@ -146,15 +144,15 @@ public class SAExecuter {
         }
     }
 
-    public <T> T executeGetRequest(String auth, String query, String userId, String ts, Class<T> valueType) throws Exception {
-        if (client == null) {
-            createConnection();
-        }
+    public <T> T executeGetRequest(String auth, String query, String userId, String ts, Class<T> valueType) {
 
         WebTarget target = null;
         Response response = null;
         T genericResponse = null;
         try {
+            if (client == null) {
+                createConnection();
+            }
 
             if (!userId.isBlank()) {
                 target = encodeQueryUser(query, userId);
@@ -170,7 +168,7 @@ public class SAExecuter {
             //consider using response.ok(valueType).build(); instead.
             genericResponse = response.readEntity(valueType);
             response.close();
-        } catch (Exception e) {
+        } catch (SARestAPIException e) {
             logger.error("Exception Get Request: \nQuery:\n\t" + query + "\nError:" + e.getMessage());
         }
 
@@ -190,12 +188,12 @@ public class SAExecuter {
     }
 
     // post request
-    public <T> T executePostRequest(String auth,String query, AuthRequest authRequest,String ts, Class<T> valueType)throws Exception {
+    public <T> T executePostRequest(String auth,String query, AuthRequest authRequest,String ts, Class<T> valueType)throws SARestAPIException {
 
-        if (client == null) {
-            createConnection();
-        }
         try {
+            if (client == null) {
+                createConnection();
+            }
             WebTarget target = null;
             Response response = null;
             T responseObject = null;
@@ -245,15 +243,15 @@ public class SAExecuter {
         return executePutRequest(auth, query, "", payloadRequest, responseValueType, ts);
     }
 
-    public <T> T executePutRequest(String auth, String query, String userId, Object payloadRequest, Class<T> responseValueType, String ts)throws Exception {
-        if(client == null) {
-            createConnection();
-        }
+    public <T> T executePutRequest(String auth, String query, String userId, Object payloadRequest, Class<T> responseValueType, String ts)throws SARestAPIException {
 
         WebTarget target = null;
         Response response = null;
         T genericResponse =null;
         try{
+            if(client == null) {
+                createConnection();
+            }
 
             if (!userId.isBlank()) {
                 target = encodeQueryUser(query, userId);
@@ -270,8 +268,8 @@ public class SAExecuter {
             genericResponse = response.readEntity(responseValueType);
             response.close();
             return genericResponse;
-        }catch(Exception e){
-            throw new SARestAPIException("Exception Put Request: \nQuery:\n\t" + query + "\nError:" + e.getMessage());
+        }catch(SARestAPIException e){
+            throw new SARestAPIException("Exception Put Request: \nQuery:\n\t" + query + "\n", e);
         }
     }
 
@@ -279,7 +277,7 @@ public class SAExecuter {
         return executePostRawRequest(auth, query, "", "", authRequest, valueType, ts);
     }
 
-    public <T> T executePostRawRequest(String auth,String query, String userId, String groupId, Object authRequest, Class<T> valueType, String ts)throws Exception{
+    public <T> T executePostRawRequest(String auth,String query, String userId, String groupId, Object authRequest, Class<T> valueType, String ts) throws SARestAPIException{
         if(client == null) {
             createConnection();
         }
@@ -302,8 +300,8 @@ public class SAExecuter {
             responseObject = response.readEntity(valueType);
             response.close();
             return responseObject;
-        }catch(Exception e){
-            throw new SARestAPIException("Exception Post Request: \nQuery:\n\t" + query + "\nError:" + e.getMessage());
+        }catch(SARestAPIException e){
+            throw new SARestAPIException("Exception Post Request: \nQuery:\n\t" + query, e);
         }
     }
 
@@ -348,16 +346,16 @@ public class SAExecuter {
         return executePostRawRequestWithoutPayload(auth, query, "", "",valueType, ts);
     }
 
-    public <T> T executePostRawRequestWithoutPayload(String auth,String query, String userId,String groupId, Class<T> valueType, String ts)throws Exception{
+    public <T> T executePostRawRequestWithoutPayload(String auth,String query, String userId,String groupId, Class<T> valueType, String ts) throws SARestAPIException{
 
-        if(client == null) {
-            createConnection();
-        }
 
         WebTarget target = null;
         Response response = null;
         T responseObject = null;
         try{
+            if(client == null) {
+                createConnection();
+            }
 
             if (!userId.isBlank()) {
                 target = encodeQueryUser(query, userId, groupId);
@@ -373,8 +371,8 @@ public class SAExecuter {
             responseObject = response.readEntity(valueType);
             response.close();
             return responseObject;
-        }catch(Exception e){
-            throw new SARestAPIException("Exception Post Request: \nQuery:\n\t" + query + "\nError:" + e.getMessage());
+        }catch(SARestAPIException e){
+            throw new SARestAPIException("Exception Post Request: \nQuery:\n\t" + query, e);
         }
     }
 
@@ -383,14 +381,14 @@ public class SAExecuter {
     }
 
     public String executeRawGetRequest(String auth, String query, String userId, String ts) throws Exception {
-        if(client == null) {
-            createConnection();
-        }
 
         WebTarget target = null;
         Response response = null;
         String factors=null;
         try{
+            if(client == null) {
+                createConnection();
+            }
             if (!userId.isBlank()) {
                 target = encodeQueryUser(query, userId);
             }
@@ -1161,19 +1159,24 @@ public class SAExecuter {
     }
 
     // Helper function for encoding users with special characters
-    private WebTarget encodeQueryUser (String query, String userId) throws Exception{
+    private WebTarget encodeQueryUser (String query, String userId) throws SARestAPIException{
         return encodeQueryUser(query, userId,"");
     }
 
-    private WebTarget encodeQueryUser (String query, String userId, String groupId) throws Exception{
+    private WebTarget encodeQueryUser (String query, String userId, String groupId) throws SARestAPIException{
 
         URI uri = URI.create(query);
         WebTarget target = client.target(uri);
-        String encodedUser = encodedValue(userId);
-        if (!groupId.isBlank()) {
-            target.queryParam("groups", encodedValue(groupId));
+        String encodedUser = null;
+        try {
+            encodedUser = encodedValue(userId);
+            if (!groupId.isBlank()) {
+                target.queryParam("groups", encodedValue(groupId));
+            }
+            return target.queryParam("username", encodedUser);
+        } catch (UnsupportedEncodingException e) {
+            throw new SARestAPIException(e);
         }
-        return target.queryParam("username", encodedUser);
     }
 
 }
