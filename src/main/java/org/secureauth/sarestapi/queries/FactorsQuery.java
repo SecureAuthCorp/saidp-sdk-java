@@ -22,20 +22,18 @@ IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
 OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-public class FactorsQuery {
+public final class FactorsQuery {
+
+    private FactorsQuery(){}
 
     //https://{domain}/{realm}/v1/users/{username}/factors
     public static String queryFactors(String realm, String userName){
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(realm).append(Resource.APPLIANCE_USERS).append(userName).append(Resource.APPLIANCE_FACTORS);
-        return stringBuilder.toString();
+        return realm + Resource.APPLIANCE_USERS + userName + Resource.APPLIANCE_FACTORS;
     }
 
     //https://{domain}/{realm}/v1/users/factors?username={username}
     public static String queryFactorsQP(String realm) {
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(realm).append(removeLastChar(Resource.APPLIANCE_USERS)).append(Resource.APPLIANCE_FACTORS);
-        return stringBuilder.toString();
+        return realm + removeLastChar(Resource.APPLIANCE_USERS) + Resource.APPLIANCE_FACTORS;
     }
 
     private static String removeLastChar (String query){

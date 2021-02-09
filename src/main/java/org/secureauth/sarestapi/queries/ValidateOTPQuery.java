@@ -22,13 +22,12 @@ IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
 OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-public class ValidateOTPQuery {
+public final class ValidateOTPQuery {
 
+    private ValidateOTPQuery(){}
 
     public static String queryValidateOTP(String realm){
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(realm).append(Resource.APPLIANCE_OTP_VALIDATE);
-        return stringBuilder.toString();
+        return realm + Resource.APPLIANCE_OTP_VALIDATE;
     }
 
 }
