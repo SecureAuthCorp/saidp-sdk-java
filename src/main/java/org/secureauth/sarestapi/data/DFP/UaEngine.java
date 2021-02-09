@@ -18,7 +18,7 @@ public class UaEngine {
     @JsonProperty("version")
     private String version;
     @JsonIgnore
-    private Map<String, Object> additionalProperties = new HashMap<String, Object>();
+    private final Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
     @JsonProperty("name")
     public String getName() {

@@ -23,6 +23,16 @@ public class UaBrowser {
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
+    public UaBrowser(String name, String version, String major, Map<String, Object> additionalProperties) {
+        this.name = name;
+        this.version = version;
+        this.major = major;
+        this.additionalProperties = additionalProperties;
+    }
+
+    public UaBrowser() {
+    }
+
     @JsonProperty("name")
     public String getName() {
         return name;
