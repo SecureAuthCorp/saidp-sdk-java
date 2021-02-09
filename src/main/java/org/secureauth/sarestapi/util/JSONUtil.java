@@ -29,9 +29,9 @@ OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
  */
 
 
-public class JSONUtil {
+public final class JSONUtil {
 
-    public JSONUtil(){}
+    private JSONUtil(){}
 
      public static String convertObjectToJSON(Object object){
         ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
