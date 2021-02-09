@@ -8,7 +8,7 @@ public class UserToGroups {
 
     public UserToGroups(){}
 
-    public UserToGroups(String[] groupNames) {
+    public UserToGroups(String... groupNames) {
         this.groupNames = groupNames;
     }
 
@@ -16,7 +16,7 @@ public class UserToGroups {
         return groupNames;
     }
 
-    public void setGroupNames(String[] groupNames) {
+    public void setGroupNames(String... groupNames) {
         this.groupNames = groupNames;
     }
 }
