@@ -44,7 +44,7 @@ import javax.ws.rs.core.Cookie;
  * </p>
  */
 
-public class SAAccess implements ISAAccess{
+public final class SAAccess implements ISAAccess{
     private static final String PUSH_TO_ACCEPT = "push_accept";
     private static final String SYMBOL_TO_ACCEPT = "push_accept_symbol";
     private static final Logger logger = LoggerFactory.getLogger(SAAccess.class);
@@ -96,6 +96,24 @@ public class SAAccess implements ISAAccess{
         saExecuter=new SAExecuter(saBaseURL);
     }
 
+    /**
+     *<p>
+     *     Returns a SAAccess Object that can be used to query the SecureAuth Rest API
+     *     This should be the default object used when setting up connectivity to the SecureAuth Appliance
+     *     This Object will allow users to support selfSigned Certificates
+     *</p>
+     * @param host FQDN of the SecureAuth Appliance
+     * @param port The port used to access the web application on the Appliance.
+     * @param ssl Use SSL
+     * @param selfSigned  Support for SeflSigned Certificates. Setting to enable disable self signed cert support
+     * @param realm the Configured Realm that enables the RESTApi
+     * @param applicationID The Application ID from the Configured Realm
+     * @param applicationKey The Application Key from the Configured Realm
+     * @param guidStrategy
+     *
+     * @deprecated from 1.0.6.0, replace by {@link org.secureauth.sarestapi.util.SAFactory}
+     */
+    @Deprecated
     public SAAccess(String host, String port,boolean ssl,boolean selfSigned, String realm, String applicationID, String applicationKey, GUIDStrategy guidStrategy){
         saBaseURL=new SABaseURL(host,port,ssl,selfSigned);
         saAuth = new SAAuth(applicationID,applicationKey,realm);
@@ -975,7 +993,15 @@ public class SAAccess implements ISAAccess{
 
     @Override
     public DFPValidateResponse DFPScoreFingerprint(DFP fingerprint) {
-        return null;
+        String ts = getServerTime();
+
+        String header = RestApiHeader.getAuthorizationHeader(saAuth, Resource.METHOD_POST, DFPQuery.queryDFPScore(saAuth.getRealm()), fingerprint, ts);
+
+        try{
+            return saExecuter.executePostRawRequest(header,saBaseURL.getApplianceURL() + DFPQuery.queryDFPScore(saAuth.getRealm()), fingerprint, DFPValidateResponse.class, ts);
+        }catch (Exception e){
+            throw new SARestAPIException("Exception occurred executing score fingerprint", e);
+        }
     }
 
     @Override
@@ -1006,7 +1032,6 @@ public class SAAccess implements ISAAccess{
     public JSObjectResponse javaScriptSrc(){
         String ts = getServerTime();
         String header = RestApiHeader.getAuthorizationHeader(saAuth,"GET",DFPQuery.queryDFPjs(saAuth.getRealm()),ts);
-
 
         try{
             return saExecuter.executeGetJSObject(header,saBaseURL.getApplianceURL() + DFPQuery.queryDFPjs(saAuth.getRealm()),ts, JSObjectResponse.class);
