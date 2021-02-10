@@ -16,7 +16,6 @@ import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.MediaType;
 
 import org.glassfish.jersey.client.ClientProperties;
-import org.glassfish.jersey.message.internal.MessageBodyProviderNotFoundException;
 import org.secureauth.sarestapi.data.*;
 import org.secureauth.sarestapi.data.BehavioralBio.BehaveBioRequest;
 import org.secureauth.sarestapi.data.Requests.BehaveBioResetRequest;
@@ -31,7 +30,6 @@ import org.secureauth.sarestapi.exception.SARestAPIException;
 import org.secureauth.sarestapi.filters.SACheckRequestFilter;
 import org.secureauth.sarestapi.guid.GUIDStrategy;
 import org.secureauth.sarestapi.guid.XRequestIDFilter;
-import org.secureauth.sarestapi.queries.StatusQuery;
 import org.secureauth.sarestapi.ssl.SATrustManagerFactory;
 import org.secureauth.sarestapi.util.JSONUtil;
 import org.secureauth.sarestapi.util.RestApiHeader;
@@ -113,7 +111,6 @@ public final class SAExecuter {
             client.property( ClientProperties.READ_TIMEOUT, this.idpApiTimeout );
         } catch (NoSuchAlgorithmException | KeyManagementException | KeyStoreException e) {
             logger.error("Exception occurred while attempting to associating our SSL cert to the session: " + e.getMessage());
-            logger.trace("Detailed trace: ", e);
             throw new SARestAPIException("Unable to create connection object, creation attempt returned NULL.", e);
         }
     }
@@ -239,7 +236,7 @@ public final class SAExecuter {
     }
 
 
-    public <T> T executePutRequest(String auth, String query, Object payloadRequest, Class<T> responseValueType, String ts)throws Exception {
+    public <T> T executePutRequest(String auth, String query, Object payloadRequest, Class<T> responseValueType, String ts)throws SARestAPIException {
         return executePutRequest(auth, query, "", payloadRequest, responseValueType, ts);
     }
 
@@ -272,7 +269,7 @@ public final class SAExecuter {
         }
     }
 
-    public <T> T executePostRawRequest(String auth,String query, Object authRequest, Class<T> valueType, String ts)throws Exception{
+    public <T> T executePostRawRequest(String auth,String query, Object authRequest, Class<T> valueType, String ts)throws SARestAPIException{
         return executePostRawRequest(auth, query, "", "", authRequest, valueType, ts);
     }
 
@@ -302,7 +299,7 @@ public final class SAExecuter {
         }
     }
 
-    public <T> T executeGenericRawRequest(String auth,String query, String ts, String method, Object authRequest, Class<T> valueType)throws Exception {
+    public <T> T executeGenericRawRequest(String auth,String query, String ts, String method, Object authRequest, Class<T> valueType)throws SARestAPIException {
         Response response = null;
         try {
             if (client == null) {
@@ -331,18 +328,17 @@ public final class SAExecuter {
         }
     }
 
-    public <T> T executeDeleteRawRequest(String auth,String query, String ts, Object authRequest, Class<T> valueType)throws Exception{
+    public <T> T executeDeleteRawRequest(String auth,String query, String ts, Object authRequest, Class<T> valueType)throws SARestAPIException{
         return executeGenericRawRequest(auth, query, ts, Resource.METHOD_DELETE, authRequest, valueType);
     }
 
-    public <T> T executePostRawRequestWithoutPayload(String auth,String query, Class<T> valueType, String ts)throws Exception {
+    public <T> T executePostRawRequestWithoutPayload(String auth,String query, Class<T> valueType, String ts)throws SARestAPIException {
         return executePostRawRequestWithoutPayload(auth, query, "", "",valueType, ts);
     }
 
     public <T> T executePostRawRequestWithoutPayload(String auth,String query, String userId,String groupId, Class<T> valueType, String ts) throws SARestAPIException{
         WebTarget target = null;
         Response response = null;
-        T responseObject = null;
         try{
             if(client == null) {
                 createConnection();
@@ -359,23 +355,22 @@ public final class SAExecuter {
                     header("Authorization", auth).
                     header("X-SA-Ext-Date", ts).
                     post(Entity.entity("",MediaType.APPLICATION_JSON));
-            responseObject = response.readEntity(valueType);
-            response.close();
-            return responseObject;
+            return response.readEntity(valueType);
         }catch(SARestAPIException e){
             throw new SARestAPIException("Exception Post Request: \nQuery:\n\t" + query, e);
+        }finally {
+            response.close();
         }
     }
 
-    public String executeRawGetRequest(String auth, String query, String ts) throws Exception {
+    public String executeRawGetRequest(String auth, String query, String ts) throws SARestAPIException {
         return executeRawGetRequest(auth, query, "", ts);
     }
 
-    public String executeRawGetRequest(String auth, String query, String userId, String ts) throws Exception {
+    public String executeRawGetRequest(String auth, String query, String userId, String ts) throws SARestAPIException {
 
         WebTarget target = null;
         Response response = null;
-        String factors=null;
         try{
             if(client == null) {
                 createConnection();
@@ -393,86 +388,84 @@ public final class SAExecuter {
                     get(Response.class);
             return response.readEntity(String.class);
         }catch(Exception e){
-            logger.error("Exception getting User Factors: \nQuery:\n\t" +
-                    query + "\nError:" + e.getMessage() + ".\nResponse code is " + response
-                    + "; Raw response:" + factors);
-            logger.trace("Detailed trace: ", e);
+            throw new SARestAPIException("Exception getting User Factors: \nQuery:\n\t" + query, e);
+        }finally {
+            response.close();
         }
-        return null;
     }
 
     //Validate User against Repository
-    public BaseResponse executeValidateUser(String header,String query, AuthRequest authRequest,String ts)throws Exception{
+    public BaseResponse executeValidateUser(String header,String query, AuthRequest authRequest,String ts)throws SARestAPIException{
         return executePostRawRequest(header, query, authRequest, BaseResponse.class, ts);
     }
 
     //Validate Users Password
-    public BaseResponse executeValidateUserPassword(String auth,String query, AuthRequest authRequest,String ts)throws Exception{
+    public BaseResponse executeValidateUserPassword(String auth,String query, AuthRequest authRequest,String ts)throws SARestAPIException{
         return executePostRawRequest(auth, query, authRequest, BaseResponse.class, ts);
     }
 
     //Validate Users Pin
-    public BaseResponse executeValidateUserPin(String auth,String query, AuthRequest authRequest,String ts)throws Exception{
+    public BaseResponse executeValidateUserPin(String auth,String query, AuthRequest authRequest,String ts)throws SARestAPIException{
         return executePostRawRequest(auth, query, authRequest, BaseResponse.class, ts);
     }
 
     //Validate Users KBA
-    public BaseResponse executeValidateKba(String auth,String query, AuthRequest authRequest, String ts)throws Exception{
+    public BaseResponse executeValidateKba(String auth,String query, AuthRequest authRequest, String ts)throws SARestAPIException{
         return executePostRawRequest(auth, query, authRequest, BaseResponse.class, ts);
     }
 
     //Validate User Oath Token
-    public BaseResponse executeValidateOath(String auth,String query, AuthRequest authRequest, String ts)throws Exception{
+    public BaseResponse executeValidateOath(String auth,String query, AuthRequest authRequest, String ts)throws SARestAPIException{
         return executePostRawRequest(auth, query, authRequest, BaseResponse.class, ts);
     }
 
     //Validate OTP By Phone
-    public ResponseObject executeOTPByPhone(String auth,String query, AuthRequest authRequest, String ts)throws Exception{
+    public ResponseObject executeOTPByPhone(String auth,String query, AuthRequest authRequest, String ts)throws SARestAPIException{
         return executePostRawRequest(auth, query, authRequest, ResponseObject.class, ts);
     }
 
     //Validate User OATH by SMS
-    public ResponseObject executeOTPBySMS(String auth, String query, AuthRequest authRequest, String ts)throws Exception{
+    public ResponseObject executeOTPBySMS(String auth, String query, AuthRequest authRequest, String ts)throws SARestAPIException{
         return executePostRawRequest(auth, query, authRequest, ResponseObject.class, ts);
     }
 
     //Validate User OTP by Email
-    public ResponseObject executeOTPByEmail(String auth,String query, AuthRequest authRequest,String ts)throws Exception{
+    public ResponseObject executeOTPByEmail(String auth,String query, AuthRequest authRequest,String ts)throws SARestAPIException{
         return executePostRawRequest(auth, query, authRequest, ResponseObject.class, ts);
     }
 
     //VALIDATE OTP by using IDP EndPoint
-    public ValidateOTPResponse executeValidateOTP(String auth, String query, ValidateOTPRequest validateOTPRequest, String ts)throws Exception{
+    public ValidateOTPResponse executeValidateOTP(String auth, String query, ValidateOTPRequest validateOTPRequest, String ts)throws SARestAPIException{
         return executePostRawRequest(auth, query, validateOTPRequest, ValidateOTPResponse.class, ts);
     }
 
     //Validate User Token by Help Desk Call
-    public ResponseObject executeOTPByHelpDesk(String auth,String query, AuthRequest authRequest, String ts)throws Exception{
+    public ResponseObject executeOTPByHelpDesk(String auth,String query, AuthRequest authRequest, String ts)throws SARestAPIException{
         return executePostRawRequest(auth, query, authRequest, ResponseObject.class, ts);
     }
 
     //Run IP Evaluation against user and IP Address
-    public IPEval executeIPEval(String auth, String query, IPEvalRequest ipEvalRequest, String ts)throws Exception{
+    public IPEval executeIPEval(String auth, String query, IPEvalRequest ipEvalRequest, String ts)throws SARestAPIException{
         return executePostRawRequest(auth, query, ipEvalRequest, IPEval.class, ts);
     }
 
     //Run AccessHistories Post
-    public ResponseObject executeAccessHistory(String auth, String query, AccessHistoryRequest accessHistoryRequest, String ts)throws Exception{
+    public ResponseObject executeAccessHistory(String auth, String query, AccessHistoryRequest accessHistoryRequest, String ts)throws SARestAPIException{
         return executePostRawRequest(auth, query, accessHistoryRequest, ResponseObject.class, ts);
     }
 
     // Run DFP Validate
-    public DFPValidateResponse executeDFPValidate(String auth, String query, DFPValidateRequest dfpValidateRequest, String ts)throws Exception{
+    public DFPValidateResponse executeDFPValidate(String auth, String query, DFPValidateRequest dfpValidateRequest, String ts)throws SARestAPIException{
         return executePostRawRequest(auth, query, dfpValidateRequest, DFPValidateResponse.class, ts);
     }
 
     // Run DFP Confirm
-    public DFPConfirmResponse executeDFPConfirm(String auth, String query, DFPConfirmRequest dfpConfirmRequest, String ts)throws Exception{
+    public DFPConfirmResponse executeDFPConfirm(String auth, String query, DFPConfirmRequest dfpConfirmRequest, String ts)throws SARestAPIException{
         return executePostRawRequest(auth, query, dfpConfirmRequest, DFPConfirmResponse.class, ts);
     }
 
     //Get JavaScript Source for DFP and Behavioral
-    public <T> T executeGetJSObject(String auth, String query,String ts,  Class<T> valueType)throws Exception {
+    public <T> T executeGetJSObject(String auth, String query,String ts, Class<T> valueType)throws Exception {
         if(client == null) {
             createConnection();
         }
@@ -501,7 +494,7 @@ public final class SAExecuter {
     }
 
     //Run BehaveBio Post
-    public BehaveBioResponse executeBehaveBioPost(String auth, String query, BehaveBioRequest behaveBioRequest, String ts)throws Exception{
+    public BehaveBioResponse executeBehaveBioPost(String auth, String query, BehaveBioRequest behaveBioRequest, String ts)throws SARestAPIException{
         return executePostRawRequest(auth, query, behaveBioRequest, BehaveBioResponse.class, ts);
     }
 
@@ -511,124 +504,79 @@ public final class SAExecuter {
     }
 
     // Run Password Reset (Admin level reset).
-    public ResponseObject executeUserPasswordReset(String auth, String query, UserPasswordRequest userPasswordRequest, String ts)throws Exception{
+    public ResponseObject executeUserPasswordReset(String auth, String query, UserPasswordRequest userPasswordRequest, String ts)throws SARestAPIException{
         return executeUserPasswordReset(auth, query, "", userPasswordRequest, ts);
     }
     // Fill userId string when you want to encode and send userId through Query Params.
-    public ResponseObject executeUserPasswordReset(String auth, String query, String userId, UserPasswordRequest userPasswordRequest, String ts)throws Exception{
+    public ResponseObject executeUserPasswordReset(String auth, String query, String userId, UserPasswordRequest userPasswordRequest, String ts)throws SARestAPIException{
         return executePostRawRequest(auth, query, userId, "", userPasswordRequest, ResponseObject.class,  ts);
     }
 
     // Run Change Password (Self Service).
-    public ResponseObject executeUserPasswordChange(String auth, String query, UserPasswordRequest userPasswordRequest, String ts)throws Exception{
+    public ResponseObject executeUserPasswordChange(String auth, String query, UserPasswordRequest userPasswordRequest, String ts)throws SARestAPIException{
         return executeUserPasswordChange(auth, query, "", userPasswordRequest, ts);
     }
 
     // Fill userId string when you want to encode and send userId through Query Params.
-    public ResponseObject executeUserPasswordChange(String auth, String query, String userId, UserPasswordRequest userPasswordRequest, String ts)throws Exception{
+    public ResponseObject executeUserPasswordChange(String auth, String query, String userId, UserPasswordRequest userPasswordRequest, String ts)throws SARestAPIException{
         return executePostRawRequest(auth, query, userPasswordRequest, ResponseObject.class, ts);
     }
 
     //Update User Profile
-    public <T> T executeUserProfileUpdateRequest(String auth, String query,NewUserProfile userProfile, String ts, Class<T> valueType)throws Exception{
+    public <T> T executeUserProfileUpdateRequest(String auth, String query,NewUserProfile userProfile, String ts, Class<T> valueType)throws SARestAPIException{
         return executeUserProfileUpdateRequest(auth, query, "", userProfile, ts, valueType);
     }
 
-    public <T> T executeUserProfileUpdateRequest(String auth, String query, String userId, NewUserProfile userProfile, String ts, Class<T> valueType)throws Exception{
-
-        if(client == null) {
-            createConnection();
-        }
-
-        WebTarget target = null;
-        Response response = null;
-        T responseObject =null;
-        try{
-
-            if (!userId.isBlank()) {
-                target = encodeQueryUser(query, userId);
-            }
-            else{
-                target = client.target(query);
-            }
-            response = target.request().
-                    accept(MediaType.APPLICATION_JSON).
-                    header("Authorization", auth).
-                    header("X-SA-Ext-Date", ts).
-                    put(Entity.entity(JSONUtil.convertObjectToJSON(userProfile), MediaType.APPLICATION_JSON));
-
-            responseObject=response.readEntity(valueType);
-            response.close();
-        }catch(Exception e){
-            logger.error(new StringBuilder().append("Exception Updating User Profile: \nQuery:\n\t")
-                    .append(query).append("\nError:").append(e.getMessage()).toString());
-            logger.trace("Detailed trace: ", e);
-        }
-
-        return responseObject;
-
+    public <T> T executeUserProfileUpdateRequest(String auth, String query, String userId, NewUserProfile userProfile, String ts, Class<T> valueType)throws SARestAPIException{
+        return executePutRequest(auth, query, userId, userProfile, valueType, ts);
     }
 
     //create User Profile
-    public <T> T executeUserProfileCreateRequest(String auth, String query, NewUserProfile newUserProfile, String ts, Class<T> valueType)throws Exception{
+    public <T> T executeUserProfileCreateRequest(String auth, String query, NewUserProfile newUserProfile, String ts, Class<T> valueType)throws SARestAPIException{
         return executePostRawRequest(auth, query, newUserProfile, valueType, ts);
     }
 
     //Single User to Single Group
-    public <T> T executeSingleUserToSingleGroup(String auth, String query, String ts, Class<T> valueType)throws Exception {
+    public <T> T executeSingleUserToSingleGroup(String auth, String query, String ts, Class<T> valueType)throws SARestAPIException {
         return executePostRawRequestWithoutPayload(auth, query, valueType, ts);
     }
 
     //Single User to Single Group
-    public <T> T executeSingleUserToSingleGroup(String auth, String query, String userId, String groupId, String ts, Class<T> valueType)throws Exception {
+    public <T> T executeSingleUserToSingleGroup(String auth, String query, String userId, String groupId, String ts, Class<T> valueType)throws SARestAPIException {
         return executePostRawRequestWithoutPayload(auth, query, userId, groupId, valueType, ts);
     }
 
     //Single Group Multiple Users
-    public <T> T executeGroupToUsersRequest(String auth, String query, UsersToGroup usersToGroup, String ts, Class<T> valueType)throws Exception{
+    public <T> T executeGroupToUsersRequest(String auth, String query, UsersToGroup usersToGroup, String ts, Class<T> valueType)throws SARestAPIException{
         return executePostRawRequest(auth, query, usersToGroup, valueType, ts);
 
     }
 
     //Single Group to Single User
-    public <T> T executeSingleGroupToSingleUser(String auth, String query, String ts, Class<T> valueType)throws Exception {
+    public <T> T executeSingleGroupToSingleUser(String auth, String query, String ts, Class<T> valueType)throws SARestAPIException {
         return executeSingleGroupToSingleUser(auth, query, "", "", ts, valueType);
 
     }
 
     //Single Group to Single User
-    public <T> T executeSingleGroupToSingleUser(String auth, String query, String userId, String groupId, String ts, Class<T> valueType)throws Exception {
+    public <T> T executeSingleGroupToSingleUser(String auth, String query, String userId, String groupId, String ts, Class<T> valueType)throws SARestAPIException {
         return executePostRawRequestWithoutPayload(auth, query, userId, groupId, valueType, ts);
 
     }
 
     //Single User to Multiple Groups
-    public <T> T executeUserToGroupsRequest(String auth, String query, UserToGroups userToGroups, String ts, Class<T> valueType)throws Exception{
+    public <T> T executeUserToGroupsRequest(String auth, String query, UserToGroups userToGroups, String ts, Class<T> valueType)throws SARestAPIException{
         return executePostRawRequest(auth, query, userToGroups, valueType, ts);
     }
 
     //Run NumberProfile Post
-    public NumberProfileResponse executeNumberProfilePost(String auth, String query, NumberProfileRequest numberProfileRequest, String ts)throws Exception{
+    public NumberProfileResponse executeNumberProfilePost(String auth, String query, NumberProfileRequest numberProfileRequest, String ts)throws SARestAPIException{
         return executePostRawRequest(auth, query, numberProfileRequest, NumberProfileResponse.class, ts);
     }
 
     //Run Number Profile Put
-    public BaseResponse executeNumberProfileUpdate(String auth, String query, NumberProfileUpdateRequest numberProfileUpdateRequest, String ts)throws Exception{
+    public BaseResponse executeNumberProfileUpdate(String auth, String query, NumberProfileUpdateRequest numberProfileUpdateRequest, String ts)throws SARestAPIException{
         return executePutRequest(auth, query, numberProfileUpdateRequest, ResponseObject.class, ts);
-    }
-
-    public BaseResponse getUserStatus(String userId, String ts, SAAuth saAuth) {
-        try {
-            String query = StatusQuery.queryStatus(saAuth.getRealm(), userId);
-
-            String header = RestApiHeader.getAuthorizationHeader(saAuth, Resource.METHOD_GET, query, ts);
-
-            return executeGetRequest(header, saBaseURL.getApplianceURL() + query, ts, BaseResponse.class);
-
-        } catch (Exception e) {
-            throw new SARestAPIException("Exception occurred executing get user status query", e);
-        }
-
     }
 
     // Helper function for encoding users with special characters
