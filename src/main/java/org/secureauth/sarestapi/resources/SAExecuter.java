@@ -144,7 +144,6 @@ public final class SAExecuter {
 
         WebTarget target = null;
         Response response = null;
-        T genericResponse = null;
         try {
             if (client == null) {
                 createConnection();
@@ -162,14 +161,12 @@ public final class SAExecuter {
                     header("X-SA-Ext-Date", ts).
                     get();
             //consider using response.ok(valueType).build(); instead.
-            genericResponse = response.readEntity(valueType);
-            response.close();
+            return response.readEntity(valueType);
         } catch (SARestAPIException e) {
             throw new SARestAPIException("Exception Get Request: \nQuery:\n\t" + query, e);
+        }finally {
+            response.close();
         }
-
-        return genericResponse;
-
     }
 
     private String encodedValue(String value) throws UnsupportedEncodingException {
@@ -308,8 +305,7 @@ public final class SAExecuter {
             if(Resource.METHOD_DELETE.equals(method)){
                 client.property(ClientProperties.SUPPRESS_HTTP_COMPLIANCE_VALIDATION, true);
             }
-            WebTarget target;
-            target = client.target(query);
+            WebTarget target = client.target(query);
             response = target.request().
                     accept(MediaType.APPLICATION_JSON).
                     header("Authorization", auth).
