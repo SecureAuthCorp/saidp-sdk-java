@@ -102,4 +102,11 @@ test {
     useJUnitPlatform()
 }
 
+spotbugsMain {
+    reports {
+        xml.enabled = false
+        html.enabled = true
+    }
+}
+
 test.finalizedBy( jacocoTestReport )
