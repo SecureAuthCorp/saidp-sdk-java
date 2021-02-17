@@ -20,6 +20,15 @@ public class UaOS {
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
+    public UaOS() {
+    }
+
+    public UaOS(String name, String version, Map<String, Object> additionalProperties) {
+        this.name = name;
+        this.version = version;
+        this.additionalProperties = additionalProperties;
+    }
+
     @JsonProperty("name")
     public String getName() {
         return name;

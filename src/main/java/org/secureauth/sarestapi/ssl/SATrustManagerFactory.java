@@ -6,15 +6,18 @@ import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
 import javax.net.ssl.X509TrustManager;
 import java.security.KeyStore;
+import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 
-public class SATrustManagerFactory {
+public final class SATrustManagerFactory {
+
+    private SATrustManagerFactory(){}
 
     private static final String PKIX_ALGORITHM = "PKIX";
 
-    public static TrustManager[] createTrustsManagersFor(SABaseURL saBaseURL) throws Exception {
+    public static TrustManager[] createTrustsManagersFor(SABaseURL saBaseURL) throws NoSuchAlgorithmException, KeyStoreException {
         if( saBaseURL.isSelfSigned() ) {
             // disabled impl.
             return new TrustManager[]{
@@ -25,11 +28,11 @@ public class SATrustManagerFactory {
                         }
 
                         @Override
-                        public void checkServerTrusted(X509Certificate[] chain, String authType) throws CertificateException {
+                        public void checkServerTrusted(X509Certificate[] chain, String authType) {
                         }
 
                         @Override
-                        public void checkClientTrusted(X509Certificate[] chain, String authType) throws CertificateException {
+                        public void checkClientTrusted(X509Certificate[] chain, String authType) {
                         }
                     }
             };

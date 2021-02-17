@@ -3,6 +3,7 @@ plugins {
     id 'java-library'
     id 'com.jfrog.artifactory' version '4.10.0'
     id 'jacoco'
+    id "com.github.spotbugs" version "4.6.0"
 }
 
 apply plugin: 'maven'
@@ -99,6 +100,13 @@ jacocoTestReport {
 
 test {
     useJUnitPlatform()
+}
+
+spotbugsMain {
+    reports {
+        xml.enabled = false
+        html.enabled = true
+    }
 }
 
 test.finalizedBy( jacocoTestReport )

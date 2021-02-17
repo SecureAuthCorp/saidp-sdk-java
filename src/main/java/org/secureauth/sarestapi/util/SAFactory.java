@@ -5,7 +5,9 @@ import org.secureauth.sarestapi.data.SAAuth;
 import org.secureauth.sarestapi.data.SABaseURL;
 import org.secureauth.sarestapi.resources.SAExecuter;
 
-public class SAFactory {
+public final class SAFactory {
+
+	private SAFactory(){}
 
 	private static SAAccess saAccess;
 
@@ -21,7 +23,7 @@ public class SAFactory {
 	 * @param applicationID The Application ID from the Configured Realm
 	 * @param applicationKey The Application Key from the Configured Realm
 	 */
-	public static SAAccess of(String host, String port, boolean ssl, String realm, String applicationID, String applicationKey){
+	public static synchronized SAAccess of(String host, String port, boolean ssl, String realm, String applicationID, String applicationKey){
 		if(saAccess == null){
 			SABaseURL saBaseURL =new SABaseURL(host,port,ssl);
 			SAAuth saAuth = new SAAuth(applicationID,applicationKey,realm);
@@ -45,7 +47,7 @@ public class SAFactory {
 	 * @param applicationID The Application ID from the Configured Realm
 	 * @param applicationKey The Application Key from the Configured Realm
 	 */
-	public static SAAccess of(String host, String port,boolean ssl,boolean selfSigned, String realm, String applicationID, String applicationKey){
+	public static synchronized SAAccess of(String host, String port,boolean ssl,boolean selfSigned, String realm, String applicationID, String applicationKey){
 		if(saAccess == null){
 			SABaseURL saBaseURL =new SABaseURL(host,port,ssl, selfSigned);
 			SAAuth saAuth = new SAAuth(applicationID,applicationKey,realm);
@@ -65,7 +67,7 @@ public class SAFactory {
 	 * @param saAuth {@link org.secureauth.sarestapi.data.SAAuth}
 	 * @param saExecuter {@link org.secureauth.sarestapi.resources.SAExecuter}
 	 */
-	public static SAAccess of(SABaseURL saBaseURL, SAAuth saAuth, SAExecuter saExecuter){
+	public static synchronized SAAccess of(SABaseURL saBaseURL, SAAuth saAuth, SAExecuter saExecuter){
 		if(saAccess == null){
 			saAccess = new SAAccess(saBaseURL, saAuth, saExecuter);
 		}

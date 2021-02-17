@@ -8,8 +8,8 @@ import java.io.StringWriter;
 /**
  * Created by rrowcliffe on 4/21/16.
  */
-public class XMLUtil {
-    public XMLUtil(){}
+public final class XMLUtil {
+    private XMLUtil(){}
 
     public static String convertObjectToXML(Object object){
         JAXBContext jaxbContext = null;
