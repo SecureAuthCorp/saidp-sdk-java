@@ -111,7 +111,7 @@ public class Fingerprint_ {
     @JsonProperty("fonts")
     private String fonts;
     @JsonIgnore
-    private Map<String, Object> additionalProperties = new HashMap<String, Object>();
+    private final Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
     @JsonProperty("uaBrowser")
     public UaBrowser getUaBrowser() {
