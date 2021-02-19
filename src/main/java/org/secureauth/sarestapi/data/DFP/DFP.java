@@ -22,7 +22,7 @@ public class DFP {
     @JsonProperty("fingerprint")
     private Fingerprint fingerprint;
     @JsonIgnore
-    private Map<String, Object> additionalProperties = new HashMap<String, Object>();
+    private final Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
     @JsonProperty("user_id")
     public String getUserId() {

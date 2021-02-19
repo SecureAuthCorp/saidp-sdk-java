@@ -1,5 +1,6 @@
 package org.secureauth.sarestapi;
 
+import org.secureauth.sarestapi.data.DFP.DFP;
 import org.secureauth.sarestapi.data.IPEval;
 import org.secureauth.sarestapi.data.PushAcceptStatus;
 import org.secureauth.sarestapi.data.Requests.AccessHistoryRequest;
@@ -8,6 +9,7 @@ import org.secureauth.sarestapi.data.Response.*;
 import org.secureauth.sarestapi.data.UserProfile.NewUserProfile;
 import org.secureauth.sarestapi.data.UserProfile.UserToGroups;
 import org.secureauth.sarestapi.data.UserProfile.UsersToGroup;
+import org.secureauth.sarestapi.exception.SARestAPIException;
 
 import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.NewCookie;
@@ -23,7 +25,7 @@ public interface ISAAccess {
 	 * @return {@link org.secureauth.sarestapi.data.IPEval}
 	 *
 	 */
-	IPEval iPEvaluation(String userId, String ipAddress);
+	IPEval iPEvaluation(String userId, String ipAddress) throws SARestAPIException;
 
 	/**
 	 * <p>
@@ -32,7 +34,7 @@ public interface ISAAccess {
 	 * @param userId the userid of the identity you wish to have a list of possible second factors
 	 * @return {@link FactorsResponse}
 	 */
-	FactorsResponse factorsByUser(String userId);
+	FactorsResponse factorsByUser(String userId) throws SARestAPIException;
 
 	/**
 	 * <p>
@@ -41,7 +43,7 @@ public interface ISAAccess {
 	 * @param userId the userid of the identity you wish to have a list of possible second factors. This method supports special characters for userId since it uses QP (Query Params) in order to create the request.
 	 * @return {@link FactorsResponse}
 	 */
-	FactorsResponse factorsByUserQP(String userId);
+	FactorsResponse factorsByUserQP(String userId) throws SARestAPIException;
 
 	/**
 	 * <p>
@@ -55,7 +57,7 @@ public interface ISAAccess {
 	 * @param clientDescription The Client Description
 	 * @return {@link FactorsResponse}
 	 */
-	ResponseObject sendPushToAcceptReq(String userId, String factorId, String endUserIP, String clientCompany, String clientDescription);
+	ResponseObject sendPushToAcceptReq(String userId, String factorId, String endUserIP, String clientCompany, String clientDescription) throws SARestAPIException;
 
 	/**
 	 * Send push to accept request asynchronously retrieving the cookie required to check the push notification status later.
@@ -68,9 +70,9 @@ public interface ISAAccess {
 	 * @param clientDescription The Client Description
 	 * @return {@link StatefulResponseObject}
 	 */
-	StatefulResponseObject sendPushToAcceptReqStateful(String userId, String factorId, String endUserIP, String clientCompany, String clientDescription);
+	StatefulResponseObject sendPushToAcceptReqStateful(String userId, String factorId, String endUserIP, String clientCompany, String clientDescription) throws SARestAPIException;
 
-	ResponseObject sendPushToAcceptSymbolReq(String userId, String factorId, String endUserIP, String clientCompany, String clientDescription);
+	ResponseObject sendPushToAcceptSymbolReq(String userId, String factorId, String endUserIP, String clientCompany, String clientDescription) throws SARestAPIException;
 
 	/**
 	 * Send push symbol to accept request asynchronously retrieving the cookie required to check the push notification status later.
@@ -83,7 +85,7 @@ public interface ISAAccess {
 	 * @param clientDescription The Client Description
 	 * @return {@link StatefulResponseObject}
 	 */
-	StatefulResponseObject sendPushToAcceptSymbolReqStateful(String userId, String factorId, String endUserIP, String clientCompany, String clientDescription);
+	StatefulResponseObject sendPushToAcceptSymbolReqStateful(String userId, String factorId, String endUserIP, String clientCompany, String clientDescription) throws SARestAPIException;
 
 	/**
 	 * <p>
@@ -98,7 +100,7 @@ public interface ISAAccess {
 	 * @param clientDescription The Client Description
 	 * @return {@link FactorsResponse}
 	 */
-	ResponseObject sendPushBiometricReq(String biometricType, String userId, String factorId, String endUserIP, String clientCompany, String clientDescription);
+	ResponseObject sendPushBiometricReq(String biometricType, String userId, String factorId, String endUserIP, String clientCompany, String clientDescription) throws SARestAPIException;
 
 	/**
 	 * Send push to accept request asynchronously retrieving the cookie required to check the push notification status later.
@@ -112,7 +114,7 @@ public interface ISAAccess {
 	 * @param clientDescription The Client Description
 	 * @return {@link StatefulResponseObject}
 	 */
-	StatefulResponseObject sendPushBiometricReqStateful(String biometricType, String userId, String factorId, String endUserIP, String clientCompany, String clientDescription);
+	StatefulResponseObject sendPushBiometricReqStateful(String biometricType, String userId, String factorId, String endUserIP, String clientCompany, String clientDescription) throws SARestAPIException;
 
 	/**
 	 * <p>
@@ -122,9 +124,9 @@ public interface ISAAccess {
 	 * @param endUserIP the IP of requesting client
 	 * @return {@link FactorsResponse}
 	 */
-	AdaptiveAuthResponse adaptiveAuthQuery(String userId, String endUserIP);
+	AdaptiveAuthResponse adaptiveAuthQuery(String userId, String endUserIP) throws SARestAPIException;
 
-	PushAcceptStatus queryPushAcceptStatus(String refId);
+	PushAcceptStatus queryPushAcceptStatus(String refId)  throws SARestAPIException;
 
 	/**
 	 * Perform push notification status query in mode stateful using the session affinity cookie.
@@ -133,7 +135,7 @@ public interface ISAAccess {
 	 * @param cookie the the session affinity cookie.
 	 * @return {@link PushAcceptStatus}
 	 */
-	PushAcceptStatus queryPushAcceptStatusStateful(String refId, Cookie cookie);
+	PushAcceptStatus queryPushAcceptStatusStateful(String refId, Cookie cookie)  throws SARestAPIException;
 
 	/**
 	 *
@@ -143,7 +145,7 @@ public interface ISAAccess {
 	 * @param userId the userid of the identity
 	 * @return {@link ResponseObject}
 	 */
-	BaseResponse validateUser(String userId);
+	BaseResponse validateUser(String userId) throws SARestAPIException;
 
 	/**
 	 * the OTP throttling count to 0 after the end-user successfully authenticates;
@@ -151,7 +153,7 @@ public interface ISAAccess {
 	 * @param userId id of user
 	 * @return base answer
 	 */
-	ThrottleResponse resetThrottleReq(String userId);
+	ThrottleResponse resetThrottleReq(String userId) throws SARestAPIException;
 
 	/**
 	 * the OTP throttling count to 0 after the end-user successfully authenticates;
@@ -160,21 +162,21 @@ public interface ISAAccess {
 	 * @param userId id of user
 	 * @return base answer
 	 */
-	ThrottleResponse resetThrottleReqQP(String userId);
+	ThrottleResponse resetThrottleReqQP(String userId) throws SARestAPIException;
 
 	/**
 	 * GET the end-user's current count of OTP usage attempts
 	 * @param userId id of user
 	 * @return base answer
 	 */
-	ThrottleResponse getThrottleReq(String userId);
+	ThrottleResponse getThrottleReq(String userId) throws SARestAPIException;
 	
 	/**
 	 * GET the end-user's current count of OTP usage attempts
 	 * @param userId id of user. This method supports special characters for userId since it uses QP (Query Params) in order to create the request.
 	 * @return base answer
 	 */
-	ThrottleResponse getThrottleReqQP(String userId);
+	ThrottleResponse getThrottleReqQP(String userId) throws SARestAPIException;
 
 	/**
 	 * <p>
@@ -184,7 +186,7 @@ public interface ISAAccess {
 	 * @param password The password of the user to validate
 	 * @return {@link ResponseObject}
 	 */
-	BaseResponse validateUserPassword(String userId, String password);
+	BaseResponse validateUserPassword(String userId, String password) throws SARestAPIException;
 
 	/**
 	 * <p>
@@ -194,7 +196,7 @@ public interface ISAAccess {
 	 * @param pin The pin of the user to validate
 	 * @return {@link ResponseObject}
 	 */
-	BaseResponse validateUserPin(String userId, String pin);
+	BaseResponse validateUserPin(String userId, String pin) throws SARestAPIException;
 
 	/**
 	 * <p>
@@ -205,7 +207,7 @@ public interface ISAAccess {
 	 * @param factorId the KB Id to be compared against
 	 * @return {@link ResponseObject}
 	 */
-	BaseResponse validateKba(String userId, String answer, String factorId);
+	BaseResponse validateKba(String userId, String answer, String factorId) throws SARestAPIException;
 
 	/**
 	 *<p>
@@ -216,7 +218,7 @@ public interface ISAAccess {
 	 * @param factorId The Device Identifier
 	 * @return {@link ResponseObject}
 	 */
-	BaseResponse validateOath(String userId, String otp, String factorId);
+	BaseResponse validateOath(String userId, String otp, String factorId) throws SARestAPIException;
 
 	/**
 	 * <p>
@@ -226,7 +228,7 @@ public interface ISAAccess {
 	 * @param factorId  Phone Property   "Phone1"
 	 * @return {@link ResponseObject}
 	 */
-	ResponseObject deliverOTPByPhone(String userId, String factorId);
+	ResponseObject deliverOTPByPhone(String userId, String factorId) throws SARestAPIException;
 
 	/**
 	 * <p>
@@ -236,7 +238,7 @@ public interface ISAAccess {
 	 * @param phoneNumber  Phone Number to call
 	 * @return {@link ResponseObject}
 	 */
-	ResponseObject deliverAdHocOTPByPhone(String userId, String phoneNumber);
+	ResponseObject deliverAdHocOTPByPhone(String userId, String phoneNumber) throws SARestAPIException;
 
 	/**
 	 * <p>
@@ -246,7 +248,7 @@ public interface ISAAccess {
 	 * @param factorId  Phone Property   "Phone1"
 	 * @return {@link ResponseObject}
 	 */
-	ResponseObject deliverOTPBySMS(String userId, String factorId);
+	ResponseObject deliverOTPBySMS(String userId, String factorId) throws SARestAPIException;
 
 	/**
 	 * <p>
@@ -256,7 +258,7 @@ public interface ISAAccess {
 	 * @param otp  OTP Value to compare against what was sent
 	 * @return {@link ValidateOTPResponse}
 	 */
-	ValidateOTPResponse validateOTP(String userId, String otp);
+	ValidateOTPResponse validateOTP(String userId, String otp) throws SARestAPIException;
 
 	/**
 	 * <p>
@@ -266,7 +268,7 @@ public interface ISAAccess {
 	 * @param phoneNumber  Phone Number to send SMS to
 	 * @return {@link ResponseObject}
 	 */
-	ResponseObject deliverAdHocOTPBySMS(String userId, String phoneNumber);
+	ResponseObject deliverAdHocOTPBySMS(String userId, String phoneNumber) throws SARestAPIException;
 
 	/**
 	 * <p>
@@ -276,7 +278,7 @@ public interface ISAAccess {
 	 * @param factorId  Help Desk Property   "HelpDesk1"
 	 * @return {@link ResponseObject}
 	 */
-	ResponseObject deliverHelpDeskOTPByEmail(String userId, String factorId);
+	ResponseObject deliverHelpDeskOTPByEmail(String userId, String factorId) throws SARestAPIException;
 
 	/**
 	 * <p>
@@ -286,7 +288,7 @@ public interface ISAAccess {
 	 * @param factorId  Email Property   "Email1"
 	 * @return {@link ResponseObject}
 	 */
-	ResponseObject deliverOTPByEmail(String userId, String factorId);
+	ResponseObject deliverOTPByEmail(String userId, String factorId) throws SARestAPIException;
 
 	/**
 	 * <p>
@@ -296,7 +298,7 @@ public interface ISAAccess {
 	 * @param emailAddress  Email Address
 	 * @return {@link ResponseObject}
 	 */
-	ResponseObject deliverAdHocOTPByEmail(String userId, String emailAddress);
+	ResponseObject deliverAdHocOTPByEmail(String userId, String emailAddress) throws SARestAPIException;
 
 	/**
 	 * <p>
@@ -306,7 +308,7 @@ public interface ISAAccess {
 	 * @param factorId  Device Property   "z0y9x87wv6u5t43srq2p1on"
 	 * @return {@link ResponseObject}
 	 */
-	ResponseObject deliverOTPByPush(String userId, String factorId);
+	ResponseObject deliverOTPByPush(String userId, String factorId) throws SARestAPIException;
 
 	/**
 	 * <p>
@@ -316,7 +318,7 @@ public interface ISAAccess {
 	 * @param factorId  Help Desk Property   "HelpDesk1"
 	 * @return {@link ResponseObject}
 	 */
-	ResponseObject deliverOTPByHelpDesk(String userId, String factorId);
+	ResponseObject deliverOTPByHelpDesk(String userId, String factorId) throws SARestAPIException;
 
 	/**
 	 * <p>
@@ -326,7 +328,7 @@ public interface ISAAccess {
 	 * @param factorId  Email Property "Email1"
 	 * @return {@link StatefulResponseObject}
 	 */
-	StatefulResponseObject emailLink(String userId, String factorId);
+	StatefulResponseObject emailLink(String userId, String factorId) throws SARestAPIException;
 
 	/**
 	 * <p>
@@ -336,7 +338,7 @@ public interface ISAAccess {
 	 * @param factorId  Phone Property "Phone1"
 	 * @return {@link StatefulResponseObject}
 	 */
-	StatefulResponseObject smsLink(String userId, String factorId);
+	StatefulResponseObject smsLink(String userId, String factorId) throws SARestAPIException;
 
 	/**
 	 * <p>
@@ -345,7 +347,7 @@ public interface ISAAccess {
 	 * @param linkId the id provided when making a link to accept request
 	 * @return {@link PushAcceptStatus}
 	 */
-	PushAcceptStatus verifyLinkToAcceptStatus(String linkId, Cookie cookie);
+	PushAcceptStatus verifyLinkToAcceptStatus(String linkId, Cookie cookie) throws SARestAPIException;
 
 	/**
 	 * <p>
@@ -356,7 +358,7 @@ public interface ISAAccess {
 	 * @return {@link AccessHistoryRequest}
 	 *
 	 */
-	ResponseObject accessHistory(String userId, String ipAddress);
+	ResponseObject accessHistory(String userId, String ipAddress) throws SARestAPIException;
 
 	/**
 	 * <p>
@@ -367,7 +369,7 @@ public interface ISAAccess {
 	 * @return {@link DFPConfirmResponse}
 	 *
 	 */
-	DFPConfirmResponse DFPConfirm(String userId, String fingerprintId);
+	DFPConfirmResponse DFPConfirm(String userId, String fingerprintId) throws SARestAPIException;
 
 	/**
 	 * <p>
@@ -379,7 +381,10 @@ public interface ISAAccess {
 	 * @return {@link DFPValidateResponse}
 	 *
 	 */
-	DFPValidateResponse DFPValidateNewFingerprint(String userId, String hostAddress, String jsonString);
+	@Deprecated
+	DFPValidateResponse DFPValidateNewFingerprint(String userId, String hostAddress, String jsonString) throws SARestAPIException;
+
+	DFPValidateResponse DFPValidateNewFingerprint(DFP fingerprint) throws SARestAPIException;
 
 	/**
 	 * <p>
@@ -395,7 +400,7 @@ public interface ISAAccess {
 	 * </p>
 	 * @return {@link JSObjectResponse}
 	 */
-	JSObjectResponse BehaveBioJSSrc();
+	JSObjectResponse BehaveBioJSSrc() throws SARestAPIException;
 
 	/**
 	 * <p>
@@ -409,7 +414,7 @@ public interface ISAAccess {
 	 * @return {@link BehaveBioResponse}
 	 *
 	 */
-	BehaveBioResponse BehaveBioProfileSubmit(String userId, String behaviorProfile, String hostAddress, String userAgent);
+	BehaveBioResponse BehaveBioProfileSubmit(String userId, String behaviorProfile, String hostAddress, String userAgent) throws SARestAPIException;
 
 	/**
 	 * <p>
@@ -423,7 +428,7 @@ public interface ISAAccess {
 	 * @return {@link ResponseObject}
 	 *
 	 */
-	ResponseObject BehaveBioProfileReset(String userId, String fieldName, String fieldType, String deviceType);
+	ResponseObject BehaveBioProfileReset(String userId, String fieldName, String fieldType, String deviceType) throws SARestAPIException;
 
 	/**
 	 * <p>
@@ -432,7 +437,7 @@ public interface ISAAccess {
 	 * @param newUserProfile The newUserProfile Object
 	 * @return {@link ResponseObject}
 	 */
-	ResponseObject createUser(NewUserProfile newUserProfile);
+	ResponseObject createUser(NewUserProfile newUserProfile) throws SARestAPIException;
 
 	/**
 	 * <p>
@@ -442,7 +447,7 @@ public interface ISAAccess {
 	 * @param userProfile The User'sProfile Object to be updated
 	 * @return {@link ResponseObject}
 	 */
-	ResponseObject updateUser(String userId, NewUserProfile userProfile);
+	ResponseObject updateUser(String userId, NewUserProfile userProfile) throws SARestAPIException;
 	
 	/**
 	 * <p>
@@ -453,7 +458,7 @@ public interface ISAAccess {
 	 * @param userProfile The User'sProfile Object to be updated
 	 * @return {@link ResponseObject}
 	 */
-	ResponseObject updateUserQP(String userId, NewUserProfile userProfile);
+	ResponseObject updateUserQP(String userId, NewUserProfile userProfile) throws SARestAPIException;
 
 	/**
 	 * <p>
@@ -464,7 +469,7 @@ public interface ISAAccess {
 	 * @param deleteRelatedData TRUE for complete delete, FALSE for only logical.
 	 * @return {@link ResponseObject}
 	 */
-	BaseResponse deleteUser(String userId, String domain, boolean deleteRelatedData);
+	BaseResponse deleteUser(String userId, String domain, boolean deleteRelatedData) throws SARestAPIException;
 
 	/**
 	 * <p>
@@ -474,7 +479,7 @@ public interface ISAAccess {
 	 * @param groupName The Name of the group to associate the user to
 	 * @return {@link GroupAssociationResponse}
 	 */
-	ResponseObject addUserToGroup(String userId, String groupName);
+	ResponseObject addUserToGroup(String userId, String groupName) throws SARestAPIException;
 
 	/**
 	 * <p>
@@ -484,7 +489,7 @@ public interface ISAAccess {
 	 * @param groupName The Name of the group to associate the user to
 	 * @return {@link GroupAssociationResponse}
 	 */
-	ResponseObject addUserToGroupQP(String userId, String groupName);
+	ResponseObject addUserToGroupQP(String userId, String groupName) throws SARestAPIException;
 
 	/**
 	 * <p>
@@ -494,7 +499,7 @@ public interface ISAAccess {
 	 * @param groupName The Name of the group to associate the user to
 	 * @return {@link GroupAssociationResponse}
 	 */
-	GroupAssociationResponse addUsersToGroup(UsersToGroup usersToGroup, String groupName);
+	GroupAssociationResponse addUsersToGroup(UsersToGroup usersToGroup, String groupName) throws SARestAPIException;
 
 	/**
 	 * <p>
@@ -504,7 +509,7 @@ public interface ISAAccess {
 	 * @param userId The userId to associate to the group
 	 * @return {@link GroupAssociationResponse}
 	 */
-	GroupAssociationResponse addGroupToUser(String groupName, String userId);
+	GroupAssociationResponse addGroupToUser(String groupName, String userId) throws SARestAPIException;
 
 	/**
 	 * <p>
@@ -514,7 +519,7 @@ public interface ISAAccess {
 	 * @param userId The userId to associate to the group. This method supports special characters for userId since it uses QP (Query Params) in order to create the request.
 	 * @return {@link GroupAssociationResponse}
 	 */
-	GroupAssociationResponse addGroupToUserQP(String groupName, String userId);
+	GroupAssociationResponse addGroupToUserQP(String groupName, String userId) throws SARestAPIException;
 
 	/**
 	 * <p>
@@ -524,7 +529,7 @@ public interface ISAAccess {
 	 * @param userToGroups The UserToGroups Object holding the list of groups to associate to the user
 	 * @return {@link GroupAssociationResponse}
 	 */
-	GroupAssociationResponse addUserToGroups(String userId, UserToGroups userToGroups);
+	GroupAssociationResponse addUserToGroups(String userId, UserToGroups userToGroups) throws SARestAPIException;
 
 	/**
 	 * <p>
@@ -533,7 +538,7 @@ public interface ISAAccess {
 	 * @param userId the userid of the identity you wish to have a list of possible second factors
 	 * @return {@link UserProfileResponse}
 	 */
-	UserProfileResponse getUserProfile(String userId);
+	UserProfileResponse getUserProfile(String userId) throws SARestAPIException;
 
 	/**
 	 * <p>
@@ -542,7 +547,7 @@ public interface ISAAccess {
 	 * @param userId the userid of the identity you wish to have a list of possible second factors. This method supports special characters for userId since it uses QP (Query Params) in order to create the request.
 	 * @return {@link UserProfileResponse}
 	 */
-	UserProfileResponse getUserProfileQP(String userId);
+	UserProfileResponse getUserProfileQP(String userId) throws SARestAPIException;
 
 	/**
 	 * <p>
@@ -552,7 +557,7 @@ public interface ISAAccess {
 	 * @param password the users new password
 	 * @return {@link ResponseObject}
 	 */
-	ResponseObject passwordReset(String userId, String password);
+	ResponseObject passwordReset(String userId, String password) throws SARestAPIException;
 
 	/**
 	 * <p>
@@ -562,7 +567,7 @@ public interface ISAAccess {
 	 * @param password the users new password
 	 * @return {@link ResponseObject}
 	 */
-	ResponseObject passwordResetQP(String userId, String password);
+	ResponseObject passwordResetQP(String userId, String password) throws SARestAPIException;
 
 	/**
 	 * <p>
@@ -573,7 +578,7 @@ public interface ISAAccess {
 	 * @param newPassword the users new Password
 	 * @return {@link ResponseObject}
 	 */
-	ResponseObject passwordChange(String userId, String currentPassword, String newPassword);
+	ResponseObject passwordChange(String userId, String currentPassword, String newPassword) throws SARestAPIException;
 
 	/**
 	 * <p>
@@ -584,7 +589,7 @@ public interface ISAAccess {
 	 * @param newPassword the users new Password
 	 * @return {@link ResponseObject}
 	 */
-	ResponseObject passwordChangeQP(String userId, String currentPassword, String newPassword);
+	ResponseObject passwordChangeQP(String userId, String currentPassword, String newPassword) throws SARestAPIException;
 
 	/**
 	 * <p>
@@ -596,7 +601,7 @@ public interface ISAAccess {
 	 * @return {@link NumberProfileResponse}
 	 *
 	 */
-	NumberProfileResponse PhoneNumberProfileSubmit(String userId, String phoneNumber);
+	NumberProfileResponse PhoneNumberProfileSubmit(String userId, String phoneNumber) throws SARestAPIException;
 
 	/**
 	 * <p>
@@ -613,21 +618,21 @@ public interface ISAAccess {
 	 * @return {@link BaseResponse}
 	 *
 	 */
-	BaseResponse UpdatePhoneNumberProfile(String userId, String phoneNumber, String portedStatus, String carrierCode, String carrier, String countryCode, String networkType);
+	BaseResponse UpdatePhoneNumberProfile(String userId, String phoneNumber, String portedStatus, String carrierCode, String carrier, String countryCode, String networkType) throws SARestAPIException;
 
 	/**
 	 * Retrieves the user's status from the username in the endpoint URL and returns a response.
 	 * @param userId The User ID that you want to validate
 	 * @return {@link BaseResponse}
 	 */
-	BaseResponse getUserStatus(String userId);
+	BaseResponse getUserStatus(String userId) throws SARestAPIException;
 
 	/**
 	 * Retrieves the user's status from the username in the endpoint URL and returns a response.
 	 * @param userId The User ID that you want to validate. This method supports special characters for userId since it uses QP (Query Params) in order to create the request.
 	 * @return {@link BaseResponse}
 	 */
-	BaseResponse getUserStatusQP(String userId);
+	BaseResponse getUserStatusQP(String userId) throws SARestAPIException;
 
 	/**
 	 * Method invokes a status to the user Id.
@@ -635,7 +640,7 @@ public interface ISAAccess {
 	 * @param status The new status [lock, unlock, enable, disable]
 	 * @return {@link BaseResponse}
 	 */
-	BaseResponse setUserStatus(String userId, String status);
+	BaseResponse setUserStatus(String userId, String status) throws SARestAPIException;
 
 	/**
 	 * Method invokes a status to the user Id.
@@ -643,7 +648,7 @@ public interface ISAAccess {
 	 * @param status The new status [lock, unlock, enable, disable]
 	 * @return {@link BaseResponse}
 	 */
-	BaseResponse setUserStatusQP(String userId, String status);
+	BaseResponse setUserStatusQP(String userId, String status) throws SARestAPIException;
 
 	/**
 	 * Retrieves score from fingerprint, user and host.
@@ -653,8 +658,10 @@ public interface ISAAccess {
 	 * @param fingerPrintJSON Descriptive name derived from the user_agent string
 	 * @return {@link DFPValidateResponse}
 	 */
-	DFPValidateResponse DFPScoreFingerprint(String userId, String hostAddress, String fingerprintId, String fingerPrintJSON);
+	@Deprecated
+	DFPValidateResponse DFPScoreFingerprint(String userId, String hostAddress, String fingerprintId, String fingerPrintJSON) throws SARestAPIException;
 
+	DFPValidateResponse DFPScoreFingerprint(DFP fingerprint) throws SARestAPIException;
 	/**
 	 * Method to complete the user account profile in the directory
 	 * @param userId User ID provided
@@ -663,7 +670,7 @@ public interface ISAAccess {
 	 * @param fingerPrintJSON Descriptive name derived from the user_agent string
 	 * @return {@link DFPValidateResponse}
 	 */
-	DFPValidateResponse DFPSaveFingerprint(String userId, String hostAddress, String fingerprintId, String fingerPrintJSON);
+	DFPValidateResponse DFPSaveFingerprint(String userId, String hostAddress, String fingerprintId, String fingerPrintJSON) throws SARestAPIException;
 
 	/**
 	 * This method will send a authenticated transaction result to Idp for the specified userId.
@@ -703,6 +710,5 @@ public interface ISAAccess {
 	 * OTHER
 	 * @return {@link BaseResponse}
 	 */
-	BaseResponse notifyAuthenticated(String userId, String result, String mfa);
-
+	BaseResponse notifyAuthenticated(String userId, String result, String mfa) throws SARestAPIException;
 }

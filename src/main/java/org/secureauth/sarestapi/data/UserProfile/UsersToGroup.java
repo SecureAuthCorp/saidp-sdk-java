@@ -8,7 +8,7 @@ public class UsersToGroup {
 
     public UsersToGroup(){}
 
-    public UsersToGroup(String[] userIds) {
+    public UsersToGroup(String... userIds) {
         this.userIds = userIds;
     }
 
@@ -16,7 +16,7 @@ public class UsersToGroup {
         return userIds;
     }
 
-    public void setUserIds(String[] userIds) {
+    public void setUserIds(String... userIds) {
         this.userIds = userIds;
     }
 }

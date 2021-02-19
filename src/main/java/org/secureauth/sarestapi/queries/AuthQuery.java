@@ -22,24 +22,19 @@ IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
 OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-public class AuthQuery {
+public final class AuthQuery {
 
+    private AuthQuery(){}
 
     public static String queryAuth(String realm){
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(realm).append(Resource.APPLIANCE_AUTH);
-        return stringBuilder.toString();
+        return realm + Resource.APPLIANCE_AUTH;
     }
     
     public static String queryAAuth(String realm){
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(realm).append(Resource.APPLIANCE_AAUTH);
-        return stringBuilder.toString();
+        return realm + Resource.APPLIANCE_AAUTH;
     }
 
     public static String queryAuthLink(String realm, String linkId){
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(realm).append(Resource.APPLIANCE_AUTH_LINK).append(linkId);
-        return stringBuilder.toString();
+        return realm + Resource.APPLIANCE_AUTH_LINK + linkId;
     }
 }

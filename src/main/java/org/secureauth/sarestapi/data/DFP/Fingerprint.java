@@ -15,7 +15,7 @@ public class Fingerprint {
     @JsonProperty("fingerprint")
     private Fingerprint_ fingerprint;
     @JsonIgnore
-    private Map<String, Object> additionalProperties = new HashMap<String, Object>();
+    private final Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
     @JsonProperty("fingerprint")
     public Fingerprint_ getFingerprint() {
