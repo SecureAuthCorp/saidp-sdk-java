@@ -1,5 +1,7 @@
 package org.secureauth.sarestapi.data.UserProfile;
 
+import java.util.Arrays;
+
 /**
  * Created by rrowcliffe on 5/8/16.
  */
@@ -13,7 +15,7 @@ public class UsersToGroup {
     }
 
     public String[] getUserIds() {
-        return userIds;
+        return Arrays.copyOf(userIds, userIds.length);
     }
 
     public void setUserIds(String... userIds) {
