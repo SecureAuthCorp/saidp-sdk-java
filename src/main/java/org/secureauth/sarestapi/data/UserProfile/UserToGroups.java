@@ -15,10 +15,10 @@ public class UserToGroups {
     }
 
     public String[] getGroupNames() {
-        return Arrays.copyOf(groupNames, groupNames.length);
+        return groupNames.clone();
     }
 
     public void setGroupNames(String... groupNames) {
-        this.groupNames = groupNames;
+        this.groupNames = Arrays.copyOf(groupNames, groupNames.length);
     }
 }

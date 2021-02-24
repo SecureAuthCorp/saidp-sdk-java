@@ -15,10 +15,10 @@ public class UsersToGroup {
     }
 
     public String[] getUserIds() {
-        return Arrays.copyOf(userIds, userIds.length);
+        return userIds.clone();
     }
 
     public void setUserIds(String... userIds) {
-        this.userIds = userIds;
+        this.userIds = Arrays.copyOf(userIds, userIds.length);
     }
 }
