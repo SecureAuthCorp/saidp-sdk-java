@@ -116,11 +116,11 @@ public final class SAExecuter {
     }
 
     //Get Factors for the user requested
-    public <T> T executeGetRequest(String auth, String query, String ts, Class<T> valueType) throws Exception {
+    public <T> T executeGetRequest(String auth, String query, String ts, Class<T> valueType) throws SARestAPIException {
         return executeGetRequest(auth, query, "", ts, valueType);
     }
 
-    public <T> T executeGetRequestStateful(String auth, Cookie ingressCookie, String query, String ts, Class<T> valueType) {
+    public <T> T executeGetRequestStateful(String auth, Cookie ingressCookie, String query, String ts, Class<T> valueType) throws SARestAPIException {
         try {
             if (client == null) {
                 createConnection();
@@ -173,7 +173,7 @@ public final class SAExecuter {
         return URLEncoder.encode(value, StandardCharsets.UTF_8.toString());
     }
 
-    public <T> T executeGetRequest(SAAuth saAuth, String baseUrl, String query, String ts, Class<T> valueType) throws Exception {
+    public <T> T executeGetRequest(SAAuth saAuth, String baseUrl, String query, String ts, Class<T> valueType) throws SARestAPIException {
 
         String header = RestApiHeader.getAuthorizationHeader(saAuth, Resource.METHOD_GET, query, ts);
 
@@ -206,7 +206,7 @@ public final class SAExecuter {
         }
     }
 
-    public <T extends StatefulResponseObject> T executePostRequestStateful(String auth,String query, AuthRequest authRequest,String ts, Class<T> valueType)throws Exception {
+    public <T extends StatefulResponseObject> T executePostRequestStateful(String auth,String query, AuthRequest authRequest,String ts, Class<T> valueType)throws SARestAPIException {
         Response response = null;
         try {
             if (client == null) {
@@ -495,7 +495,7 @@ public final class SAExecuter {
     }
 
     //Run BehaveBio Put
-    public ResponseObject executeBehaveBioReset(String auth, String query, BehaveBioResetRequest behaveBioResetRequest, String ts)throws Exception{
+    public ResponseObject executeBehaveBioReset(String auth, String query, BehaveBioResetRequest behaveBioResetRequest, String ts)throws SARestAPIException{
         return executePutRequest(auth, query, behaveBioResetRequest, ResponseObject.class, ts);
     }
 
