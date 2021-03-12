@@ -44,7 +44,7 @@ import javax.ws.rs.core.Cookie;
  * </p>
  */
 
-public final class SAAccess implements ISAAccess{
+public class SAAccess implements ISAAccess{
     private static final String PUSH_TO_ACCEPT = "push_accept";
     private static final String SYMBOL_TO_ACCEPT = "push_accept_symbol";
     private static final Logger logger = LoggerFactory.getLogger(SAAccess.class);
