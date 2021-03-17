@@ -69,7 +69,7 @@ public class Main {
                 new SAAuth( apiApplicationId, apiApplicationKey, realm ),
                 new SAExecuter( saBaseURL )
         );
-        final DiagnosticApi diagnosticApi = DIAGNOSTIC_APIS.getOrDefault( serviceName, new NoImplementedYetApi(serviceName) );
+        final DiagnosticApi diagnosticApi = DIAGNOSTIC_APIS.getOrDefault( serviceName, new NoImplementedYetApi( serviceName, DIAGNOSTIC_APIS.keySet() ) );
         // request for help.
         if( ! params.getOrDefault( "help", "" ).isEmpty() ) {
             System.out.println( "------------------------------" );
