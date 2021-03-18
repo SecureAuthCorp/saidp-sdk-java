@@ -39,7 +39,7 @@ public class Main {
         DIAGNOSTIC_APIS.put( "v1.users.profile.qp", new UsersProfileQPApi() );
     }
 
-    public static void main(String [] args) throws InterruptedException, ExecutionException {
+    public static void main(String [] args) {
         final Parameters params = new Parameters( args, PARAMETER_VALUE_DELIMITER );
         final String serviceName = params.getMandatory( PARAMETER_KEY_SERVICE );
 
@@ -92,6 +92,9 @@ public class Main {
             System.out.println( future.get() );
         } catch (ExecutionException exc) {
             System.err.println( exc.getMessage() );
+            if( Boolean.parseBoolean( params.getOrDefault( "stacktrace", "false" ) ) ) {
+                exc.printStackTrace( System.err );
+            }
         } catch (Exception exc) {
             exc.printStackTrace( System.err );
         } finally {

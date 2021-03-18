@@ -4,6 +4,7 @@ import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
 
 import java.util.Map;
+import java.util.stream.Stream;
 
 public class Parameters {
     private final Map<String, String> paramsMap;
@@ -29,8 +30,7 @@ public class Parameters {
         for(int paramNumber=0; paramNumber < args.length; paramNumber++) {
             String[] paramAndValue = args[ paramNumber ].split( delimiter );
             // help is used for service information.
-            if ( "help".equalsIgnoreCase(args[ paramNumber ] ) ) {
-                params.put( paramAndValue[0], "true");
+            if ( addParameterAsFlagIfApply( args[ paramNumber ], params, "help", "stacktrace" ) ) {
                 continue;
             }
             if( paramAndValue.length != 2) {
@@ -41,5 +41,13 @@ public class Parameters {
             params.put( paramAndValue[0], paramAndValue[1]);
         }
         return params;
+    }
+
+    private static boolean addParameterAsFlagIfApply(final String currentParam, Map<String, String> params, String ...flagNames) {
+        if ( Stream.of( flagNames ).anyMatch( name -> name.equalsIgnoreCase( currentParam ) ) ) {
+            params.put( currentParam, "true" );
+            return true;
+        }
+        return false;
     }
 }
