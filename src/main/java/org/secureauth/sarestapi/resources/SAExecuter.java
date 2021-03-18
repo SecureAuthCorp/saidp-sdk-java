@@ -162,10 +162,10 @@ public class SAExecuter {
                     get();
             //consider using response.ok(valueType).build(); instead.
             return response.readEntity(valueType);
-        } catch (SARestAPIException e) {
+        } catch (Exception e) {
             throw new SARestAPIException("Exception Get Request: \nQuery:\n\t" + query, e);
         }finally {
-            response.close();
+            closeResponseSafe( response );
         }
     }
 
@@ -202,7 +202,7 @@ public class SAExecuter {
             throw new SARestAPIException("Exception Delivering OTP by Push: \nQuery:\n\t" +
                     query + "\nError:" + e.getMessage(), e);
         }finally {
-            response.close();
+            closeResponseSafe( response );
         }
     }
 
@@ -228,7 +228,7 @@ public class SAExecuter {
             throw new SARestAPIException("Exception Delivering Push Notifiation: \nQuery:\n\t" +
                     query + "\nError:" + e.getMessage(), e);
         } finally {
-            response.close();
+            closeResponseSafe( response );
         }
     }
 
@@ -262,7 +262,7 @@ public class SAExecuter {
         }catch(SARestAPIException e){
             throw new SARestAPIException("Exception Put Request: \nQuery:\n\t" + query + "\n", e);
         }finally {
-            response.close();
+            closeResponseSafe( response );
         }
     }
 
@@ -289,10 +289,10 @@ public class SAExecuter {
                     header("X-SA-Ext-Date", ts).
                     post(Entity.entity(JSONUtil.convertObjectToJSON(authRequest),MediaType.APPLICATION_JSON));
             return response.readEntity(valueType);
-        }catch(SARestAPIException e){
+        }catch(Exception e){
             throw new SARestAPIException("Exception Post Request: \nQuery:\n\t" + query, e);
         }finally {
-            response.close();
+            closeResponseSafe( response );
         }
     }
 
@@ -320,7 +320,7 @@ public class SAExecuter {
             if(Resource.METHOD_DELETE.equals(method)){
                 client.property(ClientProperties.SUPPRESS_HTTP_COMPLIANCE_VALIDATION, false);
             }
-            response.close();
+            closeResponseSafe( response );
         }
     }
 
@@ -352,10 +352,10 @@ public class SAExecuter {
                     header("X-SA-Ext-Date", ts).
                     post(Entity.entity("",MediaType.APPLICATION_JSON));
             return response.readEntity(valueType);
-        }catch(SARestAPIException e){
+        }catch(Exception e){
             throw new SARestAPIException("Exception Post Request: \nQuery:\n\t" + query, e);
         }finally {
-            response.close();
+            closeResponseSafe( response );
         }
     }
 
@@ -386,7 +386,7 @@ public class SAExecuter {
         }catch(Exception e){
             throw new SARestAPIException("Exception getting User Factors: \nQuery:\n\t" + query, e);
         }finally {
-            response.close();
+            closeResponseSafe( response );
         }
     }
 
@@ -596,4 +596,9 @@ public class SAExecuter {
         }
     }
 
+    private void closeResponseSafe(Response response) {
+        if( response != null ) {
+            response.close();
+        }
+    }
 }
