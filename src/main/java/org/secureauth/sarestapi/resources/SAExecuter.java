@@ -515,7 +515,7 @@ public class SAExecuter {
 
     // Fill userId string when you want to encode and send userId through Query Params.
     public ResponseObject executeUserPasswordChange(String auth, String query, String userId, UserPasswordRequest userPasswordRequest, String ts)throws SARestAPIException{
-        return executePostRawRequest(auth, query, userPasswordRequest, ResponseObject.class, ts);
+        return executePostRawRequest(auth, query, userId, "", userPasswordRequest, ResponseObject.class, ts);
     }
 
     //Update User Profile
