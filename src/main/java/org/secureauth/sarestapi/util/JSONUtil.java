@@ -1,12 +1,9 @@
 package org.secureauth.sarestapi.util;
 
-
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import org.secureauth.sarestapi.data.DFP.DFP;
 import org.secureauth.sarestapi.data.Requests.DFPValidateRequest;
-import org.secureauth.sarestapi.resources.SAExecuter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

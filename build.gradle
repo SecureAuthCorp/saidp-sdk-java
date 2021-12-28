@@ -1,11 +1,12 @@
 
 plugins {
-    id 'java-library'
+    id 'java'
+    id 'application'
     id 'com.jfrog.artifactory' version '4.10.0'
     id 'jacoco'
-    id "com.github.spotbugs" version "4.6.0"
 }
 
+apply plugin: 'eclipse'
 apply plugin: 'maven'
 apply plugin: 'maven-publish'
 
@@ -55,9 +56,11 @@ dependencies {
     implementation('javax.activation:activation:1.1')
 
     implementation 'org.slf4j:slf4j-api:1.7.28'
-    implementation 'org.apache.logging.log4j:log4j-core:2.5'
-    annotationProcessor 'org.apache.logging.log4j:log4j-core:2.5'
-
+	
+	// this two lines includes log4j 2.5 modified jar with workaround for log4shell exploit (needs log4j-core)
+    implementation fileTree(dir: 'libs', include: '*.jar')
+	annotationProcessor fileTree(dir: 'libs', include: '*.jar')
+	
     testImplementation 'junit:junit:4.12'
     testImplementation 'com.google.guava:guava:11.0.2'
     testImplementation 'org.junit.jupiter:junit-jupiter-engine:5.1.0'
@@ -68,6 +71,19 @@ dependencies {
     testRuntimeOnly 'org.apache.logging.log4j:log4j-slf4j-impl:2.5'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.5.2'
 
+}
+
+application {
+    // Define the main class for the application.
+    mainClassName = 'org.secureauth.sarestapi.main.Main'
+}
+
+distributions {
+    main {
+        contents {
+            from 'src/main/resources'
+        }
+    }
 }
 
 task copyToLib(type: Copy){
@@ -100,13 +116,6 @@ jacocoTestReport {
 
 test {
     useJUnitPlatform()
-}
-
-spotbugsMain {
-    reports {
-        xml.enabled = false
-        html.enabled = true
-    }
 }
 
 test.finalizedBy( jacocoTestReport )
