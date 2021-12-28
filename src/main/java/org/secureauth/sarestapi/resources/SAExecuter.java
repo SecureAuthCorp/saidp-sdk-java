@@ -62,7 +62,7 @@ IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
 OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-public final class SAExecuter {
+public class SAExecuter {
 
     private Client client = null;
     private static final Logger logger = LoggerFactory.getLogger(SAExecuter.class);
@@ -162,10 +162,10 @@ public final class SAExecuter {
                     get();
             //consider using response.ok(valueType).build(); instead.
             return response.readEntity(valueType);
-        } catch (SARestAPIException e) {
+        } catch (Exception e) {
             throw new SARestAPIException("Exception Get Request: \nQuery:\n\t" + query, e);
         }finally {
-            response.close();
+            closeResponseSafe( response );
         }
     }
 
@@ -202,7 +202,7 @@ public final class SAExecuter {
             throw new SARestAPIException("Exception Delivering OTP by Push: \nQuery:\n\t" +
                     query + "\nError:" + e.getMessage(), e);
         }finally {
-            response.close();
+            closeResponseSafe( response );
         }
     }
 
@@ -228,7 +228,7 @@ public final class SAExecuter {
             throw new SARestAPIException("Exception Delivering Push Notifiation: \nQuery:\n\t" +
                     query + "\nError:" + e.getMessage(), e);
         } finally {
-            response.close();
+            closeResponseSafe( response );
         }
     }
 
@@ -262,7 +262,7 @@ public final class SAExecuter {
         }catch(SARestAPIException e){
             throw new SARestAPIException("Exception Put Request: \nQuery:\n\t" + query + "\n", e);
         }finally {
-            response.close();
+            closeResponseSafe( response );
         }
     }
 
@@ -289,10 +289,10 @@ public final class SAExecuter {
                     header("X-SA-Ext-Date", ts).
                     post(Entity.entity(JSONUtil.convertObjectToJSON(authRequest),MediaType.APPLICATION_JSON));
             return response.readEntity(valueType);
-        }catch(SARestAPIException e){
+        }catch(Exception e){
             throw new SARestAPIException("Exception Post Request: \nQuery:\n\t" + query, e);
         }finally {
-            response.close();
+            closeResponseSafe( response );
         }
     }
 
@@ -320,7 +320,7 @@ public final class SAExecuter {
             if(Resource.METHOD_DELETE.equals(method)){
                 client.property(ClientProperties.SUPPRESS_HTTP_COMPLIANCE_VALIDATION, false);
             }
-            response.close();
+            closeResponseSafe( response );
         }
     }
 
@@ -352,10 +352,10 @@ public final class SAExecuter {
                     header("X-SA-Ext-Date", ts).
                     post(Entity.entity("",MediaType.APPLICATION_JSON));
             return response.readEntity(valueType);
-        }catch(SARestAPIException e){
+        }catch(Exception e){
             throw new SARestAPIException("Exception Post Request: \nQuery:\n\t" + query, e);
         }finally {
-            response.close();
+            closeResponseSafe( response );
         }
     }
 
@@ -386,7 +386,7 @@ public final class SAExecuter {
         }catch(Exception e){
             throw new SARestAPIException("Exception getting User Factors: \nQuery:\n\t" + query, e);
         }finally {
-            response.close();
+            closeResponseSafe( response );
         }
     }
 
@@ -515,7 +515,7 @@ public final class SAExecuter {
 
     // Fill userId string when you want to encode and send userId through Query Params.
     public ResponseObject executeUserPasswordChange(String auth, String query, String userId, UserPasswordRequest userPasswordRequest, String ts)throws SARestAPIException{
-        return executePostRawRequest(auth, query, userPasswordRequest, ResponseObject.class, ts);
+        return executePostRawRequest(auth, query, userId, "", userPasswordRequest, ResponseObject.class, ts);
     }
 
     //Update User Profile
@@ -596,4 +596,9 @@ public final class SAExecuter {
         }
     }
 
+    private void closeResponseSafe(Response response) {
+        if( response != null ) {
+            response.close();
+        }
+    }
 }

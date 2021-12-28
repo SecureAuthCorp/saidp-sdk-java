@@ -33,7 +33,6 @@ import static org.junit.Assert.assertTrue;
 
 public class SAAccessTDD {
 
-	private static Logger logger = LoggerFactory.getLogger(SAAccessTDD.class);
 	@Rule
 	public ExpectedException exceptionRule = ExpectedException.none();
 
@@ -100,7 +99,6 @@ public class SAAccessTDD {
 		validFactorIdForOathOtp = getValue(Property.VALID_FACTOR_ID_FOR_OATH_OTP);
 		validUserOtp = getValue(Property.VALID_OTP_PIN_CODE);
 		validUserOtpOath = getValue(Property.VALID_OTP_OATH_CODE);
-		validHostAddress = getValue(Property.VALID_HOST_ADDRESS);
 		validHostAddress = getValue(Property.VALID_HOST_ADDRESS);
 		validFingerprintId = getValue(Property.VALID_FINGERPRINT_ID);
  		assumeTest = Boolean.valueOf(getValue(Property.ASSUME_TEST));

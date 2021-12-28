@@ -11,9 +11,9 @@ import javax.xml.bind.annotation.XmlRootElement;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class UserPasswordRequest {
     /* Object to Support both Password Reset and Change Password Requests */
-    private char[] currentPassword;
-    private char[] newPassword;
-    private char[] password;
+    private char[] currentPassword = new char[0];
+    private char[] newPassword = new char[0];
+    private char[] password = new char[0];
 
     public String getCurrentPassword() {
         return new String(currentPassword);
