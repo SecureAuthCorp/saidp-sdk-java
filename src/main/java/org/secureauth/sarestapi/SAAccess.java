@@ -31,6 +31,7 @@ import org.secureauth.sarestapi.resources.Resource;
 import org.secureauth.sarestapi.resources.SAExecuter;
 import org.secureauth.sarestapi.util.JSONUtil;
 import org.secureauth.sarestapi.util.RestApiHeader;
+import org.secureauth.sarestapi.util.TimeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -1257,32 +1258,6 @@ public class SAAccess implements ISAAccess{
 
     /**
      * <p>
-     *     Update User / Profile
-     *     This method supports special characters for userId since it uses QP (Query Params) in order to create the request.
-     * </p>
-     * @param userId the UserID tied to the Profile Object
-     * @param userProfile The User'sProfile Object to be updated
-     * @return {@link ResponseObject}
-     */
-    public ResponseObject updateUserQP(String userId, NewUserProfile userProfile){
-        try{
-            String ts = getServerTime();
-            sortKBQKBAbyKey(userProfile);
-            String header = RestApiHeader.getAuthorizationHeader(saAuth, Resource.METHOD_PUT, IDMQueries.queryUserProfileQP(saAuth.getRealm()),userProfile,ts);
-
-            return saExecuter.executeUserProfileUpdateRequest(header,
-                    saBaseURL.getApplianceURL() + IDMQueries.queryUserProfileQP(saAuth.getRealm()),userId,
-                    userProfile,
-                    ts,
-                    ResponseObject.class);
-
-        }catch (Exception e){
-            throw new SARestAPIException("Exception occurred executing REST query:\n" + e.getMessage() + "\n", e);
-        }
-    }
-
-    /**
-     * <p>
      *     Associate User to Group
      * </p>
      * @param userId the user id of the identity
@@ -1769,12 +1744,8 @@ public class SAAccess implements ISAAccess{
 		return null;
 	}
 
-    String getServerTime() {
-        Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
-        SimpleDateFormat dateFormat = new SimpleDateFormat(
-                "EEE, dd MMM yyyy HH:mm:ss.SSS z", Locale.US);
-        dateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
-        return dateFormat.format(calendar.getTime());
+	String getServerTime() {
+        return TimeUtils.getServerTimeMs();
     }
 
     /**
