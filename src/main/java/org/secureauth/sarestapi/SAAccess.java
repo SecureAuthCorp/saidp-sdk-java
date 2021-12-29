@@ -31,6 +31,7 @@ import org.secureauth.sarestapi.resources.Resource;
 import org.secureauth.sarestapi.resources.SAExecuter;
 import org.secureauth.sarestapi.util.JSONUtil;
 import org.secureauth.sarestapi.util.RestApiHeader;
+import org.secureauth.sarestapi.util.TimeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -1743,12 +1744,13 @@ public class SAAccess implements ISAAccess{
 		return null;
 	}
 
+    // This is for a quick fix, we need to pass this boolean through configuration, which requires a refactor of this class.
     String getServerTime() {
-        Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
-        SimpleDateFormat dateFormat = new SimpleDateFormat(
-                "EEE, dd MMM yyyy HH:mm:ss.SSS z", Locale.US);
-        dateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
-        return dateFormat.format(calendar.getTime());
+        return TimeUtils.getServerTime( true );
+    }
+
+    String getServerTime( Boolean oldIdPSupport ) {
+        return TimeUtils.getServerTime( oldIdPSupport );
     }
 
     /**
