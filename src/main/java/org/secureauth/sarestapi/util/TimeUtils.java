@@ -12,7 +12,7 @@ public class TimeUtils {
         return getServerTimeMs();
     }
 
-    public static String getServerTimeMs() {
+    static String getServerTimeMs() {
         Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
         SimpleDateFormat dateFormat = new SimpleDateFormat(
                 "EEE, dd MMM yyyy HH:mm:ss.SSS z", Locale.US);
@@ -20,8 +20,9 @@ public class TimeUtils {
         return dateFormat.format(calendar.getTime());
     }
 
-    //Just in case we want to force the second version timestamp for older versions of IDP
-    public static String getServerTimeSeconds() {
+    // Just in case we want to force the second version timestamp for older versions of IDP
+    // This may cause sync errors which we fixed using getServerTimeMs
+    static String getServerTimeSeconds() {
         Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
         SimpleDateFormat dateFormat = new SimpleDateFormat(
                 "EEE, dd MMM yyyy HH:mm:ss z", Locale.US);

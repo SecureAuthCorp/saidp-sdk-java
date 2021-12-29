@@ -1744,8 +1744,13 @@ public class SAAccess implements ISAAccess{
 		return null;
 	}
 
-	String getServerTime() {
-        return TimeUtils.getServerTimeMs();
+    // This is for a quick fix, we need to pass this boolean through configuration, which requires a refactor of this class.
+    String getServerTime() {
+        return TimeUtils.getServerTime( true );
+    }
+
+    String getServerTime( Boolean oldIdPSupport ) {
+        return TimeUtils.getServerTime( oldIdPSupport );
     }
 
     /**
