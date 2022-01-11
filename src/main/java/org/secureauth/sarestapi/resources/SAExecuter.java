@@ -75,6 +75,8 @@ public class SAExecuter {
     private ClientRequestFilter xRequestIDFilter = (requestContext) -> {};
 
     private SABaseURL saBaseURL = null;
+    // Use "X-SA-Ext-Date" for the usual application
+    private String tsHeader = "X-SA-Date";
 
     public SAExecuter(SABaseURL saBaseURL) {
         this.saBaseURL = saBaseURL;
@@ -129,7 +131,7 @@ public class SAExecuter {
             Response response = target.request().
                     accept(MediaType.APPLICATION_JSON).
                     header("Authorization", auth).
-                    header("X-SA-Ext-Date", ts).
+                    header(tsHeader, ts).
                     cookie( ingressCookie ).
                     get();
             T genericResponse = response.readEntity(valueType);
@@ -158,7 +160,7 @@ public class SAExecuter {
             response = target.request().
                     accept(MediaType.APPLICATION_JSON).
                     header("Authorization", auth).
-                    header("X-SA-Ext-Date", ts).
+                    header(tsHeader, ts).
                     get();
             //consider using response.ok(valueType).build(); instead.
             return response.readEntity(valueType);
@@ -194,7 +196,7 @@ public class SAExecuter {
             response = target.request().
                     accept(MediaType.APPLICATION_JSON).
                     header("Authorization", auth).
-                    header("X-SA-Ext-Date", ts).
+                    header(tsHeader, ts).
                     post(Entity.entity(JSONUtil.convertObjectToJSON(authRequest), MediaType.APPLICATION_JSON));
 
             return response.readEntity(valueType);
@@ -216,7 +218,7 @@ public class SAExecuter {
             response = target.request().
                     accept(MediaType.APPLICATION_JSON).
                     header("Authorization", auth).
-                    header("X-SA-Ext-Date", ts).
+                    header(tsHeader, ts).
                     post(Entity.entity(JSONUtil.convertObjectToJSON(authRequest), MediaType.APPLICATION_JSON));
             T responseObject = response.readEntity(valueType);
             responseObject.setSessionAffinityCookie(
@@ -255,7 +257,7 @@ public class SAExecuter {
             response = target.request().
                     accept(MediaType.APPLICATION_JSON).
                     header("Authorization", auth).
-                    header("X-SA-Ext-Date", ts).
+                    header(tsHeader, ts).
                     put(Entity.entity(JSONUtil.convertObjectToJSON(payloadRequest),MediaType.APPLICATION_JSON));
             //consider using response.ok(valueType).build(); instead.
             return response.readEntity(responseValueType);
@@ -286,7 +288,7 @@ public class SAExecuter {
             response = target.request().
                     accept(MediaType.APPLICATION_JSON).
                     header("Authorization", auth).
-                    header("X-SA-Ext-Date", ts).
+                    header(tsHeader, ts).
                     post(Entity.entity(JSONUtil.convertObjectToJSON(authRequest),MediaType.APPLICATION_JSON));
             return response.readEntity(valueType);
         }catch(Exception e){
@@ -309,7 +311,7 @@ public class SAExecuter {
             response = target.request().
                     accept(MediaType.APPLICATION_JSON).
                     header("Authorization", auth).
-                    header("X-SA-Ext-Date", ts).
+                    header(tsHeader, ts).
                     build(method, Entity.entity(JSONUtil.convertObjectToJSON(authRequest),MediaType.APPLICATION_JSON))
                     .invoke();
 
@@ -349,7 +351,7 @@ public class SAExecuter {
             response = target.request().
                     accept(MediaType.APPLICATION_JSON).
                     header("Authorization", auth).
-                    header("X-SA-Ext-Date", ts).
+                    header(tsHeader, ts).
                     post(Entity.entity("",MediaType.APPLICATION_JSON));
             return response.readEntity(valueType);
         }catch(Exception e){
@@ -380,7 +382,7 @@ public class SAExecuter {
             response = target.request().
             		accept(MediaType.APPLICATION_JSON).
                     header("Authorization", auth).
-                    header("X-SA-Ext-Date", ts).
+                    header(tsHeader, ts).
                     get(Response.class);
             return response.readEntity(String.class);
         }catch(Exception e){
@@ -475,7 +477,7 @@ public class SAExecuter {
             response = target.request().
                     accept(MediaType.APPLICATION_JSON).
                     header("Authorization", auth).
-                    header("X-SA-Ext-Date", ts).
+                    header(tsHeader, ts).
                     get();
             jsObjectResponse = response.readEntity(valueType);
             response.close();
