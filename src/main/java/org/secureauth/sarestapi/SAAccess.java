@@ -2,6 +2,7 @@ package org.secureauth.sarestapi;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Hashtable;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
@@ -52,6 +53,8 @@ public class SAAccess implements ISAAccess{
     protected SABaseURL saBaseURL;
     protected SAAuth saAuth;
     protected SAExecuter saExecuter;
+    private Hashtable<String, Object> configs;
+    private Boolean oldIdpSupport = false;
 
     /**
      *<p>
@@ -135,6 +138,11 @@ public class SAAccess implements ISAAccess{
         this.saBaseURL= saBaseURL;
         this.saAuth = saAuth;
         this.saExecuter = saExecuter;
+    }
+
+    public void UpdateConfig( Hashtable<String, Object> config ) {
+        configs = config;
+        oldIdpSupport = (Boolean) configs.get("oldIdP");
     }
 
     /**
@@ -1746,11 +1754,11 @@ public class SAAccess implements ISAAccess{
 
     // This is for a quick fix, we need to pass this boolean through configuration, which requires a refactor of this class.
     String getServerTime() {
-        return TimeUtils.getServerTime( true );
+        return getServerTime( oldIdpSupport );
     }
 
-    String getServerTime( Boolean oldIdPSupport ) {
-        return TimeUtils.getServerTime( oldIdPSupport );
+    String getServerTime( Boolean oldIdpSupport ) {
+        return TimeUtils.getServerTime( oldIdpSupport );
     }
 
     /**
