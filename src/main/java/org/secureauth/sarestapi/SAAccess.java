@@ -53,8 +53,7 @@ public class SAAccess implements ISAAccess{
     protected SABaseURL saBaseURL;
     protected SAAuth saAuth;
     protected SAExecuter saExecuter;
-    private Hashtable<String, Object> configs;
-    private Boolean oldIdpSupport = false;
+    protected SAConfig saConfig;
 
     /**
      *<p>
@@ -75,6 +74,7 @@ public class SAAccess implements ISAAccess{
         saBaseURL=new SABaseURL(host,port,ssl);
         saAuth = new SAAuth(applicationID,applicationKey,realm);
         saExecuter=new SAExecuter(saBaseURL);
+        saConfig = SAConfig.getInstance();
     }
 
     /**
@@ -98,6 +98,7 @@ public class SAAccess implements ISAAccess{
         saBaseURL=new SABaseURL(host,port,ssl,selfSigned);
         saAuth = new SAAuth(applicationID,applicationKey,realm);
         saExecuter=new SAExecuter(saBaseURL);
+        saConfig = SAConfig.getInstance();
     }
 
     /**
@@ -122,6 +123,7 @@ public class SAAccess implements ISAAccess{
         saBaseURL=new SABaseURL(host,port,ssl,selfSigned);
         saAuth = new SAAuth(applicationID,applicationKey,realm);
         saExecuter=new SAExecuter(saBaseURL, guidStrategy);
+        saConfig = SAConfig.getInstance();
     }
 
     /**
@@ -138,11 +140,11 @@ public class SAAccess implements ISAAccess{
         this.saBaseURL= saBaseURL;
         this.saAuth = saAuth;
         this.saExecuter = saExecuter;
+        saConfig = SAConfig.getInstance();
     }
 
-    public void UpdateConfig( Hashtable<String, Object> config ) {
-        configs = config;
-        oldIdpSupport = (Boolean) configs.get("oldIdP");
+    public void updateConfig( Hashtable<String, Object> config ) {
+        saConfig.updateConfig( config );
     }
 
     /**
@@ -1754,7 +1756,7 @@ public class SAAccess implements ISAAccess{
 
     // This is for a quick fix, we need to pass this boolean through configuration, which requires a refactor of this class.
     String getServerTime() {
-        return getServerTime( oldIdpSupport );
+        return getServerTime( saConfig.getOldIdPSupport() );
     }
 
     String getServerTime( Boolean oldIdpSupport ) {

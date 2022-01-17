@@ -75,17 +75,27 @@ public class SAExecuter {
     private ClientRequestFilter xRequestIDFilter = (requestContext) -> {};
 
     private SABaseURL saBaseURL = null;
-    // Use "X-SA-Ext-Date" for the usual application
-    private String tsHeader = "X-SA-Date";
+    private SAConfig saConfig;
+    private String tsHeader = "X-SA-Ext-Date";
 
     public SAExecuter(SABaseURL saBaseURL) {
         this.saBaseURL = saBaseURL;
         this.idpApiTimeout = Integer.parseInt(Optional.ofNullable(System.getProperty("rest.api.timeout")).orElse(TEN_SECONDS) );
+        saConfig = SAConfig.getInstance();
+        applyConfigs();
     }
 
     public SAExecuter(SABaseURL saBaseURL, GUIDStrategy guidStrategy) {
         this( saBaseURL );
         this.xRequestIDFilter = new XRequestIDFilter( guidStrategy );
+        saConfig = SAConfig.getInstance();
+        applyConfigs();
+    }
+
+    private void applyConfigs() {
+        if (saConfig == null)
+            saConfig = SAConfig.getInstance();
+        tsHeader = saConfig.getOldIdPSupport() ? "X-SA-Date" : "X-SA-Ext-Date";
     }
 
     public void setTimeout(int timeoutInMillis) {

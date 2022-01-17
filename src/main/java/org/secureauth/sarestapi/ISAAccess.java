@@ -17,7 +17,7 @@ import java.util.Hashtable;
 
 public interface ISAAccess {
 
-	void UpdateConfig( Hashtable<String, Object> config );
+	void updateConfig( Hashtable<String, Object> config );
 
 	/**
 	 * <p>
