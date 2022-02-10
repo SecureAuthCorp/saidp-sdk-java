@@ -3,7 +3,7 @@ package org.secureauth.sarestapi.data;
 import java.util.Hashtable;
 
 public class SAConfig {
-    private Hashtable<String, Object> configs;
+    private Hashtable<String, Object> config;
     private Boolean oldIdpSupport = false;
     private static volatile SAConfig instance = null;
 
@@ -19,8 +19,8 @@ public class SAConfig {
     }
 
     public void updateConfig( Hashtable<String, Object> newConfig ) {
-        configs = newConfig;
-        oldIdpSupport = (Boolean) configs.get("oldIdP");
+        config = newConfig;
+        oldIdpSupport = (Boolean) config.get("oldIdP");
     }
 
     public Boolean getOldIdPSupport() {
