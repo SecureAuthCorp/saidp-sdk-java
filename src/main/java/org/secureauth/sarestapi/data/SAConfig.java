@@ -18,8 +18,8 @@ public class SAConfig {
         return instance;
     }
 
-    public void updateConfig( Hashtable<String, Object> config ) {
-        configs = config;
+    public void updateConfig( Hashtable<String, Object> newConfig ) {
+        configs = newConfig;
         oldIdpSupport = (Boolean) configs.get("oldIdP");
     }
 
