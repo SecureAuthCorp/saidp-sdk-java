@@ -100,7 +100,7 @@ public class SAAccessUnitTest {
         // then
         this.wireMockServer.verify(
                 postRequestedFor( urlEqualTo("/Realm01/api/v1/auth" ) )
-                        .withHeader( X_SA_EXT_DATE , matching( ".*\\d{2}\\d*.\\d{3}.*" ) )
+                        .withHeader( X_SA_EXT_DATE , matching( ".*\\d{2}\\d*:\\d{2}.\\d{3}\\s.*" ) )
         );
     }
 
@@ -119,7 +119,7 @@ public class SAAccessUnitTest {
         // then
         this.wireMockServer.verify(
                 postRequestedFor( urlEqualTo("/Realm01/api/v1/auth" ) )
-                        .withHeader( X_SA_DATE , matching( ".*\\d{2}\\d*.\\d{2}.*" ) )
+                        .withHeader( X_SA_DATE , matching( ".*\\d{2}\\d*:\\d{2}\\s.*" ) )
         );
     }
 }
