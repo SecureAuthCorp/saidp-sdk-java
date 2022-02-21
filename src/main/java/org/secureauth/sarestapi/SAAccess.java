@@ -2,6 +2,7 @@ package org.secureauth.sarestapi;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Hashtable;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
@@ -52,6 +53,7 @@ public class SAAccess implements ISAAccess{
     protected SABaseURL saBaseURL;
     protected SAAuth saAuth;
     protected SAExecuter saExecuter;
+    protected SAConfig saConfig;
 
     /**
      *<p>
@@ -72,6 +74,7 @@ public class SAAccess implements ISAAccess{
         saBaseURL=new SABaseURL(host,port,ssl);
         saAuth = new SAAuth(applicationID,applicationKey,realm);
         saExecuter=new SAExecuter(saBaseURL);
+        saConfig = SAConfig.getInstance();
     }
 
     /**
@@ -95,6 +98,7 @@ public class SAAccess implements ISAAccess{
         saBaseURL=new SABaseURL(host,port,ssl,selfSigned);
         saAuth = new SAAuth(applicationID,applicationKey,realm);
         saExecuter=new SAExecuter(saBaseURL);
+        saConfig = SAConfig.getInstance();
     }
 
     /**
@@ -119,6 +123,7 @@ public class SAAccess implements ISAAccess{
         saBaseURL=new SABaseURL(host,port,ssl,selfSigned);
         saAuth = new SAAuth(applicationID,applicationKey,realm);
         saExecuter=new SAExecuter(saBaseURL, guidStrategy);
+        saConfig = SAConfig.getInstance();
     }
 
     /**
@@ -135,6 +140,11 @@ public class SAAccess implements ISAAccess{
         this.saBaseURL= saBaseURL;
         this.saAuth = saAuth;
         this.saExecuter = saExecuter;
+        saConfig = SAConfig.getInstance();
+    }
+
+    public void updateConfig( Hashtable<String, Object> config ) {
+        saConfig.updateConfig( config );
     }
 
     /**
@@ -1746,11 +1756,11 @@ public class SAAccess implements ISAAccess{
 
     // This is for a quick fix, we need to pass this boolean through configuration, which requires a refactor of this class.
     String getServerTime() {
-        return TimeUtils.getServerTime( true );
+        return getServerTime( saConfig.getOldIdPSupport() );
     }
 
-    String getServerTime( Boolean oldIdPSupport ) {
-        return TimeUtils.getServerTime( oldIdPSupport );
+    String getServerTime( Boolean oldIdpSupport ) {
+        return TimeUtils.getServerTime( oldIdpSupport );
     }
 
     /**
