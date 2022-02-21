@@ -23,7 +23,7 @@ public class SAAccessUnitTest {
     private final String X_REQUEST_ID = "X-Request-Id";
     private final String X_SA_EXT_DATE = "X-SA-Ext-Date";
     private final String X_SA_DATE = "X-SA-Date";
-    private final String OLD_IDP = "oldIdP";
+    private final String OLD_IDP = "support.deprecated.idp";
     private final Hashtable<String, Object> config = new Hashtable<String, Object>();
     private final SAConfig saConfig = SAConfig.getInstance();
     @Before

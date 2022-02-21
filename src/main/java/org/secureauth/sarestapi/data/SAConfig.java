@@ -20,7 +20,7 @@ public class SAConfig {
 
     public void updateConfig( Hashtable<String, Object> newConfig ) {
         config = newConfig;
-        oldIdpSupport = (Boolean) config.get("oldIdP");
+        oldIdpSupport = (Boolean) config.get("support.deprecated.idp");
     }
 
     public Boolean getOldIdPSupport() {
