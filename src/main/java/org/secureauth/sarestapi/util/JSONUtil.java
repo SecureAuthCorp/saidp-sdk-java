@@ -1,11 +1,11 @@
 package org.secureauth.sarestapi.util;
 
-
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import org.secureauth.sarestapi.data.DFP.DFP;
 import org.secureauth.sarestapi.data.Requests.DFPValidateRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
@@ -29,17 +29,18 @@ OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
  */
 
 
-public class JSONUtil {
+public final class JSONUtil {
+    private static final Logger logger = LoggerFactory.getLogger(JSONUtil.class);
 
-    public JSONUtil(){}
+    private JSONUtil(){}
 
      public static String convertObjectToJSON(Object object){
         ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
         String json = null;
         try {
             json = ow.writeValueAsString(object);
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
+        }catch(IOException jpe){
+            logger.error(jpe.getMessage(), jpe);
         }
         return json;
     }
@@ -47,17 +48,12 @@ public class JSONUtil {
 
     public static DFPValidateRequest getObjectFromJSONString(String dfpJsonString){
         ObjectMapper mapper = new ObjectMapper();
-        StringBuilder stringBuilder = new StringBuilder();
         DFPValidateRequest dfpValidateRequest = new DFPValidateRequest();
 
         try{
             dfpValidateRequest = mapper.readValue(dfpJsonString,DFPValidateRequest.class);
-
-
-        }catch(JsonProcessingException jpe){
-            jpe.printStackTrace();
-        }catch(IOException ie){
-            ie.printStackTrace();
+        }catch(IOException jpe){
+            logger.error(jpe.getMessage(), jpe);
         }
 
         return dfpValidateRequest;
@@ -65,17 +61,12 @@ public class JSONUtil {
 
     public static DFP getDFPFromJSONString(String dfpJsonString){
         ObjectMapper mapper = new ObjectMapper();
-        StringBuilder stringBuilder = new StringBuilder();
         DFP dfp = new DFP();
 
         try{
             dfp = mapper.readValue(dfpJsonString,DFP.class);
-
-
-        }catch(JsonProcessingException jpe){
-            jpe.printStackTrace();
-        }catch(IOException ie){
-            ie.printStackTrace();
+        }catch(IOException jpe){
+            logger.error(jpe.getMessage(), jpe);
         }
 
         return dfp;

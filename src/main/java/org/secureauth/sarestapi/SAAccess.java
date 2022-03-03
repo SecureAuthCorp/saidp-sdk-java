@@ -2,6 +2,7 @@ package org.secureauth.sarestapi;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Hashtable;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
@@ -25,11 +26,13 @@ import org.secureauth.sarestapi.data.UserProfile.UserProfileKB;
 import org.secureauth.sarestapi.data.UserProfile.UserToGroups;
 import org.secureauth.sarestapi.data.UserProfile.UsersToGroup;
 import org.secureauth.sarestapi.exception.SARestAPIException;
+import org.secureauth.sarestapi.guid.GUIDStrategy;
 import org.secureauth.sarestapi.queries.*;
 import org.secureauth.sarestapi.resources.Resource;
 import org.secureauth.sarestapi.resources.SAExecuter;
 import org.secureauth.sarestapi.util.JSONUtil;
 import org.secureauth.sarestapi.util.RestApiHeader;
+import org.secureauth.sarestapi.util.TimeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,10 +49,11 @@ import javax.ws.rs.core.Cookie;
 public class SAAccess implements ISAAccess{
     private static final String PUSH_TO_ACCEPT = "push_accept";
     private static final String SYMBOL_TO_ACCEPT = "push_accept_symbol";
-    private static Logger logger = LoggerFactory.getLogger(SAAccess.class);
+    private static final Logger logger = LoggerFactory.getLogger(SAAccess.class);
     protected SABaseURL saBaseURL;
     protected SAAuth saAuth;
     protected SAExecuter saExecuter;
+    protected SAConfig saConfig;
 
     /**
      *<p>
@@ -70,6 +74,7 @@ public class SAAccess implements ISAAccess{
         saBaseURL=new SABaseURL(host,port,ssl);
         saAuth = new SAAuth(applicationID,applicationKey,realm);
         saExecuter=new SAExecuter(saBaseURL);
+        saConfig = SAConfig.getInstance();
     }
 
     /**
@@ -93,6 +98,32 @@ public class SAAccess implements ISAAccess{
         saBaseURL=new SABaseURL(host,port,ssl,selfSigned);
         saAuth = new SAAuth(applicationID,applicationKey,realm);
         saExecuter=new SAExecuter(saBaseURL);
+        saConfig = SAConfig.getInstance();
+    }
+
+    /**
+     *<p>
+     *     Returns a SAAccess Object that can be used to query the SecureAuth Rest API
+     *     This should be the default object used when setting up connectivity to the SecureAuth Appliance
+     *     This Object will allow users to support selfSigned Certificates
+     *</p>
+     * @param host FQDN of the SecureAuth Appliance
+     * @param port The port used to access the web application on the Appliance.
+     * @param ssl Use SSL
+     * @param selfSigned  Support for SeflSigned Certificates. Setting to enable disable self signed cert support
+     * @param realm the Configured Realm that enables the RESTApi
+     * @param applicationID The Application ID from the Configured Realm
+     * @param applicationKey The Application Key from the Configured Realm
+     * @param guidStrategy
+     *
+     * @deprecated from 1.0.6.0, replace by {@link org.secureauth.sarestapi.util.SAFactory}
+     */
+    @Deprecated
+    public SAAccess(String host, String port,boolean ssl,boolean selfSigned, String realm, String applicationID, String applicationKey, GUIDStrategy guidStrategy){
+        saBaseURL=new SABaseURL(host,port,ssl,selfSigned);
+        saAuth = new SAAuth(applicationID,applicationKey,realm);
+        saExecuter=new SAExecuter(saBaseURL, guidStrategy);
+        saConfig = SAConfig.getInstance();
     }
 
     /**
@@ -109,6 +140,11 @@ public class SAAccess implements ISAAccess{
         this.saBaseURL= saBaseURL;
         this.saAuth = saAuth;
         this.saExecuter = saExecuter;
+        saConfig = SAConfig.getInstance();
+    }
+
+    public void updateConfig( Hashtable<String, Object> config ) {
+        saConfig.updateConfig( config );
     }
 
     /**
@@ -251,7 +287,7 @@ public class SAAccess implements ISAAccess{
         PushToAcceptBiometricsRequest req = PushToAcceptRequestsFactory.createPushToAcceptBiometricRequest( biometricType, userId, factorId, endUserIP, clientCompany, clientDescription );
         String header = RestApiHeader.getAuthorizationHeader(this.saAuth, "POST", AuthQuery.queryAuth(this.saAuth.getRealm()), req, ts);
         try {
-            return (ResponseObject)this.saExecuter.executePostRequest(header, this.saBaseURL.getApplianceURL() + AuthQuery.queryAuth(this.saAuth.getRealm()), req, ts, ResponseObject.class);
+            return this.saExecuter.executePostRequest(header, this.saBaseURL.getApplianceURL() + AuthQuery.queryAuth(this.saAuth.getRealm()), req, ts, ResponseObject.class);
         } catch (Exception e) {
             throw new SARestAPIException( e );
         }
@@ -352,7 +388,6 @@ public class SAAccess implements ISAAccess{
     public ThrottleResponse resetThrottleReq(String userId){
         try{
             String ts = getServerTime();
-            AuthRequest authRequest = new AuthRequest();
             ThrottleRequest throttleRequest = new ThrottleRequest(0);
 
             String header = RestApiHeader.getAuthorizationHeader(saAuth, Resource.METHOD_PUT, ThrottleQuery.queryThrottles(saAuth.getRealm(), userId), throttleRequest, ts);
@@ -372,14 +407,13 @@ public class SAAccess implements ISAAccess{
     public ThrottleResponse resetThrottleReqQP(String userId){
         try{
             String ts = getServerTime();
-            AuthRequest authRequest = new AuthRequest();
             ThrottleRequest throttleRequest = new ThrottleRequest(0);
 
             String header = RestApiHeader.getAuthorizationHeader(saAuth, Resource.METHOD_PUT, ThrottleQuery.queryThrottlesQP(saAuth.getRealm()), throttleRequest, ts);
 
             return saExecuter.executePutRequest(header,saBaseURL.getApplianceURL() + ThrottleQuery.queryThrottlesQP(saAuth.getRealm()), userId, throttleRequest,ThrottleResponse.class, ts);
         }catch (Exception e){
-            throw new SARestAPIException("Exception occurred executing REST query:\n" + e.getMessage());
+            throw new SARestAPIException("Exception occurred executing REST query:\n" + e.getMessage(), e);
         }
     }
 
@@ -391,8 +425,6 @@ public class SAAccess implements ISAAccess{
     public ThrottleResponse getThrottleReq(String userId){
         try{
             String ts = getServerTime();
-            AuthRequest authRequest = new AuthRequest();
-
             String header = RestApiHeader.getAuthorizationHeader(saAuth, Resource.METHOD_GET, ThrottleQuery.queryThrottles(saAuth.getRealm(), userId), ts);
 
             return saExecuter.executeGetRequest(header,saBaseURL.getApplianceURL() + ThrottleQuery.queryThrottles(saAuth.getRealm(), userId), ts, ThrottleResponse.class);
@@ -409,8 +441,6 @@ public class SAAccess implements ISAAccess{
     public ThrottleResponse getThrottleReqQP(String userId){
         try{
             String ts = getServerTime();
-            AuthRequest authRequest = new AuthRequest();
-
             String header = RestApiHeader.getAuthorizationHeader(saAuth, Resource.METHOD_GET, ThrottleQuery.queryThrottlesQP(saAuth.getRealm()), ts);
 
             return saExecuter.executeGetRequest(header,saBaseURL.getApplianceURL() + ThrottleQuery.queryThrottlesQP(saAuth.getRealm()), userId, ts, ThrottleResponse.class);
@@ -510,7 +540,6 @@ public class SAAccess implements ISAAccess{
      */
     public BaseResponse validateOath(String userId, String otp, String factorId){
         String ts = getServerTime();
-        RestApiHeader restApiHeader = new RestApiHeader();
         AuthRequest authRequest = new AuthRequest();
 
         authRequest.setUser_id(userId);
@@ -518,7 +547,7 @@ public class SAAccess implements ISAAccess{
         authRequest.setToken(otp);
         authRequest.setFactor_id(factorId);
 
-        String header = restApiHeader.getAuthorizationHeader(saAuth,"POST", AuthQuery.queryAuth(saAuth.getRealm()), authRequest,ts);
+        String header = RestApiHeader.getAuthorizationHeader(saAuth,"POST", AuthQuery.queryAuth(saAuth.getRealm()), authRequest,ts);
 
         try{
             return saExecuter.executeValidateOath(header,saBaseURL.getApplianceURL() + AuthQuery.queryAuth(saAuth.getRealm()),authRequest,ts);
@@ -538,14 +567,13 @@ public class SAAccess implements ISAAccess{
      */
     public ResponseObject deliverOTPByPhone(String userId, String factorId){
         String ts = getServerTime();
-        RestApiHeader restApiHeader = new RestApiHeader();
         AuthRequest authRequest = new AuthRequest();
 
         authRequest.setUser_id(userId);
         authRequest.setType("call");
         authRequest.setFactor_id(factorId);
 
-        String header = restApiHeader.getAuthorizationHeader(saAuth,"POST", AuthQuery.queryAuth(saAuth.getRealm()), authRequest,ts);
+        String header = RestApiHeader.getAuthorizationHeader(saAuth,"POST", AuthQuery.queryAuth(saAuth.getRealm()), authRequest,ts);
 
         try{
             return saExecuter.executeOTPByPhone(header,saBaseURL.getApplianceURL() + AuthQuery.queryAuth(saAuth.getRealm()),authRequest,ts);
@@ -565,14 +593,13 @@ public class SAAccess implements ISAAccess{
      */
     public ResponseObject deliverAdHocOTPByPhone(String userId, String phoneNumber){
         String ts = getServerTime();
-        RestApiHeader restApiHeader = new RestApiHeader();
         AuthRequest authRequest = new AuthRequest();
 
         authRequest.setUser_id(userId);
         authRequest.setType("call");
         authRequest.setToken(phoneNumber);
 
-        String header = restApiHeader.getAuthorizationHeader(saAuth,"POST", AuthQuery.queryAuth(saAuth.getRealm()), authRequest,ts);
+        String header = RestApiHeader.getAuthorizationHeader(saAuth,"POST", AuthQuery.queryAuth(saAuth.getRealm()), authRequest,ts);
 
         try{
             return saExecuter.executeOTPByPhone(header,saBaseURL.getApplianceURL() + AuthQuery.queryAuth(saAuth.getRealm()),authRequest,ts);
@@ -593,13 +620,12 @@ public class SAAccess implements ISAAccess{
      */
     public ResponseObject deliverOTPBySMS(String userId, String factorId){
         String ts = getServerTime();
-        RestApiHeader restApiHeader = new RestApiHeader();
         AuthRequest authRequest = new AuthRequest();
 
         authRequest.setUser_id(userId);
         authRequest.setType("sms");
         authRequest.setFactor_id(factorId);
-        String header = restApiHeader.getAuthorizationHeader(saAuth,"POST", AuthQuery.queryAuth(saAuth.getRealm()), authRequest,ts);
+        String header = RestApiHeader.getAuthorizationHeader(saAuth,"POST", AuthQuery.queryAuth(saAuth.getRealm()), authRequest,ts);
 
         try{
             return saExecuter.executeOTPBySMS(header,saBaseURL.getApplianceURL() + AuthQuery.queryAuth(saAuth.getRealm()),authRequest,ts);
@@ -620,13 +646,12 @@ public class SAAccess implements ISAAccess{
      */
     public ValidateOTPResponse validateOTP(String userId, String otp){
         String ts = getServerTime();
-        RestApiHeader restApiHeader = new RestApiHeader();
         ValidateOTPRequest validateOTPRequest = new ValidateOTPRequest();
 
         validateOTPRequest.setUser_id(userId);
         validateOTPRequest.setOtp(otp);
 
-        String header = restApiHeader.getAuthorizationHeader(saAuth,"POST", ValidateOTPQuery.queryValidateOTP(saAuth.getRealm()), validateOTPRequest,ts);
+        String header = RestApiHeader.getAuthorizationHeader(saAuth,"POST", ValidateOTPQuery.queryValidateOTP(saAuth.getRealm()), validateOTPRequest,ts);
 
         try{
             return saExecuter.executeValidateOTP(header,saBaseURL.getApplianceURL() + ValidateOTPQuery.queryValidateOTP(saAuth.getRealm()),validateOTPRequest,ts);
@@ -646,13 +671,12 @@ public class SAAccess implements ISAAccess{
      */
     public ResponseObject deliverAdHocOTPBySMS(String userId, String phoneNumber){
         String ts = getServerTime();
-        RestApiHeader restApiHeader = new RestApiHeader();
         AuthRequest authRequest = new AuthRequest();
 
         authRequest.setUser_id(userId);
-        authRequest.setType("sms");
+        authRequest.setType(Resource.SMS);
         authRequest.setToken(phoneNumber);
-        String header = restApiHeader.getAuthorizationHeader(saAuth,"POST", AuthQuery.queryAuth(saAuth.getRealm()), authRequest,ts);
+        String header = RestApiHeader.getAuthorizationHeader(saAuth,"POST", AuthQuery.queryAuth(saAuth.getRealm()), authRequest,ts);
 
         try{
             return saExecuter.executeOTPBySMS(header,saBaseURL.getApplianceURL() + AuthQuery.queryAuth(saAuth.getRealm()),authRequest,ts);
@@ -672,13 +696,12 @@ public class SAAccess implements ISAAccess{
      */
     public ResponseObject deliverHelpDeskOTPByEmail(String userId, String factorId){
         String ts = getServerTime();
-        RestApiHeader restApiHeader = new RestApiHeader();
         AuthRequest authRequest = new AuthRequest();
 
         authRequest.setUser_id(userId);
         authRequest.setType("help_desk");
         authRequest.setFactor_id(factorId);
-        String header = restApiHeader.getAuthorizationHeader(saAuth,"POST", AuthQuery.queryAuth(saAuth.getRealm()), authRequest,ts);
+        String header = RestApiHeader.getAuthorizationHeader(saAuth,"POST", AuthQuery.queryAuth(saAuth.getRealm()), authRequest,ts);
 
         try{
             return saExecuter.executeOTPByEmail(header,saBaseURL.getApplianceURL() + AuthQuery.queryAuth(saAuth.getRealm()), authRequest,ts);
@@ -698,13 +721,12 @@ public class SAAccess implements ISAAccess{
      */
     public ResponseObject deliverOTPByEmail(String userId, String factorId){
         String ts = getServerTime();
-        RestApiHeader restApiHeader = new RestApiHeader();
         AuthRequest authRequest = new AuthRequest();
 
         authRequest.setUser_id(userId);
-        authRequest.setType("email");
+        authRequest.setType(Resource.EMAIL);
         authRequest.setFactor_id(factorId);
-        String header = restApiHeader.getAuthorizationHeader(saAuth,"POST", AuthQuery.queryAuth(saAuth.getRealm()), authRequest,ts);
+        String header = RestApiHeader.getAuthorizationHeader(saAuth,"POST", AuthQuery.queryAuth(saAuth.getRealm()), authRequest,ts);
 
         try{
             return saExecuter.executeOTPByEmail(header,saBaseURL.getApplianceURL() + AuthQuery.queryAuth(saAuth.getRealm()), authRequest,ts);
@@ -724,13 +746,12 @@ public class SAAccess implements ISAAccess{
      */
     public ResponseObject deliverAdHocOTPByEmail(String userId, String emailAddress){
         String ts = getServerTime();
-        RestApiHeader restApiHeader = new RestApiHeader();
         AuthRequest authRequest = new AuthRequest();
 
         authRequest.setUser_id(userId);
         authRequest.setType("email");
         authRequest.setToken(emailAddress);
-        String header = restApiHeader.getAuthorizationHeader(saAuth,"POST", AuthQuery.queryAuth(saAuth.getRealm()), authRequest,ts);
+        String header = RestApiHeader.getAuthorizationHeader(saAuth,"POST", AuthQuery.queryAuth(saAuth.getRealm()), authRequest,ts);
 
         try{
             return saExecuter.executeOTPByEmail(header,saBaseURL.getApplianceURL() + AuthQuery.queryAuth(saAuth.getRealm()), authRequest,ts);
@@ -751,13 +772,12 @@ public class SAAccess implements ISAAccess{
      */
     public ResponseObject deliverOTPByPush(String userId, String factorId){
         String ts = getServerTime();
-        RestApiHeader restApiHeader = new RestApiHeader();
         AuthRequest authRequest = new AuthRequest();
 
         authRequest.setUser_id(userId);
         authRequest.setType("push");
         authRequest.setFactor_id(factorId);
-        String header = restApiHeader.getAuthorizationHeader(saAuth,"POST", AuthQuery.queryAuth(saAuth.getRealm()), authRequest,ts);
+        String header = RestApiHeader.getAuthorizationHeader(saAuth,"POST", AuthQuery.queryAuth(saAuth.getRealm()), authRequest,ts);
 
         try{
             return saExecuter.executePostRequest(header,saBaseURL.getApplianceURL() + AuthQuery.queryAuth(saAuth.getRealm()), authRequest,ts, ResponseObject.class);
@@ -777,13 +797,12 @@ public class SAAccess implements ISAAccess{
      */
     public ResponseObject deliverOTPByHelpDesk(String userId, String factorId){
         String ts = getServerTime();
-        RestApiHeader restApiHeader = new RestApiHeader();
         AuthRequest authRequest = new AuthRequest();
 
         authRequest.setUser_id(userId);
         authRequest.setType("help_desk");
         authRequest.setFactor_id(factorId);
-        String header = restApiHeader.getAuthorizationHeader(saAuth,"POST", AuthQuery.queryAuth(saAuth.getRealm()), authRequest,ts);
+        String header = RestApiHeader.getAuthorizationHeader(saAuth,"POST", AuthQuery.queryAuth(saAuth.getRealm()), authRequest,ts);
 
         try{
             return saExecuter.executeOTPByHelpDesk(header,saBaseURL.getApplianceURL() + AuthQuery.queryAuth(saAuth.getRealm()),authRequest,ts);
@@ -791,6 +810,76 @@ public class SAAccess implements ISAAccess{
             logger.error(new StringBuilder().append("Exception occurred executing REST query::\n").append(e.getMessage()).append("\n").toString(), e);
         }
         return null;
+    }
+
+    /**
+     * <p>
+     *     Send Link to accept by email
+     *     The response is as follows
+     *     {
+     *        "reference_id": "xxxxxxxxxxxxxxxxx",
+     *        "status": "valid",
+     *        "message": "",
+     *        "user_id": "xxxxxxxxxxx"
+     *      }
+     * </p>
+     * @param userId the userid of the identity
+     * @param factorId  Email Property "Email1"
+     * @return {@link StatefulResponseObject}
+     */
+    public StatefulResponseObject emailLink(String userId, String factorId){
+        String ts = getServerTime();
+        AuthRequest authRequest = LinkToAcceptFactory.createLinkToAcceptAuthRequest(userId, factorId, Resource.EMAIL_LINK);
+        return getStatefulResponseObject(ts, authRequest);
+    }
+
+    /**
+     * <p>
+     *     Send Link to accept by email
+     *     The response is as follows
+     *     {
+     *        "reference_id": "xxxxxxxxxxxxxxxxx",
+     *        "status": "valid",
+     *        "message": "",
+     *        "user_id": "xxxxxxxxxxx"
+     *      }
+     * </p>
+     * @param userId the userid of the identity
+     * @param factorId  Phone Property "Phone1"
+     * @return {@link StatefulResponseObject}
+     */
+    public StatefulResponseObject smsLink(String userId, String factorId){
+        String ts = getServerTime();
+        AuthRequest authRequest = LinkToAcceptFactory.createLinkToAcceptAuthRequest(userId, factorId, Resource.SMS_LINK);
+        return getStatefulResponseObject(ts, authRequest);
+    }
+
+    private StatefulResponseObject getStatefulResponseObject(String ts, AuthRequest authRequest) {
+        String header = RestApiHeader.getAuthorizationHeader(saAuth, Resource.METHOD_POST, AuthQuery.queryAuth(saAuth.getRealm()), authRequest,ts);
+
+        try{
+            return saExecuter.executePostRequestStateful(header, saBaseURL.getApplianceURL() + AuthQuery.queryAuth(saAuth.getRealm()), authRequest, ts, StatefulResponseObject.class);
+        }catch (Exception e){
+            throw new SARestAPIException( e );
+        }
+    }
+
+    /**
+     * <p>
+     *     Verify Link to accept using code
+     * </p>
+     * @param linkId the id provided when making a link to accept request
+     * @return {@link PushAcceptStatus}
+     */
+    public PushAcceptStatus verifyLinkToAcceptStatus(String linkId, Cookie cookie) {
+        String ts = getServerTime();
+        String header = RestApiHeader.getAuthorizationHeader(saAuth, Resource.METHOD_GET, AuthQuery.queryAuthLink(saAuth.getRealm(), linkId), ts);
+
+        try{
+            return saExecuter.executeGetRequestStateful(header, cookie, saBaseURL.getApplianceURL() + AuthQuery.queryAuthLink(saAuth.getRealm(), linkId), ts, PushAcceptStatus.class);
+        }catch (Exception e){
+            throw new SARestAPIException( e );
+        }
     }
 
     /**
@@ -804,12 +893,11 @@ public class SAAccess implements ISAAccess{
      */
     public ResponseObject accessHistory(String userId, String ipAddress){
         String ts = getServerTime();
-        RestApiHeader restApiHeader =new RestApiHeader();
         AccessHistoryRequest accessHistoryRequest =new AccessHistoryRequest();
         accessHistoryRequest.setIp_address(ipAddress);
         accessHistoryRequest.setUser_id(userId);
 
-        String header = restApiHeader.getAuthorizationHeader(saAuth,"POST", AccessHistoryQuery.queryAccessHistory(saAuth.getRealm()), accessHistoryRequest, ts);
+        String header = RestApiHeader.getAuthorizationHeader(saAuth,"POST", AccessHistoryQuery.queryAccessHistory(saAuth.getRealm()), accessHistoryRequest, ts);
 
         try{
 
@@ -833,13 +921,12 @@ public class SAAccess implements ISAAccess{
      */
     public DFPConfirmResponse DFPConfirm(String userId, String fingerprintId){
         String ts = getServerTime();
-        RestApiHeader restApiHeader =new RestApiHeader();
         DFPConfirmRequest dfpConfirmRequest =new DFPConfirmRequest();
         dfpConfirmRequest.setUser_id(userId);
         dfpConfirmRequest.setFingerprint_id(fingerprintId);
 
 
-        String header = restApiHeader.getAuthorizationHeader(saAuth,"POST", DFPQuery.queryDFPConfirm(saAuth.getRealm()), dfpConfirmRequest, ts);
+        String header = RestApiHeader.getAuthorizationHeader(saAuth,"POST", DFPQuery.queryDFPConfirm(saAuth.getRealm()), dfpConfirmRequest, ts);
 
         try{
 
@@ -864,14 +951,13 @@ public class SAAccess implements ISAAccess{
      */
     public DFPValidateResponse DFPValidateNewFingerprint(String userId, String hostAddress, String jsonString){
         String ts = getServerTime();
-        RestApiHeader restApiHeader =new RestApiHeader();
         DFPValidateRequest dfpValidateRequest = new DFPValidateRequest();
         DFP dfp = JSONUtil.getDFPFromJSONString(jsonString);
         dfpValidateRequest.setFingerprint(dfp);
         dfpValidateRequest.setUser_id(userId);
         dfpValidateRequest.setHost_address(hostAddress);
 
-        String header = restApiHeader.getAuthorizationHeader(saAuth,"POST", DFPQuery.queryDFPValidate(saAuth.getRealm()), dfpValidateRequest, ts);
+        String header = RestApiHeader.getAuthorizationHeader(saAuth,"POST", DFPQuery.queryDFPValidate(saAuth.getRealm()), dfpValidateRequest, ts);
 
         try{
 
@@ -884,6 +970,18 @@ public class SAAccess implements ISAAccess{
         return null;
     }
 
+    @Override
+    public DFPValidateResponse DFPValidateNewFingerprint(DFP fingerprint) {
+        String ts = getServerTime();
+
+        String header = RestApiHeader.getAuthorizationHeader(saAuth, Resource.METHOD_POST, DFPQuery.queryDFPValidate(saAuth.getRealm()), fingerprint, ts);
+
+        try{
+            return saExecuter.executePostRawRequest(header,saBaseURL.getApplianceURL() + DFPQuery.queryDFPValidate(saAuth.getRealm()), fingerprint, DFPValidateResponse.class, ts);
+        }catch (Exception e){
+            throw new SARestAPIException("Exception occurred executing score fingerprint", e);
+        }
+    }
 
     @Override
     public DFPValidateResponse DFPScoreFingerprint(String userId, String hostAddress, String fingerprintId, String fingerPrintJSON) {
@@ -899,6 +997,19 @@ public class SAAccess implements ISAAccess{
             String header = RestApiHeader.getAuthorizationHeader(saAuth, Resource.METHOD_POST, query, dfpScoreRequest, ts);
             return saExecuter.executePostRawRequest(header,saBaseURL.getApplianceURL() +  query, dfpScoreRequest, DFPValidateResponse.class, ts);
 
+        }catch (Exception e){
+            throw new SARestAPIException("Exception occurred executing score fingerprint", e);
+        }
+    }
+
+    @Override
+    public DFPValidateResponse DFPScoreFingerprint(DFP fingerprint) {
+        String ts = getServerTime();
+
+        String header = RestApiHeader.getAuthorizationHeader(saAuth, Resource.METHOD_POST, DFPQuery.queryDFPScore(saAuth.getRealm()), fingerprint, ts);
+
+        try{
+            return saExecuter.executePostRawRequest(header,saBaseURL.getApplianceURL() + DFPQuery.queryDFPScore(saAuth.getRealm()), fingerprint, DFPValidateResponse.class, ts);
         }catch (Exception e){
             throw new SARestAPIException("Exception occurred executing score fingerprint", e);
         }
@@ -931,9 +1042,7 @@ public class SAAccess implements ISAAccess{
      */
     public JSObjectResponse javaScriptSrc(){
         String ts = getServerTime();
-        RestApiHeader restApiHeader = new RestApiHeader();
-        String header = restApiHeader.getAuthorizationHeader(saAuth,"GET",DFPQuery.queryDFPjs(saAuth.getRealm()),ts);
-
+        String header = RestApiHeader.getAuthorizationHeader(saAuth,"GET",DFPQuery.queryDFPjs(saAuth.getRealm()),ts);
 
         try{
             return saExecuter.executeGetJSObject(header,saBaseURL.getApplianceURL() + DFPQuery.queryDFPjs(saAuth.getRealm()),ts, JSObjectResponse.class);
@@ -958,8 +1067,7 @@ public class SAAccess implements ISAAccess{
      */
     public JSObjectResponse BehaveBioJSSrc(){
         String ts = getServerTime();
-        RestApiHeader restApiHeader = new RestApiHeader();
-        String header = restApiHeader.getAuthorizationHeader(saAuth,"GET",BehaveBioQuery.queryBehaveBiojs(saAuth.getRealm()),ts);
+        String header = RestApiHeader.getAuthorizationHeader(saAuth,"GET",BehaveBioQuery.queryBehaveBiojs(saAuth.getRealm()),ts);
 
 
         try{
@@ -986,14 +1094,13 @@ public class SAAccess implements ISAAccess{
      */
     public BehaveBioResponse BehaveBioProfileSubmit(String userId, String behaviorProfile, String hostAddress, String userAgent){
         String ts = getServerTime();
-        RestApiHeader restApiHeader =new RestApiHeader();
         BehaveBioRequest behaveBioRequest = new BehaveBioRequest();
         behaveBioRequest.setUserId(userId);
         behaveBioRequest.setBehaviorProfile(behaviorProfile);
         behaveBioRequest.setHostAddress(hostAddress);
         behaveBioRequest.setUserAgent(userAgent);
 
-        String header = restApiHeader.getAuthorizationHeader(saAuth,"POST", BehaveBioQuery.queryBehaveBio(saAuth.getRealm()), behaveBioRequest, ts);
+        String header = RestApiHeader.getAuthorizationHeader(saAuth,"POST", BehaveBioQuery.queryBehaveBio(saAuth.getRealm()), behaveBioRequest, ts);
 
         try{
 
@@ -1020,14 +1127,13 @@ public class SAAccess implements ISAAccess{
      */
     public ResponseObject BehaveBioProfileReset(String userId, String fieldName, String fieldType, String deviceType){
         String ts = getServerTime();
-        RestApiHeader restApiHeader =new RestApiHeader();
         BehaveBioResetRequest behaveBioResetRequest = new BehaveBioResetRequest();
         behaveBioResetRequest.setUserId(userId);
         behaveBioResetRequest.setFieldName(fieldName);
         behaveBioResetRequest.setFieldType(fieldType);
         behaveBioResetRequest.setDeviceType(deviceType);
 
-        String header = restApiHeader.getAuthorizationHeader(saAuth,"PUT", BehaveBioQuery.queryBehaveBio(saAuth.getRealm()), behaveBioResetRequest, ts);
+        String header = RestApiHeader.getAuthorizationHeader(saAuth,"PUT", BehaveBioQuery.queryBehaveBio(saAuth.getRealm()), behaveBioResetRequest, ts);
 
         try{
 
@@ -1120,7 +1226,7 @@ public class SAAccess implements ISAAccess{
                         (v1,v2)->v1,
                         LinkedHashMap::new)));
     }
-	
+
     /**
      * <p>
      *     Update User / Profile
@@ -1147,6 +1253,18 @@ public class SAAccess implements ISAAccess{
         }
     }
 
+    @Override
+    public BaseResponse deleteUser(String userId, String domain, boolean deleteRelatedData) {
+        try{
+            String ts = getServerTime();
+            DeleteUserRequest deleteUserRequest = new DeleteUserRequest(userId, deleteRelatedData, domain);
+            String header = RestApiHeader.getAuthorizationHeader(saAuth, Resource.METHOD_DELETE, IDMQueries.queryUsers(saAuth.getRealm()), deleteUserRequest,  ts);
+            return saExecuter.executeDeleteRawRequest(header,saBaseURL.getApplianceURL() + IDMQueries.queryUsers(saAuth.getRealm()),
+                    ts, deleteUserRequest, BaseResponse.class);
+        }catch (Exception e){
+            throw new SARestAPIException("Exception occurred executing REST query:\n" + e.getMessage() + "\n", e);
+        }
+    }
 
     /**
      * <p>
@@ -1317,8 +1435,7 @@ public class SAAccess implements ISAAccess{
         String ts = getServerTime();
         UserPasswordRequest userPasswordRequest = new UserPasswordRequest();
         userPasswordRequest.setPassword(password);
-        RestApiHeader restApiHeader = new RestApiHeader();
-        String header = restApiHeader.getAuthorizationHeader(saAuth,"POST",IDMQueries.queryUserResetPwd(saAuth.getRealm(), userId),userPasswordRequest,ts);
+        String header = RestApiHeader.getAuthorizationHeader(saAuth,"POST",IDMQueries.queryUserResetPwd(saAuth.getRealm(), userId),userPasswordRequest,ts);
 
 
         try{
@@ -1343,8 +1460,7 @@ public class SAAccess implements ISAAccess{
         String ts = getServerTime();
         UserPasswordRequest userPasswordRequest = new UserPasswordRequest();
         userPasswordRequest.setPassword(password);
-        RestApiHeader restApiHeader = new RestApiHeader();
-        String header = restApiHeader.getAuthorizationHeader(saAuth,"POST",IDMQueries.queryUserResetPwdQP(saAuth.getRealm()),userPasswordRequest,ts);
+        String header = RestApiHeader.getAuthorizationHeader(saAuth,"POST",IDMQueries.queryUserResetPwdQP(saAuth.getRealm()),userPasswordRequest,ts);
 
 
         try{
@@ -1370,8 +1486,7 @@ public class SAAccess implements ISAAccess{
         UserPasswordRequest userPasswordRequest = new UserPasswordRequest();
         userPasswordRequest.setCurrentPassword(currentPassword);
         userPasswordRequest.setNewPassword(newPassword);
-        RestApiHeader restApiHeader = new RestApiHeader();
-        String header = restApiHeader.getAuthorizationHeader(saAuth,"POST",IDMQueries.queryUserChangePwd(saAuth.getRealm(), userId),userPasswordRequest,ts);
+        String header = RestApiHeader.getAuthorizationHeader(saAuth,"POST",IDMQueries.queryUserChangePwd(saAuth.getRealm(), userId),userPasswordRequest,ts);
 
 
         try{
@@ -1397,8 +1512,7 @@ public class SAAccess implements ISAAccess{
         UserPasswordRequest userPasswordRequest = new UserPasswordRequest();
         userPasswordRequest.setCurrentPassword(currentPassword);
         userPasswordRequest.setNewPassword(newPassword);
-        RestApiHeader restApiHeader = new RestApiHeader();
-        String header = restApiHeader.getAuthorizationHeader(saAuth,"POST",IDMQueries.queryUserChangePwdQP(saAuth.getRealm()),userPasswordRequest,ts);
+        String header = RestApiHeader.getAuthorizationHeader(saAuth,"POST",IDMQueries.queryUserChangePwdQP(saAuth.getRealm()),userPasswordRequest,ts);
 
 
         try{
@@ -1466,12 +1580,11 @@ public class SAAccess implements ISAAccess{
      */
     public NumberProfileResponse PhoneNumberProfileSubmit(String userId, String phoneNumber){
         String ts = getServerTime();
-        RestApiHeader restApiHeader =new RestApiHeader();
         NumberProfileRequest numberProfileRequest = new NumberProfileRequest();
         numberProfileRequest.setUser_id(userId);
         numberProfileRequest.setPhone_number(phoneNumber);
 
-        String header = restApiHeader.getAuthorizationHeader(saAuth,"POST", NumberProfileQuery.queryNumberProfile(saAuth.getRealm()), numberProfileRequest, ts);
+        String header = RestApiHeader.getAuthorizationHeader(saAuth,"POST", NumberProfileQuery.queryNumberProfile(saAuth.getRealm()), numberProfileRequest, ts);
 
         try{
 
@@ -1501,7 +1614,6 @@ public class SAAccess implements ISAAccess{
      */
     public BaseResponse UpdatePhoneNumberProfile(String userId, String phoneNumber, String portedStatus, String carrierCode, String carrier, String countryCode, String networkType){
         String ts = getServerTime();
-        RestApiHeader restApiHeader =new RestApiHeader();
         NumberProfileUpdateRequest numberProfileUpdateRequest = new NumberProfileUpdateRequest();
         numberProfileUpdateRequest.setUser_id(userId);
         numberProfileUpdateRequest.setPhone_number(phoneNumber);
@@ -1513,7 +1625,7 @@ public class SAAccess implements ISAAccess{
         carrierInfo.setNetworkType(networkType);
         numberProfileUpdateRequest.setCarrierInfo(carrierInfo);
 
-        String header = restApiHeader.getAuthorizationHeader(saAuth,"PUT", NumberProfileQuery.queryNumberProfile(saAuth.getRealm()), numberProfileUpdateRequest, ts);
+        String header = RestApiHeader.getAuthorizationHeader(saAuth,"PUT", NumberProfileQuery.queryNumberProfile(saAuth.getRealm()), numberProfileUpdateRequest, ts);
 
         try{
 
@@ -1632,9 +1744,8 @@ public class SAAccess implements ISAAccess{
      */
     public String executeGetRequest(String query) {
 		String ts = getServerTime();
-		RestApiHeader restApiHeader = new RestApiHeader();
 		query = saAuth.getRealm() + query;
-		String header = restApiHeader.getAuthorizationHeader(saAuth, "GET", query, ts);
+		String header = RestApiHeader.getAuthorizationHeader(saAuth, "GET", query, ts);
 		try {
 			return saExecuter.executeRawGetRequest(header, saBaseURL.getApplianceURL() + query, ts);
 		} catch (Exception e) {
@@ -1643,12 +1754,13 @@ public class SAAccess implements ISAAccess{
 		return null;
 	}
 
+    // This is for a quick fix, we need to pass this boolean through configuration, which requires a refactor of this class.
     String getServerTime() {
-        Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
-        SimpleDateFormat dateFormat = new SimpleDateFormat(
-                "EEE, dd MMM yyyy HH:mm:ss.SSS z", Locale.US);
-        dateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
-        return dateFormat.format(calendar.getTime());
+        return getServerTime( saConfig.getOldIdPSupport() );
+    }
+
+    String getServerTime( Boolean oldIdpSupport ) {
+        return TimeUtils.getServerTime( oldIdpSupport );
     }
 
     /**

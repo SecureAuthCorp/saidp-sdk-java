@@ -8,6 +8,10 @@ public class SARestAPIException extends RuntimeException {
 		super(message);
 	}
 
+	public SARestAPIException(String message, Throwable e) {
+		super(message, e);
+	}
+
 	public SARestAPIException(String s, Exception e) {
 		super(s,e);
 	}

@@ -1,6 +1,7 @@
 
 plugins {
-    id 'java-library'
+    id 'java'
+    id 'application'
     id 'com.jfrog.artifactory' version '4.10.0'
     id 'jacoco'
 }
@@ -33,6 +34,15 @@ artifactory {
     }
 }
 
+// The following task is used internally in the corporation 
+// to use a local version exported in maven local without colliding 
+// with the version uploaded in mavenCentral.
+task buildLocal {
+    if( project.hasProperty( 'useMavenLocal' ) ) {
+        version = currentVersion + '_LOCAL'
+        finalizedBy( compileJava )
+    }
+}
 sourceCompatibility = 11.0
 
 dependencies {
@@ -60,6 +70,19 @@ dependencies {
     testRuntimeOnly 'org.apache.logging.log4j:log4j-core:2.17.1'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.5.2'
 
+}
+
+application {
+    // Define the main class for the application.
+    mainClassName = 'org.secureauth.sarestapi.main.Main'
+}
+
+distributions {
+    main {
+        contents {
+            from 'src/main/resources'
+        }
+    }
 }
 
 task copyToLib(type: Copy){

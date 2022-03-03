@@ -22,13 +22,12 @@ IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
 OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-public class AccessHistoryQuery {
+public final class AccessHistoryQuery {
 
+    private AccessHistoryQuery(){}
 
     public static String queryAccessHistory(String realm){
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(realm).append(Resource.APPLIANCE_ACCESSHISTORY);
-        return stringBuilder.toString();
+        return realm + Resource.APPLIANCE_ACCESSHISTORY;
     }
 
 }

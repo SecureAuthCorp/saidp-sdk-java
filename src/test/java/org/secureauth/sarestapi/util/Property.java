@@ -10,6 +10,7 @@ public enum Property {
 	VALID_USERNAME("user.username"),
 	VALID_PIN("user.pin"),
 	VALID_PASSWORD("user.password"),
+	USER_DOMAIN("user.domain"),
 	VALID_FACTOR_ID_FOR_OATH_OTP("user.oath.totp.factor.id"),
 	VALID_OATH_TOTP_SHARED_KEY("user.oath.totp.shared.key"),
 	VALID_OATH_TOTP_LENGTH("user.oath.totp.length"),
