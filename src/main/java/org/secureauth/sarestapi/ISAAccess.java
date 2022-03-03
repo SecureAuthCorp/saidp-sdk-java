@@ -13,8 +13,11 @@ import org.secureauth.sarestapi.exception.SARestAPIException;
 
 import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.NewCookie;
+import java.util.Hashtable;
 
 public interface ISAAccess {
+
+	void updateConfig( Hashtable<String, Object> config );
 
 	/**
 	 * <p>
