@@ -1,9 +1,6 @@
 package org.secureauth.restapi.test;
 
-import org.junit.Assume;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.*;
 import org.junit.rules.ExpectedException;
 import org.secureauth.sarestapi.ISAAccess;
 import org.secureauth.sarestapi.SAAccess;
@@ -53,6 +50,10 @@ public class SAAccessTDD {
 	private static String validPin;
 	private static String validPassword;
 	private static String userDomain;
+	private static String newUserPin;
+	private final static String NEW_USERNAME = "new-user";
+	private final static String NEW_USER_PASSWORD = "password";
+	private final static String NEW_USERNAME_QP = "new-user" + "+~.!@$%^&*'_";
 	private final static String UNEXISTING_USERNAME = "unexisting-user";
 	private final static String UNEXISTING_USERNAME_QP = UNEXISTING_USERNAME + "+~.!@$%^&*'_";
 
@@ -64,6 +65,14 @@ public class SAAccessTDD {
 	//Response messages
 	private static final String FOUND_MESSAGE = "found";
 	private static final String NOT_FOUND_MESSAGE = "not_found";
+	private static final String VALID_MESSAGE = "valid";
+	private static final String INVALID_MESSAGE = "invalid";
+	private static final String OK_MESSAGE = "OK";
+	private static final String INVALID_OTP_MESSAGE = "OTP is invalid.";
+	private static final String ID_FOUND_MESSAGE = "User Id found";
+	private static final String ID_NOT_FOUND_MESSAGE = "User Id was not found.";
+	private static final String SUCCESS_MESSAGE = "success";
+	private static final String PROCESSED_REQUEST_MESSAGE = "Request has been processed.";
 
 	//User OATH-OTP
 	private static String validFactorIdForOathOtp;
@@ -120,7 +129,7 @@ public class SAAccessTDD {
 		 */
 		BaseResponse response = saAccess.validateUserPin(validUsername, validPin);
 		assertNotNull(response);
-		assertEquals("valid", response.getStatus());
+		assertEquals(VALID_MESSAGE, response.getStatus());
 		assertTrue(response.getMessage().isEmpty());
 
 	}
@@ -138,11 +147,11 @@ public class SAAccessTDD {
 		SAAccess saAccessWithXRequestID = new SAAccess( saBaseURL, saAuth, new SAExecuter( saBaseURL, guidStrategy) );
 		BaseResponse response = saAccessWithXRequestID.validateUserPin(validUsername, validPin);
 		assertNotNull(response);
-		assertEquals("valid", response.getStatus());
+		assertEquals(VALID_MESSAGE, response.getStatus());
 		assertTrue(response.getMessage().isEmpty());
 
 	}
-
+	
 	@Test
 	public void testGetPropertiesWithValidUser() throws Exception {
 		/*
@@ -182,7 +191,7 @@ public class SAAccessTDD {
 		assertEquals(FOUND_MESSAGE, response.getStatus());
 		assertTrue(response.getMessage().isEmpty());
 	}
-
+	
 	@Test
 	public void testGetPropertiesWithValidUserQP() throws Exception {
 		/*
@@ -222,7 +231,7 @@ public class SAAccessTDD {
 		assertEquals(FOUND_MESSAGE, response.getStatus());
 		assertTrue(response.getMessage().isEmpty());
 	}
-
+	
 	@Test
 	public void testGetPropertiesWithUnexistingUser() throws Exception {
 		/*
@@ -240,10 +249,10 @@ public class SAAccessTDD {
 
 		UserProfileResponse response = saAccess.getUserProfile(UNEXISTING_USERNAME);
 		assertNotNull(response);
-		assertEquals(NOT_FOUND_MESSAGE, response.getStatus());
-		assertEquals( "User Id was not found.", response.getMessage());
+		assertEquals( NOT_FOUND_MESSAGE, response.getStatus() );
+		assertEquals( ID_NOT_FOUND_MESSAGE, response.getMessage());
 	}
-
+	
 	@Test
 	public void testGetPropertiesWithUnexistingUserQP() throws Exception {
 		/*
@@ -262,8 +271,8 @@ public class SAAccessTDD {
 		UserProfileResponse response = saAccess.getUserProfileQP(UNEXISTING_USERNAME_QP);
 		assertNotNull(response);
 		// If the special characters are not being recognised then we should get some sort of reject instead of a NOT_FOUND_MESSAGE here
-		assertEquals(NOT_FOUND_MESSAGE, response.getStatus());
-		assertEquals( "User Id was not found.", response.getMessage());
+		assertEquals( NOT_FOUND_MESSAGE, response.getStatus() );
+		assertEquals( ID_NOT_FOUND_MESSAGE, response.getMessage() );
 	}
 
 	@Test
@@ -278,7 +287,7 @@ public class SAAccessTDD {
 
 		BaseResponse response = saAccess.validateOath(validUsername, validUserOtpOath, validFactorIdForOathOtp);
 		assertNotNull(response);
-		assertEquals("valid", response.getStatus());
+		assertEquals(VALID_MESSAGE, response.getStatus());
 		assertTrue(response.getMessage().isEmpty());
 	}
 
@@ -295,9 +304,10 @@ public class SAAccessTDD {
 		String invalidFactorId = "zzzz0000z0000a00zzzz000z0zz0z00z";
 
 		BaseResponse response = saAccess.validateOath(validUsername, validUserOtp, invalidFactorId);
+		String expectedResponse = String.format("Request validation failed with: Unknown factor id %s", invalidFactorId);
 		assertNotNull(response);
-		assertEquals(response.getStatus(), "invalid");
-		assertEquals(response.getMessage(), "Request validation failed with: Unknown factor id 'zzzz0000z0000a00zzzz000z0zz0z00z'.");
+		assertEquals(INVALID_MESSAGE, response.getStatus());
+		assertEquals(expectedResponse, response.getMessage());
 	}
 
 	@Test
@@ -312,11 +322,10 @@ public class SAAccessTDD {
 
 		BaseResponse response = saAccess.validateOath(validUsername, validUserOtp, validFactorIdForOathOtp);
 		assertNotNull(response);
-		assertEquals(response.getStatus(), "invalid");
-		assertEquals(response.getMessage(), "OTP is invalid.");
+		assertEquals(INVALID_MESSAGE, response.getStatus());
+		assertEquals(INVALID_OTP_MESSAGE, response.getMessage());
 	}
-
-
+	
 	@Test
 	public void testValidatePasswordWithValidCredentials() throws Exception {
 		/*
@@ -329,10 +338,10 @@ public class SAAccessTDD {
 
 		BaseResponse response = saAccess.validateUserPassword(validUsername, validPassword);
 		assertNotNull(response);
-		assertEquals(response.getStatus(), "valid");
+		assertEquals(VALID_MESSAGE, response.getStatus());
 		assertTrue(response.getMessage().isEmpty());
 	}
-
+	
 	@Test
 	public void testValidatePasswordWithInvalidPassword() throws Exception {
 		/*
@@ -346,20 +355,20 @@ public class SAAccessTDD {
 
 		BaseResponse response = saAccess.validateUserPassword(validUsername, invalidPassword);
 		assertNotNull(response);
-		assertEquals(response.getStatus(), "invalid");
-		assertEquals(response.getMessage(), "User Id or password is invalid.");
+		assertEquals(INVALID_MESSAGE, response.getStatus());
+		assertEquals("User Id or password is invalid.", response.getMessage());
 	}
-
+	
 	@Test
 	public void testValidatePasswordFromUnexistingUser() throws Exception {
 		String somePassword = "password";
 
 		BaseResponse response = saAccess.validateUserPassword(UNEXISTING_USERNAME, somePassword);
 		assertNotNull(response);
-		assertEquals(response.getStatus(), NOT_FOUND_MESSAGE);
-		assertEquals(response.getMessage(), "User Id was not found.");
+		assertEquals(NOT_FOUND_MESSAGE, response.getStatus());
+		assertEquals(ID_NOT_FOUND_MESSAGE, response.getMessage());
 	}
-
+	
 	@Test
 	public void testGetFactorsFromValidUser() throws Exception {
 		/*
@@ -394,7 +403,7 @@ public class SAAccessTDD {
 		assertEquals(FOUND_MESSAGE, response.getStatus());
 		assertTrue(response.getMessage().isEmpty());
 	}
-
+	
 	@Test
 	public void testGetFactorsFromValidUserQP() throws Exception {
 		/*
@@ -429,7 +438,7 @@ public class SAAccessTDD {
 		assertEquals(FOUND_MESSAGE, response.getStatus());
 		assertTrue(response.getMessage().isEmpty());
 	}
-
+	
 	@Test
 	public void testGetFactorsFromUnexistingUser() throws Exception {
 		/*
@@ -445,9 +454,9 @@ public class SAAccessTDD {
 		FactorsResponse response = saAccess.factorsByUser(UNEXISTING_USERNAME);
 		assertNotNull(response);
 		assertEquals(NOT_FOUND_MESSAGE, response.getStatus());
-		assertEquals("User Id was not found.", response.getMessage());
+		assertEquals(ID_NOT_FOUND_MESSAGE, response.getMessage());
 	}
-
+	
 	@Test
 	public void testGetFactorsFromUnexistingUserQP() throws Exception {
 		/*
@@ -463,9 +472,9 @@ public class SAAccessTDD {
 		FactorsResponse response = saAccess.factorsByUserQP(UNEXISTING_USERNAME_QP);
 		assertNotNull(response);
 		assertEquals(NOT_FOUND_MESSAGE, response.getStatus());
-		assertEquals("User Id was not found.", response.getMessage());
+		assertEquals(ID_NOT_FOUND_MESSAGE, response.getMessage());
 	}
-
+	
 	@Test
 	public void testUserPINWithInvalidNumbers() throws Exception {
 		/*
@@ -479,10 +488,10 @@ public class SAAccessTDD {
 
 		BaseResponse response = saAccess.validateUserPin(validUsername, invalidNumbersForPin);
 		assertNotNull(response);
-		assertEquals(response.getStatus(), "invalid");
+		assertEquals(INVALID_MESSAGE, response.getStatus());
 		assertTrue(response.getMessage().contains("PIN is invalid."));
 	}
-
+	
 	@Test
 	public void testValidateUserWithValidInfo() throws Exception {
 		/*
@@ -495,10 +504,10 @@ public class SAAccessTDD {
 
 		BaseResponse response = saAccess.validateUser(validUsername);
 		assertNotNull(response);
-		assertEquals(response.getStatus(), FOUND_MESSAGE);
-		assertEquals(response.getMessage(), "User Id found");
+		assertEquals(FOUND_MESSAGE, response.getStatus());
+		assertEquals(ID_FOUND_MESSAGE, response.getMessage());
 	}
-
+	
 	@Test
 	public void testValidateUserNotFound() throws Exception {
 		/*
@@ -512,10 +521,10 @@ public class SAAccessTDD {
 
 		BaseResponse response = saAccess.validateUser(UNEXISTING_USERNAME_QP);
 		assertNotNull(response);
-		assertEquals(response.getStatus(), NOT_FOUND_MESSAGE);
-		assertEquals(response.getMessage(), "User Id was not found.");
+		assertEquals(NOT_FOUND_MESSAGE, response.getStatus());
+		assertEquals(ID_NOT_FOUND_MESSAGE, response.getMessage());
 	}
-
+	
 	@Test
 	public void testValidateUserWithInvalidKey() throws Exception{
 		/*
@@ -530,10 +539,10 @@ public class SAAccessTDD {
 		SAAccess invalidAuthAccess = new SAAccess(saBaseURL, invalidAuth, saExecuter);
 		BaseResponse response = invalidAuthAccess.validateUser(validUsername);
 		assertNotNull(response);
-		assertEquals("invalid", response.getStatus());
+		assertEquals(INVALID_MESSAGE, response.getStatus());
 		assertTrue(response.getMessage().contains("Invalid credentials."));
 	}
-
+	
 	@Test
 	public void testValidateUserWithValidID() throws Exception {
 		/*
@@ -548,19 +557,20 @@ public class SAAccessTDD {
 		SAAccess invalidAuthAccess = new SAAccess(saBaseURL, invalidAuth, saExecuter);
 		BaseResponse response = invalidAuthAccess.validateUser(validUsername);
 		assertNotNull(response);
-		assertEquals("invalid", response.getStatus());
+		assertEquals(INVALID_MESSAGE, response.getStatus());
 		assertTrue(response.getMessage().contains("AppId is unknown."));
 	}
-
+	
 	@Test
-	//@Ignore("Slow test")
+	//("Slow test")
+	//@Ignore
 	public void testValidateUserWithInvalidHost() throws Exception  {
 		SABaseURL invalidBase = new SABaseURL("invalidHost", port, ssl, true);
 		SAAccess invalidAuthAccess = new SAAccess(invalidBase, saAuth, saExecuter);
 		BaseResponse response = invalidAuthAccess.validateUser(validUsername);
 		assertNull("Already connected", response);
 	}
-
+	
 	@Test
 	public void testUserPINWithInvalidStrings() throws Exception {
 		/*
@@ -570,11 +580,10 @@ public class SAAccessTDD {
 			  "message" : "PIN is invalid."
 			}
 		 */
-		String invalidStringForPin = "invalid";
 
-		BaseResponse response = saAccess.validateUserPin(validUsername, invalidStringForPin);
+		BaseResponse response = saAccess.validateUserPin(validUsername, INVALID_MESSAGE);
 		assertNotNull(response);
-		assertEquals(response.getStatus(), invalidStringForPin);
+		assertEquals(INVALID_MESSAGE, response.getStatus());
 		assertTrue(response.getMessage().contains("PIN is invalid."));
 	}
 
@@ -594,7 +603,7 @@ public class SAAccessTDD {
 		ResponseObject responseObj = saAccess.updateUser(validUsername, newUserProfile);
 
 		assertNotNull(responseObj);
-		assertEquals("success", responseObj.getStatus());
+		assertEquals(SUCCESS_MESSAGE, responseObj.getStatus());
 		assertEquals("", responseObj.getMessage());
 	}
 
@@ -618,7 +627,7 @@ public class SAAccessTDD {
 		ResponseObject responseObj = saAccess.createUser(newUserProfile);
 
 		assertNotNull(responseObj);
-		assertEquals("success", responseObj.getStatus());
+		assertEquals(SUCCESS_MESSAGE, responseObj.getStatus());
 		assertEquals("", responseObj.getMessage());
 	}
 
@@ -668,7 +677,7 @@ public class SAAccessTDD {
 
 		DFPValidateResponse response = saAccess.DFPScoreFingerprint(validUsername, validHostAddress, validFingerprintId, emptyFingerprintJSON);
 		assertNotNull(response);
-		assertEquals("not_found", response.getStatus());
+		assertEquals(NOT_FOUND_MESSAGE, response.getStatus());
 		assertEquals(0.0, response.getScore(), 0.1);
 		assertEquals(0.0, response.getUpdate_score(), 0.1);
 	}
@@ -676,14 +685,14 @@ public class SAAccessTDD {
 	@Test
 	public void testDeleteUserValid() throws Exception {
 		//when
-		BaseResponse responseObj = saAccess.deleteUser(validUsername, userDomain, Boolean.FALSE );
+		BaseResponse responseObj = saAccess.deleteUser(NEW_USERNAME, userDomain, Boolean.FALSE );
 		//then
 		assertNotNull(responseObj);
-		assertEquals("success", responseObj.getStatus());
+		assertEquals(SUCCESS_MESSAGE, responseObj.getStatus());
 		assertEquals("User delete complete", responseObj.getMessage());
-		assertEquals(userDomain + "\\" +validUsername, responseObj.getUser_id());
+		assertEquals(userDomain + "\\" +NEW_USERNAME, responseObj.getUser_id());
 	}
-
+	
 	@Test
 	public void testDeleteUserInvalidUser() throws Exception {
 		//when
@@ -790,13 +799,11 @@ public class SAAccessTDD {
 
 		DFPValidateResponse response = saAccess.DFPScoreFingerprint(validUsername, validHostAddress, validFingerprintId, fingerprintJSON);
 		assertNotNull(response);
-		assertEquals("found", response.getStatus());
+		assertEquals(FOUND_MESSAGE, response.getStatus());
 		assertEquals(100.0, response.getScore(), 1);
 		assertEquals(90.0, response.getUpdate_score(), 1);
 		assertEquals(89.0, response.getMatch_score(), 1);
 	}
-
-
 
 	@Test
 	public void testDFPSaveWithValidFound() throws Exception {
@@ -892,7 +899,7 @@ public class SAAccessTDD {
 
 		DFPValidateResponse response = saAccess.DFPSaveFingerprint(validUsername, validHostAddress, validFingerprintId, fingerprintJSON);
 		assertNotNull(response);
-		assertEquals("found", response.getStatus());
+		assertEquals(FOUND_MESSAGE, response.getStatus());
 		assertEquals(100.0, response.getScore(), 1);
 		assertEquals(89.0, response.getUpdate_score(), 1);
 		assertEquals(90.0, response.getMatch_score(), 1);
@@ -918,7 +925,7 @@ public class SAAccessTDD {
 
 		DFPValidateResponse response = saAccess.DFPSaveFingerprint(validUsername, validHostAddress, validFingerprintId, emptyFingerprintJSON);
 		assertNotNull(response);
-		assertEquals("not_found", response.getStatus());
+		assertEquals(NOT_FOUND_MESSAGE, response.getStatus());
 		assertEquals(0.0, response.getScore(), 0.1);
 		assertEquals(0.0, response.getUpdate_score(), 0.1);
 		assertEquals("", response.getFingerprintId());
@@ -928,87 +935,87 @@ public class SAAccessTDD {
 	@Test
 	public void testNotifySuccessAuthenticatedResult() {
 		BaseResponse response = saAccess.notifyAuthenticated( validUsername, "success", "EMAIL" );
-		assertEquals( "Request has been processed.", response.getMessage() );
+		assertEquals( PROCESSED_REQUEST_MESSAGE, response.getMessage() );
 	}
 
 	@Test
 	public void testNotifyAbortedAuthenticatedResult() {
 		BaseResponse response = saAccess.notifyAuthenticated( validUsername, "aborted", "EMAIL" );
-		assertEquals( "Request has been processed.", response.getMessage() );
+		assertEquals( PROCESSED_REQUEST_MESSAGE, response.getMessage() );
 	}
 
 	@Test
 	public void testNotifyCancelledAuthenticatedResult() {
 		BaseResponse response = saAccess.notifyAuthenticated( validUsername, "cancelled", "EMAIL" );
-		assertEquals( "Request has been processed.", response.getMessage() );
+		assertEquals( PROCESSED_REQUEST_MESSAGE, response.getMessage() );
 	}
 
 	@Test
 	public void testNotifyWrongAuthenticatedResult() {
 		BaseResponse response = saAccess.notifyAuthenticated( validUsername, "wrong", "NONE" );
-		assertEquals( "Request has been processed.", response.getMessage() );
+		assertEquals( PROCESSED_REQUEST_MESSAGE, response.getMessage() );
 	}
 
 	@Test
 	public void testWhenUserIdIsNotValidThenNotifyAuthenticatedResultFail() {
 		BaseResponse response = saAccess.notifyAuthenticated( UNEXISTING_USERNAME, "success", "NONE" );
-		assertEquals( "User Id was not found.", response.getMessage() );
+		assertEquals( ID_NOT_FOUND_MESSAGE, response.getMessage() );
 	}
 
 	// This tests the creation of a real user
 	@Test
 	public void testCreateUserWithSpecialCharacters() {
 		NewUserProfile userProfile = new NewUserProfile();
-		userProfile.setUserId(UNEXISTING_USERNAME_QP);
-		userProfile.setPassword("1234");
+		userProfile.setUserId(NEW_USERNAME_QP);
+		userProfile.setPassword(NEW_USER_PASSWORD);
 
 		BaseResponse response = saAccess.createUser(userProfile);
-		assertEquals("OK", response.getStatus());
+		assertEquals(OK_MESSAGE, response.getStatus());
 	}
 
 	@Test
 	public void testGetCreatedUserWithSpecialCharacters() {
-		String userName = UNEXISTING_USERNAME_QP;
+		String userName = validUsername;
 		BaseResponse response = saAccess.getUserProfileQP(userName);
 
-		assertEquals("found", response.getStatus());
+		assertEquals(FOUND_MESSAGE, response.getStatus());
 	}
 
 	@Test
 	public void testGetCreatedFactorsUserWithSpecialCharacters() {
-		String userName = UNEXISTING_USERNAME_QP;
+		String userName = validUsername;
 		BaseResponse response = saAccess.factorsByUserQP(userName);
 
-		assertEquals("found", response.getStatus());
+		assertEquals(FOUND_MESSAGE, response.getStatus());
 	}
 
 	@Test
 	public void testGetCreatedThrottleUserWithSpecialCharacters() {
-		String userName = UNEXISTING_USERNAME_QP;
+		String userName = validUsername;
 		BaseResponse response = saAccess.getThrottleReqQP(userName);
 
-		assertEquals("found", response.getStatus());
+		assertEquals(FOUND_MESSAGE, response.getStatus());
 	}
 
 	@Test
 	public void testLinkToAcceptEmail() {
 		StatefulResponseObject response = saAccess.emailLink(validUsername, "Email1");
 
-		assertEquals("valid", response.getStatus());
+		assertEquals(VALID_MESSAGE, response.getStatus());
 	}
 
 	@Test
 	public void testLinkToAcceptSMS() {
 		StatefulResponseObject response = saAccess.smsLink(validUsername, "Phone1");
 
-		assertEquals("valid", response.getStatus());
+		assertEquals(VALID_MESSAGE, response.getStatus());
 	}
 
 	@Test
 	public void testLinkToAcceptVerify() {
-		StatefulResponseObject linkResponse = saAccess.emailLink(validUsername, "Email1");
+		StatefulResponseObject linkResponse = saAccess.smsLink(validUsername, "Phone1");
 		PushAcceptStatus response = saAccess.verifyLinkToAcceptStatus(linkResponse.getReference_id(), linkResponse.getSessionAffinityCookie());
 
-		assertEquals("found", response.getStatus());
+		assertEquals(FOUND_MESSAGE, response.getStatus());
 	}
 }
