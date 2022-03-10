@@ -22,19 +22,16 @@ IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
 OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-public class BehaveBioQuery {
+public final class BehaveBioQuery {
 
+    private BehaveBioQuery(){}
 
     public static String queryBehaveBiojs(String realm){
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(realm).append(Resource.APPLIANCE_BEHAVEBIO_JS);
-        return stringBuilder.toString();
+        return realm + Resource.APPLIANCE_BEHAVEBIO_JS;
     }
     
     public static String queryBehaveBio(String realm){
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(realm).append(Resource.APPLIANCE_BEHAVEBIO);
-        return stringBuilder.toString();
+        return realm + Resource.APPLIANCE_BEHAVEBIO;
     }
 
 }

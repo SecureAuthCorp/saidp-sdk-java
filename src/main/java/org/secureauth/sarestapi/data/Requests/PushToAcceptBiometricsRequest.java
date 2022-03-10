@@ -13,5 +13,9 @@ public class PushToAcceptBiometricsRequest extends PushToAcceptRequest {
     public void setBiometricType(String biometricType) {
         this.biometricType = biometricType;
     }
+
+    public String getBiometricType() {
+        return biometricType;
+    }
 }
 

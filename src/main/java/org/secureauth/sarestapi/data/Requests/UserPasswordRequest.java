@@ -11,31 +11,31 @@ import javax.xml.bind.annotation.XmlRootElement;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class UserPasswordRequest {
     /* Object to Support both Password Reset and Change Password Requests */
-    private String currentPassword;
-    private String newPassword;
-    private String password;
+    private char[] currentPassword = new char[0];
+    private char[] newPassword = new char[0];
+    private char[] password = new char[0];
 
     public String getCurrentPassword() {
-        return currentPassword;
+        return new String(currentPassword);
     }
 
     public void setCurrentPassword(String currentPassword) {
-        this.currentPassword = currentPassword;
+        this.currentPassword = currentPassword.toCharArray();
     }
 
     public String getNewPassword() {
-        return newPassword;
+        return new String(newPassword);
     }
 
     public void setNewPassword(String newPassword) {
-        this.newPassword = newPassword;
+        this.newPassword = newPassword.toCharArray();
     }
 
     public String getPassword() {
-        return password;
+        return new String(password);
     }
 
     public void setPassword(String password) {
-        this.password = password;
+        this.password = password.toCharArray();
     }
 }
