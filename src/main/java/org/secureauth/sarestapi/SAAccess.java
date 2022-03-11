@@ -114,9 +114,8 @@ public class SAAccess implements ISAAccess{
      * @param realm the Configured Realm that enables the RESTApi
      * @param applicationID The Application ID from the Configured Realm
      * @param applicationKey The Application Key from the Configured Realm
-     * @param guidStrategy
+     * @param guidStrategy The strategy used for the UUID
      *
-     * @return
      *
      * @deprecated from 1.0.6.0, replace by {@link org.secureauth.sarestapi.util.SAFactory}
      */
@@ -138,7 +137,6 @@ public class SAAccess implements ISAAccess{
      * @param saAuth {@link org.secureauth.sarestapi.data.SAAuth}
      * @param saExecuter {@link org.secureauth.sarestapi.resources.SAExecuter}
      *
-     * @return
      */
     public SAAccess(SABaseURL saBaseURL, SAAuth saAuth, SAExecuter saExecuter){
         this.saBaseURL= saBaseURL;
