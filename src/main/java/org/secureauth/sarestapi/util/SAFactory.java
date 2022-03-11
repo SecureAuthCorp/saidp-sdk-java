@@ -22,6 +22,8 @@ public final class SAFactory {
 	 * @param realm the Configured Realm that enables the RESTApi
 	 * @param applicationID The Application ID from the Configured Realm
 	 * @param applicationKey The Application Key from the Configured Realm
+	 *
+	 * @return saAccess The created access
 	 */
 	public static synchronized SAAccess of(String host, String port, boolean ssl, String realm, String applicationID, String applicationKey){
 		if(saAccess == null){
@@ -46,6 +48,8 @@ public final class SAFactory {
 	 * @param realm the Configured Realm that enables the RESTApi
 	 * @param applicationID The Application ID from the Configured Realm
 	 * @param applicationKey The Application Key from the Configured Realm
+	 *
+	 * @return saAccess The created access
 	 */
 	public static synchronized SAAccess of(String host, String port,boolean ssl,boolean selfSigned, String realm, String applicationID, String applicationKey){
 		if(saAccess == null){
@@ -66,6 +70,8 @@ public final class SAFactory {
 	 * @param saBaseURL {@link org.secureauth.sarestapi.data.SABaseURL}
 	 * @param saAuth {@link org.secureauth.sarestapi.data.SAAuth}
 	 * @param saExecuter {@link org.secureauth.sarestapi.resources.SAExecuter}
+	 *
+	 * @return saAccess The created access
 	 */
 	public static synchronized SAAccess of(SABaseURL saBaseURL, SAAuth saAuth, SAExecuter saExecuter){
 		if(saAccess == null){
