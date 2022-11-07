@@ -4,11 +4,12 @@ plugins {
     id 'application'
     id 'com.jfrog.artifactory' version '4.10.0'
     id 'jacoco'
+    id 'eclipse'
+    id 'maven-publish'
+    // Deprecated in Gradle 7, replaced by maven-publish
+    // https://docs.gradle.org/7.0/userguide/upgrading_version_6.html#removal_of_the_legacy_maven_plugin
+    // id 'maven'
 }
-
-apply plugin: 'eclipse'
-apply plugin: 'maven'
-apply plugin: 'maven-publish'
 
 group = 'org.secureauth.sarestapi'
 version = currentVersion
@@ -87,7 +88,7 @@ distributions {
 
 task copyToLib(type: Copy){
     into "$buildDir/libs"
-    from configurations.runtime
+    from configurations.runtimeOnly
 }
 
 task generate_zip(type: Zip) {
