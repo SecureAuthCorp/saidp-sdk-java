@@ -68,7 +68,7 @@ public class SAAccessTDD {
 	private static final String VALID_MESSAGE = "valid";
 	private static final String INVALID_MESSAGE = "invalid";
 	private static final String OK_MESSAGE = "OK";
-	private static final String INVALID_OTP_MESSAGE = "OTP is invalid.";
+	private static final String INVALID_OTP_MESSAGE = "Request validation failed with: A 'token' value is required for types: password, kba, oath, pin, yubikey., Unknown factor id ";
 	private static final String ID_FOUND_MESSAGE = "User Id found";
 	private static final String ID_NOT_FOUND_MESSAGE = "User Id was not found.";
 	private static final String SUCCESS_MESSAGE = "success";
@@ -90,6 +90,7 @@ public class SAAccessTDD {
 		saBaseURL = new SABaseURL(host, port, ssl, true);
 		saExecuter = new SAExecuter(saBaseURL);
 		saAccess = SAFactory.of(saBaseURL, saAuth, saExecuter);
+		saExecuter.setTimeout(50000);
 	}
 
 
@@ -304,10 +305,10 @@ public class SAAccessTDD {
 		String invalidFactorId = "zzzz0000z0000a00zzzz000z0zz0z00z";
 
 		BaseResponse response = saAccess.validateOath(validUsername, validUserOtp, invalidFactorId);
-		String expectedResponse = String.format("Request validation failed with: Unknown factor id %s", invalidFactorId);
+		String expectedResponse = String.format("Unknown factor id '%s'", invalidFactorId);
 		assertNotNull(response);
 		assertEquals(INVALID_MESSAGE, response.getStatus());
-		assertEquals(expectedResponse, response.getMessage());
+		assertTrue(response.getMessage().contains(expectedResponse));
 	}
 
 	@Test
@@ -323,9 +324,9 @@ public class SAAccessTDD {
 		BaseResponse response = saAccess.validateOath(validUsername, validUserOtp, validFactorIdForOathOtp);
 		assertNotNull(response);
 		assertEquals(INVALID_MESSAGE, response.getStatus());
-		assertEquals(INVALID_OTP_MESSAGE, response.getMessage());
+		assertEquals(INVALID_OTP_MESSAGE + "'" + validFactorIdForOathOtp+ "'.", response.getMessage());
 	}
-	
+
 	@Test
 	public void testValidatePasswordWithValidCredentials() throws Exception {
 		/*
@@ -474,7 +475,7 @@ public class SAAccessTDD {
 		assertEquals(NOT_FOUND_MESSAGE, response.getStatus());
 		assertEquals(ID_NOT_FOUND_MESSAGE, response.getMessage());
 	}
-	
+
 	@Test
 	public void testUserPINWithInvalidNumbers() throws Exception {
 		/*
@@ -692,7 +693,7 @@ public class SAAccessTDD {
 		assertEquals("User delete complete", responseObj.getMessage());
 		assertEquals(userDomain + "\\" +NEW_USERNAME, responseObj.getUser_id());
 	}
-	
+
 	@Test
 	public void testDeleteUserInvalidUser() throws Exception {
 		//when
@@ -1013,8 +1014,11 @@ public class SAAccessTDD {
 		assertEquals(VALID_MESSAGE, response.getStatus());
 	}
 
+	// You can execute this test to try out an SMS auth manually
+	@Ignore
 	@Test
 	public void testLinkToAcceptVerify() {
+		saExecuter.setTimeout(90000);
 		StatefulResponseObject linkResponse = saAccess.smsLink(validUsername, "Phone1");
 		PushAcceptStatus response = saAccess.verifyLinkToAcceptStatus(linkResponse.getReference_id(), linkResponse.getSessionAffinityCookie());
 
