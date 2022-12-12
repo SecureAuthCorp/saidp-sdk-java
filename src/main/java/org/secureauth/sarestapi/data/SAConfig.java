@@ -12,14 +12,13 @@ public class SAConfig {
     }
 
     public static synchronized SAConfig getInstance() {
-        if (instance == null) {
+        if (instance == null)
             instance = new SAConfig();
-        }
         return instance;
     }
 
     public void updateConfig( Hashtable<String, Object> newConfig ) {
-        config = newConfig;
+        getInstance().config = newConfig;
         oldIdpSupport = (Boolean) config.get("support.deprecated.idp");
     }
 

@@ -86,10 +86,10 @@ distributions {
     }
 }
 
-task copyToLib(type: Copy){
-    into "$buildDir/libs"
-    from configurations.runtimeOnly
-}
+// task copyToLib(type: Copy){
+//     into "$buildDir/libs"
+//     from configurations.runtime
+// }
 
 task generate_zip(type: Zip) {
     description 'Generates a zip file containing the docs and libs directories.'
@@ -98,7 +98,7 @@ task generate_zip(type: Zip) {
     archiveName "saidp-sdk-java-${version}.zip"
 }
 
-build.dependsOn( copyToLib )
+//build.dependsOn( copyToLib )
 build.dependsOn( javadoc )
 generate_zip.finalizedBy( build )
 
