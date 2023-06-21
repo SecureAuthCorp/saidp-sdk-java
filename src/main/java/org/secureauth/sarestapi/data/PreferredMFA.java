@@ -1,0 +1,34 @@
+package org.secureauth.sarestapi.data;
+
+import org.secureauth.sarestapi.util.JSONUtil;
+
+public class PreferredMFA {
+
+    private String type;
+    private String mode;
+    private String available_choosen_mode;
+
+    public String getType() {
+        return type;
+    }
+    public void setType(String type) {
+        this.type = type;
+    }
+    public String getMode() {
+        return mode;
+    }
+    public void setMode(String mode) {
+        this.mode = mode;
+    }
+    public String getAvailable_choosen_mode() {
+        return available_choosen_mode;
+    }
+    public void setAvailable_choosen_mode(String available_choosen_mode) {
+        this.available_choosen_mode = available_choosen_mode;
+    }
+    @Override
+    public String toString(){
+        return JSONUtil.convertObjectToJSON(this);
+    }
+
+}
