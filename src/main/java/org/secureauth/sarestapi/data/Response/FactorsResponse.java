@@ -6,6 +6,7 @@ package org.secureauth.sarestapi.data.Response;
  */
 import com.fasterxml.jackson.annotation.JsonInclude;
 import org.secureauth.sarestapi.data.Factors;
+import org.secureauth.sarestapi.data.PreferredMFA;
 import org.secureauth.sarestapi.util.JSONUtil;
 
 
@@ -19,13 +20,18 @@ import java.util.ArrayList;
 public class FactorsResponse extends BaseResponse{
 
     private ArrayList<Factors> factors = new ArrayList<Factors>();
-
+    public PreferredMFA preferred_mfa = new PreferredMFA();
     public ArrayList<Factors> getFactors() {
         return factors;
     }
-
     public void setFactors(ArrayList<Factors> factors) {
         this.factors = factors;
+    }
+    public PreferredMFA getPreferred_mfa() {
+        return preferred_mfa;
+    }
+    public void setPreferred_mfa(PreferredMFA preferred_mfa) {
+        this.preferred_mfa = preferred_mfa;
     }
 
     @Override
