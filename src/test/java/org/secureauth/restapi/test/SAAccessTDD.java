@@ -20,7 +20,6 @@ import org.secureauth.sarestapi.util.SAFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
 import java.util.UUID;
 
 import static org.junit.Assert.assertEquals;
@@ -45,10 +44,11 @@ public class SAAccessTDD {
 	private static String port;
 	private static Boolean ssl;
 
-	//User
+	// User
 	private static String validUsername;
 	private static String validPin;
 	private static String validPassword;
+	private static String validYubicoToken;
 	private static String userDomain;
 	private static String newUserPin;
 	private final static String NEW_USERNAME = "new-user";
@@ -57,12 +57,11 @@ public class SAAccessTDD {
 	private final static String UNEXISTING_USERNAME = "unexisting-user";
 	private final static String UNEXISTING_USERNAME_QP = UNEXISTING_USERNAME + "+~.!@$%^&*'_";
 
-	//DFP
+	// DFP
 	private static String validFingerprintId;
 	private static String validHostAddress;
 
-
-	//Response messages
+	// Response messages
 	private static final String FOUND_MESSAGE = "found";
 	private static final String NOT_FOUND_MESSAGE = "not_found";
 	private static final String VALID_MESSAGE = "valid";
@@ -74,7 +73,7 @@ public class SAAccessTDD {
 	private static final String SUCCESS_MESSAGE = "success";
 	private static final String PROCESSED_REQUEST_MESSAGE = "Request has been processed.";
 
-	//User OATH-OTP
+	// User OATH-OTP
 	private static String validFactorIdForOathOtp;
 	private static String validUserOtp;
 	private static String validUserOtpOath;
@@ -92,8 +91,7 @@ public class SAAccessTDD {
 		saAccess = SAFactory.of(saBaseURL, saAuth, saExecuter);
 	}
 
-
-	private void setupStrings(){
+	private void setupStrings() {
 		retrievePropertiesUtils = new RetrievePropertiesUtils();
 		apiApplicationId = getValue(Property.API_APPLICATION_ID);
 		apiApplicationKey = getValue(Property.API_APPLICATION_KEY);
@@ -110,11 +108,12 @@ public class SAAccessTDD {
 		validUserOtpOath = getValue(Property.VALID_OTP_OATH_CODE);
 		validHostAddress = getValue(Property.VALID_HOST_ADDRESS);
 		validFingerprintId = getValue(Property.VALID_FINGERPRINT_ID);
- 		assumeTest = Boolean.valueOf(getValue(Property.ASSUME_TEST));
+		validYubicoToken = getValue(Property.VALID_YUBICO_TOKEN);
+		assumeTest = Boolean.valueOf(getValue(Property.ASSUME_TEST));
 
 	}
 
-	private String getValue(Property property){
+	private String getValue(Property property) {
 		return retrievePropertiesUtils.getValueFromProperty(property);
 	}
 
@@ -122,10 +121,10 @@ public class SAAccessTDD {
 	public void testUserPINWithValidValues() throws Exception {
 		/*
 		 * Response would return:
-			{
-			  "status" : "valid",
-			  "message" : ""
-			}
+		 * {
+		 * "status" : "valid",
+		 * "message" : ""
+		 * }
 		 */
 		BaseResponse response = saAccess.validateUserPin(validUsername, validPin);
 		assertNotNull(response);
@@ -138,52 +137,52 @@ public class SAAccessTDD {
 	public void testUserPINWithValidValuesIncludingAXRequestID() throws Exception {
 		/*
 		 * Response would return:
-			{
-			  "status" : "valid",
-			  "message" : ""
-			}
+		 * {
+		 * "status" : "valid",
+		 * "message" : ""
+		 * }
 		 */
 		final GUIDStrategy guidStrategy = UUID::randomUUID;
-		SAAccess saAccessWithXRequestID = new SAAccess( saBaseURL, saAuth, new SAExecuter( saBaseURL, guidStrategy) );
+		SAAccess saAccessWithXRequestID = new SAAccess(saBaseURL, saAuth, new SAExecuter(saBaseURL, guidStrategy));
 		BaseResponse response = saAccessWithXRequestID.validateUserPin(validUsername, validPin);
 		assertNotNull(response);
 		assertEquals(VALID_MESSAGE, response.getStatus());
 		assertTrue(response.getMessage().isEmpty());
 
 	}
-	
+
 	@Test
 	public void testGetPropertiesWithValidUser() throws Exception {
 		/*
 		 * Response would return:
-			{
-			  "status" : "found",
-			  "message" : "",
-			  "userId" : "jsmith",
-			  "properties" : {
-			    "firstName" : {
-			      "value" : "John",
-			      "isWritable" : "false"
-			    },
-			    "lastName" : {
-			      "value" : "Smith",
-			      "isWritable" : "false"
-			    },
-			    "email1" : {
-			      "value" : "jsmith@secureauth.com",
-			      "isWritable" : "false"
-			    }
-			  },
-			  "knowledgeBase" : { },
-			  "groups" : [ ],
-			  "accessHistories" : [ {
-			    "userAgent" : "Jersey/2.5.1 (HttpUrlConnection 1.8.0_202)",
-			    "ipAddress" : "11.1.1.2",
-			    "timeStamp" : "2019-07-12T18:13:17.921501Z",
-			    "authState" : "Success"
-			  },
-			  {...} ]
-			}
+		 * {
+		 * "status" : "found",
+		 * "message" : "",
+		 * "userId" : "jsmith",
+		 * "properties" : {
+		 * "firstName" : {
+		 * "value" : "John",
+		 * "isWritable" : "false"
+		 * },
+		 * "lastName" : {
+		 * "value" : "Smith",
+		 * "isWritable" : "false"
+		 * },
+		 * "email1" : {
+		 * "value" : "jsmith@secureauth.com",
+		 * "isWritable" : "false"
+		 * }
+		 * },
+		 * "knowledgeBase" : { },
+		 * "groups" : [ ],
+		 * "accessHistories" : [ {
+		 * "userAgent" : "Jersey/2.5.1 (HttpUrlConnection 1.8.0_202)",
+		 * "ipAddress" : "11.1.1.2",
+		 * "timeStamp" : "2019-07-12T18:13:17.921501Z",
+		 * "authState" : "Success"
+		 * },
+		 * {...} ]
+		 * }
 		 */
 
 		UserProfileResponse response = saAccess.getUserProfile(validUsername);
@@ -191,39 +190,39 @@ public class SAAccessTDD {
 		assertEquals(FOUND_MESSAGE, response.getStatus());
 		assertTrue(response.getMessage().isEmpty());
 	}
-	
+
 	@Test
 	public void testGetPropertiesWithValidUserQP() throws Exception {
 		/*
 		 * Response would return:
-			{
-			  "status" : "found",
-			  "message" : "",
-			  "userId" : "jsmith",
-			  "properties" : {
-			    "firstName" : {
-			      "value" : "John",
-			      "isWritable" : "false"
-			    },
-			    "lastName" : {
-			      "value" : "Smith",
-			      "isWritable" : "false"
-			    },
-			    "email1" : {
-			      "value" : "jsmith@secureauth.com",
-			      "isWritable" : "false"
-			    }
-			  },
-			  "knowledgeBase" : { },
-			  "groups" : [ ],
-			  "accessHistories" : [ {
-			    "userAgent" : "Jersey/2.5.1 (HttpUrlConnection 1.8.0_202)",
-			    "ipAddress" : "11.1.1.2",
-			    "timeStamp" : "2019-07-12T18:13:17.921501Z",
-			    "authState" : "Success"
-			  },
-			  {...} ]
-			}
+		 * {
+		 * "status" : "found",
+		 * "message" : "",
+		 * "userId" : "jsmith",
+		 * "properties" : {
+		 * "firstName" : {
+		 * "value" : "John",
+		 * "isWritable" : "false"
+		 * },
+		 * "lastName" : {
+		 * "value" : "Smith",
+		 * "isWritable" : "false"
+		 * },
+		 * "email1" : {
+		 * "value" : "jsmith@secureauth.com",
+		 * "isWritable" : "false"
+		 * }
+		 * },
+		 * "knowledgeBase" : { },
+		 * "groups" : [ ],
+		 * "accessHistories" : [ {
+		 * "userAgent" : "Jersey/2.5.1 (HttpUrlConnection 1.8.0_202)",
+		 * "ipAddress" : "11.1.1.2",
+		 * "timeStamp" : "2019-07-12T18:13:17.921501Z",
+		 * "authState" : "Success"
+		 * },
+		 * {...} ]
+		 * }
 		 */
 
 		UserProfileResponse response = saAccess.getUserProfileQP(validUsername);
@@ -231,58 +230,59 @@ public class SAAccessTDD {
 		assertEquals(FOUND_MESSAGE, response.getStatus());
 		assertTrue(response.getMessage().isEmpty());
 	}
-	
+
 	@Test
 	public void testGetPropertiesWithUnexistingUser() throws Exception {
 		/*
 		 * Response would return:
-			{
-			  "status" : "not_found",
-			  "message" : "User Id was not found.",
-			  "user_id" : "unexisting-user",
-			  "properties" : { },
-			  "knowledgeBase" : { },
-			  "groups" : [ ],
-			  "accessHistories" : [ ]
-			}
+		 * {
+		 * "status" : "not_found",
+		 * "message" : "User Id was not found.",
+		 * "user_id" : "unexisting-user",
+		 * "properties" : { },
+		 * "knowledgeBase" : { },
+		 * "groups" : [ ],
+		 * "accessHistories" : [ ]
+		 * }
 		 */
 
 		UserProfileResponse response = saAccess.getUserProfile(UNEXISTING_USERNAME);
 		assertNotNull(response);
-		assertEquals( NOT_FOUND_MESSAGE, response.getStatus() );
-		assertEquals( ID_NOT_FOUND_MESSAGE, response.getMessage());
+		assertEquals(NOT_FOUND_MESSAGE, response.getStatus());
+		assertEquals(ID_NOT_FOUND_MESSAGE, response.getMessage());
 	}
-	
+
 	@Test
 	public void testGetPropertiesWithUnexistingUserQP() throws Exception {
 		/*
 		 * Response would return:
-			{
-			  "status" : "not_found",
-			  "message" : "User Id was not found.",
-			  "user_id" : "unexisting-user",
-			  "properties" : { },
-			  "knowledgeBase" : { },
-			  "groups" : [ ],
-			  "accessHistories" : [ ]
-			}
+		 * {
+		 * "status" : "not_found",
+		 * "message" : "User Id was not found.",
+		 * "user_id" : "unexisting-user",
+		 * "properties" : { },
+		 * "knowledgeBase" : { },
+		 * "groups" : [ ],
+		 * "accessHistories" : [ ]
+		 * }
 		 */
 
 		UserProfileResponse response = saAccess.getUserProfileQP(UNEXISTING_USERNAME_QP);
 		assertNotNull(response);
-		// If the special characters are not being recognised then we should get some sort of reject instead of a NOT_FOUND_MESSAGE here
-		assertEquals( NOT_FOUND_MESSAGE, response.getStatus() );
-		assertEquals( ID_NOT_FOUND_MESSAGE, response.getMessage() );
+		// If the special characters are not being recognised then we should get some
+		// sort of reject instead of a NOT_FOUND_MESSAGE here
+		assertEquals(NOT_FOUND_MESSAGE, response.getStatus());
+		assertEquals(ID_NOT_FOUND_MESSAGE, response.getMessage());
 	}
 
 	@Test
 	public void testValidateOathOTPWithValidCode() throws Exception {
 		/*
 		 * Response would return:
-			{
-			  "status" : "valid",
-			  "message" : ""
-			}
+		 * {
+		 * "status" : "valid",
+		 * "message" : ""
+		 * }
 		 */
 
 		BaseResponse response = saAccess.validateOath(validUsername, validUserOtpOath, validFactorIdForOathOtp);
@@ -295,16 +295,18 @@ public class SAAccessTDD {
 	public void testValidateOathOTPWithInvalidFactorId() throws Exception {
 		/*
 		 * Response would return:
-			{
-			  "status" : "invalid",
-			  "message" : "Request validation failed with: Unknown factor id 'zzzz0000b4504a15acec016d7ef9f42b'."
-			}
+		 * {
+		 * "status" : "invalid",
+		 * "message" :
+		 * "Request validation failed with: Unknown factor id 'zzzz0000b4504a15acec016d7ef9f42b'."
+		 * }
 		 */
 
 		String invalidFactorId = "zzzz0000z0000a00zzzz000z0zz0z00z";
 
 		BaseResponse response = saAccess.validateOath(validUsername, validUserOtp, invalidFactorId);
-		String expectedResponse = String.format("Request validation failed with: Unknown factor id %s", invalidFactorId);
+		String expectedResponse = String.format("Request validation failed with: Unknown factor id %s",
+				invalidFactorId);
 		assertNotNull(response);
 		assertEquals(INVALID_MESSAGE, response.getStatus());
 		assertEquals(expectedResponse, response.getMessage());
@@ -314,10 +316,10 @@ public class SAAccessTDD {
 	public void testValidateOathOTPWithInvalidCode() throws Exception {
 		/*
 		 * Response would return:
-			{
-			  "status" : "invalid",
-			  "message" : "OTP is invalid."
-			}
+		 * {
+		 * "status" : "invalid",
+		 * "message" : "OTP is invalid."
+		 * }
 		 */
 
 		BaseResponse response = saAccess.validateOath(validUsername, validUserOtp, validFactorIdForOathOtp);
@@ -325,15 +327,15 @@ public class SAAccessTDD {
 		assertEquals(INVALID_MESSAGE, response.getStatus());
 		assertEquals(INVALID_OTP_MESSAGE, response.getMessage());
 	}
-	
+
 	@Test
 	public void testValidatePasswordWithValidCredentials() throws Exception {
 		/*
 		 * Response would return:
-			{
-			  "status" : "valid",
-			  "message" : ""
-			}
+		 * {
+		 * "status" : "valid",
+		 * "message" : ""
+		 * }
 		 */
 
 		BaseResponse response = saAccess.validateUserPassword(validUsername, validPassword);
@@ -341,15 +343,15 @@ public class SAAccessTDD {
 		assertEquals(VALID_MESSAGE, response.getStatus());
 		assertTrue(response.getMessage().isEmpty());
 	}
-	
+
 	@Test
 	public void testValidatePasswordWithInvalidPassword() throws Exception {
 		/*
 		 * Response would return:
-			{
-			  "status" : "invalid",
-			  "message" : "User Id or password is invalid."
-			}
+		 * {
+		 * "status" : "invalid",
+		 * "message" : "User Id or password is invalid."
+		 * }
 		 */
 		String invalidPassword = "invalidPassword";
 
@@ -358,7 +360,7 @@ public class SAAccessTDD {
 		assertEquals(INVALID_MESSAGE, response.getStatus());
 		assertEquals("User Id or password is invalid.", response.getMessage());
 	}
-	
+
 	@Test
 	public void testValidatePasswordFromUnexistingUser() throws Exception {
 		String somePassword = "password";
@@ -368,34 +370,34 @@ public class SAAccessTDD {
 		assertEquals(NOT_FOUND_MESSAGE, response.getStatus());
 		assertEquals(ID_NOT_FOUND_MESSAGE, response.getMessage());
 	}
-	
+
 	@Test
 	public void testGetFactorsFromValidUser() throws Exception {
 		/*
 		 * Response would return:
-			{
-			  "status" : "found",
-			  "message" : "",
-			  "user_id" : "jsmith",
-			  "factors" : [ {
-			    "type" : "email",
-			    "id" : "Email1",
-			    "value" : "jsmith@secureauth.com"
-			  }, {
-			    "type" : "push",
-			    "id" : "8020890sxt414974b2235e31f4192785",
-			    "value" : "SM-J7",
-			    "capabilities" : [ "push", "push_accept" ]
-			  }, {
-			    "type" : "oath",
-			    "id" : "7edec5b5e3f553150f1e90261a03b8fd",
-			    "value" : "Windows"
-			  }, {
-			    "type" : "oath",
-			    "id" : "6f669edbb4504a15acec016d7ef9f42b",
-			    "value" : "SM-J7"
-			  } ]
-			}
+		 * {
+		 * "status" : "found",
+		 * "message" : "",
+		 * "user_id" : "jsmith",
+		 * "factors" : [ {
+		 * "type" : "email",
+		 * "id" : "Email1",
+		 * "value" : "jsmith@secureauth.com"
+		 * }, {
+		 * "type" : "push",
+		 * "id" : "8020890sxt414974b2235e31f4192785",
+		 * "value" : "SM-J7",
+		 * "capabilities" : [ "push", "push_accept" ]
+		 * }, {
+		 * "type" : "oath",
+		 * "id" : "7edec5b5e3f553150f1e90261a03b8fd",
+		 * "value" : "Windows"
+		 * }, {
+		 * "type" : "oath",
+		 * "id" : "6f669edbb4504a15acec016d7ef9f42b",
+		 * "value" : "SM-J7"
+		 * } ]
+		 * }
 		 */
 
 		FactorsResponse response = saAccess.factorsByUser(validUsername);
@@ -403,34 +405,34 @@ public class SAAccessTDD {
 		assertEquals(FOUND_MESSAGE, response.getStatus());
 		assertTrue(response.getMessage().isEmpty());
 	}
-	
+
 	@Test
 	public void testGetFactorsFromValidUserQP() throws Exception {
 		/*
 		 * Response would return:
-			{
-			  "status" : "found",
-			  "message" : "",
-			  "user_id" : "jsmith",
-			  "factors" : [ {
-			    "type" : "email",
-			    "id" : "Email1",
-			    "value" : "jsmith@secureauth.com"
-			  }, {
-			    "type" : "push",
-			    "id" : "8020890sxt414974b2235e31f4192785",
-			    "value" : "SM-J7",
-			    "capabilities" : [ "push", "push_accept" ]
-			  }, {
-			    "type" : "oath",
-			    "id" : "7edec5b5e3f553150f1e90261a03b8fd",
-			    "value" : "Windows"
-			  }, {
-			    "type" : "oath",
-			    "id" : "6f669edbb4504a15acec016d7ef9f42b",
-			    "value" : "SM-J7"
-			  } ]
-			}
+		 * {
+		 * "status" : "found",
+		 * "message" : "",
+		 * "user_id" : "jsmith",
+		 * "factors" : [ {
+		 * "type" : "email",
+		 * "id" : "Email1",
+		 * "value" : "jsmith@secureauth.com"
+		 * }, {
+		 * "type" : "push",
+		 * "id" : "8020890sxt414974b2235e31f4192785",
+		 * "value" : "SM-J7",
+		 * "capabilities" : [ "push", "push_accept" ]
+		 * }, {
+		 * "type" : "oath",
+		 * "id" : "7edec5b5e3f553150f1e90261a03b8fd",
+		 * "value" : "Windows"
+		 * }, {
+		 * "type" : "oath",
+		 * "id" : "6f669edbb4504a15acec016d7ef9f42b",
+		 * "value" : "SM-J7"
+		 * } ]
+		 * }
 		 */
 
 		FactorsResponse response = saAccess.factorsByUserQP(validUsername);
@@ -438,17 +440,17 @@ public class SAAccessTDD {
 		assertEquals(FOUND_MESSAGE, response.getStatus());
 		assertTrue(response.getMessage().isEmpty());
 	}
-	
+
 	@Test
 	public void testGetFactorsFromUnexistingUser() throws Exception {
 		/*
 		 * Response would return:
-			{
-			  "status" : "not_found",
-			  "message" : "User Id was not found.",
-			  "user_id" : "unexisting-user",
-			  "factors" : [ ]
-			}
+		 * {
+		 * "status" : "not_found",
+		 * "message" : "User Id was not found.",
+		 * "user_id" : "unexisting-user",
+		 * "factors" : [ ]
+		 * }
 		 */
 
 		FactorsResponse response = saAccess.factorsByUser(UNEXISTING_USERNAME);
@@ -456,17 +458,17 @@ public class SAAccessTDD {
 		assertEquals(NOT_FOUND_MESSAGE, response.getStatus());
 		assertEquals(ID_NOT_FOUND_MESSAGE, response.getMessage());
 	}
-	
+
 	@Test
 	public void testGetFactorsFromUnexistingUserQP() throws Exception {
 		/*
 		 * Response would return:
-			{
-			  "status" : "not_found",
-			  "message" : "User Id was not found.",
-			  "user_id" : "unexisting-user",
-			  "factors" : [ ]
-			}
+		 * {
+		 * "status" : "not_found",
+		 * "message" : "User Id was not found.",
+		 * "user_id" : "unexisting-user",
+		 * "factors" : [ ]
+		 * }
 		 */
 
 		FactorsResponse response = saAccess.factorsByUserQP(UNEXISTING_USERNAME_QP);
@@ -474,15 +476,15 @@ public class SAAccessTDD {
 		assertEquals(NOT_FOUND_MESSAGE, response.getStatus());
 		assertEquals(ID_NOT_FOUND_MESSAGE, response.getMessage());
 	}
-	
+
 	@Test
 	public void testUserPINWithInvalidNumbers() throws Exception {
 		/*
 		 * Response would return:
-			{
-			  "status" : "invalid",
-			  "message" : "PIN is invalid."
-			}
+		 * {
+		 * "status" : "invalid",
+		 * "message" : "PIN is invalid."
+		 * }
 		 */
 		String invalidNumbersForPin = "000000";
 
@@ -491,15 +493,15 @@ public class SAAccessTDD {
 		assertEquals(INVALID_MESSAGE, response.getStatus());
 		assertTrue(response.getMessage().contains("PIN is invalid."));
 	}
-	
+
 	@Test
 	public void testValidateUserWithValidInfo() throws Exception {
 		/*
 		 * Response would return:
-			{
-			  "status" : "found",
-			  "message" : "User Id found"
-			}
+		 * {
+		 * "status" : "found",
+		 * "message" : "User Id found"
+		 * }
 		 */
 
 		BaseResponse response = saAccess.validateUser(validUsername);
@@ -507,16 +509,16 @@ public class SAAccessTDD {
 		assertEquals(FOUND_MESSAGE, response.getStatus());
 		assertEquals(ID_FOUND_MESSAGE, response.getMessage());
 	}
-	
+
 	@Test
 	public void testValidateUserNotFound() throws Exception {
 		/*
 		 * Response would return:
-			{
-			  "status" : "not_found",
-			  "message" : "User Id was not found.",
-			  "user_id" : "unexisting-user"
-			}
+		 * {
+		 * "status" : "not_found",
+		 * "message" : "User Id was not found.",
+		 * "user_id" : "unexisting-user"
+		 * }
 		 */
 
 		BaseResponse response = saAccess.validateUser(UNEXISTING_USERNAME_QP);
@@ -524,33 +526,34 @@ public class SAAccessTDD {
 		assertEquals(NOT_FOUND_MESSAGE, response.getStatus());
 		assertEquals(ID_NOT_FOUND_MESSAGE, response.getMessage());
 	}
-	
+
 	@Test
-	public void testValidateUserWithInvalidKey() throws Exception{
+	public void testValidateUserWithInvalidKey() throws Exception {
 		/*
 		 * Response would return:
-			{
-			  "status" : "not_found",
-			  "message" : "The requested resource cannot be found."
-			}
+		 * {
+		 * "status" : "not_found",
+		 * "message" : "The requested resource cannot be found."
+		 * }
 		 */
 
-		SAAuth invalidAuth = new SAAuth(apiApplicationId, "de141d3f532be6035c3206083df96c8d1b645220094705aaa3ff9765b0a1a81e", realm);
+		SAAuth invalidAuth = new SAAuth(apiApplicationId,
+				"de141d3f532be6035c3206083df96c8d1b645220094705aaa3ff9765b0a1a81e", realm);
 		SAAccess invalidAuthAccess = new SAAccess(saBaseURL, invalidAuth, saExecuter);
 		BaseResponse response = invalidAuthAccess.validateUser(validUsername);
 		assertNotNull(response);
 		assertEquals(INVALID_MESSAGE, response.getStatus());
 		assertTrue(response.getMessage().contains("Invalid credentials."));
 	}
-	
+
 	@Test
 	public void testValidateUserWithValidID() throws Exception {
 		/*
 		 * Response would return:
-			{
-			  "status" : "not_found",
-			  "message" : "The requested resource cannot be found."
-			}
+		 * {
+		 * "status" : "not_found",
+		 * "message" : "The requested resource cannot be found."
+		 * }
 		 */
 
 		SAAuth invalidAuth = new SAAuth("invalidID", apiApplicationKey, realm);
@@ -560,25 +563,25 @@ public class SAAccessTDD {
 		assertEquals(INVALID_MESSAGE, response.getStatus());
 		assertTrue(response.getMessage().contains("AppId is unknown."));
 	}
-	
+
 	@Test
-	//("Slow test")
-	//@Ignore
-	public void testValidateUserWithInvalidHost() throws Exception  {
+	// ("Slow test")
+	// @Ignore
+	public void testValidateUserWithInvalidHost() throws Exception {
 		SABaseURL invalidBase = new SABaseURL("invalidHost", port, ssl, true);
 		SAAccess invalidAuthAccess = new SAAccess(invalidBase, saAuth, saExecuter);
 		BaseResponse response = invalidAuthAccess.validateUser(validUsername);
 		assertNull("Already connected", response);
 	}
-	
+
 	@Test
 	public void testUserPINWithInvalidStrings() throws Exception {
 		/*
 		 * Response would return:
-			{
-			  "status" : "invalid",
-			  "message" : "PIN is invalid."
-			}
+		 * {
+		 * "status" : "invalid",
+		 * "message" : "PIN is invalid."
+		 * }
 		 */
 
 		BaseResponse response = saAccess.validateUserPin(validUsername, INVALID_MESSAGE);
@@ -655,7 +658,7 @@ public class SAAccessTDD {
 		assertEquals(null, responseObj);
 	}
 
-	private double randomNumberBetween(int min, int max){
+	private double randomNumberBetween(int min, int max) {
 		return (Math.random() * ((max - min) + 1)) + min;
 	}
 
@@ -663,19 +666,20 @@ public class SAAccessTDD {
 	public void testDFPScoreWithValidNotFound() throws Exception {
 		/*
 		 * Response would return:
-			{
-			    "fingerprint_id": "",
-			    "fingerprint_name": "",
-			    "score": "0.00",
-			    "match_score": "0.00",
-			    "update_score": "0.00",
-			    "status": "not_found",
-			    "message": ""
-			 }
+		 * {
+		 * "fingerprint_id": "",
+		 * "fingerprint_name": "",
+		 * "score": "0.00",
+		 * "match_score": "0.00",
+		 * "update_score": "0.00",
+		 * "status": "not_found",
+		 * "message": ""
+		 * }
 		 */
 		String emptyFingerprintJSON = "{}";
 
-		DFPValidateResponse response = saAccess.DFPScoreFingerprint(validUsername, validHostAddress, validFingerprintId, emptyFingerprintJSON);
+		DFPValidateResponse response = saAccess.DFPScoreFingerprint(validUsername, validHostAddress, validFingerprintId,
+				emptyFingerprintJSON);
 		assertNotNull(response);
 		assertEquals(NOT_FOUND_MESSAGE, response.getStatus());
 		assertEquals(0.0, response.getScore(), 0.1);
@@ -684,20 +688,20 @@ public class SAAccessTDD {
 
 	@Test
 	public void testDeleteUserValid() throws Exception {
-		//when
-		BaseResponse responseObj = saAccess.deleteUser(NEW_USERNAME, userDomain, Boolean.FALSE );
-		//then
+		// when
+		BaseResponse responseObj = saAccess.deleteUser(NEW_USERNAME, userDomain, Boolean.FALSE);
+		// then
 		assertNotNull(responseObj);
 		assertEquals(SUCCESS_MESSAGE, responseObj.getStatus());
 		assertEquals("User delete complete", responseObj.getMessage());
-		assertEquals(userDomain + "\\" +NEW_USERNAME, responseObj.getUser_id());
+		assertEquals(userDomain + "\\" + NEW_USERNAME, responseObj.getUser_id());
 	}
-	
+
 	@Test
 	public void testDeleteUserInvalidUser() throws Exception {
-		//when
-		BaseResponse responseObj = saAccess.deleteUser(UNEXISTING_USERNAME, userDomain, Boolean.FALSE );
-		//then
+		// when
+		BaseResponse responseObj = saAccess.deleteUser(UNEXISTING_USERNAME, userDomain, Boolean.FALSE);
+		// then
 		assertNotNull(responseObj);
 		assertEquals("failed", responseObj.getStatus());
 		assertEquals("user_id does not exist", responseObj.getMessage());
@@ -709,18 +713,19 @@ public class SAAccessTDD {
 	public void testDFPScoreWithValidFoundData() throws Exception {
 		/*
 		 * Response would return:
-			{
-			    "fingerprint_id": "",
-			    "fingerprint_name": "",
-			    "score": "0.00",
-			    "match_score": "0.00",
-			    "update_score": "0.00",
-			    "status": "not_found",
-			    "message": ""
-			 }
+		 * {
+		 * "fingerprint_id": "",
+		 * "fingerprint_name": "",
+		 * "score": "0.00",
+		 * "match_score": "0.00",
+		 * "update_score": "0.00",
+		 * "status": "not_found",
+		 * "message": ""
+		 * }
 		 */
 		String fingerprintJSON = "{\n" +
-				"        \"fingerprint\" : {\"uaString\" : \"Mozilla/5.0 (Windows NT 6.3; WOW64; rv:52.0) Gecko/20100101 Firefox/52.0\",\n" +
+				"        \"fingerprint\" : {\"uaString\" : \"Mozilla/5.0 (Windows NT 6.3; WOW64; rv:52.0) Gecko/20100101 Firefox/52.0\",\n"
+				+
 				"        \"uaBrowser\" : {\n" +
 				"            \"name\" : \"Firefox\",\n" +
 				"            \"version\" : \"52.0\",\n" +
@@ -772,7 +777,8 @@ public class SAAccessTDD {
 				"            \"touchStart\" : false\n" +
 				"        },\n" +
 				"        \"cookieSupport\" : true,\n" +
-				"        \"fonts\" : \"Aharoni,Andalus,Angsana New,AngsanaUPC,Aparajita,Arabic Typesetting,Arial,Batang,BatangChe,Bauhaus 93,Bodoni 72,Bodoni 72 Oldstyle,Bodoni 72 Smallcaps,Bookshelf Symbol 7,Browallia New,BrowalliaUPC,Calibri,Cambria,Cambria Math,Candara,Comic Sans MS,Consolas,Constantia,Corbel,Cordia New,CordiaUPC,DaunPenh,David,DFKai-SB,DilleniaUPC,DokChampa,Dotum,DotumChe,Ebrima,English 111 Vivace BT,Estrangelo Edessa,EucrosiaUPC,Euphemia,FangSong,Franklin Gothic,FrankRuehl,FreesiaUPC,Gabriola,Gautami,Georgia,GeoSlab 703 Lt BT,GeoSlab 703 XBd BT,Gisha,Gulim,GulimChe,Gungsuh,GungsuhChe,Helvetica,Humanst 521 Cn BT,Impact,IrisUPC,Iskoola Pota,JasmineUPC,KaiTi,Kalinga,Kartika,Khmer UI,KodchiangUPC,Kokila,Lao UI,Latha,Leelawadee,Levenim MT,LilyUPC,Lucida Console,Lucida Sans Unicode,Malgun Gothic,Mangal,Marlett,Meiryo,Meiryo UI,Microsoft Himalaya,Microsoft JhengHei,Microsoft New Tai Lue,Microsoft PhagsPa,Microsoft Sans Serif,Microsoft Tai Le,Microsoft Uighur,Microsoft YaHei,Microsoft Yi Baiti,MingLiU,MingLiU_HKSCS,MingLiU_HKSCS-ExtB,MingLiU-ExtB,Miriam,Miriam Fixed,Modern No. 20,Mongolian Baiti,MoolBoran,MS Gothic,MS Mincho,MS PGothic,MS PMincho,MS Sans Serif,MS Serif,MS UI Gothic,MV Boli,Narkisim,NSimSun,Nyala,Palatino Linotype,Plantagenet Cherokee,PMingLiU,PMingLiU-ExtB,Raavi,Rod,Roman,Sakkal Majalla,Segoe Print,Segoe Script,Segoe UI,Segoe UI Symbol,Shonar Bangla,Shruti,SimHei,Simplified Arabic,Simplified Arabic Fixed,SimSun,SimSun-ExtB,Small Fonts,Sylfaen,Tahoma,Times,Times New Roman,Traditional Arabic,Trebuchet MS,Tunga,Univers CE 55 Medium,Utsaah,Vani,Verdana,Vijaya,Vrinda,Wingdings,Wingdings 2,Wingdings 3\",\n" +
+				"        \"fonts\" : \"Aharoni,Andalus,Angsana New,AngsanaUPC,Aparajita,Arabic Typesetting,Arial,Batang,BatangChe,Bauhaus 93,Bodoni 72,Bodoni 72 Oldstyle,Bodoni 72 Smallcaps,Bookshelf Symbol 7,Browallia New,BrowalliaUPC,Calibri,Cambria,Cambria Math,Candara,Comic Sans MS,Consolas,Constantia,Corbel,Cordia New,CordiaUPC,DaunPenh,David,DFKai-SB,DilleniaUPC,DokChampa,Dotum,DotumChe,Ebrima,English 111 Vivace BT,Estrangelo Edessa,EucrosiaUPC,Euphemia,FangSong,Franklin Gothic,FrankRuehl,FreesiaUPC,Gabriola,Gautami,Georgia,GeoSlab 703 Lt BT,GeoSlab 703 XBd BT,Gisha,Gulim,GulimChe,Gungsuh,GungsuhChe,Helvetica,Humanst 521 Cn BT,Impact,IrisUPC,Iskoola Pota,JasmineUPC,KaiTi,Kalinga,Kartika,Khmer UI,KodchiangUPC,Kokila,Lao UI,Latha,Leelawadee,Levenim MT,LilyUPC,Lucida Console,Lucida Sans Unicode,Malgun Gothic,Mangal,Marlett,Meiryo,Meiryo UI,Microsoft Himalaya,Microsoft JhengHei,Microsoft New Tai Lue,Microsoft PhagsPa,Microsoft Sans Serif,Microsoft Tai Le,Microsoft Uighur,Microsoft YaHei,Microsoft Yi Baiti,MingLiU,MingLiU_HKSCS,MingLiU_HKSCS-ExtB,MingLiU-ExtB,Miriam,Miriam Fixed,Modern No. 20,Mongolian Baiti,MoolBoran,MS Gothic,MS Mincho,MS PGothic,MS PMincho,MS Sans Serif,MS Serif,MS UI Gothic,MV Boli,Narkisim,NSimSun,Nyala,Palatino Linotype,Plantagenet Cherokee,PMingLiU,PMingLiU-ExtB,Raavi,Rod,Roman,Sakkal Majalla,Segoe Print,Segoe Script,Segoe UI,Segoe UI Symbol,Shonar Bangla,Shruti,SimHei,Simplified Arabic,Simplified Arabic Fixed,SimSun,SimSun-ExtB,Small Fonts,Sylfaen,Tahoma,Times,Times New Roman,Traditional Arabic,Trebuchet MS,Tunga,Univers CE 55 Medium,Utsaah,Vani,Verdana,Vijaya,Vrinda,Wingdings,Wingdings 2,Wingdings 3\",\n"
+				+
 				"        \"id\" : \"a31332450f284e9bbb1572e7c1c4927a\",\n" +
 				"        \"userId\" : \"atest\",\n" +
 				"        \"displayName\" : \"Windows - 8.1 - Firefox\",\n" +
@@ -797,7 +803,8 @@ public class SAAccessTDD {
 				"        \"deviceComment\" : \"\"\n" +
 				"    }";
 
-		DFPValidateResponse response = saAccess.DFPScoreFingerprint(validUsername, validHostAddress, validFingerprintId, fingerprintJSON);
+		DFPValidateResponse response = saAccess.DFPScoreFingerprint(validUsername, validHostAddress, validFingerprintId,
+				fingerprintJSON);
 		assertNotNull(response);
 		assertEquals(FOUND_MESSAGE, response.getStatus());
 		assertEquals(100.0, response.getScore(), 1);
@@ -805,24 +812,23 @@ public class SAAccessTDD {
 		assertEquals(89.0, response.getMatch_score(), 1);
 	}
 
-
-
 	@Test
 	public void testDFPSaveWithValidFound() throws Exception {
 		/*
 		 * Response would return:
-			{
-			    "fingerprint_id": "",
-			    "fingerprint_name": "",
-			    "score": "0.00",
-			    "match_score": "0.00",
-			    "update_score": "0.00",
-			    "status": "not_found",
-			    "message": ""
-			 }
+		 * {
+		 * "fingerprint_id": "",
+		 * "fingerprint_name": "",
+		 * "score": "0.00",
+		 * "match_score": "0.00",
+		 * "update_score": "0.00",
+		 * "status": "not_found",
+		 * "message": ""
+		 * }
 		 */
 		String fingerprintJSON = "{\n" +
-				"        \"fingerprint\" : {\"uaString\" : \"Mozilla/5.0 (Windows NT 6.3; WOW64; rv:52.0) Gecko/20100101 Firefox/52.0\",\n" +
+				"        \"fingerprint\" : {\"uaString\" : \"Mozilla/5.0 (Windows NT 6.3; WOW64; rv:52.0) Gecko/20100101 Firefox/52.0\",\n"
+				+
 				"        \"uaBrowser\" : {\n" +
 				"            \"name\" : \"Firefox\",\n" +
 				"            \"version\" : \"52.0\",\n" +
@@ -874,7 +880,8 @@ public class SAAccessTDD {
 				"            \"touchStart\" : false\n" +
 				"        },\n" +
 				"        \"cookieSupport\" : true,\n" +
-				"        \"fonts\" : \"Aharoni,Andalus,Angsana New,AngsanaUPC,Aparajita,Arabic Typesetting,Arial,Batang,BatangChe,Bauhaus 93,Bodoni 72,Bodoni 72 Oldstyle,Bodoni 72 Smallcaps,Bookshelf Symbol 7,Browallia New,BrowalliaUPC,Calibri,Cambria,Cambria Math,Candara,Comic Sans MS,Consolas,Constantia,Corbel,Cordia New,CordiaUPC,DaunPenh,David,DFKai-SB,DilleniaUPC,DokChampa,Dotum,DotumChe,Ebrima,English 111 Vivace BT,Estrangelo Edessa,EucrosiaUPC,Euphemia,FangSong,Franklin Gothic,FrankRuehl,FreesiaUPC,Gabriola,Gautami,Georgia,GeoSlab 703 Lt BT,GeoSlab 703 XBd BT,Gisha,Gulim,GulimChe,Gungsuh,GungsuhChe,Helvetica,Humanst 521 Cn BT,Impact,IrisUPC,Iskoola Pota,JasmineUPC,KaiTi,Kalinga,Kartika,Khmer UI,KodchiangUPC,Kokila,Lao UI,Latha,Leelawadee,Levenim MT,LilyUPC,Lucida Console,Lucida Sans Unicode,Malgun Gothic,Mangal,Marlett,Meiryo,Meiryo UI,Microsoft Himalaya,Microsoft JhengHei,Microsoft New Tai Lue,Microsoft PhagsPa,Microsoft Sans Serif,Microsoft Tai Le,Microsoft Uighur,Microsoft YaHei,Microsoft Yi Baiti,MingLiU,MingLiU_HKSCS,MingLiU_HKSCS-ExtB,MingLiU-ExtB,Miriam,Miriam Fixed,Modern No. 20,Mongolian Baiti,MoolBoran,MS Gothic,MS Mincho,MS PGothic,MS PMincho,MS Sans Serif,MS Serif,MS UI Gothic,MV Boli,Narkisim,NSimSun,Nyala,Palatino Linotype,Plantagenet Cherokee,PMingLiU,PMingLiU-ExtB,Raavi,Rod,Roman,Sakkal Majalla,Segoe Print,Segoe Script,Segoe UI,Segoe UI Symbol,Shonar Bangla,Shruti,SimHei,Simplified Arabic,Simplified Arabic Fixed,SimSun,SimSun-ExtB,Small Fonts,Sylfaen,Tahoma,Times,Times New Roman,Traditional Arabic,Trebuchet MS,Tunga,Univers CE 55 Medium,Utsaah,Vani,Verdana,Vijaya,Vrinda,Wingdings,Wingdings 2,Wingdings 3\",\n" +
+				"        \"fonts\" : \"Aharoni,Andalus,Angsana New,AngsanaUPC,Aparajita,Arabic Typesetting,Arial,Batang,BatangChe,Bauhaus 93,Bodoni 72,Bodoni 72 Oldstyle,Bodoni 72 Smallcaps,Bookshelf Symbol 7,Browallia New,BrowalliaUPC,Calibri,Cambria,Cambria Math,Candara,Comic Sans MS,Consolas,Constantia,Corbel,Cordia New,CordiaUPC,DaunPenh,David,DFKai-SB,DilleniaUPC,DokChampa,Dotum,DotumChe,Ebrima,English 111 Vivace BT,Estrangelo Edessa,EucrosiaUPC,Euphemia,FangSong,Franklin Gothic,FrankRuehl,FreesiaUPC,Gabriola,Gautami,Georgia,GeoSlab 703 Lt BT,GeoSlab 703 XBd BT,Gisha,Gulim,GulimChe,Gungsuh,GungsuhChe,Helvetica,Humanst 521 Cn BT,Impact,IrisUPC,Iskoola Pota,JasmineUPC,KaiTi,Kalinga,Kartika,Khmer UI,KodchiangUPC,Kokila,Lao UI,Latha,Leelawadee,Levenim MT,LilyUPC,Lucida Console,Lucida Sans Unicode,Malgun Gothic,Mangal,Marlett,Meiryo,Meiryo UI,Microsoft Himalaya,Microsoft JhengHei,Microsoft New Tai Lue,Microsoft PhagsPa,Microsoft Sans Serif,Microsoft Tai Le,Microsoft Uighur,Microsoft YaHei,Microsoft Yi Baiti,MingLiU,MingLiU_HKSCS,MingLiU_HKSCS-ExtB,MingLiU-ExtB,Miriam,Miriam Fixed,Modern No. 20,Mongolian Baiti,MoolBoran,MS Gothic,MS Mincho,MS PGothic,MS PMincho,MS Sans Serif,MS Serif,MS UI Gothic,MV Boli,Narkisim,NSimSun,Nyala,Palatino Linotype,Plantagenet Cherokee,PMingLiU,PMingLiU-ExtB,Raavi,Rod,Roman,Sakkal Majalla,Segoe Print,Segoe Script,Segoe UI,Segoe UI Symbol,Shonar Bangla,Shruti,SimHei,Simplified Arabic,Simplified Arabic Fixed,SimSun,SimSun-ExtB,Small Fonts,Sylfaen,Tahoma,Times,Times New Roman,Traditional Arabic,Trebuchet MS,Tunga,Univers CE 55 Medium,Utsaah,Vani,Verdana,Vijaya,Vrinda,Wingdings,Wingdings 2,Wingdings 3\",\n"
+				+
 				"        \"id\" : \"a31332450f284e9bbb1572e7c1c4927a\",\n" +
 				"        \"userId\" : \"atest\",\n" +
 				"        \"displayName\" : \"Windows - 8.1 - Firefox\",\n" +
@@ -899,7 +906,8 @@ public class SAAccessTDD {
 				"        \"deviceComment\" : \"\"\n" +
 				"    }";
 
-		DFPValidateResponse response = saAccess.DFPSaveFingerprint(validUsername, validHostAddress, validFingerprintId, fingerprintJSON);
+		DFPValidateResponse response = saAccess.DFPSaveFingerprint(validUsername, validHostAddress, validFingerprintId,
+				fingerprintJSON);
 		assertNotNull(response);
 		assertEquals(FOUND_MESSAGE, response.getStatus());
 		assertEquals(100.0, response.getScore(), 1);
@@ -913,19 +921,20 @@ public class SAAccessTDD {
 	public void testDFPSaveWithValidNotFound() throws Exception {
 		/*
 		 * Response would return:
-			{
-			    "fingerprint_id": "",
-			    "fingerprint_name": "",
-			    "score": "0.00",
-			    "match_score": "0.00",
-			    "update_score": "0.00",
-			    "status": "not_found",
-			    "message": ""
-			 }
+		 * {
+		 * "fingerprint_id": "",
+		 * "fingerprint_name": "",
+		 * "score": "0.00",
+		 * "match_score": "0.00",
+		 * "update_score": "0.00",
+		 * "status": "not_found",
+		 * "message": ""
+		 * }
 		 */
 		String emptyFingerprintJSON = "{}";
 
-		DFPValidateResponse response = saAccess.DFPSaveFingerprint(validUsername, validHostAddress, validFingerprintId, emptyFingerprintJSON);
+		DFPValidateResponse response = saAccess.DFPSaveFingerprint(validUsername, validHostAddress, validFingerprintId,
+				emptyFingerprintJSON);
 		assertNotNull(response);
 		assertEquals(NOT_FOUND_MESSAGE, response.getStatus());
 		assertEquals(0.0, response.getScore(), 0.1);
@@ -936,32 +945,32 @@ public class SAAccessTDD {
 
 	@Test
 	public void testNotifySuccessAuthenticatedResult() {
-		BaseResponse response = saAccess.notifyAuthenticated( validUsername, "success", "EMAIL" );
-		assertEquals( PROCESSED_REQUEST_MESSAGE, response.getMessage() );
+		BaseResponse response = saAccess.notifyAuthenticated(validUsername, "success", "EMAIL");
+		assertEquals(PROCESSED_REQUEST_MESSAGE, response.getMessage());
 	}
 
 	@Test
 	public void testNotifyAbortedAuthenticatedResult() {
-		BaseResponse response = saAccess.notifyAuthenticated( validUsername, "aborted", "EMAIL" );
-		assertEquals( PROCESSED_REQUEST_MESSAGE, response.getMessage() );
+		BaseResponse response = saAccess.notifyAuthenticated(validUsername, "aborted", "EMAIL");
+		assertEquals(PROCESSED_REQUEST_MESSAGE, response.getMessage());
 	}
 
 	@Test
 	public void testNotifyCancelledAuthenticatedResult() {
-		BaseResponse response = saAccess.notifyAuthenticated( validUsername, "cancelled", "EMAIL" );
-		assertEquals( PROCESSED_REQUEST_MESSAGE, response.getMessage() );
+		BaseResponse response = saAccess.notifyAuthenticated(validUsername, "cancelled", "EMAIL");
+		assertEquals(PROCESSED_REQUEST_MESSAGE, response.getMessage());
 	}
 
 	@Test
 	public void testNotifyWrongAuthenticatedResult() {
-		BaseResponse response = saAccess.notifyAuthenticated( validUsername, "wrong", "NONE" );
-		assertEquals( PROCESSED_REQUEST_MESSAGE, response.getMessage() );
+		BaseResponse response = saAccess.notifyAuthenticated(validUsername, "wrong", "NONE");
+		assertEquals(PROCESSED_REQUEST_MESSAGE, response.getMessage());
 	}
 
 	@Test
 	public void testWhenUserIdIsNotValidThenNotifyAuthenticatedResultFail() {
-		BaseResponse response = saAccess.notifyAuthenticated( UNEXISTING_USERNAME, "success", "NONE" );
-		assertEquals( ID_NOT_FOUND_MESSAGE, response.getMessage() );
+		BaseResponse response = saAccess.notifyAuthenticated(UNEXISTING_USERNAME, "success", "NONE");
+		assertEquals(ID_NOT_FOUND_MESSAGE, response.getMessage());
 	}
 
 	// This tests the creation of a real user
@@ -1016,8 +1025,25 @@ public class SAAccessTDD {
 	@Test
 	public void testLinkToAcceptVerify() {
 		StatefulResponseObject linkResponse = saAccess.smsLink(validUsername, "Phone1");
-		PushAcceptStatus response = saAccess.verifyLinkToAcceptStatus(linkResponse.getReference_id(), linkResponse.getSessionAffinityCookie());
+		PushAcceptStatus response = saAccess.verifyLinkToAcceptStatus(linkResponse.getReference_id(),
+				linkResponse.getSessionAffinityCookie());
 
 		assertEquals(FOUND_MESSAGE, response.getStatus());
+	}
+
+	@Test
+	public void testYubikeyValid() throws Exception {
+		/*
+		 * Response would return:
+		 * {
+		 * "status" : "valid",
+		 * "message" : ""
+		 * }
+		 */
+
+		BaseResponse response = saAccess.validateYubicoToken(validUsername, validYubicoToken);
+		assertNotNull(response);
+		assertEquals(VALID_MESSAGE, response.getStatus());
+		assertTrue(response.getMessage().isEmpty());
 	}
 }
