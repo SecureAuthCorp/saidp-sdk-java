@@ -183,7 +183,7 @@ public class SAAccess implements ISAAccess {
         IPEvalRequest ipEvalRequest = new IPEvalRequest();
         ipEvalRequest.setIp_address(ipAddress);
         ipEvalRequest.setUser_id(userId);
-        ipEvalRequest.setType("risk");
+        ipEvalRequest.setType(Resource.RISK);
 
         String header = RestApiHeader.getAuthorizationHeader(saAuth, "POST", IPEvalQuery.queryIPEval(saAuth.getRealm()),
                 ipEvalRequest, ts);
@@ -438,7 +438,7 @@ public class SAAccess implements ISAAccess {
         AuthRequest authRequest = new AuthRequest();
 
         authRequest.setUser_id(userId);
-        authRequest.setType("user_id");
+        authRequest.setType(Resource.USER_ID);
 
         String header = RestApiHeader.getAuthorizationHeader(saAuth, "POST", AuthQuery.queryAuth(saAuth.getRealm()),
                 authRequest, ts);
@@ -587,7 +587,7 @@ public class SAAccess implements ISAAccess {
         AuthRequest authRequest = new AuthRequest();
 
         authRequest.setUser_id(userId);
-        authRequest.setType("pin");
+        authRequest.setType(Resource.PIN);
         authRequest.setToken(pin);
 
         String header = RestApiHeader.getAuthorizationHeader(saAuth, "POST", AuthQuery.queryAuth(saAuth.getRealm()),
@@ -618,7 +618,7 @@ public class SAAccess implements ISAAccess {
         AuthRequest authRequest = new AuthRequest();
 
         authRequest.setUser_id(userId);
-        authRequest.setType("kba");
+        authRequest.setType(Resource.KBA);
         authRequest.setToken(answer);
         authRequest.setFactor_id(factorId);
 
@@ -650,7 +650,7 @@ public class SAAccess implements ISAAccess {
         AuthRequest authRequest = new AuthRequest();
 
         authRequest.setUser_id(userId);
-        authRequest.setType("oath");
+        authRequest.setType(Resource.OATH);
         authRequest.setToken(otp);
         authRequest.setFactor_id(factorId);
 
@@ -681,7 +681,7 @@ public class SAAccess implements ISAAccess {
         AuthRequest authRequest = new AuthRequest();
 
         authRequest.setUser_id(userId);
-        authRequest.setType("call");
+        authRequest.setType(Resource.CALL);
         authRequest.setFactor_id(factorId);
 
         String header = RestApiHeader.getAuthorizationHeader(saAuth, "POST", AuthQuery.queryAuth(saAuth.getRealm()),
@@ -711,7 +711,7 @@ public class SAAccess implements ISAAccess {
         AuthRequest authRequest = new AuthRequest();
 
         authRequest.setUser_id(userId);
-        authRequest.setType("call");
+        authRequest.setType(Resource.CALL);
         authRequest.setToken(phoneNumber);
 
         String header = RestApiHeader.getAuthorizationHeader(saAuth, "POST", AuthQuery.queryAuth(saAuth.getRealm()),
@@ -859,7 +859,7 @@ public class SAAccess implements ISAAccess {
         AuthRequest authRequest = new AuthRequest();
 
         authRequest.setUser_id(userId);
-        authRequest.setType("help_desk");
+        authRequest.setType(Resource.HELP_DESK);
         authRequest.setFactor_id(factorId);
         String header = RestApiHeader.getAuthorizationHeader(saAuth, "POST", AuthQuery.queryAuth(saAuth.getRealm()),
                 authRequest, ts);
@@ -917,7 +917,7 @@ public class SAAccess implements ISAAccess {
         AuthRequest authRequest = new AuthRequest();
 
         authRequest.setUser_id(userId);
-        authRequest.setType("email");
+        authRequest.setType(Resource.EMAIL);
         authRequest.setToken(emailAddress);
         String header = RestApiHeader.getAuthorizationHeader(saAuth, "POST", AuthQuery.queryAuth(saAuth.getRealm()),
                 authRequest, ts);
@@ -1837,7 +1837,7 @@ public class SAAccess implements ISAAccess {
         String url = saAuth.getRealm() + Resource.APPLIANCE_AUTHENTICATED;
         String serverTime = this.getServerTime();
         Map<String, String> body = Maps.newHashMap();
-        body.put("user_id", userId);
+        body.put(Resource.USER_ID, userId);
         body.put("authenticated", result);
         body.put("authregmethod", mfa);
         String authorization = RestApiHeader.getAuthorizationHeader(

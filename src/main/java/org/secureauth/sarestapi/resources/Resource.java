@@ -105,5 +105,11 @@ public class Resource {
     public static final String SMS_LINK = "sms_link";
     public static final String YUBIKEY = "yubikey";
     public static final String PASSWORD = "password";
+    public static final String RISK = "risk";
+    public static final String USER_ID = "user_id";
+    public static final String PIN = "pin";
+    public static final String KBA = "kba";
+    public static final String CALL = "call";
+    public static final String HELP_DESK = "help_desk";
 
 }
