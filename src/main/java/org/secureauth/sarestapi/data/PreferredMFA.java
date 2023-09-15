@@ -6,10 +6,32 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class PreferredMFA {
+	 
+	private String factorId;
+	private String capability;
+    private String type;
+    private String mode;
+    private String available_choosen_mode;
 
-    private String factorId;
-    private String capability;
-
+    public String getType() {
+        return type;
+    }
+    public void setType(String type) {
+        this.type = type;
+    }
+    public String getMode() {
+        return mode;
+    }
+    public void setMode(String mode) {
+        this.mode = mode;
+    }
+    public String getAvailable_choosen_mode() {
+        return available_choosen_mode;
+    }
+    public void setAvailable_choosen_mode(String available_choosen_mode) {
+        this.available_choosen_mode = available_choosen_mode;
+    }
+    
     public String getFactorId() {
         return factorId;
     }
@@ -22,6 +44,7 @@ public class PreferredMFA {
     public void setCapability(String capability) {
         this.capability = capability;
     }
+    
     @Override
     public String toString(){
         return JSONUtil.convertObjectToJSON(this);
