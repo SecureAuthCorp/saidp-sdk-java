@@ -1,6 +1,9 @@
 package org.secureauth.sarestapi.data.Response;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import org.secureauth.sarestapi.util.JSONUtil;
 
 import javax.xml.bind.annotation.XmlRootElement;
@@ -10,9 +13,16 @@ import javax.xml.bind.annotation.XmlRootElement;
  */
 @XmlRootElement
 @JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class BaseResponse {
+	
+	@JsonProperty("status")
     private String status;
+	
+	@JsonProperty("message")
     private String message;
+	
+	@JsonProperty("user_id")
     private String user_id;
 
     public String getStatus() {

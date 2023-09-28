@@ -3,7 +3,9 @@ package org.secureauth.sarestapi.data;
 import org.secureauth.sarestapi.util.JSONUtil;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class PreferredMFA {
 	 
