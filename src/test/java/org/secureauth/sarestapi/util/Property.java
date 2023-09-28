@@ -18,15 +18,16 @@ public enum Property {
 	VALID_OTP_OATH_CODE("user.otp.oath"),
 	VALID_HOST_ADDRESS("valid.host.address"),
 	VALID_FINGERPRINT_ID("valid.fingerprint.id"),
+	VALID_YUBICO_TOKEN("valid.yubico.token"),
 	ASSUME_TEST("assume.test");
 
 	private final String value;
 
-	private Property(String value){
+	private Property(String value) {
 		this.value = value;
 	}
 
-	public String getValue(){
+	public String getValue() {
 		return this.value;
 	}
 }
