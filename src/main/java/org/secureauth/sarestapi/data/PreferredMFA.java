@@ -2,6 +2,7 @@ package org.secureauth.sarestapi.data;
 
 import org.secureauth.sarestapi.util.JSONUtil;
 
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
@@ -9,8 +10,8 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class PreferredMFA {
 	 
-	private String factorId;
-	private String capability;
+	  private String factorId;
+	  private String capability;
     private String type;
     private String mode;
     private String available_choosen_mode;
@@ -33,7 +34,7 @@ public class PreferredMFA {
     public void setAvailable_choosen_mode(String available_choosen_mode) {
         this.available_choosen_mode = available_choosen_mode;
     }
-    
+
     public String getFactorId() {
         return factorId;
     }
@@ -46,7 +47,7 @@ public class PreferredMFA {
     public void setCapability(String capability) {
         this.capability = capability;
     }
-    
+
     @Override
     public String toString(){
         return JSONUtil.convertObjectToJSON(this);

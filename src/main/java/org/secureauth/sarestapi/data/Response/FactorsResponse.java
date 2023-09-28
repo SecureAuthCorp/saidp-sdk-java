@@ -23,13 +23,12 @@ import java.util.ArrayList;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class FactorsResponse extends BaseResponse {
 
-	@JsonProperty("factors")
+	  @JsonProperty("factors")
     private ArrayList<Factors> factors = new ArrayList<Factors>();
-	
-	@JsonProperty("preferred_mfa")
+
+	  @JsonProperty("preferred_mfa")
     public PreferredMFA preferred_mfa = new PreferredMFA();
-	
-	
+  
     public ArrayList<Factors> getFactors() {
         return factors;
     }
