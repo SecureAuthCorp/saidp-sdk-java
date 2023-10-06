@@ -1,13 +1,8 @@
 package org.secureauth.sarestapi.guid;
 
-import com.github.tomakehurst.wiremock.WireMockServer;
-import com.github.tomakehurst.wiremock.verification.LoggedRequest;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.secureauth.sarestapi.SAAccess;
-import org.secureauth.sarestapi.data.SAConfig;
+import static com.github.tomakehurst.wiremock.client.WireMock.matching;
+import static com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 
 import java.util.Hashtable;
 import java.util.List;
@@ -15,7 +10,16 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import static com.github.tomakehurst.wiremock.client.WireMock.*;
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+import org.secureauth.sarestapi.SAAccess;
+import org.secureauth.sarestapi.data.SAConfig;
+import org.secureauth.sarestapi.util.SAFactory;
+
+import com.github.tomakehurst.wiremock.WireMockServer;
+import com.github.tomakehurst.wiremock.verification.LoggedRequest;
 
 public class SAAccessUnitTest {
 
@@ -40,7 +44,7 @@ public class SAAccessUnitTest {
     @Test
     public void given_SAAccessWithNewRequestIDForEachRequest_When_PerformOutOfBandAuthStateful_Then_XRequestIDHeaderIsPresent() {
         // given
-        final SAAccess saAccess = this.createSAAccessWithGUIDStrategy( UUID::randomUUID );
+        final SAAccess saAccess = this.createSAAccessWithTransactionId( UUID.randomUUID().toString() );
         final String userId = "test-user-1";
         final String factorId = "9a29542309654256a0d71f9e86095f45";
         // when
@@ -55,7 +59,7 @@ public class SAAccessUnitTest {
     @Test
     public void given_SAAccessWithNewRequestIDForEachRequest_When_PerformFiveOutOfBandAuthStatefulRequests_Then_FiveDifferentXRequestIDHeaderValueAreGenerated() {
         // given
-        final SAAccess saAccess = this.createSAAccessWithGUIDStrategy( UUID::randomUUID );
+        final SAAccess saAccess = this.createSAAccessWithTransactionId( UUID.randomUUID().toString() );
         final String userId = "test-user-1";
         final String factorId = "9a29542309654256a0d71f9e86095f45";
         final int requestsToMake = 5;
@@ -75,8 +79,8 @@ public class SAAccessUnitTest {
         );
     }
 
-    private SAAccess createSAAccessWithGUIDStrategy(GUIDStrategy guidStrategy) {
-        return new SAAccess(
+    private SAAccess createSAAccessWithTransactionId(String transactionId) {
+        return SAFactory.of(
                 "localhost",
                 "8090",
                 false,
@@ -84,7 +88,7 @@ public class SAAccessUnitTest {
                 "Realm01",
                 "Realm01-ApplicationId",
                 "Realm01-ApplicationKey",
-                guidStrategy
+                transactionId
         );
     }
 
@@ -92,7 +96,7 @@ public class SAAccessUnitTest {
     @Test
     public void testHeaderForOldIdPSupportOff() {
         // given
-        final SAAccess saAccess = this.createSAAccessWithGUIDStrategy( UUID::randomUUID );
+        final SAAccess saAccess = this.createSAAccessWithTransactionId( UUID.randomUUID().toString() );
         final String userId = "test-user-1";
         final String factorId = "9a29542309654256a0d71f9e86095f45";
         // when
@@ -111,7 +115,7 @@ public class SAAccessUnitTest {
         // given
         config.put( OLD_IDP, true );
         saConfig.updateConfig( config );
-        final SAAccess saAccess = this.createSAAccessWithGUIDStrategy( UUID::randomUUID );
+        final SAAccess saAccess = this.createSAAccessWithTransactionId( UUID.randomUUID().toString() );
         final String userId = "test-user-1";
         final String factorId = "9a29542309654256a0d71f9e86095f45";
         // when
