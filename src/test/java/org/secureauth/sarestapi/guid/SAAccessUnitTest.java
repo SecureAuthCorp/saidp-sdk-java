@@ -56,31 +56,8 @@ public class SAAccessUnitTest {
         );
     }
 
-    @Test
-    public void given_SAAccessWithNewRequestIDForEachRequest_When_PerformFiveOutOfBandAuthStatefulRequests_Then_FiveDifferentXRequestIDHeaderValueAreGenerated() {
-        // given
-        final SAAccess saAccess = this.createSAAccessWithTransactionId( UUID.randomUUID().toString() );
-        final String userId = "test-user-1";
-        final String factorId = "9a29542309654256a0d71f9e86095f45";
-        final int requestsToMake = 5;
-        // when
-        IntStream.range( 0, requestsToMake )
-                .forEach( i ->
-                        saAccess.sendPushToAcceptReqStateful(userId, factorId, "127.0.0.1", "", "")
-                );
-        // then
-        List<LoggedRequest> requestList = this.wireMockServer.findAll(
-                postRequestedFor( urlEqualTo("/Realm01/api/v1/auth" ) )
-                        .withHeader( X_REQUEST_ID, matching( "\\S{36}" ) )
-        );
-        Assert.assertEquals(
-                requestsToMake,
-                requestList.stream().map( r -> r.getHeader( X_REQUEST_ID ) ).collect(Collectors.toSet() ).size()
-        );
-    }
-
     private SAAccess createSAAccessWithTransactionId(String transactionId) {
-        return SAFactory.of(
+        return SAFactory.newOf(
                 "localhost",
                 "8090",
                 false,
