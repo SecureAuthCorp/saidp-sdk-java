@@ -244,21 +244,9 @@ public class SAAccess implements ISAAccess {
                 FactorsQuery.queryFactorsV3(saAuth.getRealm(), userId), ts);
 
         try {
-        	
-        	FactorsResponse response = saExecuter.executeGetRequest(header,
+        	return saExecuter.executeGetRequest(header,
                     saBaseURL.getApplianceURL() + FactorsQuery.queryFactorsV3(saAuth.getRealm(), userId), ts,
                     FactorsResponse.class);
-        	
-        	// Fallback to v1 if v3 not available
-        	if (Resource.STATUS_NOT_FOUND.equalsIgnoreCase(response.getStatus())) {
-                header = RestApiHeader.getAuthorizationHeader(saAuth, Resource.METHOD_GET,
-                        FactorsQuery.queryFactors(saAuth.getRealm(), userId), ts);
-                
-        		response = saExecuter.executeGetRequest(header,
-                        saBaseURL.getApplianceURL() + FactorsQuery.queryFactors(saAuth.getRealm(), userId), ts,                        FactorsResponse.class);;
-        	}
-        	
-            return response;
         } catch (Exception e) {
             logger.error(new StringBuilder().append("Exception occurred executing REST query::\n")
                     .append(e.getMessage()).append("\n").toString(), e);
@@ -314,10 +302,9 @@ public class SAAccess implements ISAAccess {
                 FactorsQuery.queryFactorsQPV3(saAuth.getRealm()), ts);
 
         try {
-            return saExecuter.executeGetRequest(header,
+        	return saExecuter.executeGetRequest(header,
                     saBaseURL.getApplianceURL() + FactorsQuery.queryFactorsQPV3(saAuth.getRealm()), userId, ts,
                     FactorsResponse.class);
-
         } catch (Exception e) {
             logger.error(new StringBuilder().append("Exception occurred executing REST query::\n")
                     .append(e.getMessage()).append("\n").toString(), e);
