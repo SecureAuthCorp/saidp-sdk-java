@@ -23,11 +23,11 @@ import java.util.ArrayList;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class FactorsResponse extends BaseResponse {
 
-	  @JsonProperty("factors")
+	@JsonProperty("factors")
     private ArrayList<Factors> factors = new ArrayList<Factors>();
 
-	  @JsonProperty("preferred_mfa")
-    public PreferredMFA preferred_mfa = new PreferredMFA();
+	@JsonProperty("preferred_mfa")
+    public PreferredMFA preferredMfa = new PreferredMFA();
   
     public ArrayList<Factors> getFactors() {
         return factors;
@@ -35,11 +35,11 @@ public class FactorsResponse extends BaseResponse {
     public void setFactors(ArrayList<Factors> factors) {
         this.factors = factors;
     }
-    public PreferredMFA getPreferred_mfa() {
-        return preferred_mfa;
+    public PreferredMFA getPreferredMfa() {
+        return preferredMfa;
     }
-    public void setPreferred_mfa(PreferredMFA preferred_mfa) {
-        this.preferred_mfa = preferred_mfa;
+    public void setPreferredMfa(PreferredMFA preferredMfa) {
+        this.preferredMfa = preferredMfa;
     }
 
     @Override
