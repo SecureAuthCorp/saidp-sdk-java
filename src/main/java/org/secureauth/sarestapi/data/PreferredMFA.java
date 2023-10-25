@@ -2,6 +2,7 @@ package org.secureauth.sarestapi.data;
 
 import org.secureauth.sarestapi.util.JSONUtil;
 
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
