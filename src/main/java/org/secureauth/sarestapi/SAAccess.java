@@ -204,6 +204,7 @@ public class SAAccess implements ISAAccess {
     /**
      * <p>
      * Returns the list of Factors available for the specified user
+     * Used for both /v1/users/factors and /v2/users/factors
      * </p>
      * 
      * @param userId the userid of the identity you wish to have a list of possible
@@ -225,11 +226,38 @@ public class SAAccess implements ISAAccess {
         }
         return null;
     }
+    
+    /**
+     * <p>
+     * Returns the list of Factors available for the specified user.
+     * Used for /v3/users/factors
+     * Includes Preferred MFA configured/set by the admin/user.
+     * </p>
+     * 
+     * @param userId the userid of the identity you wish to have a list of possible
+     *               second factors
+     * @return {@link FactorsResponse}
+     */
+    public FactorsResponse factorsByUserV3(String userId) {
+        String ts = getServerTime();
+        String header = RestApiHeader.getAuthorizationHeader(saAuth, Resource.METHOD_GET,
+                FactorsQuery.queryFactorsV3(saAuth.getRealm(), userId), ts);
+
+        try {
+        	return saExecuter.executeGetRequest(header,
+                    saBaseURL.getApplianceURL() + FactorsQuery.queryFactorsV3(saAuth.getRealm(), userId), ts,
+                    FactorsResponse.class);
+        } catch (Exception e) {
+            logger.error(new StringBuilder().append("Exception occurred executing REST query::\n")
+                    .append(e.getMessage()).append("\n").toString(), e);
+        }
+        return null;
+    }
 
     /**
      * <p>
-     * Returns the list of Factors available for the specified user supporting
-     * special characters
+     * Returns the list of Factors available for the specified user supporting special characters
+     * Used for both /v1/users/factors and /v2/users/factors
      * </p>
      * 
      * @param userId the userid of the identity you wish to have a list of possible
@@ -248,6 +276,35 @@ public class SAAccess implements ISAAccess {
                     saBaseURL.getApplianceURL() + FactorsQuery.queryFactorsQP(saAuth.getRealm()), userId, ts,
                     FactorsResponse.class);
 
+        } catch (Exception e) {
+            logger.error(new StringBuilder().append("Exception occurred executing REST query::\n")
+                    .append(e.getMessage()).append("\n").toString(), e);
+        }
+        return null;
+    }
+    
+    /**
+     * <p>
+     * Returns the list of Factors available for the specified user supporting special characters
+     * Used for /v3/users/factors
+     * Includes Preferred MFA configured/set by the admin/user.
+     * </p>
+     * 
+     * @param userId the userid of the identity you wish to have a list of possible
+     *               second factors. This method supports special characters for
+     *               userId since it uses QP (Query Params) in order to create the
+     *               request.
+     * @return {@link FactorsResponse}
+     */
+    public FactorsResponse factorsByUserQPV3(String userId) {
+        String ts = getServerTime();
+        String header = RestApiHeader.getAuthorizationHeader(saAuth, Resource.METHOD_GET,
+                FactorsQuery.queryFactorsQPV3(saAuth.getRealm()), ts);
+
+        try {
+        	return saExecuter.executeGetRequest(header,
+                    saBaseURL.getApplianceURL() + FactorsQuery.queryFactorsQPV3(saAuth.getRealm()), userId, ts,
+                    FactorsResponse.class);
         } catch (Exception e) {
             logger.error(new StringBuilder().append("Exception occurred executing REST query::\n")
                     .append(e.getMessage()).append("\n").toString(), e);

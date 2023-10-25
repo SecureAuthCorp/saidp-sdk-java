@@ -30,10 +30,20 @@ public final class FactorsQuery {
     public static String queryFactors(String realm, String userName){
         return realm + Resource.APPLIANCE_USERS + userName + Resource.APPLIANCE_FACTORS;
     }
+    
+  //https://{domain}/{realm}/v3/users/{username}/factors
+    public static String queryFactorsV3(String realm, String userName){
+        return realm + Resource.APPLIANCE_USERS_V3 + userName + Resource.APPLIANCE_FACTORS;
+    }
 
     //https://{domain}/{realm}/v1/users/factors?username={username}
     public static String queryFactorsQP(String realm) {
         return realm + removeLastChar(Resource.APPLIANCE_USERS) + Resource.APPLIANCE_FACTORS;
+    }
+    
+  //https://{domain}/{realm}/v3/users/factors?username={username}
+    public static String queryFactorsQPV3(String realm) {
+        return realm + removeLastChar(Resource.APPLIANCE_USERS_V3) + Resource.APPLIANCE_FACTORS;
     }
 
     private static String removeLastChar (String query){

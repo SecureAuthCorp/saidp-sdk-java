@@ -41,6 +41,7 @@ public class Resource {
 
     public static final String API_VERSION = "v1";
     public static final String API_VERSION_2 = "v2";
+    public static final String API_VERSION_3 = "v3";
     public static final String HTTPS = "https://";
     public static final String HTTP = "http://";
     public static final String COLON = ":";
@@ -49,6 +50,7 @@ public class Resource {
     public static final String APPLIANCE_AUTH_LINK = "/api/" + API_VERSION + "/auth/link/";
     public static final String APPLIANCE_AAUTH = "/api/" + API_VERSION + "/adaptauth";
     public static final String APPLIANCE_USERS = "/api/" + API_VERSION + "/users/";
+    public static final String APPLIANCE_USERS_V3 = "/api/" + API_VERSION_3 + "/users/";
     public static final String APPLIANCE_AUTHENTICATED = "/api/" + API_VERSION_2 + "/authenticated";
     public static final String APPLIANCE_IDM_USERS = "/users/";
     public static final String APPLIANCE_IDM_USERS_PASSWD_RESET = "/resetpwd";
