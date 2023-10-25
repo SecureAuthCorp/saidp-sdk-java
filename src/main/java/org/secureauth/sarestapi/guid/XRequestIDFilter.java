@@ -5,14 +5,14 @@ import javax.ws.rs.client.ClientRequestFilter;
 
 public class XRequestIDFilter implements ClientRequestFilter {
 
-    private GUIDStrategy guidStrategy;
+    private String transactionId;
 
-    public XRequestIDFilter(GUIDStrategy guidStrategy) {
-        this.guidStrategy = guidStrategy;
+    public XRequestIDFilter(String transactionId) {
+        this.transactionId = transactionId;
     }
 
     @Override
     public void filter(ClientRequestContext requestContext) {
-        requestContext.getHeaders().putSingle( "X-Request-ID", this.guidStrategy.generateRequestID() );
+        requestContext.getHeaders().putSingle( "X-Request-ID", this.transactionId );
     }
 }

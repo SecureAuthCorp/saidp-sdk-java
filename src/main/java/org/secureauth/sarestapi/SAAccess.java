@@ -1,33 +1,71 @@
 package org.secureauth.sarestapi;
 
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Hashtable;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
-import java.util.TimeZone;
 import java.util.stream.Collectors;
 
-import com.google.common.collect.Maps;
-import org.secureauth.sarestapi.data.*;
+import javax.ws.rs.core.Cookie;
+
+import org.secureauth.sarestapi.data.IPEval;
+import org.secureauth.sarestapi.data.PushAcceptStatus;
+import org.secureauth.sarestapi.data.SAAuth;
+import org.secureauth.sarestapi.data.SABaseURL;
+import org.secureauth.sarestapi.data.SAConfig;
 import org.secureauth.sarestapi.data.BehavioralBio.BehaveBioRequest;
 import org.secureauth.sarestapi.data.DFP.DFP;
 import org.secureauth.sarestapi.data.NumberProfile.CarrierInfo;
+import org.secureauth.sarestapi.data.Requests.AccessHistoryRequest;
+import org.secureauth.sarestapi.data.Requests.AdaptiveAuthRequest;
+import org.secureauth.sarestapi.data.Requests.AuthRequest;
 import org.secureauth.sarestapi.data.Requests.BehaveBioResetRequest;
-import org.secureauth.sarestapi.data.Response.BehaveBioResponse;
-import org.secureauth.sarestapi.data.Requests.*;
-import org.secureauth.sarestapi.data.Response.*;
+import org.secureauth.sarestapi.data.Requests.DFPConfirmRequest;
+import org.secureauth.sarestapi.data.Requests.DFPScoreRequest;
+import org.secureauth.sarestapi.data.Requests.DFPValidateRequest;
+import org.secureauth.sarestapi.data.Requests.DeleteUserRequest;
+import org.secureauth.sarestapi.data.Requests.IPEvalRequest;
+import org.secureauth.sarestapi.data.Requests.LinkToAcceptFactory;
+import org.secureauth.sarestapi.data.Requests.NumberProfileRequest;
+import org.secureauth.sarestapi.data.Requests.NumberProfileUpdateRequest;
+import org.secureauth.sarestapi.data.Requests.PushToAcceptBiometricsRequest;
+import org.secureauth.sarestapi.data.Requests.PushToAcceptRequest;
+import org.secureauth.sarestapi.data.Requests.PushToAcceptRequestsFactory;
+import org.secureauth.sarestapi.data.Requests.StatusRequest;
+import org.secureauth.sarestapi.data.Requests.ThrottleRequest;
 import org.secureauth.sarestapi.data.Requests.UserPasswordRequest;
+import org.secureauth.sarestapi.data.Requests.ValidateOTPRequest;
+import org.secureauth.sarestapi.data.Response.AdaptiveAuthResponse;
+import org.secureauth.sarestapi.data.Response.BaseResponse;
+import org.secureauth.sarestapi.data.Response.BehaveBioResponse;
+import org.secureauth.sarestapi.data.Response.DFPConfirmResponse;
+import org.secureauth.sarestapi.data.Response.DFPValidateResponse;
+import org.secureauth.sarestapi.data.Response.FactorsResponse;
+import org.secureauth.sarestapi.data.Response.GroupAssociationResponse;
+import org.secureauth.sarestapi.data.Response.JSObjectResponse;
+import org.secureauth.sarestapi.data.Response.NumberProfileResponse;
+import org.secureauth.sarestapi.data.Response.ResponseObject;
+import org.secureauth.sarestapi.data.Response.StatefulResponseObject;
+import org.secureauth.sarestapi.data.Response.ThrottleResponse;
 import org.secureauth.sarestapi.data.Response.UserProfileResponse;
+import org.secureauth.sarestapi.data.Response.ValidateOTPResponse;
 import org.secureauth.sarestapi.data.UserProfile.NewUserProfile;
 import org.secureauth.sarestapi.data.UserProfile.UserProfileKB;
 import org.secureauth.sarestapi.data.UserProfile.UserToGroups;
 import org.secureauth.sarestapi.data.UserProfile.UsersToGroup;
 import org.secureauth.sarestapi.exception.SARestAPIException;
 import org.secureauth.sarestapi.guid.GUIDStrategy;
-import org.secureauth.sarestapi.queries.*;
+import org.secureauth.sarestapi.queries.AccessHistoryQuery;
+import org.secureauth.sarestapi.queries.AuthQuery;
+import org.secureauth.sarestapi.queries.BehaveBioQuery;
+import org.secureauth.sarestapi.queries.DFPQuery;
+import org.secureauth.sarestapi.queries.FactorsQuery;
+import org.secureauth.sarestapi.queries.IDMQueries;
+import org.secureauth.sarestapi.queries.IPEvalQuery;
+import org.secureauth.sarestapi.queries.NumberProfileQuery;
+import org.secureauth.sarestapi.queries.StatusQuery;
+import org.secureauth.sarestapi.queries.ThrottleQuery;
+import org.secureauth.sarestapi.queries.ValidateOTPQuery;
 import org.secureauth.sarestapi.resources.Resource;
 import org.secureauth.sarestapi.resources.SAExecuter;
 import org.secureauth.sarestapi.util.JSONUtil;
@@ -36,7 +74,7 @@ import org.secureauth.sarestapi.util.TimeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.ws.rs.core.Cookie;
+import com.google.common.collect.Maps;
 
 /**
  * @author rrowcliffe@secureauth.com
@@ -204,6 +242,7 @@ public class SAAccess implements ISAAccess {
     /**
      * <p>
      * Returns the list of Factors available for the specified user
+     * Used for both /v1/users/factors and /v2/users/factors
      * </p>
      * 
      * @param userId the userid of the identity you wish to have a list of possible
@@ -225,11 +264,38 @@ public class SAAccess implements ISAAccess {
         }
         return null;
     }
+    
+    /**
+     * <p>
+     * Returns the list of Factors available for the specified user.
+     * Used for /v3/users/factors
+     * Includes Preferred MFA configured/set by the admin/user.
+     * </p>
+     * 
+     * @param userId the userid of the identity you wish to have a list of possible
+     *               second factors
+     * @return {@link FactorsResponse}
+     */
+    public FactorsResponse factorsByUserV3(String userId) {
+        String ts = getServerTime();
+        String header = RestApiHeader.getAuthorizationHeader(saAuth, Resource.METHOD_GET,
+                FactorsQuery.queryFactorsV3(saAuth.getRealm(), userId), ts);
+
+        try {
+        	return saExecuter.executeGetRequest(header,
+                    saBaseURL.getApplianceURL() + FactorsQuery.queryFactorsV3(saAuth.getRealm(), userId), ts,
+                    FactorsResponse.class);
+        } catch (Exception e) {
+            logger.error(new StringBuilder().append("Exception occurred executing REST query::\n")
+                    .append(e.getMessage()).append("\n").toString(), e);
+        }
+        return null;
+    }
 
     /**
      * <p>
-     * Returns the list of Factors available for the specified user supporting
-     * special characters
+     * Returns the list of Factors available for the specified user supporting special characters
+     * Used for both /v1/users/factors and /v2/users/factors
      * </p>
      * 
      * @param userId the userid of the identity you wish to have a list of possible
@@ -248,6 +314,35 @@ public class SAAccess implements ISAAccess {
                     saBaseURL.getApplianceURL() + FactorsQuery.queryFactorsQP(saAuth.getRealm()), userId, ts,
                     FactorsResponse.class);
 
+        } catch (Exception e) {
+            logger.error(new StringBuilder().append("Exception occurred executing REST query::\n")
+                    .append(e.getMessage()).append("\n").toString(), e);
+        }
+        return null;
+    }
+    
+    /**
+     * <p>
+     * Returns the list of Factors available for the specified user supporting special characters
+     * Used for /v3/users/factors
+     * Includes Preferred MFA configured/set by the admin/user.
+     * </p>
+     * 
+     * @param userId the userid of the identity you wish to have a list of possible
+     *               second factors. This method supports special characters for
+     *               userId since it uses QP (Query Params) in order to create the
+     *               request.
+     * @return {@link FactorsResponse}
+     */
+    public FactorsResponse factorsByUserQPV3(String userId) {
+        String ts = getServerTime();
+        String header = RestApiHeader.getAuthorizationHeader(saAuth, Resource.METHOD_GET,
+                FactorsQuery.queryFactorsQPV3(saAuth.getRealm()), ts);
+
+        try {
+        	return saExecuter.executeGetRequest(header,
+                    saBaseURL.getApplianceURL() + FactorsQuery.queryFactorsQPV3(saAuth.getRealm()), userId, ts,
+                    FactorsResponse.class);
         } catch (Exception e) {
             logger.error(new StringBuilder().append("Exception occurred executing REST query::\n")
                     .append(e.getMessage()).append("\n").toString(), e);
@@ -1105,6 +1200,28 @@ public class SAAccess implements ISAAccess {
 
         return null;
     }
+    
+    /**
+     * <p>
+     *     Update user access history
+     * </p>
+     * @param userid the user id of the identity
+     * @param endUserIP the IP of requesting client
+     * @return base response object
+     */
+    public ResponseObject updateAccessHistory(String userid, String endUserIP){
+        String ts = getServerTime();
+        UpdateUserHistoryRequest req = new UpdateUserHistoryRequest(userid, endUserIP);
+        String uri = saAuth.getRealm() + "/api/"+ Resource.API_VERSION +"/accesshistory";
+        String header = RestApiHeader.getAuthorizationHeader(saAuth,"POST", uri, req,ts);
+
+        try{
+            return saExecuter.executePostRequest(header,saBaseURL.getApplianceURL() + uri, req, ts, ResponseObject.class);
+        }catch (Exception e){
+            logger.error("Update user access history error", e);
+        }
+        return null;
+    }
 
     /**
      * <p>
@@ -1956,6 +2073,35 @@ public class SAAccess implements ISAAccess {
 
         return null;
     }
+    
+    /**
+     * Validate the yubico OTP token from userId.
+     * @param userId
+     * @param token
+     * @return ResponseObject with status and message. Where "status" is "valid" or "invalid" according the case.
+     */
+    public ResponseObject validateUserYubicoOTPToken(String userId, String token) {
+        AuthRequest authRequest = new AuthRequest();
+        authRequest.setUser_id( userId );
+        authRequest.setType( Resource.YUBIKEY );
+        authRequest.setToken( token );
+
+        String uri = this.getAuthUri();
+        String serverTime = this.getServerTime();
+        ResponseObject response;
+        try {
+            String authHeader = RestApiHeader.getAuthorizationHeader( this.saAuth,"POST", uri, authRequest, serverTime );
+            response = this.saExecuter.executePostRequest( authHeader,this.saBaseURL.getApplianceURL() + uri, authRequest, serverTime, ResponseObject.class );
+            if( response == null ) {
+                response = this.buildInvalidResponseObjectWithMessage( "null response.");
+            }
+        } catch (Throwable th){
+            logger.error("Error validating Yubikey token : ", th);
+            // invalid response object.
+            response = this.buildInvalidResponseObjectWithMessage( th.getMessage() );
+        }
+        return response;
+    }
 
     /**
      * Retrieves the user's status from the username in the endpoint URL and returns
@@ -2097,6 +2243,34 @@ public class SAAccess implements ISAAccess {
 
     String getServerTime(Boolean oldIdpSupport) {
         return TimeUtils.getServerTime(oldIdpSupport);
+    }
+    
+    private String getAuthUri() {
+        return saAuth.getRealm() + "/api/"+ Resource.API_VERSION +"/auth";
+    }
+
+    private ResponseObject buildInvalidResponseObjectWithMessage(String message) {
+        ResponseObject response = new ResponseObject();
+        response.setStatus( "invalid" );
+        response.setMessage( message );
+        return response;
+    }
+    
+    public static class UpdateUserHistoryRequest extends AuthRequest {
+    	private String ip_address;
+
+        public UpdateUserHistoryRequest(String userId, String ip) {
+        	this.setUser_id(userId);
+        	ip_address = ip;
+        }
+        
+		public String getIp_address() {
+			return ip_address;
+		}
+
+		public void setIp_address(String ip_address) {
+			this.ip_address = ip_address;
+		}
     }
 
     /**
