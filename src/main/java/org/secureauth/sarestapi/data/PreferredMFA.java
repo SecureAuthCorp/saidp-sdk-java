@@ -19,7 +19,7 @@ public class PreferredMFA {
 	@JsonProperty("available_choosen_mode")
 	private String availableChoosenMode;
 	
-	@JsonProperty("factorId")
+	@JsonProperty("factor_id")
 	private String factorId;
 
 	@JsonProperty("auth_type")
