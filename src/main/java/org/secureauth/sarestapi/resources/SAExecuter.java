@@ -87,7 +87,22 @@ public class SAExecuter {
 
     public SAExecuter(SABaseURL saBaseURL, GUIDStrategy guidStrategy) {
         this( saBaseURL );
-        this.xRequestIDFilter = new XRequestIDFilter( guidStrategy );
+        this.xRequestIDFilter = new XRequestIDFilter( guidStrategy.generateRequestID().toString() );
+        saConfig = SAConfig.getInstance();
+        applyConfigs();
+    }
+    
+    public SAExecuter(SABaseURL saBaseURL, String transactionId) {
+        this( saBaseURL );
+        this.xRequestIDFilter = new XRequestIDFilter( transactionId );
+        saConfig = SAConfig.getInstance();
+        applyConfigs();
+    }
+    
+    public SAExecuter(SABaseURL saBaseURL, String transactionId, int timeoutInMillis) {
+        this( saBaseURL );
+        this.xRequestIDFilter = new XRequestIDFilter( transactionId );
+        this.idpApiTimeout = timeoutInMillis;
         saConfig = SAConfig.getInstance();
         applyConfigs();
     }

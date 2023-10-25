@@ -95,7 +95,7 @@ public class Resource {
     public static final String HELPDESKS = "HelpDesks";
     public static final String HELPDESK = "HelpDesk";
     public static final String OATHS = "Oaths";
-    public static final String OATH = "Oath";
+    public static final String OATH = "oath";
     public static final String PUSHS = "Pushs";
     public static final String PUSH = "Push";
     public static final String FACTORS = "factors";
