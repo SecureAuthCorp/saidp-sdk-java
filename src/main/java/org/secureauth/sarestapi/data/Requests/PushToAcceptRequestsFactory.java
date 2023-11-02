@@ -1,15 +1,14 @@
 package org.secureauth.sarestapi.data.Requests;
 
 import org.secureauth.sarestapi.data.PushAcceptDetails;
+import org.secureauth.sarestapi.resources.Resource;
 
 public class PushToAcceptRequestsFactory {
-
-    private static final String BIOMETRIC_TO_ACCEPT = "push_accept_biometric";
 
     public static PushToAcceptBiometricsRequest createPushToAcceptBiometricRequest(String biometricType, String userId, String factorId, String endUserIP, String clientCompany, String clientDescription) {
         PushToAcceptBiometricsRequest req = new PushToAcceptBiometricsRequest();
         req.setUser_id(userId);
-        req.setType(BIOMETRIC_TO_ACCEPT);
+        req.setType(Resource.PUSH_ACCEPT_BIOMETRIC);
         req.setFactor_id(factorId);
         req.setBiometricType( biometricType );
         PushAcceptDetails pad = new PushAcceptDetails();
