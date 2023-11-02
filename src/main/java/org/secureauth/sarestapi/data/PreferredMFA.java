@@ -14,7 +14,7 @@ public class PreferredMFA {
 	@JsonProperty("factor_id")
 	private String factorId;
 
-	@JsonProperty("auth_type")
+	@JsonProperty("type")
 	private String type;
 	
 	@JsonProperty("biometric_type")
