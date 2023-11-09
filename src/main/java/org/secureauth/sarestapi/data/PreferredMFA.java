@@ -10,45 +10,15 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class PreferredMFA {
-
-	@JsonProperty("type")
-	private String type;
-	
-	@JsonProperty("mode")
-	private String mode;
-	
-	@JsonProperty("available_choosen_mode")
-	private String availableChoosenMode;
 	
 	@JsonProperty("factor_id")
 	private String factorId;
 
-	@JsonProperty("auth_type")
-	private String authType;
-
-	public String getType() {
-		return type;
-	}
-
-	public void setType(String type) {
-		this.type = type;
-	}
-
-	public String getMode() {
-		return mode;
-	}
-
-	public void setMode(String mode) {
-		this.mode = mode;
-	}
-
-	public String getAvailableChoosenMode() {
-		return availableChoosenMode;
-	}
-
-	public void setAvailableChoosenMode(String availableChoosenMode) {
-		this.availableChoosenMode = availableChoosenMode;
-	}
+	@JsonProperty("type")
+	private String type;
+	
+	@JsonProperty("biometric_type")
+	private String biometricType;
 
 	public String getFactorId() {
 		return factorId;
@@ -58,12 +28,20 @@ public class PreferredMFA {
 		this.factorId = factorId;
 	}
 
-	public String getAuthType() {
-		return authType;
+	public String getType() {
+		return type;
 	}
 
-	public void setAuthType(String authType) {
-		this.authType = authType;
+	public void setType(String type) {
+		this.type = type;
+	}
+
+	public String getBiometricType() {
+		return biometricType;
+	}
+
+	public void setBiometricType(String biometricType) {
+		this.biometricType = biometricType;
 	}
 
 	@Override

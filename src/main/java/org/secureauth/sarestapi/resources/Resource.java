@@ -113,5 +113,10 @@ public class Resource {
     public static final String KBA = "kba";
     public static final String CALL = "call";
     public static final String HELP_DESK = "help_desk";
+    
+    
+    public static final String PUSH_ACCEPT_BIOMETRIC = "push_accept_biometric";
+    public static final String FINGERPRINT = "fingerprint";
+    public static final String FACE = "face";
 
 }

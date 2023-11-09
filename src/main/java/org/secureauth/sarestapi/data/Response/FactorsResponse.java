@@ -27,7 +27,7 @@ public class FactorsResponse extends BaseResponse {
     private ArrayList<Factors> factors = new ArrayList<Factors>();
   
 	  @JsonProperty("preferred_mfa")
-    public PreferredMFA preferred_mfa = new PreferredMFA();
+    public PreferredMFA preferredMfa = new PreferredMFA();
 
     public ArrayList<Factors> getFactors() {
         return factors;
