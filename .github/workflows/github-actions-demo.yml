@@ -17,12 +17,12 @@ jobs:
       - name: Setup Gradle
         uses: gradle/gradle-build-action@v2
       - name: Run build with Gradle Wrapper
-        run: ./gradlew build
+        run: ${{ github.workspace }}/gradlew build
       - name: Archive production artifacts
         uses: actions/upload-artifact@v3
         with:
           name: Store artifacts
-          path: build/libs/*
+          path: ${{ github.workspace }}/build/libs/*
       - run: echo "💡 The ${{ github.repository }} repository has been cloned to the runner."
       - run: echo "🖥️ The workflow is now ready to test your code on the runner."
       - name: List files in the repository
