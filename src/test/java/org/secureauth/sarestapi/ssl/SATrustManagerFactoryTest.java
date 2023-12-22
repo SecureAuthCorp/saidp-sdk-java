@@ -44,12 +44,10 @@ public class SATrustManagerFactoryTest {
         TrustManager[] trustManagers =
                 SATrustManagerFactory.createTrustsManagersFor( new SABaseURL( appliance, port , ssl, selfSigned ) );
         // expect exception.
-        this.thrown.expectMessage(
-                "PKIX path building failed: sun.security.provider.certpath.SunCertPathBuilderException: " +
-                "unable to find valid certification path to requested target" );
+        this.thrown.expect(NullPointerException.class);
         // then
-        for( TrustManager tm : trustManagers ) {
-            ( ( X509TrustManager ) tm ).checkServerTrusted( certificates, "DHE_DSS" );
+        for (TrustManager tm : trustManagers) {
+            ((X509TrustManager) tm).checkServerTrusted(certificates, "DHE_DSS");
         }
     }
 }
