@@ -1,5 +1,6 @@
 SAAccess
 ===========
+![Build](https://github.com/SecureAuthCorp/saidp-sdk-java/actions/workflows/github-actions.yml/badge.svg)
 
 SAAccess is a solution that allows access to SecureAuth's REST api. The intention
 is to provide a easy and a standard method to to access the SecureAuth Appliance REST
