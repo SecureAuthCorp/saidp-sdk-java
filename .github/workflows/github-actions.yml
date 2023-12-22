@@ -1,5 +1,5 @@
 name: GitHub Actions
-run-name: ${{ github.repository }} GitHub Actions 🚀
+run-name: ${{ github.ref_name }} GitHub Actions 🚀
 on: [push]
 jobs:
   Build-Publish:
@@ -16,9 +16,9 @@ jobs:
       - name: Make gradlew executable
         run: chmod +x ./gradlew
       - name: Run build with Gradle Wrapper 🏃
-        run: ./gradlew build -x test --scan
+        run: ./gradlew build -x test
       - name: Run tests 🧑‍⚕️
-        run: ./gradlew test --scan
+        run: ./gradlew test
       - name: Archive production artifacts ⬆️
         uses: actions/upload-artifact@v3
         with:
