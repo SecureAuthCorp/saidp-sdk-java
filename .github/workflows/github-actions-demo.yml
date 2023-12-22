@@ -16,12 +16,12 @@ jobs:
       - name: Make gradlew executable
         run: chmod +x ./gradlew
       - name: Run build with Gradle Wrapper 🏃
-        run: ./gradlew build
-      - name: Get artifact name
-        run: value=`ls ./build/libs`
+        run: ./gradlew build -x test
+      - name: Run tests 🧑‍⚕️
+        run: ./gradlew test
       - name: Archive production artifacts ⬆️
         uses: actions/upload-artifact@v3
         with:
-          name: Store artifacts
-          path: ./build/libs/$value
+          name: Artifacts
+          path: ./build/libs/saRestApi-*.jar
       - run: echo "🍏 This job's status is ${{ job.status }}."
