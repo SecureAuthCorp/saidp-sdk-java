@@ -1,6 +1,6 @@
 name: GitHub Actions
 run-name: ${{ github.ref_name }} GitHub Actions 🚀
-on: [push]
+on: [push, pull_request]
 jobs:
   Build-Publish:
     runs-on: ubuntu-latest
