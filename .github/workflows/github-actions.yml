@@ -35,4 +35,6 @@ jobs:
           JF_USER: ${{ secrets.JFROG_USERNAME }}
           JF_PASSWORD: ${{ secrets.JFROG_PASSWORD }}
       - run: |
+          echo ${{secrets.ARTIFACTORY_URL}}
+          echo ${{secrets.JFROG_USERNAME}}
           jf rt ping
