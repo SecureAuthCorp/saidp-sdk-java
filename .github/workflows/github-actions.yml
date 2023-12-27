@@ -25,3 +25,19 @@ jobs:
           name: Artifacts
           path: ./build/libs/saRestApi-*.jar
       - run: echo "🍏 This job's status is ${{ job.status }}."
+  Push-to-artifactory:
+    runs-on: ubuntu-latest
+    steps:
+      # This action checks out the code from the repository
+      - name: Checkout Code
+        uses: actions/checkout@v2
+      # This action sets up the JFrog CLI with the Artifactory URL and access token
+      - uses: jfrog/setup-jfrog-cli@v3
+        env:
+          JF_URL: ${{ secrets.ARTIFACTORY_URL }}
+          # Basic authentication credentials
+          JF_USER: ${{ secrets.JFROG_USERNAME }}
+          JF_PASSWORD: ${{ secrets.JFROG_PASSWORD }}
+      # This command adds a new server configuration to the JFrog CLI
+      - run: |
+          jf rt ping
