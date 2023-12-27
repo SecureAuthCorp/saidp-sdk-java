@@ -27,6 +27,7 @@ jobs:
       - run: echo "🍏 This job's status is ${{ job.status }}."
   Push-to-artifactory:
     runs-on: ubuntu-latest
+    needs: Build-Publish
     steps:
       # This action checks out the code from the repository
       - name: Checkout Code
@@ -35,9 +36,19 @@ jobs:
       - uses: jfrog/setup-jfrog-cli@v3
         env:
           JF_URL: ${{ secrets.ARTIFACTORY_URL }}
-          # Basic authentication credentials
           JF_USER: ${{ secrets.JFROG_USERNAME }}
           JF_PASSWORD: ${{ secrets.JFROG_PASSWORD }}
       # This command adds a new server configuration to the JFrog CLI
-      - run: |
-          jf rt ping
+      - name: Create version for Artifactory
+        run: |
+          export BUILD_NAME="my-build"
+          export BUILD_MODULE="my-module"
+          export BUILD_NUMBER="1"
+
+          export VERSION="1.0.3.5"
+
+          jf rt upload "./build/libs/saRestApi-*.jar" radius-release-local/saRestApi/$PATH_TO_DIRECTORY --build-name $BUILD_NAME --build-number $BUILD_NUMBER --module $BUILD_MODULE
+      # This action publishes the build information to Artifactory and deletes older builds
+      - name: Build to Artifactory
+        run: |
+          jf rt build-publish $BUILD_NAME $BUILD_NUMBER
