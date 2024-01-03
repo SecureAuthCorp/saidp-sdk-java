@@ -19,23 +19,30 @@ jobs:
         run: ./gradlew build -x test
       - name: Run tests 🧑‍⚕️
         run: ./gradlew test
+      # Might want to remove this step
       - name: Archive production artifacts ⬆️
         uses: actions/upload-artifact@v3
         with:
           name: Artifacts
           path: ./build/libs/saRestApi-*.jar
-      - run: echo "🍏 This job's status is ${{ job.status }}."
-  Push-to-artifactory:
-    runs-on: ubuntu-latest
-    needs: Build-Publish
-    steps:
       - uses: jfrog/setup-jfrog-cli@v3
         env:
           JF_URL: ${{ secrets.ARTIFACTORY_URL }}
           JF_USER: ${{ secrets.JFROG_USERNAME }}
           JF_PASSWORD: ${{ secrets.JFROG_PASSWORD }}
       - run: |
-          echo $JF_URL
-          echo ${{ secrets.ARTIFACTORY_URL }}
-          echo $JF_USER
-          jf rt ping
+          # This command adds a new server configuration to the JFrog CLI
+      - name: Create version for Artifactory
+        run: |
+          export BUILD_NAME="saidp-sdk-java"
+          export BUILD_MODULE="sdk-java"
+          export BUILD_NUMBER="1"
+
+          export VERSION="1.0.3.5"
+
+          jf rt upload "./build/libs/saRestApi-*.jar" radius-release-local/saRestApi/$PATH_TO_DIRECTORY --build-name $BUILD_NAME --build-number $BUILD_NUMBER --module $BUILD_MODULE
+      # This action publishes the build information to Artifactory and deletes older builds
+      - name: Publish to Artifactory
+        run: |
+          jf rt build-publish $BUILD_NAME $BUILD_NUMBER
+      - run: echo "🍏 This job's status is ${{ job.status }}."
