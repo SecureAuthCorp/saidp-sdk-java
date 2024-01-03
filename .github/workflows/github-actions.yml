@@ -40,7 +40,7 @@ jobs:
 
           export VERSION="1.0.3.5"
 
-          jf rt upload "./build/libs/saRestApi-*.jar" secureauth-downloads/radius-release-local/saRestApi/$PATH_TO_DIRECTORY --build-name $BUILD_NAME --build-number $BUILD_NUMBER --module $BUILD_MODULE
+          jf rt upload "./build/libs/saRestApi-*.jar" radius-release-local/saRestApi/$PATH_TO_DIRECTORY --build-name $BUILD_NAME --build-number $BUILD_NUMBER --module $BUILD_MODULE
       # This action publishes the build information to Artifactory and deletes older builds
       - name: Publish to Artifactory
         run: |
