@@ -31,6 +31,7 @@ jobs:
           JF_USER: ${{ secrets.JFROG_USERNAME }}
           JF_PASSWORD: ${{ secrets.JFROG_PASSWORD }}
       - run: |
+          jf rt ping
           # This command adds a new server configuration to the JFrog CLI
       - name: Create version for Artifactory
         run: |
