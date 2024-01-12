@@ -45,6 +45,7 @@ jobs:
           jf rt upload "./build/libs/saRestApi-*.jar" radius-release-local/saRestApi/$PATH_TO_DIRECTORY --build-name $BUILD_NAME --build-number $BUILD_NUMBER --module $BUILD_MODULE
       # This action publishes the build information to Artifactory and deletes older builds
       - name: Publish to Artifactory
+        if: ${{ github.event_name == 'pull_request' && github.pull_request_target == 'master' }}
         run: |
           jf rt build-publish $BUILD_NAME $BUILD_NUMBER
       - run: echo "🍏 This job's status is ${{ job.status }}."
