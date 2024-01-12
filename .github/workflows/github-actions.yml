@@ -21,6 +21,7 @@ jobs:
         run: ./gradlew test
       # Might want to remove this step
       - name: Archive production artifacts ⬆️
+        if: ${{ github.event_name == 'pull_request' && github.pull_request_target == 'master' }}
         uses: actions/upload-artifact@v3
         with:
           name: Artifacts
@@ -31,9 +32,9 @@ jobs:
           JF_USER: ${{ secrets.JFROG_USERNAME }}
           JF_PASSWORD: ${{ secrets.JFROG_PASSWORD }}
       - run: |
-          jf rt ping
           # This command adds a new server configuration to the JFrog CLI
       - name: Create version for Artifactory
+        if: ${{ github.event_name == 'pull_request' && github.pull_request_target == 'master' }}
         run: |
           export BUILD_NAME="saidp-sdk-java"
           export BUILD_MODULE="sdk-java"
@@ -44,6 +45,7 @@ jobs:
           jf rt upload "./build/libs/saRestApi-*.jar" radius-release-local/saRestApi/$PATH_TO_DIRECTORY --build-name $BUILD_NAME --build-number $BUILD_NUMBER --module $BUILD_MODULE
       # This action publishes the build information to Artifactory and deletes older builds
       - name: Publish to Artifactory
+        if: ${{ github.event_name == 'pull_request' && github.pull_request_target == 'master' }}
         run: |
           jf rt build-publish $BUILD_NAME $BUILD_NUMBER
       - run: echo "🍏 This job's status is ${{ job.status }}."
