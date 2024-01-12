@@ -6,8 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import javax.ws.rs.core.Cookie;
-
+import jakarta.ws.rs.core.Cookie;
 import org.secureauth.sarestapi.data.IPEval;
 import org.secureauth.sarestapi.data.PushAcceptStatus;
 import org.secureauth.sarestapi.data.SAAuth;
@@ -232,7 +231,7 @@ public class SAAccess implements ISAAccess {
                     saBaseURL.getApplianceURL() + IPEvalQuery.queryIPEval(saAuth.getRealm()), ipEvalRequest, ts);
 
         } catch (Exception e) {
-            logger.error(new StringBuilder().append("Exception occurred executing REST query::\n")
+            logger.error(new  StringBuilder().append("Exception occurred executing REST query::\n")
                     .append(e.getMessage()).append("\n").toString(), e);
         }
 
@@ -2076,8 +2075,8 @@ public class SAAccess implements ISAAccess {
     
     /**
      * Validate the yubico OTP token from userId.
-     * @param userId
-     * @param token
+     * @param userId UserId to validate
+     * @param token Token to validate
      * @return ResponseObject with status and message. Where "status" is "valid" or "invalid" according the case.
      */
     public ResponseObject validateUserYubicoOTPToken(String userId, String token) {

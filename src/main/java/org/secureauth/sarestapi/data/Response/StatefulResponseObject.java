@@ -1,6 +1,6 @@
 package org.secureauth.sarestapi.data.Response;
 
-import javax.ws.rs.core.NewCookie;
+import jakarta.ws.rs.core.NewCookie;
 
 public class StatefulResponseObject extends ResponseObject {
 

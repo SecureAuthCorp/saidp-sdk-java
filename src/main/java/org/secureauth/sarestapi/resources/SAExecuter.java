@@ -11,11 +11,13 @@ import java.security.SecureRandom;
 import java.util.Optional;
 
 import javax.net.ssl.*;
-import javax.ws.rs.client.*;
-import javax.ws.rs.core.Cookie;
-import javax.ws.rs.core.MediaType;
 
+import com.fasterxml.jackson.jaxrs.json.JacksonJaxbJsonProvider;
+import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
+import jakarta.ws.rs.client.*;
+import jakarta.ws.rs.core.*;
 import org.glassfish.jersey.client.ClientProperties;
+import org.glassfish.jersey.jackson.JacksonFeature;
 import org.secureauth.sarestapi.data.*;
 import org.secureauth.sarestapi.data.BehavioralBio.BehaveBioRequest;
 import org.secureauth.sarestapi.data.Requests.BehaveBioResetRequest;
@@ -38,9 +40,6 @@ import org.slf4j.LoggerFactory;
 
 //Jersey 2 Libs
 import org.glassfish.jersey.client.ClientConfig;
-
-import javax.ws.rs.core.NewCookie;
-import javax.ws.rs.core.Response;
 
 
 /**
@@ -129,6 +128,8 @@ public class SAExecuter {
             ctx.init(null, SATrustManagerFactory.createTrustsManagersFor( this.saBaseURL ) , new SecureRandom());
             config.register(SACheckRequestFilter.class);
             config.register( this.xRequestIDFilter );
+            config.register(JacksonFeature.class);
+
             client = ClientBuilder.newBuilder()
                     .withConfig(config)
                     .sslContext(ctx)
