@@ -21,6 +21,7 @@ jobs:
         run: ./gradlew test
       # Might want to remove this step
       - name: Archive production artifacts ⬆️
+        if: ${{ github.event_name == 'pull_request' && github.pull_request_target == 'master' }}
         uses: actions/upload-artifact@v3
         with:
           name: Artifacts
@@ -34,6 +35,7 @@ jobs:
           jf rt ping
           # This command adds a new server configuration to the JFrog CLI
       - name: Create version for Artifactory
+        if: ${{ github.event_name == 'pull_request' && github.pull_request_target == 'master' }}
         run: |
           export BUILD_NAME="saidp-sdk-java"
           export BUILD_MODULE="sdk-java"
