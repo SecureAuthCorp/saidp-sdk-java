@@ -33,19 +33,15 @@ jobs:
           JF_PASSWORD: ${{ secrets.JFROG_PASSWORD }}
       - run: |
           # This command adds a new server configuration to the JFrog CLI
-      - name: Create version for Artifactory
-        if: ${{ github.event_name == 'pull_request' && github.pull_request_target == 'master' }}
+      - name: Upload to artifactory
+        if: ${{ github.event_name == 'pull_request' }}
         run: |
           export BUILD_NAME="saidp-sdk-java"
           export BUILD_MODULE="sdk-java"
-          export BUILD_NUMBER="1"
+          # export BUILD_NUMBER="1"
+          
+          export VERSION=$(cat gradle.properties | grep -Po "\d*\.\d*\.\d*\.\d*")
 
-          export VERSION="1.0.3.5"
-
-          jf rt upload "./build/libs/saRestApi-*.jar" radius-release-local/saRestApi/$PATH_TO_DIRECTORY --build-name $BUILD_NAME --build-number $BUILD_NUMBER --module $BUILD_MODULE
-      # This action publishes the build information to Artifactory and deletes older builds
-      - name: Publish to Artifactory
-        if: ${{ github.event_name == 'pull_request' && github.pull_request_target == 'master' }}
-        run: |
+          jf rt upload "./build/libs/saRestApi-*.jar" radius-release-local/saRestApi/$VERSION --build-name $BUILD_NAME --build-number $BUILD_NUMBER --module $BUILD_MODULE
           jf rt build-publish $BUILD_NAME $BUILD_NUMBER
       - run: echo "🍏 This job's status is ${{ job.status }}."
