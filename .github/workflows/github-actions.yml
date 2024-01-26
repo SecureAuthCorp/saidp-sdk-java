@@ -38,7 +38,7 @@ jobs:
         run: |
           export BUILD_NAME="saidp-sdk-java"
           export BUILD_MODULE="sdk-java"
-          # export BUILD_NUMBER="1"
+          export BUILD_NUMBER="1"
           
           export VERSION=$(cat gradle.properties | grep -Po "\d*\.\d*\.\d*\.\d*")
 
