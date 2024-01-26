@@ -42,6 +42,6 @@ jobs:
           
           export VERSION=$(cat gradle.properties | grep -Po "\d*\.\d*\.\d*\.\d*")
 
-          jf rt upload "./build/libs/saRestApi-*.jar" radius-release-local/saRestApi/$VERSION --build-name $BUILD_NAME --build-number $BUILD_NUMBER --module $BUILD_MODULE
+          jf rt upload "./build/libs/saRestApi-*.jar" radius-release-local/saRestApi/$VERSION/saRestApi-$VERSION.jar --build-name $BUILD_NAME --build-number $BUILD_NUMBER --module $BUILD_MODULE
           jf rt build-publish $BUILD_NAME $BUILD_NUMBER
       - run: echo "🍏 This job's status is ${{ job.status }}."
