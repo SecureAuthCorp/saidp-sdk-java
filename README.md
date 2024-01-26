@@ -21,8 +21,9 @@ Requirements:
 
 Dependencies:
 ------------
-* jackson-jaxrs-json-provider 2.7.3
-* jersey-client 2.5.1
+* jackson-jaxrs-json-provider 2.16.1
+* jersey-client 3.1.5
+* jersey-media-json-jackson:3.1.5
 * Commons Codec 1.10
 * SLF4J 1.7.28
 * jaxb 2.3.0

@@ -1,5 +1,6 @@
 package org.secureauth.sarestapi;
 
+import jakarta.ws.rs.core.Cookie;
 import org.secureauth.sarestapi.data.DFP.DFP;
 import org.secureauth.sarestapi.data.IPEval;
 import org.secureauth.sarestapi.data.PushAcceptStatus;
@@ -11,8 +12,6 @@ import org.secureauth.sarestapi.data.UserProfile.UserToGroups;
 import org.secureauth.sarestapi.data.UserProfile.UsersToGroup;
 import org.secureauth.sarestapi.exception.SARestAPIException;
 
-import javax.ws.rs.core.Cookie;
-import javax.ws.rs.core.NewCookie;
 import java.util.Hashtable;
 
 public interface ISAAccess {
