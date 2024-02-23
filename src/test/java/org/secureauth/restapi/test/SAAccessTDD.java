@@ -51,6 +51,7 @@ public class SAAccessTDD {
 	private static String validYubicoToken;
 	private static String userDomain;
 	private static String newUserPin;
+	private static String validIp;
 	private final static String NEW_USERNAME = "new-user";
 	private final static String NEW_USER_PASSWORD = "password";
 	private final static String NEW_USERNAME_QP = "new-user" + "+~.!@$%^&*'_";
@@ -109,6 +110,7 @@ public class SAAccessTDD {
 		validHostAddress = getValue(Property.VALID_HOST_ADDRESS);
 		validFingerprintId = getValue(Property.VALID_FINGERPRINT_ID);
 		validYubicoToken = getValue(Property.VALID_YUBICO_TOKEN);
+		validIp = getValue(Property.VALID_IP);
 		assumeTest = Boolean.valueOf(getValue(Property.ASSUME_TEST));
 
 	}
@@ -329,7 +331,7 @@ public class SAAccessTDD {
 	}
 
 	@Test
-	public void testValidatePasswordWithValidCredentials() throws Exception {
+	public void testValidatePasswordWithValidCredentialsWithoutIp() throws Exception {
 		/*
 		 * Response would return:
 		 * {
@@ -339,6 +341,21 @@ public class SAAccessTDD {
 		 */
 
 		BaseResponse response = saAccess.validateUserPassword(validUsername, validPassword);
+		assertNotNull(response);
+		assertEquals(VALID_MESSAGE, response.getStatus());
+		assertTrue(response.getMessage().isEmpty());
+	}
+
+	@Test
+	public void testValidatePasswordWithValidCredentials() throws Exception {
+		/*
+		 * Response would return:
+		 * {
+		 * "status" : "valid",
+		 * "message" : ""
+		 * }
+		 */
+		BaseResponse response = saAccess.validateUserPassword(validUsername, validPassword, validIp);
 		assertNotNull(response);
 		assertEquals(VALID_MESSAGE, response.getStatus());
 		assertTrue(response.getMessage().isEmpty());

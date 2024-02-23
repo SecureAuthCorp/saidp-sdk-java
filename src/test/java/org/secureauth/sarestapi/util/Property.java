@@ -19,6 +19,7 @@ public enum Property {
 	VALID_HOST_ADDRESS("valid.host.address"),
 	VALID_FINGERPRINT_ID("valid.fingerprint.id"),
 	VALID_YUBICO_TOKEN("valid.yubico.token"),
+	VALID_IP("user.ip"),
 	ASSUME_TEST("assume.test");
 
 	private final String value;
