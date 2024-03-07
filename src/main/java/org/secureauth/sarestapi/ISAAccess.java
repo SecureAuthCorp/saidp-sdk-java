@@ -212,12 +212,25 @@ public interface ISAAccess {
 	 * <p>
 	 * Checks the users password against SecureAuth Datastore
 	 * </p>
-	 * 
+	 *
 	 * @param userId   the userid of the identity
 	 * @param password The password of the user to validate
 	 * @return {@link ResponseObject}
 	 */
 	BaseResponse validateUserPassword(String userId, String password) throws SARestAPIException;
+
+	/**
+	 * <p>
+	 * Checks the users password against SecureAuth Datastore
+	 * </p>
+	 *
+	 * @param userId   the userid of the identity
+	 * @param password The password of the user to validate
+	 * @param enduserIp the enduser's ip address
+	 * @return {@link ResponseObject}
+	 */
+	BaseResponse validateUserPassword(String userId, String password, String enduserIp) throws SARestAPIException;
+
 
 	/**
 	 * <p>

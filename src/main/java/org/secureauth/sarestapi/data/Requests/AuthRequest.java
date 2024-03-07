@@ -32,6 +32,7 @@ public class AuthRequest {
     private String type;
     private String token;
     private String factor_id;
+    private String enduser_ip;
 
 
     public String getUser_id() {
@@ -65,6 +66,14 @@ public class AuthRequest {
     public void setFactor_id(String factor_id) {
         this.factor_id = factor_id;
     }
+
+    public String getEnduser_ip() {
+        return enduser_ip;
+    }
+
+    public void setEnduser_ip(String enduser_ip) {
+		this.enduser_ip = enduser_ip;
+	}
 
     @Override
     public String toString(){
